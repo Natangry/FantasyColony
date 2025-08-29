@@ -207,145 +207,169 @@
     "kind": "class",
     "name": "BuildPlacementTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 9
+    "line": 12
   },
   {
     "kind": "method",
     "name": "SyncToolFromController",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 31
+    "line": 34
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 43
+    "line": 46
+  },
+  {
+    "kind": "method",
+    "name": "GetMousePosition",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 56
+  },
+  {
+    "kind": "method",
+    "name": "LeftClickDown",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 66
+  },
+  {
+    "kind": "method",
+    "name": "RightClickDown",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 74
+  },
+  {
+    "kind": "method",
+    "name": "CancelPressed",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 82
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 51
+    "line": 90
   },
   {
     "kind": "method",
     "name": "ReadGridInfo",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 78
+    "line": 117
   },
   {
     "kind": "method",
     "name": "UpdateGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 130
+    "line": 169
   },
   {
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 189
+    "line": 229
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 196
+    "line": 236
   },
   {
     "kind": "method",
     "name": "RectOverlaps",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 215
+    "line": 255
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 221
+    "line": 261
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 263
+    "line": 303
   },
   {
     "kind": "method",
     "name": "EnsureMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 279
+    "line": 319
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 291
+    "line": 331
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 309
+    "line": 349
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 340
+    "line": 380
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 355
+    "line": 395
   },
   {
     "kind": "method",
     "name": "GetFootprint",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 363
+    "line": 403
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 374
+    "line": 414
   },
   {
     "kind": "method",
     "name": "TryGetMouseOnGround",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 388
+    "line": 428
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 409
+    "line": 456
   },
   {
     "kind": "method",
     "name": "DestroyMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 425
+    "line": 472
   },
   {
     "kind": "method",
     "name": "InvalidReason",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 435
+    "line": 482
   },
   {
     "kind": "method",
     "name": "CancelPlacement",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 446
+    "line": 493
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 460
+    "line": 507
   },
   {
     "kind": "class",
