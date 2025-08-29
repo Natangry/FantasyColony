@@ -93,13 +93,13 @@
     "kind": "class",
     "name": "BuildBootstrap",
     "file": "Assets/Scripts/Build/BuildBootstrap.cs",
-    "line": 2
+    "line": 3
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/Build/BuildBootstrap.cs",
-    "line": 6
+    "line": 7
   },
   {
     "kind": "class",
@@ -573,7 +573,7 @@
     "kind": "namespace",
     "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/Defs.cs",
-    "line": 66
+    "line": 67
   },
   {
     "kind": "class",
@@ -597,7 +597,7 @@
     "kind": "class",
     "name": "XmlDefLoader",
     "file": "Assets/Scripts/Defs/Defs.cs",
-    "line": 69
+    "line": 70
   },
   {
     "kind": "method",
@@ -724,6 +724,60 @@
     "name": "PickVisibleLayer",
     "file": "Assets/Scripts/Rendering/VisualFactory.cs",
     "line": 77
+  },
+  {
+    "kind": "class",
+    "name": "VisualRegistry",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 4
+  },
+  {
+    "kind": "method",
+    "name": "Build",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 10
+  },
+  {
+    "kind": "method",
+    "name": "SpawnGhost",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 28
+  },
+  {
+    "kind": "method",
+    "name": "SpawnPlaced",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 36
+  },
+  {
+    "kind": "method",
+    "name": "MakeQuadPrefab",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 44
+  },
+  {
+    "kind": "method",
+    "name": "MakeMaterial",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 58
+  },
+  {
+    "kind": "method",
+    "name": "Orient",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 81
+  },
+  {
+    "kind": "method",
+    "name": "LayerFromNameOrIndex",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 99
+  },
+  {
+    "kind": "method",
+    "name": "PickVisibleLayer",
+    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
+    "line": 107
   },
   {
     "kind": "class",

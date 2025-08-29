@@ -118,6 +118,7 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Rendering)
 
 - **VisualFactory.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualFactory.cs)
+- **VisualRegistry.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualRegistry.cs)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
