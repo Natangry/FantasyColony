@@ -3,9 +3,9 @@ using UnityEngine;
 public class IntroScreen : MonoBehaviour
 {
     [Header("Layout")]
-    [SerializeField] private float titlePct = 0.18f;           // % of screen height for the title font size
-    [SerializeField] private float buttonPct = 0.06f;          // % of screen height for button height
-    [SerializeField] private float minButtonHeight = 64f;      // hard floor so buttons are never tiny
+    [SerializeField] private float titlePct = 0.18f;            // % of screen height for the title font size
+    [SerializeField] private float buttonPct = 0.06f;           // % of screen height for button height
+    [SerializeField] private float minButtonHeight = 64f;       // hard floor so buttons are never tiny
     [SerializeField] private Color backgroundColor = new Color(0.08f, 0.09f, 0.11f, 1f); // opaque
 
     [Header("Content")]
@@ -20,8 +20,13 @@ public class IntroScreen : MonoBehaviour
     private bool showMenu = true;
     private GUIStyle titleStyle;
     private GUIStyle buttonStyle;
+    private GUIStyle sizeStyle;
+    private GUIStyle sizeSelectedStyle;
+    private GUIStyle confirmStyle;
     private GUIStyle bgStyle;
     private Texture2D bgTex;
+    private Texture2D sizeTex;
+    private Texture2D sizeSelTex;
 
     private void EnsureStyles()
     {
@@ -30,6 +35,18 @@ public class IntroScreen : MonoBehaviour
             bgTex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             bgTex.SetPixel(0, 0, backgroundColor);
             bgTex.Apply();
+        }
+        if (sizeTex == null)
+        {
+            sizeTex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+            sizeTex.SetPixel(0, 0, new Color(0.22f, 0.24f, 0.28f, 1f));
+            sizeTex.Apply();
+        }
+        if (sizeSelTex == null)
+        {
+            sizeSelTex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+            sizeSelTex.SetPixel(0, 0, new Color(0.32f, 0.52f, 0.92f, 1f));
+            sizeSelTex.Apply();
         }
         if (bgStyle == null)
         {
@@ -58,6 +75,29 @@ public class IntroScreen : MonoBehaviour
                 alignment = TextAnchor.MiddleCenter
             };
         }
+        if (sizeStyle == null)
+        {
+            sizeStyle = new GUIStyle(buttonStyle);
+            sizeStyle.normal.background = sizeTex;
+            sizeStyle.hover.background = sizeTex;
+            sizeStyle.active.background = sizeTex;
+            sizeStyle.fontStyle = FontStyle.Normal;
+            sizeStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+        }
+        if (sizeSelectedStyle == null)
+        {
+            sizeSelectedStyle = new GUIStyle(buttonStyle);
+            sizeSelectedStyle.normal.background = sizeSelTex;
+            sizeSelectedStyle.hover.background = sizeSelTex;
+            sizeSelectedStyle.active.background = sizeSelTex;
+            sizeSelectedStyle.fontStyle = FontStyle.Bold;
+            sizeSelectedStyle.normal.textColor = Color.white;
+        }
+        if (confirmStyle == null)
+        {
+            confirmStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+            confirmStyle.normal.textColor = Color.white;
+        }
     }
 
     private void OnGUI()
@@ -76,6 +116,9 @@ public class IntroScreen : MonoBehaviour
 
         titleStyle.fontSize = Mathf.RoundToInt(titleSize);
         buttonStyle.fontSize = Mathf.RoundToInt(btnH * 0.38f);
+        sizeStyle.fontSize = buttonStyle.fontSize;
+        sizeSelectedStyle.fontSize = buttonStyle.fontSize;
+        confirmStyle.fontSize = Mathf.RoundToInt(btnH * 0.45f);
 
         GUILayout.BeginArea(full);
         GUILayout.BeginVertical();
@@ -97,14 +140,21 @@ public class IntroScreen : MonoBehaviour
                 if (i >= mapSizeLabels.Length) break;
 
                 bool isActive = selectedMapIndex == i;
-                bool pressed = GUILayout.Toggle(isActive, mapSizeLabels[i], buttonStyle, GUILayout.Height(btnH), GUILayout.ExpandWidth(true));
-                if (pressed) selectedMapIndex = i;
+                string label = isActive ? mapSizeLabels[i] + "   \u2713" : mapSizeLabels[i];
+                GUIStyle st = isActive ? sizeSelectedStyle : sizeStyle;
+                if (GUILayout.Button(label, st, GUILayout.Height(btnH), GUILayout.ExpandWidth(true)))
+                {
+                    selectedMapIndex = i;
+                }
 
                 GUILayout.Space(gridPadding);
             }
             GUILayout.EndHorizontal();
             GUILayout.Space(gridPadding * 0.6f);
         }
+
+        GUILayout.Space(btnH * 0.2f);
+        GUILayout.Label($"Map Size: {mapSizeLabels[selectedMapIndex]}", confirmStyle);
 
         GUILayout.Space(btnH * 0.4f);
 
