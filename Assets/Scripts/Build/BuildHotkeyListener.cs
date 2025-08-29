@@ -6,22 +6,38 @@ using UnityEngine;
 /// </summary>
 public class BuildHotkeyListener : MonoBehaviour
 {
-    private void Update()
+    private void Toggle()
     {
         if (IntroScreen.IsVisible) return; // ignore while at the intro menu
 
+        BuildBootstrap.Ensure();
+        var bm = BuildModeController.Instance;
+        if (bm == null)
+        {
+            var go = GameObject.Find("BuildSystems (Auto)");
+            if (go == null) go = new GameObject("BuildSystems (Auto)");
+            bm = go.GetComponent<BuildModeController>();
+            if (bm == null) bm = go.AddComponent<BuildModeController>();
+        }
+        bm.ToggleBuildMode();
+    }
+
+    private void Update()
+    {
         if (Input.GetKeyDown(KeyCode.B))
         {
-            BuildBootstrap.Ensure();
-            var bm = BuildModeController.Instance;
-            if (bm == null)
-            {
-                var go = GameObject.Find("BuildSystems (Auto)");
-                if (go == null) go = new GameObject("BuildSystems (Auto)");
-                bm = go.GetComponent<BuildModeController>();
-                if (bm == null) bm = go.AddComponent<BuildModeController>();
-            }
-            bm.ToggleBuildMode();
+            Toggle();
+        }
+    }
+
+    // Backstop for projects configured with the new Input System where GetKeyDown might be ignored
+    private void OnGUI()
+    {
+        var e = Event.current;
+        if (e != null && e.type == EventType.KeyDown && e.keyCode == KeyCode.B)
+        {
+            Toggle();
+            e.Use();
         }
     }
 }
