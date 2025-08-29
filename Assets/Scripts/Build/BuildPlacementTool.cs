@@ -91,7 +91,12 @@ public class BuildPlacementTool : MonoBehaviour
             return false; // unique per map
 
         // Check for any existing Building occupying this tile (1x1 for now)
-        var all = FindObjectsOfType<Building>();
+        Building[] all;
+#if UNITY_2023_1_OR_NEWER
+        all = UnityEngine.Object.FindObjectsByType<Building>(FindObjectsSortMode.None);
+#else
+        all = FindObjectsOfType<Building>();
+#endif
         foreach (var b in all)
         {
             if (b.Occupies(_snapGridPos)) return false;
@@ -180,9 +185,9 @@ public class BuildPlacementTool : MonoBehaviour
             var t = asm.GetType(typeName);
             if (t == null) continue;
 #if UNITY_2023_1_OR_NEWER
-            var comp = Object.FindAnyObjectByType(t) as Component;
+            var comp = UnityEngine.Object.FindAnyObjectByType(t) as Component;
 #else
-            var comp = Object.FindObjectOfType(t) as Component;
+            var comp = UnityEngine.Object.FindObjectOfType(t) as Component;
 #endif
             if (comp != null) return comp;
         }
