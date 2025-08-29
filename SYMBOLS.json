@@ -291,97 +291,97 @@
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 315
+    "line": 319
   },
   {
     "kind": "method",
     "name": "EnsureMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 325
+    "line": 329
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 334
+    "line": 338
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 352
+    "line": 356
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 383
+    "line": 387
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 398
+    "line": 402
   },
   {
     "kind": "method",
     "name": "GetFootprint",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 406
+    "line": 410
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 417
+    "line": 421
   },
   {
     "kind": "method",
     "name": "CameraHasLayer",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 439
+    "line": 444
   },
   {
     "kind": "method",
     "name": "TryGetMouseOnGround",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 445
+    "line": 450
   },
   {
     "kind": "method",
     "name": "ResolveActiveVisual",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 473
+    "line": 478
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 493
+    "line": 498
   },
   {
     "kind": "method",
     "name": "DestroyMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 509
+    "line": 514
   },
   {
     "kind": "method",
     "name": "InvalidReason",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 518
+    "line": 523
   },
   {
     "kind": "method",
     "name": "CancelPlacement",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 529
+    "line": 534
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 543
+    "line": 548
   },
   {
     "kind": "class",
