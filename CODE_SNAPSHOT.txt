@@ -610,6 +610,7 @@ public class BuildPlacementTool : MonoBehaviour
 {
     private BuildTool _tool = BuildTool.None;
     private GameObject _ghost;
+    private SpriteRenderer _ghostSr;
     private bool _canPlace;
     private Vector3 _snapWorldPos;
     private Vector2Int _snapGridPos;
@@ -618,6 +619,10 @@ public class BuildPlacementTool : MonoBehaviour
     private float _tile = 1f; private int _w = 128; private int _h = 128;
     private Vector3 _gridMinWorld; // bottom-left world corner of tile (0,0)
     private bool _haveBounds;
+    private bool _assumeCentered;
+
+    private Camera _cam;
+    private static Sprite _whiteSprite;
 
     private void LateUpdate()
     {
@@ -672,12 +677,13 @@ public class BuildPlacementTool : MonoBehaviour
 
     private void UpdateGhost()
     {
-        var cam = Camera.main;
+        var cam = GetCamera();
         var m = Input.mousePosition;
-        Vector3 world = cam != null ? cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z))) : Vector3.zero;
+        if (cam == null) return; // can't place without a camera
+        Vector3 world = cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z)));
 
         // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
-        Vector3 anchor = _haveBounds ? _gridMinWorld : Vector3.zero;
+        Vector3 anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
 
         // Snap to grid anchored at bottom-left
         float tx = Mathf.Round((world.x - anchor.x) / _tile) * _tile + anchor.x;
@@ -755,30 +761,17 @@ public class BuildPlacementTool : MonoBehaviour
     private void EnsureGhost()
     {
         if (_ghost != null) return;
-        _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        _ghost.name = "Build Ghost";
+        _ghost = new GameObject("Build Ghost");
         _ghost.layer = 0;
-        var mr = _ghost.GetComponent<MeshRenderer>();
-        mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
-        SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.7f));
-    }
-
-    private void DestroyGhost()
-    {
-        if (_ghost != null)
+        _ghostSr = _ghost.AddComponent<SpriteRenderer>();
+        if (_whiteSprite == null)
         {
-            Destroy(_ghost);
-            _ghost = null;
+            var tex = new Texture2D(1,1, TextureFormat.RGBA32, false); tex.SetPixel(0,0, Color.white); tex.Apply();
+            _whiteSprite = Sprite.Create(tex, new Rect(0,0,1,1), new Vector2(0.5f,0.5f), 1f);
         }
-    }
-
-    private void SetGhostColor(Color c)
-    {
-        var mr = _ghost != null ? _ghost.GetComponent<MeshRenderer>() : null;
-        if (mr != null && mr.sharedMaterial != null)
-        {
-            mr.sharedMaterial.color = c;
-        }
+        _ghostSr.sprite = _whiteSprite;
+        _ghostSr.sortingOrder = 1000;
+        SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.35f));
     }
 
     private Transform EnsureBuildingsParent()
@@ -827,6 +820,39 @@ public class BuildPlacementTool : MonoBehaviour
             {
                 try { value = (T)System.Convert.ChangeType(v, typeof(T)); } catch { }
             }
+        }
+    }
+
+    private Camera GetCamera()
+    {
+        if (_cam != null) return _cam;
+#if UNITY_2023_1_OR_NEWER
+        _cam = Camera.main != null ? Camera.main : (Camera.GetAllCamerasCount() > 0 ? Camera.allCameras[0] : null);
+#else
+        _cam = Camera.main != null ? Camera.main : (Camera.allCamerasCount > 0 ? Camera.allCameras[0] : null);
+#endif
+        return _cam;
+    }
+
+    private Vector3 GuessCenteredAnchor()
+    {
+        // Assume grid is centered around (0,0) if no renderer bounds are found
+        _assumeCentered = true;
+        return new Vector3(-_w * _tile * 0.5f, -_h * _tile * 0.5f, 0f);
+    }
+
+    private void SetGhostColor(Color c)
+    {
+        if (_ghostSr != null) _ghostSr.color = c;
+    }
+
+    private void DestroyGhost()
+    {
+        if (_ghost != null)
+        {
+            UnityEngine.Object.Destroy(_ghost);
+            _ghost = null;
+            _ghostSr = null;
         }
     }
 }
