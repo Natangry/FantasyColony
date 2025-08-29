@@ -85,6 +85,30 @@
   },
   {
     "kind": "class",
+    "name": "ControlManager",
+    "file": "Assets/Scripts/Systems/ControlManager.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "AssumeControl",
+    "file": "Assets/Scripts/Systems/ControlManager.cs",
+    "line": 12
+  },
+  {
+    "kind": "method",
+    "name": "ReleaseControl",
+    "file": "Assets/Scripts/Systems/ControlManager.cs",
+    "line": 28
+  },
+  {
+    "kind": "property",
+    "name": "Controlled",
+    "file": "Assets/Scripts/Systems/ControlManager.cs",
+    "line": 10
+  },
+  {
+    "kind": "class",
     "name": "PauseController",
     "file": "Assets/Scripts/Systems/PauseController.cs",
     "line": 12
@@ -259,6 +283,18 @@
   },
   {
     "kind": "class",
+    "name": "SelectionHUD",
+    "file": "Assets/Scripts/UI/SelectionHUD.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "OnGUI",
+    "file": "Assets/Scripts/UI/SelectionHUD.cs",
+    "line": 23
+  },
+  {
+    "kind": "class",
     "name": "SpritePawn",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
     "line": 9
@@ -267,31 +303,37 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 45
+    "line": 46
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 70
+    "line": 71
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 75
+    "line": 76
+  },
+  {
+    "kind": "method",
+    "name": "SetControlled",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 261
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 260
+    "line": 279
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 336
+    "line": 355
   },
   {
     "kind": "class",

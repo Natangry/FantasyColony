@@ -57,6 +57,7 @@
 ## Assets/Scripts/Systems
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Systems)
 
+- **ControlManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/ControlManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/ControlManager.cs)
 - **PauseController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
 - **SelectionController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs)
 - **SelectionController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs.meta)
@@ -71,6 +72,7 @@
 
 - **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
 - **IntroScreen.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs.meta)
+- **SelectionHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
