@@ -34,8 +34,16 @@ public class BuildPlacementTool : MonoBehaviour
         if (_tool != bm.CurrentTool)
         {
             _tool = bm.CurrentTool;
-            _footSize = GetFootprint();
         }
+        // Always refresh footprint (avoid stale 1x1)
+        _footSize = GetFootprint();
+    }
+
+    public void SetTool(BuildTool tool)
+    {
+        _tool = tool;
+        _footSize = GetFootprint();
+        EnsureGhost();
     }
 
     private void LateUpdate()
@@ -59,12 +67,6 @@ public class BuildPlacementTool : MonoBehaviour
         {
             TryPlace();
         }
-    }
-
-    public void SetTool(BuildTool tool)
-    {
-        _tool = tool;
-        if (_tool == BuildTool.None) DestroyGhost();
     }
 
     private void ReadGridInfo()
@@ -132,17 +134,16 @@ public class BuildPlacementTool : MonoBehaviour
         var cam = GetCamera();
         if (cam == null) return; // can't place without a camera
 
-        // Raycast from camera to the detected ground plane
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        Plane ground = _plane == GridPlane.XZ
-            ? new Plane(Vector3.up, new Vector3(0f, _groundConst, 0f))
-            : new Plane(Vector3.forward, new Vector3(0f, 0f, _groundConst));
-        if (!ground.Raycast(ray, out float enter)) return;
-        Vector3 world = ray.GetPoint(enter);
+        // Compute world point at the ground depth that works for both perspective and orthographic
+        Vector3 groundRef = _plane == GridPlane.XZ ? new Vector3(0f, _groundConst, 0f) : new Vector3(0f, 0f, _groundConst);
+        float depth = cam.WorldToScreenPoint(groundRef).z;
+        Vector3 mp = Input.mousePosition;
+        Vector3 world = cam.ScreenToWorldPoint(new Vector3(mp.x, mp.y, depth));
 
         // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
+        if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1); // belt & suspenders
 
         // Snap to grid anchored at bottom-left on the active plane
         int gx, gy;
@@ -219,6 +220,7 @@ public class BuildPlacementTool : MonoBehaviour
     {
         // Ensure we're using the latest tool info
         SyncToolFromController();
+        if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1);
 
         if (!_canPlace) return;
 
@@ -259,19 +261,17 @@ public class BuildPlacementTool : MonoBehaviour
     private void EnsureGhost()
     {
         if (_ghost != null) return;
-        _ghost = new GameObject("Build Ghost");
+        // Use a Quad + Unlit material to ensure visibility in all camera setups
+        _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        _ghost.name = "Build Ghost";
         _ghost.layer = 0;
-        _ghostSr = _ghost.AddComponent<SpriteRenderer>();
-        if (_whiteSprite == null)
-        {
-            var tex = new Texture2D(1,1, TextureFormat.RGBA32, false); tex.SetPixel(0,0, Color.white); tex.Apply();
-            _whiteSprite = Sprite.Create(tex, new Rect(0,0,1,1), new Vector2(0.5f,0.5f), 1f);
-        }
-        _ghostSr.sprite = _whiteSprite;
-        _ghostSr.sortingOrder = 1000;
-        // Orient to active plane
-        _ghost.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
-        SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.35f));
+        var mr = _ghost.GetComponent<MeshRenderer>();
+        var mat = new Material(Shader.Find("Unlit/Color"));
+        mat.color = new Color(0.2f, 0.9f, 0.2f, 0.35f);
+        mr.sharedMaterial = mat;
+        // Remove collider on the ghost
+        var col = _ghost.GetComponent<Collider>();
+        if (col != null) Destroy(col);
     }
 
     private Transform EnsureBuildingsParent()
@@ -364,13 +364,30 @@ public class BuildPlacementTool : MonoBehaviour
         style.alignment = TextAnchor.UpperLeft;
         style.fontSize = 14;
         string plane = _plane.ToString();
-        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 260, 96), text, style);
+        string reason = _canPlace ? "" : InvalidReason();
+        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 360, 110), text, style);
+    }
+
+    private string InvalidReason()
+    {
+        if (!IsInsideGrid(_snapGridPos, _footSize)) return "(out of bounds)";
+        if (_tool == BuildTool.PlaceConstructionBoard && BuildModeController.UniqueBuildingExists<ConstructionBoard>())
+            return "(unique-per-map already placed)";
+        var all = UnityEngine.Object.FindObjectsByType<Building>(FindObjectsSortMode.None);
+        foreach (var b in all)
+            if (RectOverlaps(b.GridPos, b.size, _snapGridPos, _footSize)) return $"(overlap with {b.displayName})";
+        return "";
     }
 
     private void SetGhostColor(Color c)
     {
-        if (_ghostSr != null) _ghostSr.color = c;
+        var mr = _ghost != null ? _ghost.GetComponent<Renderer>() : null;
+        if (mr != null)
+        {
+            var mat = mr.sharedMaterial;
+            if (mat != null) mat.color = c;
+        }
     }
 
     private void DestroyGhost()
