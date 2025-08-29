@@ -105,5 +105,14 @@ public class GameClock : MonoBehaviour
 // Convenience static accessor if desired elsewhere.
 public static class GameClockAPI
 {
-    public static GameClock Find() => UnityEngine.Object.FindObjectOfType<GameClock>();
+    public static GameClock Find()
+    {
+#if UNITY_2023_1_OR_NEWER
+        // Prefer the modern API to avoid CS0618 warnings.
+        return UnityEngine.Object.FindFirstObjectByType<GameClock>();
+#else
+        // Fallback for older Unity versions.
+        return UnityEngine.Object.FindObjectOfType<GameClock>();
+#endif
+    }
 }
