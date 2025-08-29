@@ -3,7 +3,7 @@ using FantasyColony.Defs;
 
 public static class BuildBootstrap
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)] private static void Auto() => Ensure();
     public static void Ensure()
     {
         var go = GameObject.Find("BuildSystems (Auto)");
@@ -25,5 +25,6 @@ public static class BuildBootstrap
 
         DefDatabase.LoadAll();
         VisualRegistry.Build(Application.isEditor);
+        SpriteVisualFactory2D.Build();
     }
 }

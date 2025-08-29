@@ -184,7 +184,6 @@ public class BuildPlacementTool : MonoBehaviour
         if (!TryGetMouseOnGround(cam, out var world)) return;
         // show marker even before we know if placement is valid
         if (_marker == null) EnsureMarker();
-        // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
         if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1); // belt & suspenders
@@ -231,8 +230,8 @@ public class BuildPlacementTool : MonoBehaviour
         // Raw hit marker (tiny) at mouse world
         if (_marker != null)
         {
-            _marker.transform.position = world + (_plane == GridPlane.XZ ? Vector3.up * 0.03f : Vector3.forward * 0.01f);
-            _marker.transform.localScale = Vector3.one * _tile * 0.2f;
+            _marker.transform.position = new Vector3(world.x, world.y, -0.02f);
+            _marker.transform.localScale = Vector3.one * Mathf.Max(0.1f,_tile*0.2f);
             _marker.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
         }
     }
@@ -305,8 +304,8 @@ public class BuildPlacementTool : MonoBehaviour
                 board.OnPlaced(_snapGridPos, _tile);
 
                 // Attach visual via defs
-                var vdef = _ghostVDef ?? new VisualDef { id = "core.Visual.Board_Default" };
-                VisualRegistry.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
+                var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
+                SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
                 break;
             }
         }
@@ -318,18 +317,21 @@ public class BuildPlacementTool : MonoBehaviour
     private void EnsureGhost()
     {
         if (_ghost != null) return;
-        var vdef = _ghostVDef ?? new VisualDef();
-        _ghost = VisualRegistry.SpawnGhost(vdef.id ?? "core.Visual.Board_Default", _footSize, _tile, this.transform);
-        _ghostMr = _ghost.GetComponent<MeshRenderer>();
+        var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
+        _ghost = SpriteVisualFactory2D.SpawnGhost(vdef.id, _footSize, _tile, this.transform);
+        var sr = _ghost.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.sortingOrder += 2; // ensure on top of ground
+        _ghostMr = null;
     }
 
     private void EnsureMarker()
     {
         if (_marker != null) return;
-        var vdef = _ghostVDef ?? new VisualDef();
-        var markerColor = vdef.Color; markerColor.a = 0.85f;
-        _marker = VisualFactory.CreateGhost(new VisualDef{ color_rgba = ColorUtility.ToHtmlStringRGBA(markerColor), plane = vdef.plane, z_lift = 0.1f }, new Vector2Int(1,1), _tile, this.transform, _gridLayer, _plane, GetCamera());
-        _markerMr = _marker.GetComponent<MeshRenderer>();
+        var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
+        _marker = SpriteVisualFactory2D.SpawnGhost(vdef.id, Vector2Int.one, _tile*0.2f, this.transform);
+        var sr = _marker.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.color = new Color(1f,1f,0.2f,0.85f);
+        _markerMr = null;
     }
 
     private Transform EnsureBuildingsParent()
@@ -425,8 +427,12 @@ public class BuildPlacementTool : MonoBehaviour
         string reason = _canPlace ? "" : InvalidReason();
         string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
         string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
-        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nGridLayer: {_gridLayer}  CamHasLayer: {CameraHasLayer(_gridLayer)}\nGhostActive: {(_ghost!=null)}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 620, 190), text, style);
+        Vector2 mpLegacy = Input.mousePosition;
+        Vector2 mpNIS = Vector2.zero; #if ENABLE_INPUT_SYSTEM
+        if (UnityEngine.InputSystem.Mouse.current!=null) mpNIS = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        #endif
+        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nMouse Legacy: {mpLegacy.x:F0},{mpLegacy.y:F0}  NIS: {mpNIS.x:F0},{mpNIS.y:F0}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 680, 210), text, style);
     }
 
     private bool CameraHasLayer(int layer)
