@@ -53,6 +53,10 @@ public class PawnInteractionManager : MonoBehaviour
                 float rad = (a.CollisionRadius + b.CollisionRadius) * 1.05f + extraRadiusPadding;
                 if (dist2 > rad * rad) continue;
 
+                // Sprinting cancels/ignores interactions (dash through)
+                if (a.IsSprinting || b.IsSprinting)
+                    continue;
+
                 // Decide leader/follower
                 SpritePawn leader, follower;
                 if (a.IsControlled && !b.IsControlled) { leader = a; follower = b; }
