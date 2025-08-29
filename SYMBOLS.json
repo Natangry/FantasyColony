@@ -48,6 +48,12 @@
     "line": 8
   },
   {
+    "kind": "method",
+    "name": "SpawnSecondPawn",
+    "file": "Assets/Scripts/Boot/PawnBootstrap.cs",
+    "line": 38
+  },
+  {
     "kind": "class",
     "name": "SelectionBootstrap",
     "file": "Assets/Scripts/Boot/SelectionBootstrap.cs",
@@ -429,7 +435,7 @@
     "kind": "method",
     "name": "QuitGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 137
+    "line": 139
   },
   {
     "kind": "class",
@@ -462,40 +468,58 @@
     "line": 9
   },
   {
+    "kind": "enum",
+    "name": "MovementPattern",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 11
+  },
+  {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 46
+    "line": 60
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 71
+    "line": 93
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 76
+    "line": 98
   },
   {
     "kind": "method",
     "name": "SetControlled",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 261
+    "line": 283
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 279
+    "line": 301
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 355
+    "line": 408
+  },
+  {
+    "kind": "method",
+    "name": "ConfigurePattern",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 464
+  },
+  {
+    "kind": "method",
+    "name": "SetRingColor",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 474
   },
   {
     "kind": "class",
