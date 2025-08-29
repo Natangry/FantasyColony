@@ -255,133 +255,145 @@
     "kind": "method",
     "name": "ReadGridInfo",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 121
+    "line": 123
   },
   {
     "kind": "method",
     "name": "UpdateGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 177
+    "line": 179
   },
   {
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 237
+    "line": 239
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 244
+    "line": 246
   },
   {
     "kind": "method",
     "name": "RectOverlaps",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 263
+    "line": 265
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 269
+    "line": 271
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 319
+    "line": 334
   },
   {
     "kind": "method",
     "name": "EnsureMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 329
+    "line": 344
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 338
+    "line": 353
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 356
+    "line": 371
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 387
+    "line": 402
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 402
+    "line": 417
   },
   {
     "kind": "method",
     "name": "GetFootprint",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 410
+    "line": 425
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 421
+    "line": 436
   },
   {
     "kind": "method",
     "name": "CameraHasLayer",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 444
+    "line": 459
   },
   {
     "kind": "method",
     "name": "TryGetMouseOnGround",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 450
+    "line": 465
   },
   {
     "kind": "method",
     "name": "ResolveActiveVisual",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 478
+    "line": 493
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 498
+    "line": 513
   },
   {
     "kind": "method",
     "name": "DestroyMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 514
+    "line": 529
   },
   {
     "kind": "method",
     "name": "InvalidReason",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 523
+    "line": 538
   },
   {
     "kind": "method",
     "name": "CancelPlacement",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 534
+    "line": 549
+  },
+  {
+    "kind": "method",
+    "name": "CleanupAfterPlacement",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 563
+  },
+  {
+    "kind": "method",
+    "name": "KillAllPreviews",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 574
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 548
+    "line": 584
   },
   {
     "kind": "class",
@@ -1453,21 +1465,15 @@
   },
   {
     "kind": "method",
-    "name": "DetectGridLayer",
-    "file": "Assets/Scripts/World/Buildings/ConstructionBoard.cs",
-    "line": 66
-  },
-  {
-    "kind": "method",
     "name": "FindAnyGridRenderer",
     "file": "Assets/Scripts/World/Buildings/ConstructionBoard.cs",
-    "line": 74
+    "line": 51
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/World/Buildings/ConstructionBoard.cs",
-    "line": 92
+    "line": 69
   },
   {
     "kind": "class",
