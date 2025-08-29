@@ -159,49 +159,49 @@
     "kind": "class",
     "name": "SelectionController",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 11
+    "line": 10
   },
   {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 21
+    "line": 20
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 36
+    "line": 35
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 49
+    "line": 48
   },
   {
     "kind": "method",
     "name": "TrySelectFromScreen",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 56
+    "line": 55
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 73
+    "line": 72
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 87
+    "line": 86
   },
   {
     "kind": "property",
     "name": "Selected",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 13
+    "line": 12
   },
   {
     "kind": "class",
@@ -237,43 +237,43 @@
     "kind": "class",
     "name": "SpritePawn",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 9
+    "line": 8
   },
   {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 42
+    "line": 41
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 67
+    "line": 66
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 72
+    "line": 71
   },
   {
     "kind": "method",
     "name": "OnSelectionChanged",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 257
+    "line": 256
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 262
+    "line": 261
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 338
+    "line": 337
   },
   {
     "kind": "class",
