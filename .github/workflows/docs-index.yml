@@ -41,12 +41,19 @@ jobs:
 
       - name: Commit index if changed
         run: |
-          if git diff --quiet Docs/INDEX.md; then
+          set -e
+          # Show what was generated (debug)
+          echo "=== Generated Docs/INDEX.md preview ==="
+          head -n 50 Docs/INDEX.md || true
+          echo "======================================="
+
+          # If anything about this file changed or it is new, commit it.
+          if [ -n "$(git status --porcelain Docs/INDEX.md)" ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add Docs/INDEX.md
+            git commit -m "docs: auto-update Docs/INDEX.md [skip ci]" || echo "Nothing to commit"
+            git push
+          else
             echo "No index changes"
-            exit 0
           fi
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add Docs/INDEX.md
-          git commit -m "docs: auto-update Docs/INDEX.md [skip ci]"
-          git push
