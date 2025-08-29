@@ -447,19 +447,19 @@
     "kind": "method",
     "name": "EnsureStyles",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 25
+    "line": 30
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 62
+    "line": 102
   },
   {
     "kind": "method",
     "name": "OnStartGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 134
+    "line": 184
   },
   {
     "kind": "class",
