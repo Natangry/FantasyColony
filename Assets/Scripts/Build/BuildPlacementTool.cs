@@ -4,6 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Handles in-world placement of buildings while a placement tool is active.
+/// This version targets a top-down world on the XZ plane (y = up).
 /// </summary>
 public class BuildPlacementTool : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class BuildPlacementTool : MonoBehaviour
     private Vector2Int _snapGridPos;
     private Vector2Int _footSize = Vector2Int.one; // current tool footprint in tiles
     private Vector3 _anchor;
+    private float _groundY;
 
     // Grid snapshot via reflection to avoid tight coupling
     private float _tile = 1f; private int _w = 128; private int _h = 128;
@@ -64,48 +66,60 @@ public class BuildPlacementTool : MonoBehaviour
             TryGetField(grid, "width", ref _w);
             TryGetField(grid, "height", ref _h);
 
-            // Try to find a Renderer to get true world bounds
+            // Try to find a Renderer to get true world bounds (use X and Z on XZ plane)
             var rend = (grid as Component).GetComponentInChildren<Renderer>();
             if (rend != null)
             {
                 var b = rend.bounds;
-                _gridMinWorld = new Vector3(b.min.x, b.min.y, 0f);
+                _gridMinWorld = new Vector3(b.min.x, 0f, b.min.z);
+                _groundY = b.min.y;
                 _haveBounds = true;
             }
+            else
+            {
+                _groundY = 0f;
+            }
+        }
+        else
+        {
+            _groundY = 0f;
         }
     }
 
     private void UpdateGhost()
     {
         var cam = GetCamera();
-        var m = Input.mousePosition;
         if (cam == null) return; // can't place without a camera
-        Vector3 world = cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z)));
+
+        // Raycast from camera to the ground plane at y = _groundY (XZ world)
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Plane ground = new Plane(Vector3.up, new Vector3(0f, _groundY, 0f));
+        if (!ground.Raycast(ray, out float enter)) return;
+        Vector3 world = ray.GetPoint(enter);
 
         // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
 
-        // Snap to grid anchored at bottom-left
+        // Snap to grid anchored at bottom-left (use X,Z)
         int gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
-        int gy = Mathf.RoundToInt((world.y - _anchor.y) / _tile);
+        int gy = Mathf.RoundToInt((world.z - _anchor.z) / _tile);
         gx = Mathf.Clamp(gx, -_w, _w * 2);
         gy = Mathf.Clamp(gy, -_h, _h * 2);
         // bottom-left of footprint
         _snapGridPos = new Vector2Int(gx, gy);
         float cx = _anchor.x + ((gx + _footSize.x * 0.5f) * _tile);
-        float cy = _anchor.y + ((gy + _footSize.y * 0.5f) * _tile);
-        _snapWorldPos = new Vector3(cx, cy, 0f);
+        float cz = _anchor.z + ((gy + _footSize.y * 0.5f) * _tile);
+        _snapWorldPos = new Vector3(cx, _groundY + 0.02f, cz); // slight lift to avoid z-fighting
+
+        _canPlace = IsInsideGrid(_snapGridPos, _footSize) && IsPlacementAllowedHere();
 
         EnsureGhost();
 
-        // Validate
-        _canPlace = IsInsideGrid(_snapGridPos, _footSize) && IsPlacementAllowedHere();
-
         // Color
-        SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.7f) : new Color(0.9f, 0.2f, 0.2f, 0.7f));
+        SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.35f) : new Color(0.9f, 0.2f, 0.2f, 0.35f));
         _ghost.transform.position = _snapWorldPos;
-        _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f);
+        _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f); // after rotation, x→X, y→Z
     }
 
     private bool IsInsideGrid(Vector2Int p, Vector2Int size)
@@ -152,10 +166,10 @@ public class BuildPlacementTool : MonoBehaviour
             {
                 var go = new GameObject("Construction Board");
                 go.transform.SetParent(parent, worldPositionStays: true);
-                // Align to bottom-left tile of the footprint
+                // Align to bottom-left tile of the footprint (XZ world)
                 float wx = _anchor.x + (_snapGridPos.x * _tile);
-                float wy = _anchor.y + (_snapGridPos.y * _tile);
-                go.transform.position = new Vector3(wx, wy, 0f);
+                float wz = _anchor.z + (_snapGridPos.y * _tile);
+                go.transform.position = new Vector3(wx, _groundY, wz);
 
                 var board = go.AddComponent<ConstructionBoard>();
                 board.displayName = "Construction Board";
@@ -183,6 +197,8 @@ public class BuildPlacementTool : MonoBehaviour
         }
         _ghostSr.sprite = _whiteSprite;
         _ghostSr.sortingOrder = 1000;
+        // Rotate the sprite so its plane lies on XZ (y up)
+        _ghost.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
         SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.35f));
     }
 
@@ -252,7 +268,7 @@ public class BuildPlacementTool : MonoBehaviour
 
     private Vector3 GuessCenteredAnchor()
     {
-        return new Vector3(-_w * _tile * 0.5f, -_h * _tile * 0.5f, 0f);
+        return new Vector3(-_w * _tile * 0.5f, _groundY, -_h * _tile * 0.5f);
     }
 
     private Vector2Int GetFootprint()

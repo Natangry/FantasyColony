@@ -8,7 +8,7 @@ public class Building : MonoBehaviour
     public string id = "building";
     public string displayName = "Building";
     public bool uniquePerMap = false;
-    public Vector2Int size = Vector2Int.one; // tiles wide/high
+    public Vector2Int size = Vector2Int.one; // tiles wide (X) / deep (Z)
 
     [Header("Runtime")]
     [SerializeField] protected Vector2Int gridPos; // bottom-left tile of footprint
@@ -21,11 +21,13 @@ public class Building : MonoBehaviour
         gridPos = grid;
         tileSize = tile;
 
-        // Add a collider for clicks if missing
-        var col = GetComponent<BoxCollider2D>();
-        if (col == null) col = gameObject.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(size.x * tileSize, size.y * tileSize);
-        col.offset = Vector2.zero;
+        // Add/adjust a 3D collider that sits on the XZ plane
+        var col3 = GetComponent<BoxCollider>();
+        if (col3 == null) col3 = gameObject.AddComponent<BoxCollider>();
+        float w = size.x * tileSize;
+        float d = size.y * tileSize;
+        col3.size = new Vector3(w, 0.1f, d);
+        col3.center = new Vector3(w * 0.5f, 0.05f, d * 0.5f);
     }
 
     public virtual void OnRemoved() { }
