@@ -1,0 +1,25 @@
+// ===== FILE: Assets/IntroScreen.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Displays a simple introductory message when the game starts.
+/// Attach this script to an object in the intro scene.
+/// </summary>
+public class IntroScreen : MonoBehaviour
+{
+    void Start()
+    {
+        Debug.Log("Welcome to Fantasy Colony!");
+    }
+
+    /// <summary>
+    /// Placeholder callback for starting the game.
+    /// </summary>
+    public void OnStartGame()
+    {
+        // TODO: Load the main game scene.
+        Debug.Log("Start Game pressed.");
+    }
+}
+
+

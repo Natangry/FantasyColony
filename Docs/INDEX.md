@@ -1,30 +1,24 @@
-# Repository Index
+# Docs Index (auto)
 
-- **.gitignore** — [View](https://github.com/Natangry/FantasyColony/blob/main/.gitignore) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/.gitignore)
+↩️ [Back to Repository Index](../INDEX.md)
 
-## Assets
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+- **Glossary.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Glossary.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Glossary.md)
 
-- **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/IntroScreen.cs)
-
-## Docs/Colony
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Colony)
+## Colony
 
 - **Jobs-and-Assignment-Loop-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Jobs-and-Assignment-Loop-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Jobs-and-Assignment-Loop-v0.1.md)
 - **Personalities-Social-and-Relationships-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Personalities-Social-and-Relationships-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Personalities-Social-and-Relationships-v0.1.md)
 - **Sound-the-Alarm-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Sound-the-Alarm-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Sound-the-Alarm-v0.1.md)
 - **Threat-Director-Raids-and-Sieges-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Threat-Director-Raids-and-Sieges-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Threat-Director-Raids-and-Sieges-v0.1.md)
 
-## Docs/Combat
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Combat)
+## Combat
 
 - **Core-Stats-Damage-and-Math-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/Core-Stats-Damage-and-Math-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/Core-Stats-Damage-and-Math-v0.1.md)
 - **NonLethal-Capture-and-Custody-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/NonLethal-Capture-and-Custody-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/NonLethal-Capture-and-Custody-v0.1.md)
 - **RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md)
 - **Status-and-Dispels-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/Status-and-Dispels-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/Status-and-Dispels-v0.1.md)
 
-## Docs/Decisions
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Decisions)
+## Decisions
 
 - **ADR-0001-Combat-Model-RTwP.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0001-Combat-Model-RTwP.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0001-Combat-Model-RTwP.md)
 - **ADR-0002-Director-and-Quest-Dials.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0002-Director-and-Quest-Dials.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0002-Director-and-Quest-Dials.md)
@@ -33,8 +27,7 @@
 - **ADR-0005-Major-Sagas-and-Boss-Arcs.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0005-Major-Sagas-and-Boss-Arcs.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0005-Major-Sagas-and-Boss-Arcs.md)
 - **ADR-0006-Faction-Mutators-and-Settlement-Scenes.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0006-Faction-Mutators-and-Settlement-Scenes.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0006-Faction-Mutators-and-Settlement-Scenes.md)
 
-## Docs/Design
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Design)
+## Design
 
 - **Building-Blueprints-and-Designations-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Building-Blueprints-and-Designations-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Building-Blueprints-and-Designations-v0.1.md)
 - **Colony-Loop-and-Pacing.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Colony-Loop-and-Pacing.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Colony-Loop-and-Pacing.md)
@@ -42,8 +35,8 @@
 - **Core-Stats-and-Combat-Math-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Core-Stats-and-Combat-Math-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Core-Stats-and-Combat-Math-v0.1.md)
 - **Gambit-Library-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Gambit-Library-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Gambit-Library-v0.1.md)
 - **Items-Inventory-and-Storage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Items-Inventory-and-Storage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Items-Inventory-and-Storage-v0.1.md)
-- **Jobs-and-Workstation-Shifts.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Jobs-and-Workstation-Shifts.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Jobs-and-Workstation-Shifts.md)
 - **Jobs-Designation-Integration.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Jobs-Designation-Integration.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Jobs-Designation-Integration.md)
+- **Jobs-and-Workstation-Shifts.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Jobs-and-Workstation-Shifts.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Jobs-and-Workstation-Shifts.md)
 - **Mod-Packaging-and-Load-Order-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Mod-Packaging-and-Load-Order-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Mod-Packaging-and-Load-Order-v0.1.md)
 - **Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md)
 - **Modding-Data-Schemas-v0.1-Addendum-Buildings.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Buildings.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Buildings.md)
@@ -115,28 +108,19 @@
 - **Validation-Severity-and-Lints.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Validation-Severity-and-Lints.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Validation-Severity-and-Lints.md)
 - **Workforce-Scheduling-and-Character-Info-UI.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Workforce-Scheduling-and-Character-Info-UI.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Workforce-Scheduling-and-Character-Info-UI.md)
 
-## Docs/Gear
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Gear)
+## Gear
 
 - **Equipment-Loadouts-Armory-and-Durability-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Gear/Equipment-Loadouts-Armory-and-Durability-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Gear/Equipment-Loadouts-Armory-and-Durability-v0.1.md)
 
-## Docs
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs)
-
-- **Glossary.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Glossary.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Glossary.md)
-
-## Docs/Logistics
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Logistics)
+## Logistics
 
 - **Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Logistics/Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Logistics/Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md)
 
-## Docs/Overview
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Overview)
+## Overview
 
 - **Phase-0-Pre-Production.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Overview/Phase-0-Pre-Production.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Overview/Phase-0-Pre-Production.md)
 
-## Docs/Phases
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Phases)
+## Phases
 
 - **Phase-0-Pre-Production.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-0-Pre-Production.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-0-Pre-Production.md)
 - **Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md)
@@ -146,34 +130,29 @@
 - **Phase-4-Content-and-Systems-Expansion.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-4-Content-and-Systems-Expansion.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-4-Content-and-Systems-Expansion.md)
 - **Phase-5-Alpha-Polish-and-Mod-Hooks.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-5-Alpha-Polish-and-Mod-Hooks.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-5-Alpha-Polish-and-Mod-Hooks.md)
 
-## Docs/Progression
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Progression)
+## Progression
 
 - **Migration-Job-Combat-Unlocks-to-Classes.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Progression/Migration-Job-Combat-Unlocks-to-Classes.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Progression/Migration-Job-Combat-Unlocks-to-Classes.md)
 - **Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Progression/Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Progression/Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md)
 
-## Docs/Runbooks
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Runbooks)
+## Runbooks
 
 - **Codex-Workflow.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Runbooks/Codex-Workflow.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Runbooks/Codex-Workflow.md)
 
-## Docs/Tools
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Tools)
+## Tools
 
 - **Asset-Picker-and-Atlas-Builder-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Asset-Picker-and-Atlas-Builder-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Asset-Picker-and-Atlas-Builder-v0.1.md)
 - **Def-Editor-and-Dependency-Wizard-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Def-Editor-and-Dependency-Wizard-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Def-Editor-and-Dependency-Wizard-v0.1.md)
 - **Editor-UX-Guide-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Editor-UX-Guide-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Editor-UX-Guide-v0.1.md)
 - **Localization-Key-Editor-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Localization-Key-Editor-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Localization-Key-Editor-v0.1.md)
 
-## Docs/UI
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/UI)
+## UI
 
 - **Character-Info-and-Compare-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/UI/Character-Info-and-Compare-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/UI/Character-Info-and-Compare-v0.1.md)
 - **Loadout-Manager-and-Armory-UI-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/UI/Loadout-Manager-and-Armory-UI-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/UI/Loadout-Manager-and-Armory-UI-v0.1.md)
 - **Logistics-Overlays-and-Alerts-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/UI/Logistics-Overlays-and-Alerts-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/UI/Logistics-Overlays-and-Alerts-v0.1.md)
 
-## Docs/World
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/World)
+## World
 
 - **Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md)
 - **Catastrophic-FailForward-and-Rebuild-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Catastrophic-FailForward-and-Rebuild-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Catastrophic-FailForward-and-Rebuild-v0.1.md)
@@ -192,5 +171,3 @@
 - **Settlement-Scenes-and-Services-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Settlement-Scenes-and-Services-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Settlement-Scenes-and-Services-v0.1.md)
 - **Storyteller-and-Pacing-Director-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md)
 - **World-Metrics-Conditions-and-Triggers-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md)
-- **LICENSE** — [View](https://github.com/Natangry/FantasyColony/blob/main/LICENSE) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/LICENSE)
-- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/README.md)
