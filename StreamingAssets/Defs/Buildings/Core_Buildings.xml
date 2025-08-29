@@ -1,0 +1,12 @@
+<Defs>
+  <Building id="core.Building.ConstructionBoard">
+    <display_name>Construction Board</display_name>
+    <size_x>3</size_x>
+    <size_y>1</size_y>
+    <unique>true</unique>
+    <visual_ref>core.Visual.Board_Default</visual_ref>
+    <job_slots>
+      <slot job="core.Job.Builder" count="1" />
+    </job_slots>
+  </Building>
+</Defs>

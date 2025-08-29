@@ -1,0 +1,9 @@
+<Defs>
+  <Visual id="core.Visual.Board_Default">
+    <plane>XZ</plane>
+    <render_layer>Default</render_layer>
+    <color_rgba>#F3D95AFF</color_rgba>
+    <shader_hint>URP/Unlit</shader_hint>
+    <z_lift>0.05</z_lift>
+  </Visual>
+</Defs>
