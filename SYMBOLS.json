@@ -1,6 +1,18 @@
 [
   {
     "kind": "class",
+    "name": "CameraBootstrap",
+    "file": "Assets/Scripts/Boot/CameraBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "EnsureCameraFollower",
+    "file": "Assets/Scripts/Boot/CameraBootstrap.cs",
+    "line": 11
+  },
+  {
+    "kind": "class",
     "name": "IntroBootstrap",
     "file": "Assets/Scripts/Boot/IntroBootstrap.cs",
     "line": 7
@@ -58,6 +70,54 @@
     "name": "GenerateDefaultGrid",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "FollowControlledPawn",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 20
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 26
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 37
+  },
+  {
+    "kind": "method",
+    "name": "OnControlledChanged",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 42
+  },
+  {
+    "kind": "method",
+    "name": "LateUpdate",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 51
+  },
+  {
+    "kind": "method",
+    "name": "SnapToTarget",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 70
+  },
+  {
+    "kind": "method",
+    "name": "SnapPosToPixelGrid",
+    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "line": 84
   },
   {
     "kind": "class",
