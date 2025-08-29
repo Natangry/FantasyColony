@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Generate repo-wide INDEX.md (and Docs/INDEX.md)
+      - name: Generate repo-wide INDEX.md
         env:
           REPO: ${{ github.repository }}
         run: |
@@ -51,36 +51,22 @@ jobs:
             for f in files:
               p = f if rel == '.' else f'{rel}/{f}'
               # don't index the index files themselves to avoid loops
-              if p in ('INDEX.md', 'Docs/INDEX.md'): continue
+              if p == 'INDEX.md':
+                continue
               p = p.replace(os.sep, '/')
               lines.append(f'- **{os.path.basename(p)}** — [View]({view_url(p)}) · [Raw]({raw_url(p)})')
 
           open('INDEX.md', 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
-
-          # --- Optional: keep Docs/INDEX.md (subset) for convenience ---
-          DOCS = 'Docs'
-          if os.path.isdir(DOCS):
-            dlines = ['# Docs Index (auto)\n', '↩️ [Back to Repository Index](../INDEX.md)\n']
-            for base, dirs, files in os.walk(DOCS):
-              dirs[:] = sorted(dirs)
-              files = sorted(f for f in files if f not in ('INDEX.md','README.md','.DS_Store'))
-              rel = os.path.relpath(base, DOCS)
-              if rel != '.':
-                dlines.append(f'\n## {rel.replace(os.sep,"/")}\n')
-              for f in files:
-                p = os.path.join(base, f).replace(os.sep, '/')
-                dlines.append(f'- **{f}** — [View]({view_url(p)}) · [Raw]({raw_url(p)})')
-            open(os.path.join(DOCS, 'INDEX.md'), 'w', encoding='utf-8').write('\n'.join(dlines) + '\n')
           PY
 
       - name: Commit index if changed
         run: |
           set -e
-          CHANGED="$(git status --porcelain INDEX.md Docs/INDEX.md 2>/dev/null || true)"
+          CHANGED="$(git status --porcelain INDEX.md 2>/dev/null || true)"
           if [ -n "$CHANGED" ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add INDEX.md Docs/INDEX.md 2>/dev/null || true
+            git add INDEX.md 2>/dev/null || true
             git commit -m "ci: refresh repository index [skip ci]" || echo "Nothing to commit"
             git push
           else
