@@ -15,6 +15,8 @@
 ## Assets/Scenes
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scenes)
 
+- **Main.unity** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/Main.unity) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/Main.unity)
+- **Main.unity.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/Main.unity.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/Main.unity.meta)
 - **SampleScene.unity** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/SampleScene.unity) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/SampleScene.unity)
 - **SampleScene.unity.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/SampleScene.unity.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/SampleScene.unity.meta)
 
@@ -23,10 +25,16 @@
 
 - **Scripts.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Boot.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot.meta)
+
 ## Assets/Scripts/Boot
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Boot)
 
 - **IntroBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs)
+- **IntroBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -314,6 +322,7 @@
 - **ProjectSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ProjectSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ProjectSettings.asset)
 - **ProjectVersion.txt** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ProjectVersion.txt) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ProjectVersion.txt)
 - **QualitySettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/QualitySettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/QualitySettings.asset)
+- **SceneTemplateSettings.json** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/SceneTemplateSettings.json) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/SceneTemplateSettings.json)
 - **ShaderGraphSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ShaderGraphSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ShaderGraphSettings.asset)
 - **TagManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/TagManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/TagManager.asset)
 - **TimeManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/TimeManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/TimeManager.asset)
