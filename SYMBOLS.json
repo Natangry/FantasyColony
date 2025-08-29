@@ -13,6 +13,18 @@
   },
   {
     "kind": "class",
+    "name": "WorldBootstrap",
+    "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "GenerateDefaultGrid",
+    "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
     "name": "IntroScreen",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
     "line": 12
@@ -39,7 +51,25 @@
     "kind": "method",
     "name": "QuitGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 132
+    "line": 135
+  },
+  {
+    "kind": "class",
+    "name": "SimpleGridMap",
+    "file": "Assets/Scripts/World/SimpleGridMap.cs",
+    "line": 9
+  },
+  {
+    "kind": "method",
+    "name": "Build",
+    "file": "Assets/Scripts/World/SimpleGridMap.cs",
+    "line": 24
+  },
+  {
+    "kind": "method",
+    "name": "Build",
+    "file": "Assets/Scripts/World/SimpleGridMap.cs",
+    "line": 30
   },
   {
     "kind": "class",
