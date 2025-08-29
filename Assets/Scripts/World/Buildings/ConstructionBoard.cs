@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// One-per-map station that offers the Builder job via slots.
-/// Footprint: 1x3 tiles (vertical), anchored at bottom-left.
+/// Footprint: 3x1 tiles (horizontal), anchored at bottom-left.
 /// </summary>
 public class ConstructionBoard : Building
 {
@@ -15,7 +15,7 @@ public class ConstructionBoard : Building
         id = "construction_board";
         displayName = string.IsNullOrEmpty(displayName) ? "Construction Board" : displayName;
         uniquePerMap = true;
-        size = new Vector2Int(1, 3);
+        size = new Vector2Int(3, 1);
     }
 
     private void OnMouseUpAsButton()
@@ -50,7 +50,7 @@ public class ConstructionBoard : Building
         {
             if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
             mr.sharedMaterial.color = new Color(0.95f, 0.85f, 0.35f, 1f);
-            // Scale to 1x3 footprint
+            // Scale to 3x1 footprint
             mr.transform.localScale = new Vector3(size.x * tileSize, size.y * tileSize, 1f);
             mr.transform.localPosition = new Vector3((size.x * tileSize) * 0.5f, (size.y * tileSize) * 0.5f, 0f);
         }
