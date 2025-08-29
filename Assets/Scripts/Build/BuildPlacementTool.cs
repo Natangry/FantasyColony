@@ -27,6 +27,17 @@ public class BuildPlacementTool : MonoBehaviour
     private Camera _cam;
     private static Sprite _whiteSprite;
 
+    private void SyncToolFromController()
+    {
+        var bm = BuildModeController.Instance;
+        if (bm == null) return;
+        if (_tool != bm.CurrentTool)
+        {
+            _tool = bm.CurrentTool;
+            _footSize = GetFootprint();
+        }
+    }
+
     private void LateUpdate()
     {
         if (_tool == BuildTool.None)
@@ -110,6 +121,14 @@ public class BuildPlacementTool : MonoBehaviour
 
     private void UpdateGhost()
     {
+        // Keep local tool state in sync with the controller every frame
+        SyncToolFromController();
+
+        if (_tool == BuildTool.None)
+        {
+            DestroyGhost();
+            return;
+        }
         var cam = GetCamera();
         if (cam == null) return; // can't place without a camera
 
@@ -198,6 +217,9 @@ public class BuildPlacementTool : MonoBehaviour
 
     private void TryPlace()
     {
+        // Ensure we're using the latest tool info
+        SyncToolFromController();
+
         if (!_canPlace) return;
 
         Transform parent = EnsureBuildingsParent();
@@ -336,13 +358,14 @@ public class BuildPlacementTool : MonoBehaviour
     // Optional tiny debug overlay to help diagnose placement in the wild
     private void OnGUI()
     {
+        SyncToolFromController();
         if (_tool == BuildTool.None) return;
         var style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.box);
         style.alignment = TextAnchor.UpperLeft;
         style.fontSize = 14;
         string plane = _plane.ToString();
-        string text = $"Plane: {plane}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 200, 80), text, style);
+        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 260, 96), text, style);
     }
 
     private void SetGhostColor(Color c)
