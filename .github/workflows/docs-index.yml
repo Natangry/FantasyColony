@@ -1,0 +1,52 @@
+name: Update Docs Index
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'Docs/**' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Docs/INDEX.md
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import os, urllib.parse
+          REPO = os.environ['REPO']
+          ROOT = 'Docs'
+          os.makedirs(ROOT, exist_ok=True)
+          lines = ['# Docs Index\n']
+          for base, dirs, files in os.walk(ROOT):
+              dirs[:] = sorted(dirs)
+              files = sorted(f for f in files if f not in ('INDEX.md','README.md','.DS_Store'))
+              rel = os.path.relpath(base, ROOT)
+              if rel != '.':
+                  lines.append(f'\n## {rel.replace(os.sep,"/")}\n')
+              for f in files:
+                  p = os.path.join(base,f).replace(os.sep,'/')
+                  view = f'https://github.com/{REPO}/blob/main/{urllib.parse.quote(p)}'
+                  raw  = f'https://raw.githubusercontent.com/{REPO}/main/{urllib.parse.quote(p)}'
+                  lines.append(f'- **{f}** — [View]({view}) · [Raw]({raw})')
+          with open(os.path.join(ROOT,'INDEX.md'),'w',encoding='utf-8') as w:
+              w.write('\n'.join(lines) + '\n')
+          PY
+
+      - name: Commit index if changed
+        run: |
+          if git diff --quiet Docs/INDEX.md; then
+            echo "No index changes"
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add Docs/INDEX.md
+          git commit -m "docs: auto-update Docs/INDEX.md [skip ci]"
+          git push
