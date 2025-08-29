@@ -606,7 +606,12 @@ public class BuildPlacementTool : MonoBehaviour
             return false; // unique per map
 
         // Check for any existing Building occupying this tile (1x1 for now)
-        var all = FindObjectsOfType<Building>();
+        Building[] all;
+#if UNITY_2023_1_OR_NEWER
+        all = UnityEngine.Object.FindObjectsByType<Building>(FindObjectsSortMode.None);
+#else
+        all = FindObjectsOfType<Building>();
+#endif
         foreach (var b in all)
         {
             if (b.Occupies(_snapGridPos)) return false;
@@ -695,9 +700,9 @@ public class BuildPlacementTool : MonoBehaviour
             var t = asm.GetType(typeName);
             if (t == null) continue;
 #if UNITY_2023_1_OR_NEWER
-            var comp = Object.FindAnyObjectByType(t) as Component;
+            var comp = UnityEngine.Object.FindAnyObjectByType(t) as Component;
 #else
-            var comp = Object.FindObjectOfType(t) as Component;
+            var comp = UnityEngine.Object.FindObjectOfType(t) as Component;
 #endif
             if (comp != null) return comp;
         }
@@ -1260,13 +1265,23 @@ public class PawnJob : MonoBehaviour
 
     private void OnEnable()
     {
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js != null) js.RegisterPawn(this);
     }
 
     private void OnDisable()
     {
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js != null) js.UnregisterPawn(this);
     }
 
@@ -3159,7 +3174,12 @@ public class ConstructionBoard : Building
     public override void OnPlaced(Vector2Int grid, float tile)
     {
         base.OnPlaced(grid, tile);
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js != null)
         {
             js.SetSlots(this, JobType.Builder, builderSlots);
@@ -3188,7 +3208,12 @@ public class ConstructionBoard : Building
     {
         if (!_showInspector) return;
 
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js == null) return;
 
         Rect r = new Rect(20f, Screen.height * 0.6f, Mathf.Max(260f, Screen.width * 0.22f), Screen.height * 0.35f);
