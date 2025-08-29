@@ -388,6 +388,9 @@ public class SpritePawn : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float speed = 3.0f;
     [SerializeField] private float margin = 1.25f;
+    [Tooltip("If true, patrol uses diagonal corners to demonstrate 8-direction movement.")]
+    [SerializeField] private bool diagonalPatrol = true;
+    private Vector3 logicalPos; // continuous (unsnapped) position
 
     // Patrol corners (world-space)
     private Vector3[] corners = new Vector3[4];
@@ -417,6 +420,7 @@ public class SpritePawn : MonoBehaviour
         BuildPatrolFromGridOrCamera();
         // Start near the first corner so movement is immediately visible (lift slightly above grid to avoid z-fighting).
         var start = corners[0]; start.y = 0.02f;
+        logicalPos = start;
         transform.position = start;
     }
 
@@ -569,10 +573,23 @@ public class SpritePawn : MonoBehaviour
         float maxX = grid.width * grid.tileSize - margin;
         float maxZ = grid.height * grid.tileSize - margin;
 
-        corners[0] = new Vector3(minX, 0f, minZ);
-        corners[1] = new Vector3(maxX, 0f, minZ);
-        corners[2] = new Vector3(maxX, 0f, maxZ);
-        corners[3] = new Vector3(minX, 0f, maxZ);
+        if (diagonalPatrol)
+        {
+            // Diagonal loop to demonstrate 8-direction movement:
+            // bottom-left -> top-right -> top-left -> bottom-right -> repeat
+            corners[0] = new Vector3(minX, 0f, minZ);
+            corners[1] = new Vector3(maxX, 0f, maxZ);
+            corners[2] = new Vector3(minX, 0f, maxZ);
+            corners[3] = new Vector3(maxX, 0f, minZ);
+        }
+        else
+        {
+            // Axis-aligned rectangle
+            corners[0] = new Vector3(minX, 0f, minZ);
+            corners[1] = new Vector3(maxX, 0f, minZ);
+            corners[2] = new Vector3(maxX, 0f, maxZ);
+            corners[3] = new Vector3(minX, 0f, maxZ);
+        }
         cornerIndex = 1;
     }
 
@@ -594,22 +611,40 @@ public class SpritePawn : MonoBehaviour
     private void Update()
     {
         if (corners == null || corners.Length < 4) return;
-        Vector3 pos = transform.position;
-        Vector3 target = corners[cornerIndex];
-        Vector3 to = target - pos;
+
+        // Continuous motion in logical space (no snap)
+        Vector3 target = corners[cornerIndex]; target.y = 0.02f;
+        Vector3 to = target - logicalPos; to.y = 0f;
         float dist = to.magnitude;
-        if (dist < 0.01f)
+
+        // Pixel-based arrival threshold to avoid getting stuck due to snapping.
+        float upp = PixelCameraHelper.WorldUnitsPerPixel(cam);
+        float arriveEps = Mathf.Max(upp * 1.5f, 0.02f);
+
+        if (dist <= arriveEps)
         {
             cornerIndex = (cornerIndex + 1) % 4;
             target = corners[cornerIndex];
-            to = target - pos;
+            target.y = 0.02f;
+            to = target - logicalPos;
+            to.y = 0f;
+            dist = to.magnitude;
         }
-        Vector3 dir = (to.sqrMagnitude > 1e-8f) ? (to / to.magnitude) : Vector3.zero;
-        pos += dir * speed * Time.deltaTime;
 
-        // Pixel snap after moving (preserve Y height).
-        pos = PixelCameraHelper.SnapToPixelGrid(pos, cam);
-        transform.position = pos;
+        Vector3 dir = (dist > 1e-8f) ? (to / dist) : Vector3.zero;
+        // Advance logical (unsnapped) position
+        logicalPos += dir * speed * Time.deltaTime;
+        logicalPos.y = 0.02f;
+
+        // Clamp if we overshoot target this frame (prevents oscillation near corners)
+        Vector3 newTo = target - logicalPos; newTo.y = 0f;
+        if (Vector3.Dot(newTo, to) < 0f) // passed the target
+        {
+            logicalPos = target;
+        }
+
+        // Render at pixel-snapped position
+        transform.position = PixelCameraHelper.SnapToPixelGrid(logicalPos, cam);
     }
 }
 

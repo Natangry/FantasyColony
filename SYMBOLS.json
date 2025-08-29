@@ -99,13 +99,13 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 33
+    "line": 36
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 226
+    "line": 243
   },
   {
     "kind": "class",
