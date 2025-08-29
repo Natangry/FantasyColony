@@ -213,85 +213,85 @@
     "kind": "method",
     "name": "LateUpdate",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 25
+    "line": 24
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 48
+    "line": 47
   },
   {
     "kind": "method",
     "name": "ReadGridInfo",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 54
+    "line": 53
   },
   {
     "kind": "method",
     "name": "UpdateGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 76
+    "line": 75
   },
   {
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 106
+    "line": 105
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 113
+    "line": 112
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 132
+    "line": 131
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 159
+    "line": 158
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 175
+    "line": 174
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 193
+    "line": 192
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 224
+    "line": 223
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 235
+    "line": 238
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 242
+    "line": 243
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 247
+    "line": 248
   },
   {
     "kind": "class",
