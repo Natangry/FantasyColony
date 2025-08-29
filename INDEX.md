@@ -66,6 +66,7 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Systems)
 
 - **ControlManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/ControlManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/ControlManager.cs)
+- **GameCalendar.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameCalendar.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameCalendar.cs)
 - **GameClock.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameClock.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameClock.cs)
 - **PauseController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
 - **PawnInteractionManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs)

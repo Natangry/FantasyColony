@@ -253,6 +253,96 @@
   },
   {
     "kind": "class",
+    "name": "SeasonDef",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 6
+  },
+  {
+    "kind": "class",
+    "name": "GameCalendar",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 17
+  },
+  {
+    "kind": "class",
+    "name": "GameCalendarAPI",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 148
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 61
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 67
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 73
+  },
+  {
+    "kind": "method",
+    "name": "HandleDayAdvanced",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 79
+  },
+  {
+    "kind": "method",
+    "name": "ResetCalendar",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 84
+  },
+  {
+    "kind": "method",
+    "name": "AdvanceOneDay",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 94
+  },
+  {
+    "kind": "method",
+    "name": "RecomputeDaysPerYear",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 108
+  },
+  {
+    "kind": "method",
+    "name": "ResolveSeasonAndDay",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 119
+  },
+  {
+    "kind": "method",
+    "name": "SafeInvokeYearChanged",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 137
+  },
+  {
+    "kind": "method",
+    "name": "SafeInvokeSeasonChanged",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 142
+  },
+  {
+    "kind": "method",
+    "name": "Find",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 151
+  },
+  {
+    "kind": "property",
+    "name": "DaysPerYear",
+    "file": "Assets/Scripts/Systems/GameCalendar.cs",
+    "line": 38
+  },
+  {
+    "kind": "class",
     "name": "GameClock",
     "file": "Assets/Scripts/Systems/GameClock.cs",
     "line": 8
@@ -489,19 +579,19 @@
     "kind": "class",
     "name": "ClockHUD",
     "file": "Assets/Scripts/UI/ClockHUD.cs",
-    "line": 6
+    "line": 7
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/UI/ClockHUD.cs",
-    "line": 12
+    "line": 16
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/ClockHUD.cs",
-    "line": 24
+    "line": 33
   },
   {
     "kind": "class",
