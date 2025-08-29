@@ -54,10 +54,15 @@ public class SpritePawn : MonoBehaviour
     private Vector2 manualInput;
     private Vector3 manualVel;
 
-    // Public properties
+    // Public status used by manager
     public bool IsControlled => isControlled;
-    public bool IsInteractable => !isControlled && interactionState == InteractionState.None && Time.unscaledTime >= cooldownUntilUnscaled;
+    // Allow controlled pawns to participate in interactions (as leaders); manager enforces follower rule.
+    public bool IsInteractable => interactionState == InteractionState.None && Time.unscaledTime >= cooldownUntilUnscaled;
     public float CollisionRadius => (collisionRadius > 0f ? collisionRadius : Mathf.Max(0.2f, (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit) * 0.6f));
+    [Header("Sprint")]
+    [SerializeField] private float sprintMultiplier = 1.6f;
+    private bool isSprinting;
+    public bool IsSprinting => isSprinting && isControlled;
 
     // Internal state
     private Camera cam;
@@ -195,11 +200,23 @@ public class SpritePawn : MonoBehaviour
     // ---------------- Manual control ----------------
     private void UpdateManualControl()
     {
+        // Toggle sprint with Shift (works on both input systems)
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null &&
+            (Keyboard.current.leftShiftKey.wasPressedThisFrame || Keyboard.current.rightShiftKey.wasPressedThisFrame))
+        {
+            isSprinting = !isSprinting;
+        }
+#else
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)) isSprinting = !isSprinting;
+#endif
+
         Vector2 input = ReadMoveInput();
         if (input.sqrMagnitude > 1f) input.Normalize();
 
         // target velocity in world XZ plane at "speed"
-        Vector3 targetVel = new Vector3(input.x, 0f, input.y) * speed;
+        float mult = isSprinting ? sprintMultiplier : 1f;
+        Vector3 targetVel = new Vector3(input.x, 0f, input.y) * speed * mult;
 
         // accelerate/decelerate toward target
         Vector3 delta = targetVel - manualVel;
@@ -506,6 +523,9 @@ public class SpritePawn : MonoBehaviour
     public void SetControlled(bool on)
     {
         isControlled = on;
+        // If we release control, clear sprint state so next time starts normal
+        if (!on) { isSprinting = false; manualVel = Vector3.zero; }
+        // Visual cue: brighten ring when controlled
         if (ringGO != null && ringMat != null)
         {
             float worldW = (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit);
@@ -518,6 +538,9 @@ public class SpritePawn : MonoBehaviour
             if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", col);
         }
         if (on && interactionState != InteractionState.None)
+            EndInteraction();
+        // If we just started sprinting pre-control, ensure interactions won't linger
+        if (isControlled && isSprinting && interactionState != InteractionState.None)
             EndInteraction();
         if (ringGO != null) ringGO.SetActive(on || isSelected);
     }
