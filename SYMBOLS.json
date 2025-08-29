@@ -267,121 +267,121 @@
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 239
+    "line": 238
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 246
+    "line": 245
   },
   {
     "kind": "method",
     "name": "RectOverlaps",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 265
+    "line": 264
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 271
+    "line": 270
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 317
+    "line": 316
   },
   {
     "kind": "method",
     "name": "EnsureMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 325
+    "line": 326
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 334
+    "line": 336
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 352
+    "line": 354
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 383
+    "line": 385
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 398
+    "line": 400
   },
   {
     "kind": "method",
     "name": "GetFootprint",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 406
+    "line": 408
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 417
+    "line": 419
   },
   {
     "kind": "method",
     "name": "CameraHasLayer",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 431
+    "line": 437
   },
   {
     "kind": "method",
     "name": "TryGetMouseOnGround",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 437
+    "line": 443
   },
   {
     "kind": "method",
     "name": "ResolveActiveVisual",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 465
+    "line": 471
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 485
+    "line": 491
   },
   {
     "kind": "method",
     "name": "DestroyMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 501
+    "line": 507
   },
   {
     "kind": "method",
     "name": "InvalidReason",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 511
+    "line": 517
   },
   {
     "kind": "method",
     "name": "CancelPlacement",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 522
+    "line": 528
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 536
+    "line": 542
   },
   {
     "kind": "class",
@@ -688,6 +688,54 @@
     "name": "SetJob",
     "file": "Assets/Scripts/Pawns/PawnJob.cs",
     "line": 36
+  },
+  {
+    "kind": "class",
+    "name": "SpriteVisualFactory2D",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 4
+  },
+  {
+    "kind": "method",
+    "name": "Build",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 12
+  },
+  {
+    "kind": "method",
+    "name": "SpawnGhost",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 35
+  },
+  {
+    "kind": "method",
+    "name": "SpawnPlaced",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 43
+  },
+  {
+    "kind": "method",
+    "name": "MakeSpritePrefab",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 51
+  },
+  {
+    "kind": "method",
+    "name": "SizeAndPlace",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 64
+  },
+  {
+    "kind": "method",
+    "name": "EnsureWhiteSprite",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 72
+  },
+  {
+    "kind": "method",
+    "name": "DetectSortingLayer",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 80
   },
   {
     "kind": "class",

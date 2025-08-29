@@ -345,7 +345,7 @@ using FantasyColony.Defs;
 
 public static class BuildBootstrap
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)] private static void Auto() => Ensure();
     public static void Ensure()
     {
         var go = GameObject.Find("BuildSystems (Auto)");
@@ -367,6 +367,7 @@ public static class BuildBootstrap
 
         DefDatabase.LoadAll();
         VisualRegistry.Build(Application.isEditor);
+        SpriteVisualFactory2D.Build();
     }
 }
 
@@ -794,7 +795,6 @@ public class BuildPlacementTool : MonoBehaviour
         if (!TryGetMouseOnGround(cam, out var world)) return;
         // show marker even before we know if placement is valid
         if (_marker == null) EnsureMarker();
-        // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
         if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1); // belt & suspenders
@@ -841,8 +841,8 @@ public class BuildPlacementTool : MonoBehaviour
         // Raw hit marker (tiny) at mouse world
         if (_marker != null)
         {
-            _marker.transform.position = world + (_plane == GridPlane.XZ ? Vector3.up * 0.03f : Vector3.forward * 0.01f);
-            _marker.transform.localScale = Vector3.one * _tile * 0.2f;
+            _marker.transform.position = new Vector3(world.x, world.y, -0.02f);
+            _marker.transform.localScale = Vector3.one * Mathf.Max(0.1f,_tile*0.2f);
             _marker.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
         }
     }
@@ -915,8 +915,8 @@ public class BuildPlacementTool : MonoBehaviour
                 board.OnPlaced(_snapGridPos, _tile);
 
                 // Attach visual via defs
-                var vdef = _ghostVDef ?? new VisualDef { id = "core.Visual.Board_Default" };
-                VisualRegistry.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
+                var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
+                SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
                 break;
             }
         }
@@ -928,18 +928,21 @@ public class BuildPlacementTool : MonoBehaviour
     private void EnsureGhost()
     {
         if (_ghost != null) return;
-        var vdef = _ghostVDef ?? new VisualDef();
-        _ghost = VisualRegistry.SpawnGhost(vdef.id ?? "core.Visual.Board_Default", _footSize, _tile, this.transform);
-        _ghostMr = _ghost.GetComponent<MeshRenderer>();
+        var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
+        _ghost = SpriteVisualFactory2D.SpawnGhost(vdef.id, _footSize, _tile, this.transform);
+        var sr = _ghost.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.sortingOrder += 2; // ensure on top of ground
+        _ghostMr = null;
     }
 
     private void EnsureMarker()
     {
         if (_marker != null) return;
-        var vdef = _ghostVDef ?? new VisualDef();
-        var markerColor = vdef.Color; markerColor.a = 0.85f;
-        _marker = VisualFactory.CreateGhost(new VisualDef{ color_rgba = ColorUtility.ToHtmlStringRGBA(markerColor), plane = vdef.plane, z_lift = 0.1f }, new Vector2Int(1,1), _tile, this.transform, _gridLayer, _plane, GetCamera());
-        _markerMr = _marker.GetComponent<MeshRenderer>();
+        var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
+        _marker = SpriteVisualFactory2D.SpawnGhost(vdef.id, Vector2Int.one, _tile*0.2f, this.transform);
+        var sr = _marker.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.color = new Color(1f,1f,0.2f,0.85f);
+        _markerMr = null;
     }
 
     private Transform EnsureBuildingsParent()
@@ -1035,8 +1038,12 @@ public class BuildPlacementTool : MonoBehaviour
         string reason = _canPlace ? "" : InvalidReason();
         string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
         string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
-        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nGridLayer: {_gridLayer}  CamHasLayer: {CameraHasLayer(_gridLayer)}\nGhostActive: {(_ghost!=null)}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 620, 190), text, style);
+        Vector2 mpLegacy = Input.mousePosition;
+        Vector2 mpNIS = Vector2.zero; #if ENABLE_INPUT_SYSTEM
+        if (UnityEngine.InputSystem.Mouse.current!=null) mpNIS = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        #endif
+        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nMouse Legacy: {mpLegacy.x:F0},{mpLegacy.y:F0}  NIS: {mpNIS.x:F0},{mpNIS.y:F0}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 680, 210), text, style);
     }
 
     private bool CameraHasLayer(int layer)
@@ -1917,6 +1924,102 @@ public class PawnJob : MonoBehaviour
         current = t;
         assignedBy = by;
         name = gameObject.name; // keep name stable; could add suffix if desired
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Rendering/SpriteVisualFactory2D.cs =====
+using System.Collections.Generic;
+using FantasyColony.Defs;
+using UnityEngine;
+
+public static class SpriteVisualFactory2D
+{
+    private static readonly Dictionary<string, GameObject> _ghostPrefabs = new();
+    private static readonly Dictionary<string, GameObject> _placedPrefabs = new();
+    private static Sprite _white;
+    private static string _sortingLayer;
+    private static int _orderGround;
+
+    public static void Build()
+    {
+        _ghostPrefabs.Clear();
+        _placedPrefabs.Clear();
+        EnsureWhiteSprite();
+        DetectSortingLayer();
+
+        foreach (var kv in DefDatabase.Visuals)
+        {
+            var v = kv.Value;
+            _ghostPrefabs[v.id] = MakeSpritePrefab(v, translucent:true);
+            _placedPrefabs[v.id] = MakeSpritePrefab(v, translucent:false);
+        }
+        if (_ghostPrefabs.Count == 0)
+        {
+            // synthesize a default visual so we see something
+            var v = new VisualDef { id = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
+            _ghostPrefabs[v.id] = MakeSpritePrefab(v, translucent:true);
+            _placedPrefabs[v.id] = MakeSpritePrefab(v, translucent:false);
+        }
+        Debug.Log($"[SpriteVisualFactory2D] Ready. SortingLayer='{_sortingLayer}', GroundOrder={_orderGround}");
+    }
+
+    public static GameObject SpawnGhost(string visualId, Vector2Int foot, float tile, Transform parent)
+    {
+        if (!_ghostPrefabs.TryGetValue(visualId, out var pf)) return null;
+        var inst = Object.Instantiate(pf, parent);
+        SizeAndPlace(inst.transform, foot, tile, true);
+        return inst;
+    }
+
+    public static GameObject SpawnPlaced(string visualId, Vector2Int foot, float tile, Transform parent)
+    {
+        if (!_placedPrefabs.TryGetValue(visualId, out var pf)) return null;
+        var inst = Object.Instantiate(pf, parent);
+        SizeAndPlace(inst.transform, foot, tile, false);
+        return inst;
+    }
+
+    private static GameObject MakeSpritePrefab(VisualDef vdef, bool translucent)
+    {
+        var go = new GameObject(vdef.id + (translucent?".Ghost":".Placed"));
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = _white;
+        sr.sortingLayerName = _sortingLayer;
+        sr.sortingOrder = _orderGround + (translucent?5:3);
+        var c = vdef.Color; if (translucent) c.a *= 0.4f; sr.color = c;
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localRotation = Quaternion.identity; // XY plane
+        return go;
+    }
+
+    private static void SizeAndPlace(Transform t, Vector2Int foot, float tile, bool ghost)
+    {
+        // Scale sprite in XY to desired world size: default white is 1 unit per side already
+        t.localScale = new Vector3(Mathf.Max(0.1f, foot.x * tile), Mathf.Max(0.1f, foot.y * tile), 1f);
+        // offset half size from parent (which is bottom-left)
+        t.localPosition = new Vector3((foot.x * tile) * 0.5f, (foot.y * tile) * 0.5f, ghost ? -0.01f : 0f);
+    }
+
+    private static void EnsureWhiteSprite()
+    {
+        if (_white != null) return;
+        var tex = new Texture2D(1,1, TextureFormat.RGBA32, false);
+        tex.SetPixel(0,0,Color.white); tex.Apply();
+        _white = Sprite.Create(tex, new Rect(0,0,1,1), new Vector2(0.5f,0.5f), 1f);
+    }
+
+    private static void DetectSortingLayer()
+    {
+        // Try to inherit the ground/pawn sorting layer; fallback to Default
+        _sortingLayer = "Default";
+        _orderGround = 0;
+        var anySR = Object.FindAnyObjectByType<SpriteRenderer>();
+        if (anySR != null)
+        {
+            _sortingLayer = anySR.sortingLayerName;
+            _orderGround = anySR.sortingOrder;
+        }
     }
 }
 
