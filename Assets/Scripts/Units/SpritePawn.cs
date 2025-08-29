@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 
 /// <summary>
 /// A simple SNES-style sprite pawn that patrols a rectangle within the camera view.
@@ -181,7 +180,7 @@ public class SpritePawn : MonoBehaviour
         var renderer = quadGO.GetComponent<MeshRenderer>();
         renderer.sharedMaterial = mat;
         var col = quadGO.GetComponent<Collider>();
-        if (col) Object.Destroy(col);
+        if (col) UnityEngine.Object.Destroy(col);
 
         // Scale quad to match pixel size / pixels-per-unit
         float worldW = (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit);
@@ -251,7 +250,7 @@ public class SpritePawn : MonoBehaviour
         ringGO.transform.localScale = new Vector3(scale, scale, 1f);
         var rr = ringGO.GetComponent<MeshRenderer>();
         rr.sharedMaterial = ringMat;
-        var rc = ringGO.GetComponent<Collider>(); if (rc) Destroy(rc);
+        var rc = ringGO.GetComponent<Collider>(); if (rc) UnityEngine.Object.Destroy(rc);
         ringGO.SetActive(false);
     }
 
@@ -279,9 +278,9 @@ public class SpritePawn : MonoBehaviour
     {
         // Prefer the procedural grid to keep the pawn on the grass.
 #if UNITY_2022_2_OR_NEWER
-        var grid = Object.FindAnyObjectByType<SimpleGridMap>();
+        var grid = UnityEngine.Object.FindAnyObjectByType<SimpleGridMap>();
 #else
-        var grid = Object.FindObjectOfType<SimpleGridMap>();
+        var grid = UnityEngine.Object.FindObjectOfType<SimpleGridMap>();
 #endif
         if (grid != null)
         {
