@@ -189,61 +189,67 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 32
+    "line": 35
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 47
+    "line": 50
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 68
+    "line": 78
   },
   {
     "kind": "method",
     "name": "ApplyGroupSelection",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 80
+    "line": 90
   },
   {
     "kind": "method",
     "name": "SingleClickSelect",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 108
+    "line": 118
   },
   {
     "kind": "method",
     "name": "OnMouseDown",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 125
+    "line": 135
   },
   {
     "kind": "method",
     "name": "OnMouseDrag",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 132
+    "line": 143
   },
   {
     "kind": "method",
     "name": "OnMouseUp",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 141
+    "line": 153
   },
   {
     "kind": "method",
     "name": "GetScreenRectBL",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 174
+    "line": 187
+  },
+  {
+    "kind": "method",
+    "name": "IsOverHUD",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 196
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 183
+    "line": 205
   },
   {
     "kind": "property",
@@ -291,7 +297,19 @@
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/SelectionHUD.cs",
-    "line": 23
+    "line": 27
+  },
+  {
+    "kind": "property",
+    "name": "LastPanelRectBL",
+    "file": "Assets/Scripts/UI/SelectionHUD.cs",
+    "line": 25
+  },
+  {
+    "kind": "property",
+    "name": "LastGizmoRectBL",
+    "file": "Assets/Scripts/UI/SelectionHUD.cs",
+    "line": 26
   },
   {
     "kind": "class",
