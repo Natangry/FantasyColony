@@ -1,6 +1,9 @@
 using System;
 using System.Reflection;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem; // New Input System support
+#endif
 
 /// <summary>
 /// Handles in-world placement of buildings while a placement tool is active.
@@ -49,6 +52,42 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureMarker();
     }
 
+    // --- Input helpers: support both legacy Input and the new Input System ---
+    private Vector2 GetMousePosition()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null)
+        {
+            return Mouse.current.position.ReadValue();
+        }
+#endif
+        return Input.mousePosition;
+    }
+
+    private bool LeftClickDown()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) return true;
+#endif
+        return Input.GetMouseButtonDown(0);
+    }
+
+    private bool RightClickDown()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame) return true;
+#endif
+        return Input.GetMouseButtonDown(1);
+    }
+
+    private bool CancelPressed()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) return true;
+#endif
+        return Input.GetKeyDown(KeyCode.Escape);
+    }
+
     private void Update()
     {
         // Drive placement every frame
@@ -66,11 +105,11 @@ public class BuildPlacementTool : MonoBehaviour
         UpdateGhost();
 
         // Handle input
-        if (Input.GetMouseButtonDown(0))
+        if (LeftClickDown())
         {
             TryPlace();
         }
-        else if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+        else if (RightClickDown() || CancelPressed())
         {
             CancelPlacement();
         }
@@ -134,7 +173,8 @@ public class BuildPlacementTool : MonoBehaviour
         if (cam == null) return; // can't place without a camera
 
         if (!TryGetMouseOnGround(cam, out var world)) return;
-
+        // show marker even before we know if placement is valid
+        if (_marker == null) EnsureMarker();
         // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
@@ -389,7 +429,8 @@ public class BuildPlacementTool : MonoBehaviour
     private bool TryGetMouseOnGround(Camera cam, out Vector3 world)
     {
         // 1) Try raycast to plane (works in both perspective and ortho)
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Vector2 mp = GetMousePosition();
+        Ray ray = cam.ScreenPointToRay(new Vector3(mp.x, mp.y, 0f));
         Plane ground = _plane == GridPlane.XZ
             ? new Plane(Vector3.up, new Vector3(0f, _groundConst, 0f))
             : new Plane(Vector3.forward, new Vector3(0f, 0f, _groundConst));
@@ -402,8 +443,14 @@ public class BuildPlacementTool : MonoBehaviour
         // 2) Fallback via depth from ground reference (covers edge camera setups)
         Vector3 groundRef = _plane == GridPlane.XZ ? new Vector3(0f, _groundConst, 0f) : new Vector3(0f, 0f, _groundConst);
         float depth = cam.WorldToScreenPoint(groundRef).z;
-        Vector3 mp = Input.mousePosition;
         world = cam.ScreenToWorldPoint(new Vector3(mp.x, mp.y, depth));
+        if (!float.IsNaN(world.x)) return true;
+
+        // 3) Final fallback: project using camera basis onto plane
+        Vector3 origin = cam.transform.position;
+        Vector3 dir = (cam.transform.forward.sqrMagnitude < 0.0001f) ? Vector3.forward : cam.transform.forward;
+        Ray ray2 = new Ray(origin, dir);
+        if (ground.Raycast(ray2, out float enter2)) { world = ray2.GetPoint(enter2); return true; }
         return true;
     }
 
