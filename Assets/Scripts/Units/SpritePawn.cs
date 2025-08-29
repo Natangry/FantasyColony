@@ -8,6 +8,12 @@ using System.Collections.Generic;
 [AddComponentMenu("Units/Sprite Pawn (Test)")]
 public class SpritePawn : MonoBehaviour
 {
+    public enum MovementPattern
+    {
+        Rectangle,
+        DiagonalLoop,
+        Lissajous8
+    }
     // Registry for marquee selection
     public static readonly HashSet<SpritePawn> Instances = new HashSet<SpritePawn>();
 
@@ -27,7 +33,9 @@ public class SpritePawn : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float speed = 3.0f;
     [SerializeField] private float margin = 1.25f;
-    [Tooltip("If true, patrol uses diagonal corners to demonstrate 8-direction movement.")]
+    [Tooltip("Choose how this pawn moves when not controlled.")]
+    [SerializeField] private MovementPattern pattern = MovementPattern.DiagonalLoop;
+    [Tooltip("Legacy toggle kept for backward compatibility; 'pattern' now takes precedence.")]
     [SerializeField] private bool diagonalPatrol = true;
     private Vector3 logicalPos; // continuous (unsnapped) position
 
@@ -43,6 +51,12 @@ public class SpritePawn : MonoBehaviour
     private GameObject ringGO;
     private bool isControlled;
     private bool isSelected;
+
+    // Lissajous (figure-8) state
+    private float lissaT;
+    private float lissaAmpX, lissaAmpZ;
+    private float lissaCenterX, lissaCenterZ;
+    private bool lissaReady;
 
     private void Awake()
     {
@@ -64,7 +78,15 @@ public class SpritePawn : MonoBehaviour
         CreateSelectionRing();
         BuildPatrolFromGridOrCamera();
         // Start near the first corner so movement is immediately visible (lift slightly above grid to avoid z-fighting).
-        var start = corners[0]; start.y = 0.02f;
+        Vector3 start;
+        if (pattern == MovementPattern.Lissajous8 && lissaReady)
+        {
+            start = new Vector3(lissaCenterX, 0.02f, lissaCenterZ);
+        }
+        else
+        {
+            start = corners[0]; start.y = 0.02f;
+        }
         logicalPos = start;
         transform.position = start;
     }
@@ -318,7 +340,23 @@ public class SpritePawn : MonoBehaviour
         float maxX = grid.width * grid.tileSize - margin;
         float maxZ = grid.height * grid.tileSize - margin;
 
-        if (diagonalPatrol)
+        if (pattern == MovementPattern.Lissajous8)
+        {
+            // Precompute figure-8 center and amplitudes inside the grid bounds.
+            lissaCenterX = (minX + maxX) * 0.5f;
+            lissaCenterZ = (minZ + maxZ) * 0.5f;
+            lissaAmpX = Mathf.Max(0.1f, (maxX - minX) * 0.45f);
+            lissaAmpZ = Mathf.Max(0.1f, (maxZ - minZ) * 0.35f);
+            lissaT = 0f;
+            lissaReady = true;
+            // Still set corners for safety, though Update will use Lissajous.
+            corners[0] = new Vector3(lissaCenterX, 0f, lissaCenterZ);
+            corners[1] = corners[0];
+            corners[2] = corners[0];
+            corners[3] = corners[0];
+            cornerIndex = 1;
+        }
+        else if (pattern == MovementPattern.DiagonalLoop || diagonalPatrol)
         {
             // Diagonal loop to demonstrate 8-direction movement:
             // bottom-left -> top-right -> top-left -> bottom-right -> repeat
@@ -326,6 +364,7 @@ public class SpritePawn : MonoBehaviour
             corners[1] = new Vector3(maxX, 0f, maxZ);
             corners[2] = new Vector3(minX, 0f, maxZ);
             corners[3] = new Vector3(maxX, 0f, minZ);
+            cornerIndex = 1;
         }
         else
         {
@@ -334,8 +373,8 @@ public class SpritePawn : MonoBehaviour
             corners[1] = new Vector3(maxX, 0f, minZ);
             corners[2] = new Vector3(maxX, 0f, maxZ);
             corners[3] = new Vector3(minX, 0f, maxZ);
+            cornerIndex = 1;
         }
-        cornerIndex = 1;
     }
 
     void BuildPatrolFromCamera()
@@ -346,15 +385,42 @@ public class SpritePawn : MonoBehaviour
         if (minX > maxX) { float c = (minX + maxX) * 0.5f; minX = maxX = c; }
         if (minZ > maxZ) { float c = (minZ + maxZ) * 0.5f; minZ = maxZ = c; }
 
-        corners[0] = new Vector3(minX, 0f, minZ);
-        corners[1] = new Vector3(maxX, 0f, minZ);
-        corners[2] = new Vector3(maxX, 0f, maxZ);
-        corners[3] = new Vector3(minX, 0f, maxZ);
-        cornerIndex = 1; // head toward the second corner first
+        if (pattern == MovementPattern.Lissajous8)
+        {
+            lissaCenterX = (minX + maxX) * 0.5f;
+            lissaCenterZ = (minZ + maxZ) * 0.5f;
+            lissaAmpX = Mathf.Max(0.1f, (maxX - minX) * 0.45f);
+            lissaAmpZ = Mathf.Max(0.1f, (maxZ - minZ) * 0.35f);
+            lissaT = 0f; lissaReady = true;
+            corners[0] = new Vector3(lissaCenterX, 0f, lissaCenterZ);
+            corners[1] = corners[0]; corners[2] = corners[0]; corners[3] = corners[0];
+            cornerIndex = 1;
+        }
+        else
+        {
+            corners[0] = new Vector3(minX, 0f, minZ);
+            corners[1] = new Vector3(maxX, 0f, minZ);
+            corners[2] = new Vector3(maxX, 0f, maxZ);
+            corners[3] = new Vector3(minX, 0f, maxZ);
+            cornerIndex = 1; // head toward the second corner first
+        }
     }
 
     private void Update()
     {
+        if (pattern == MovementPattern.Lissajous8 && lissaReady)
+        {
+            // Smooth figure-8: x = sin(t), z = sin(2t)
+            lissaT += speed * Time.deltaTime;
+            logicalPos = new Vector3(
+                lissaCenterX + lissaAmpX * Mathf.Sin(lissaT),
+                0.02f,
+                lissaCenterZ + lissaAmpZ * Mathf.Sin(2f * lissaT)
+            );
+            transform.position = PixelCameraHelper.SnapToPixelGrid(logicalPos, cam);
+            return;
+        }
+
         if (corners == null || corners.Length < 4) return;
 
         // Continuous motion in logical space (no snap)
@@ -390,6 +456,29 @@ public class SpritePawn : MonoBehaviour
 
         // Render at pixel-snapped position
         transform.position = PixelCameraHelper.SnapToPixelGrid(logicalPos, cam);
+    }
+
+    /// <summary>
+    /// Configure movement pattern (and optionally speed) at runtime. Rebuilds paths/params immediately.
+    /// </summary>
+    public void ConfigurePattern(MovementPattern newPattern, float newSpeed = -1f)
+    {
+        pattern = newPattern;
+        if (newSpeed > 0f) speed = newSpeed;
+        BuildPatrolFromGridOrCamera();
+    }
+
+    /// <summary>
+    /// Optionally set selection ring color at runtime.
+    /// </summary>
+    public void SetRingColor(Color c)
+    {
+        ringColor = c;
+        if (ringMat != null)
+        {
+            if (ringMat.HasProperty("_Color")) ringMat.SetColor("_Color", c);
+            if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", c);
+        }
     }
 }
 
