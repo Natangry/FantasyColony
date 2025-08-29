@@ -10,6 +10,9 @@ public static class SpriteVisualFactory2D
     private static string _sortingLayer;
     private static int _orderGround;
 
+    public static string SortingLayerName => _sortingLayer;
+    public static int GroundOrder => _orderGround;
+
     public static void Build()
     {
         _ghostPrefabs.Clear();
@@ -80,14 +83,20 @@ public static class SpriteVisualFactory2D
 
     private static void DetectSortingLayer()
     {
-        // Try to inherit the ground/pawn sorting layer; fallback to Default
+        // Prefer a Pawn/Unit sprite if available, else any SpriteRenderer, else Default
         _sortingLayer = "Default";
         _orderGround = 0;
-        var anySR = Object.FindAnyObjectByType<SpriteRenderer>();
-        if (anySR != null)
+        SpriteRenderer picked = null;
+        foreach (var sr in Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None))
         {
-            _sortingLayer = anySR.sortingLayerName;
-            _orderGround = anySR.sortingOrder;
+            var n = sr.gameObject.name.ToLower();
+            if (n.Contains("pawn") || n.Contains("unit") || n.Contains("colonist")) { picked = sr; break; }
+            if (picked == null) picked = sr; // fallback to first seen
+        }
+        if (picked != null)
+        {
+            _sortingLayer = picked.sortingLayerName;
+            _orderGround = picked.sortingOrder;
         }
     }
 }

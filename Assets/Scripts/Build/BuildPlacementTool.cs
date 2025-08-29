@@ -31,6 +31,7 @@ public class BuildPlacementTool : MonoBehaviour
     private int _gridLayer = 0; // render layer to use for ghost/marker/visuals
     private string _activeBuildingDefId = "core.Building.ConstructionBoard";
     private VisualDef _ghostVDef; // cached visual for the active building
+    private string _lastPlaceStatus = string.Empty;
 
     private Camera _cam;
     private static Sprite _whiteSprite;
@@ -100,8 +101,7 @@ public class BuildPlacementTool : MonoBehaviour
 
         if (_tool == BuildTool.None)
         {
-            DestroyGhost();
-            DestroyMarker();
+            KillAllPreviews();
             return;
         }
 
@@ -277,7 +277,7 @@ public class BuildPlacementTool : MonoBehaviour
 
         if (!_canPlace) return;
 
-        Transform parent = EnsureBuildingsParent();
+        Transform parent = EnsurePlacedParent2D() ?? EnsureBuildingsParent();
         Debug.Log($"[BuildPlacementTool] Placing {_tool} at grid {_snapGridPos} world {_snapWorldPos}");
 
         switch (_tool)
@@ -285,7 +285,7 @@ public class BuildPlacementTool : MonoBehaviour
             case BuildTool.PlaceConstructionBoard:
             {
                 var go = new GameObject("Construction Board");
-                go.transform.SetParent(parent, worldPositionStays: true);
+                go.transform.SetParent(parent, worldPositionStays: false);
                 // Align to bottom-left tile of the footprint
                 float wx = _anchor.x + (_snapGridPos.x * _tile);
                 if (_plane == GridPlane.XZ)
@@ -296,7 +296,7 @@ public class BuildPlacementTool : MonoBehaviour
                 else
                 {
                     float wy = _anchor.y + (_snapGridPos.y * _tile);
-                    go.transform.position = new Vector3(wx, wy, _groundConst);
+                    go.transform.position = new Vector3(wx, wy, 0f);
                 }
 
                 var board = go.AddComponent<ConstructionBoard>();
@@ -307,22 +307,24 @@ public class BuildPlacementTool : MonoBehaviour
 
                 // Attach visual via defs (2D sprite)
                 var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
-                var placed = SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
+                var placed = SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile <= 0 ? 1f : _tile, go.transform);
                 if (placed == null)
                 {
                     Debug.LogError("[BuildPlacementTool] SpawnPlaced returned null – visual def missing?");
+                    _lastPlaceStatus = "ERR: no visual";
                 }
                 else
                 {
-                    // Ensure render priority over ground
+                    // Ensure render priority & layer similar to pawns
                     var sr = placed.GetComponent<SpriteRenderer>();
                     if (sr != null)
                     {
-                        // Try to match pawn render ordering if available
-                        sr.sortingOrder += 3;
+                        sr.sortingLayerName = SpriteVisualFactory2D.SortingLayerName;
+                        sr.sortingOrder = SpriteVisualFactory2D.GroundOrder + 3;
                         sr.enabled = true;
                     }
                     placed.SetActive(true);
+                    _lastPlaceStatus = "OK";
                 }
 
                 // Clear previews and finalize tool state for unique-per-map
@@ -436,7 +438,7 @@ public class BuildPlacementTool : MonoBehaviour
     private void OnGUI()
     {
         SyncToolFromController();
-        GUI.depth = -1000; // draw on top of windows
+        GUI.depth = -32767; // draw on top of windows
         if (_tool == BuildTool.None) return; // only when a build tool is active
         var style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.box);
         style.alignment = TextAnchor.UpperLeft;
@@ -453,8 +455,8 @@ public class BuildPlacementTool : MonoBehaviour
             mpNIS = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
         }
 #endif
-        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nMouse Legacy: {mpLegacy.x:F0},{mpLegacy.y:F0}  NIS: {mpNIS.x:F0},{mpNIS.y:F0}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 680, 210), text, style);
+        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nMouse Legacy: {mpLegacy.x:F0},{mpLegacy.y:F0}  NIS: {mpNIS.x:F0},{mpNIS.y:F0}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nSorting: {SpriteVisualFactory2D.SortingLayerName} / base {SpriteVisualFactory2D.GroundOrder}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}\nPlaced Last: {_lastPlaceStatus}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 760, 240), text, style);
     }
 
     private bool CameraHasLayer(int layer)
@@ -576,10 +578,28 @@ public class BuildPlacementTool : MonoBehaviour
     {
         DestroyGhost();
         DestroyMarker();
-        // belt & suspenders: nuke any stray preview sprites under our transform
         foreach (var sr in GetComponentsInChildren<SpriteRenderer>(true))
-            if (sr.gameObject.name.Contains("Build Ghost") || sr.gameObject.name.Contains("Build Marker"))
+        {
+            var n = sr.gameObject.name;
+            if (n.Contains("Build Ghost") || n.Contains("Build Marker"))
+            {
                 Destroy(sr.gameObject);
+            }
+        }
+    }
+
+    private Transform EnsurePlacedParent2D()
+    {
+        var t = GameObject.Find("World2D/Buildings")?.transform;
+        if (t != null) return t;
+        var root = GameObject.Find("World2D")?.transform;
+        if (root == null)
+        {
+            var go = new GameObject("World2D");
+            root = go.transform; root.position = Vector3.zero; root.localScale = Vector3.one;
+        }
+        var b = new GameObject("Buildings").transform; b.SetParent(root, false);
+        return b;
     }
 
     private void DestroyGhost()
