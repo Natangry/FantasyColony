@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Ensures the main camera follows the currently controlled pawn.
+/// Ensures the main camera follows the currently controlled pawn and supports free WASD panning.
 /// </summary>
 public static class CameraBootstrap
 {
@@ -26,6 +26,10 @@ public static class CameraBootstrap
 
         if (cam.GetComponent<FollowControlledPawn>() == null)
             cam.gameObject.AddComponent<FollowControlledPawn>();
+
+        // Add free camera controls for when no pawn is controlled.
+        if (cam.GetComponent<FreeCameraController>() == null)
+            cam.gameObject.AddComponent<FreeCameraController>();
 
         added = true;
     }

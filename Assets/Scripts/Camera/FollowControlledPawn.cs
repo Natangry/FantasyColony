@@ -10,9 +10,12 @@ public class FollowControlledPawn : MonoBehaviour
     [Header("Follow")]
     [SerializeField] private float smoothTime = 0.15f;
     [SerializeField] private bool snapOnAcquire = true;
-    [SerializeField] private bool pixelSnap = true;
+    [SerializeField] private bool pixelSnap = false; // disable by default to avoid double-quantization jitter
     [Tooltip("Optional XZ world offset from the pawn center.")]
     [SerializeField] private Vector2 offset = Vector2.zero;
+    [Header("Stability")]
+    [SerializeField] private bool useDeadZone = true;
+    [SerializeField] private float deadZonePixels = 0.75f;
 
     private Camera _cam;
     private Transform _target;
@@ -54,13 +57,32 @@ public class FollowControlledPawn : MonoBehaviour
         if (_target == null || _cam == null) return;
 
         // Desired position keeps current camera Y & rotation; moves X/Z toward target.
-        var desired = new Vector3(
+        Vector3 desired = new Vector3(
             _target.position.x + offset.x,
             _cam.transform.position.y,
             _target.position.z + offset.y
         );
 
-        var pos = Vector3.SmoothDamp(_cam.transform.position, desired, ref _vel, Mathf.Max(0.0001f, smoothTime));
+        Vector3 current = _cam.transform.position;
+
+        // Optional dead-zone measured in on-screen pixels to prevent micro hunting.
+        if (useDeadZone)
+        {
+            float dx = desired.x - current.x;
+            float dz = desired.z - current.z;
+            float dist = Mathf.Sqrt(dx * dx + dz * dz);
+            float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(_cam));
+            float threshold = upp * Mathf.Max(0f, deadZonePixels);
+            if (dist <= threshold)
+            {
+                var snapPos = pixelSnap ? SnapPosToPixelGrid(desired, _cam) : desired;
+                _cam.transform.position = snapPos;
+                _vel = Vector3.zero;
+                return;
+            }
+        }
+
+        Vector3 pos = Vector3.SmoothDamp(current, desired, ref _vel, Mathf.Max(0.0001f, smoothTime));
 
         if (pixelSnap)
             pos = SnapPosToPixelGrid(pos, _cam);
