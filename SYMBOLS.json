@@ -163,27 +163,27 @@
   },
   {
     "kind": "method",
-    "name": "ClampToGrid",
+    "name": "EnsureGridVisibility",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 147
+    "line": 152
   },
   {
     "kind": "method",
     "name": "ReadMoveInput",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 176
+    "line": 215
   },
   {
     "kind": "method",
     "name": "ReadBoost",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 190
+    "line": 229
   },
   {
     "kind": "method",
     "name": "ReadScrollDelta",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 199
+    "line": 238
   },
   {
     "kind": "class",
