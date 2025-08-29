@@ -196,6 +196,10 @@ public class IntroScreen : MonoBehaviour
         var clock = GameClockAPI.Find();
         if (clock != null) clock.ResetClock(1, 8, 0);
 
+        // Reset the calendar to Year 1, Day 1.
+        var cal = GameCalendarAPI.Find();
+        if (cal != null) cal.ResetCalendar(1, 1);
+
         showMenu = false;
     }
 }
