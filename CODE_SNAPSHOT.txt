@@ -414,9 +414,10 @@ public class SpritePawn : MonoBehaviour
         }
 
         CreateVisual();
-        BuildPatrolFromCamera();
-        // Start near the first corner so movement is immediately visible
-        transform.position = corners[0];
+        BuildPatrolFromGridOrCamera();
+        // Start near the first corner so movement is immediately visible (lift slightly above grid to avoid z-fighting).
+        var start = corners[0]; start.y = 0.02f;
+        transform.position = start;
     }
 
     void CreateVisual()
@@ -507,13 +508,20 @@ public class SpritePawn : MonoBehaviour
         if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", Color.white);
         if (mat.HasProperty("_Color")) mat.SetColor("_Color", Color.white);
 
+        // Try to disable backface culling so the sprite is always visible from above.
+        if (mat.HasProperty("_Cull")) mat.SetInt("_Cull", 0);          // 0 = Off
+        if (mat.HasProperty("_CullMode")) mat.SetInt("_CullMode", 0);  // URP variants
+
         // Create quad and orient it flat on the ground (XZ plane) so top-down camera sees it.
         quadGO = GameObject.CreatePrimitive(PrimitiveType.Quad);
         quadGO.name = "SpriteQuad";
         quadGO.transform.SetParent(transform, false);
-        // Lay flat: rotate -90° around X so the quad faces up (normal = +Y).
-        quadGO.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+        // Lay flat: rotate +90° around X so the quad's FRONT faces the camera (normal = -Y).
+        // (Unity's Quad front originally faces +Z; +90° X rotates it to -Y.)
+        quadGO.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 
+        // Nudge slightly above ground so it never z-fights with the grid.
+        quadGO.transform.localPosition = new Vector3(0f, 0.02f, 0f);
         // Assign material and remove collider
         var renderer = quadGO.GetComponent<MeshRenderer>();
         renderer.sharedMaterial = mat;
@@ -533,6 +541,39 @@ public class SpritePawn : MonoBehaviour
         float ny = Mathf.InverseLerp(y0, y1, y) * 2f - 1f;
         float r = Mathf.Sqrt(nx * nx * 0.85f + ny * ny);
         return r <= 1.0f;
+    }
+
+    void BuildPatrolFromGridOrCamera()
+    {
+        // Prefer the procedural grid to keep the pawn on the grass.
+#if UNITY_2022_2_OR_NEWER
+        var grid = Object.FindAnyObjectByType<SimpleGridMap>();
+#else
+        var grid = Object.FindObjectOfType<SimpleGridMap>();
+#endif
+        if (grid != null)
+        {
+            BuildPatrolFromGrid(grid);
+        }
+        else
+        {
+            BuildPatrolFromCamera();
+        }
+    }
+
+    void BuildPatrolFromGrid(SimpleGridMap grid)
+    {
+        // Grid generated from (0,0) to (width*tileSize, height*tileSize) in world space.
+        float minX = 0f + margin;
+        float minZ = 0f + margin;
+        float maxX = grid.width * grid.tileSize - margin;
+        float maxZ = grid.height * grid.tileSize - margin;
+
+        corners[0] = new Vector3(minX, 0f, minZ);
+        corners[1] = new Vector3(maxX, 0f, minZ);
+        corners[2] = new Vector3(maxX, 0f, maxZ);
+        corners[3] = new Vector3(minX, 0f, maxZ);
+        cornerIndex = 1;
     }
 
     void BuildPatrolFromCamera()
@@ -566,7 +607,7 @@ public class SpritePawn : MonoBehaviour
         Vector3 dir = (to.sqrMagnitude > 1e-8f) ? (to / to.magnitude) : Vector3.zero;
         pos += dir * speed * Time.deltaTime;
 
-        // Pixel snap after moving.
+        // Pixel snap after moving (preserve Y height).
         pos = PixelCameraHelper.SnapToPixelGrid(pos, cam);
         transform.position = pos;
     }
