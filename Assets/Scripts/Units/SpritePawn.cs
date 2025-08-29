@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 /// <summary>
 /// A simple SNES-style sprite pawn that patrols a rectangle within the camera view.
@@ -18,6 +19,8 @@ public class SpritePawn : MonoBehaviour
     [SerializeField] private Color accent = new Color(0.35f, 0.42f, 0.65f, 1f);
     [SerializeField] private Color outline = new Color(0.10f, 0.10f, 0.10f, 1f);
 
+    [Header("Selection Visual")]
+    [SerializeField] private Color ringColor = new Color(1f, 0.92f, 0.25f, 1f);
     [Header("Movement")]
     [SerializeField] private float speed = 3.0f;
     [SerializeField] private float margin = 1.25f;
@@ -33,6 +36,9 @@ public class SpritePawn : MonoBehaviour
     // Visuals
     private GameObject quadGO;
     private Material mat;
+    private GameObject ringGO;
+    private Material ringMat;
+    private bool isSelected;
 
     private void Awake()
     {
@@ -50,11 +56,23 @@ public class SpritePawn : MonoBehaviour
         }
 
         CreateVisual();
+        EnsureCollider();
+        CreateSelectionRing();
         BuildPatrolFromGridOrCamera();
         // Start near the first corner so movement is immediately visible (lift slightly above grid to avoid z-fighting).
         var start = corners[0]; start.y = 0.02f;
         logicalPos = start;
         transform.position = start;
+    }
+
+    private void OnEnable()
+    {
+        SelectionController.OnSelectionChanged += OnSelectionChanged;
+    }
+
+    private void OnDisable()
+    {
+        SelectionController.OnSelectionChanged -= OnSelectionChanged;
     }
 
     void CreateVisual()
@@ -169,6 +187,83 @@ public class SpritePawn : MonoBehaviour
         float worldW = (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit);
         float worldH = (float)spriteHeightPx / Mathf.Max(1, pixelsPerUnit);
         quadGO.transform.localScale = new Vector3(worldW, worldH, 1f);
+    }
+
+    void EnsureCollider()
+    {
+        // Add a thin box collider to make the pawn clickable via raycast.
+        var col = gameObject.GetComponent<BoxCollider>();
+        if (col == null) col = gameObject.AddComponent<BoxCollider>();
+        // Match collider footprint to sprite quad scale (XZ plane).
+        float worldW = (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit);
+        float worldH = (float)spriteHeightPx / Mathf.Max(1, pixelsPerUnit);
+        col.center = new Vector3(0f, 0.05f, 0f);
+        col.size = new Vector3(worldW, 0.1f, worldH);
+        col.isTrigger = false;
+    }
+
+    void CreateSelectionRing()
+    {
+        // Donut texture (transparent center)
+        const int S = 64;
+        var tex = new Texture2D(S, S, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        tex.wrapMode = TextureWrapMode.Clamp;
+        var px = new Color32[S * S];
+        for (int i = 0; i < px.Length; i++) px[i] = new Color32(0, 0, 0, 0);
+        float cx = (S - 1) * 0.5f, cy = (S - 1) * 0.5f;
+        float rOuter = S * 0.48f;
+        float rInner = S * 0.32f;
+        for (int y = 0; y < S; y++)
+        {
+            for (int x = 0; x < S; x++)
+            {
+                float dx = x - cx, dy = y - cy;
+                float d = Mathf.Sqrt(dx * dx + dy * dy);
+                if (d <= rOuter && d >= rInner)
+                {
+                    px[y * S + x] = ringColor;
+                }
+            }
+        }
+        tex.SetPixels32(px); tex.Apply(false, false);
+
+        // Material
+        var shader = Shader.Find("Unlit/Transparent") ?? Shader.Find("Sprites/Default") ?? Shader.Find("Unlit/Texture");
+        ringMat = new Material(shader);
+        if (ringMat.HasProperty("_BaseMap")) ringMat.SetTexture("_BaseMap", tex);
+        if (ringMat.HasProperty("_MainTex")) ringMat.SetTexture("_MainTex", tex);
+        if (ringMat.HasProperty("_Color")) ringMat.SetColor("_Color", Color.white);
+        if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", Color.white);
+        ringMat.renderQueue = 3000; // transparent
+
+        // Quad
+        ringGO = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        ringGO.name = "SelectionRing";
+        ringGO.transform.SetParent(transform, false);
+        // Lay flat in XZ like the sprite
+        ringGO.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        // Slightly above sprite to avoid z-fighting and be visible around it
+        ringGO.transform.localPosition = new Vector3(0f, 0.025f, 0f);
+        // Scale ring to be a bit wider than sprite footprint
+        float worldW = (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit);
+        float scale = worldW * 1.6f;
+        ringGO.transform.localScale = new Vector3(scale, scale, 1f);
+        var rr = ringGO.GetComponent<MeshRenderer>();
+        rr.sharedMaterial = ringMat;
+        var rc = ringGO.GetComponent<Collider>(); if (rc) Destroy(rc);
+        ringGO.SetActive(false);
+    }
+
+    private void OnSelectionChanged(SpritePawn newlySelected)
+    {
+        SetSelected(newlySelected == this);
+    }
+
+    public void SetSelected(bool on)
+    {
+        isSelected = on;
+        if (ringGO != null) ringGO.SetActive(on);
     }
 
     bool InsideBody(int x, int y, int x0, int x1, int y0, int y1)
