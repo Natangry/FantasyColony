@@ -81,49 +81,67 @@
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 23
+    "line": 28
   },
   {
     "kind": "method",
     "name": "SetPaused",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 35
+    "line": 43
+  },
+  {
+    "kind": "method",
+    "name": "SetSpeed",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 54
+  },
+  {
+    "kind": "method",
+    "name": "ApplyTimeScale",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 60
   },
   {
     "kind": "method",
     "name": "TogglePause",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 46
+    "line": 65
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 53
+    "line": 72
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 64
+    "line": 101
   },
   {
     "kind": "method",
     "name": "OnPausePerformed",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 70
+    "line": 113
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Systems/PauseController.cs",
-    "line": 76
+    "line": 119
   },
   {
     "kind": "property",
     "name": "IsPaused",
     "file": "Assets/Scripts/Systems/PauseController.cs",
     "line": 14
+  },
+  {
+    "kind": "property",
+    "name": "CurrentSpeed",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 15
   },
   {
     "kind": "class",
