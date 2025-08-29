@@ -102,6 +102,18 @@
     "line": 6
   },
   {
+    "kind": "class",
+    "name": "BuildHotkeyListener",
+    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
+    "line": 7
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
+    "line": 9
+  },
+  {
     "kind": "enum",
     "name": "BuildTool",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
@@ -159,25 +171,25 @@
     "kind": "struct",
     "name": "GUIStateScope",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 73
+    "line": 86
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 14
+    "line": 18
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 35
+    "line": 39
   },
   {
     "kind": "method",
     "name": "Dispose",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 78
+    "line": 91
   },
   {
     "kind": "class",
@@ -267,19 +279,19 @@
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
-    "line": 14
+    "line": 15
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
-    "line": 30
+    "line": 31
   },
   {
     "kind": "method",
     "name": "MakeTex",
     "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
-    "line": 62
+    "line": 65
   },
   {
     "kind": "class",
@@ -877,21 +889,39 @@
   },
   {
     "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/UI/IntroScreen.cs",
+    "line": 32
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/UI/IntroScreen.cs",
+    "line": 34
+  },
+  {
+    "kind": "method",
     "name": "EnsureStyles",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 30
+    "line": 35
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 102
+    "line": 106
   },
   {
     "kind": "method",
     "name": "OnStartGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 184
+    "line": 190
+  },
+  {
+    "kind": "property",
+    "name": "IsVisible",
+    "file": "Assets/Scripts/UI/IntroScreen.cs",
+    "line": 6
   },
   {
     "kind": "class",

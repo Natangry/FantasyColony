@@ -357,8 +357,40 @@ public static class BuildBootstrap
         if (go.GetComponent<BuildPaletteHUD>() == null) go.AddComponent<BuildPaletteHUD>();
         if (go.GetComponent<JobService>() == null) go.AddComponent<JobService>();
         if (go.GetComponent<BuildToggleHUD>() == null) go.AddComponent<BuildToggleHUD>();
+        if (go.GetComponent<BuildHotkeyListener>() == null) go.AddComponent<BuildHotkeyListener>();
     }
 }
+
+
+// ===== FILE: Assets/Scripts/Build/BuildHotkeyListener.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Global listener that guarantees the B hotkey toggles Build Mode even if
+/// the BuildModeController hasn't been instantiated yet.
+/// </summary>
+public class BuildHotkeyListener : MonoBehaviour
+{
+    private void Update()
+    {
+        if (IntroScreen.IsVisible) return; // ignore while at the intro menu
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            BuildBootstrap.Ensure();
+            var bm = BuildModeController.Instance;
+            if (bm == null)
+            {
+                var go = GameObject.Find("BuildSystems (Auto)");
+                if (go == null) go = new GameObject("BuildSystems (Auto)");
+                bm = go.GetComponent<BuildModeController>();
+                if (bm == null) bm = go.AddComponent<BuildModeController>();
+            }
+            bm.ToggleBuildMode();
+        }
+    }
+}
+
 
 
 // ===== FILE: Assets/Scripts/Build/BuildModeController.cs =====
@@ -440,11 +472,15 @@ using UnityEngine;
 public class BuildPaletteHUD : MonoBehaviour
 {
     [SerializeField] private Vector2 offset = new Vector2(12f, 120f);
-    [SerializeField] private float widthPct = 0.22f;
+    [SerializeField] private float widthPct = 0.28f;
+    [SerializeField] private float heightPct = 0.65f;
+    [SerializeField] private float fontPct = 0.03f; // scale with resolution
+    [SerializeField] private float buttonHPct = 0.05f;
 
     private GUIStyle _box;
     private GUIStyle _button;
     private GUIStyle _label;
+    private Vector2 _scroll;
 
     private void Ensure()
     {
@@ -470,16 +506,23 @@ public class BuildPaletteHUD : MonoBehaviour
     private void OnGUI()
     {
         var bm = BuildModeController.Instance;
+        if (IntroScreen.IsVisible) return; // never show on intro
         if (bm == null || !bm.IsActive) return;
 
         Ensure();
 
-        float w = Mathf.Max(220f, Screen.width * widthPct);
-        Rect r = new Rect(offset.x, offset.y, w, Screen.height * 0.5f);
+        int fontSize = Mathf.RoundToInt(Mathf.Max(14f, Screen.height * fontPct));
+        _button.fontSize = fontSize;
+        _label.fontSize = fontSize;
+
+        float w = Mathf.Max(260f, Screen.width * widthPct);
+        float h = Mathf.Max(260f, Screen.height * heightPct);
+        Rect r = new Rect(offset.x, offset.y, w, h);
         GUILayout.BeginArea(r, "Build Palette", _box);
 
         GUILayout.Label("Stations", _label);
         GUILayout.Space(6f);
+        _scroll = GUILayout.BeginScrollView(_scroll);
 
         // Construction Board entry
         bool exists = BuildModeController.UniqueBuildingExists<ConstructionBoard>();
@@ -487,16 +530,18 @@ public class BuildPaletteHUD : MonoBehaviour
         {
             GUILayout.Label("Construction Board (Free)", GUILayout.ExpandWidth(true));
             GUI.enabled = !exists;
-            if (GUILayout.Button(exists ? "Placed" : "Place", _button, GUILayout.Width(90f)))
+            float btnH = Mathf.Max(32f, Screen.height * buttonHPct);
+            if (GUILayout.Button(exists ? "Placed" : "Place", _button, GUILayout.Width(120f), GUILayout.Height(btnH)))
             {
                 bm.SetTool(BuildTool.PlaceConstructionBoard);
             }
             GUI.enabled = true;
         }
+        GUILayout.EndScrollView();
 
         GUILayout.FlexibleSpace();
         GUILayout.Space(8f);
-        if (GUILayout.Button("Exit Build Mode (B)", _button, GUILayout.Height(32f)))
+        if (GUILayout.Button("Exit Build Mode (B)", _button, GUILayout.Height(Mathf.Max(36f, Screen.height * (buttonHPct * 0.9f)))))
         {
             bm.SetActive(false);
         }
@@ -736,8 +781,9 @@ using UnityEngine;
 public class BuildToggleHUD : MonoBehaviour
 {
     [SerializeField] private Vector2 offset = new Vector2(12f, 12f);
-    [SerializeField] private float fontPct = 0.028f; // slightly smaller than speed label
-    [SerializeField] private float topExtra = 52f;   // push below speed/clock text
+    [SerializeField] private float fontPct = 0.028f;     // slightly smaller than speed label
+    [SerializeField] private float topExtraPct = 0.12f;  // below speed/clock text by a proportion of screen height
+    [SerializeField] private float minTopExtra = 64f;
 
     private GUIStyle _btn;
     private GUIStyle _btnActive;
@@ -760,6 +806,7 @@ public class BuildToggleHUD : MonoBehaviour
 
     private void OnGUI()
     {
+        if (IntroScreen.IsVisible) return; // hide on intro screen
         Ensure();
 
         var bm = BuildModeController.Instance;
@@ -772,6 +819,7 @@ public class BuildToggleHUD : MonoBehaviour
         string label = active ? "🔨 Exit Build (B)" : "🔨 Build (B)";
 
         float w = Mathf.Max(160f, fontSize * 10f);
+        float topExtra = Mathf.Max(minTopExtra, Screen.height * topExtraPct);
         Rect r = new Rect(Screen.width - w - offset.x, offset.y + topExtra, w, fontSize * 1.8f);
 
         if (GUI.Button(r, label, active ? _btnActive : _btn))
@@ -2291,6 +2339,8 @@ using UnityEngine;
 
 public class IntroScreen : MonoBehaviour
 {
+    // Public flag so other HUDs (e.g., Build) can hide during the intro menu
+    public static bool IsVisible { get; private set; }
     [Header("Layout")]
     [SerializeField] private float titlePct = 0.18f;            // % of screen height for the title font size
     [SerializeField] private float buttonPct = 0.06f;           // % of screen height for button height
@@ -2317,6 +2367,8 @@ public class IntroScreen : MonoBehaviour
     private Texture2D sizeTex;
     private Texture2D sizeSelTex;
 
+    private void OnEnable() { IsVisible = true; }
+    private void OnDisable() { IsVisible = false; }
     private void EnsureStyles()
     {
         if (bgTex == null)
@@ -2391,6 +2443,8 @@ public class IntroScreen : MonoBehaviour
 
     private void OnGUI()
     {
+        // Keep public flag synced so other HUDs can hide while intro is up
+        IsVisible = showMenu;
         if (!showMenu) return;
 
         EnsureStyles();
@@ -2470,8 +2524,8 @@ public class IntroScreen : MonoBehaviour
     }
 
     // Called when Start is pressed: clear/hide the intro overlay.
-    private void OnStartGame()
-    {
+private void OnStartGame()
+{
         // Generate the selected grid map and frame the camera before hiding the menu.
         int idx = Mathf.Clamp(selectedMapIndex, 0, mapSizes.Length - 1);
         int size = mapSizes[idx];
@@ -2490,6 +2544,7 @@ public class IntroScreen : MonoBehaviour
         if (cal != null) cal.ResetCalendar(1, 1);
 
         showMenu = false;
+        IsVisible = false;
     }
 }
 
