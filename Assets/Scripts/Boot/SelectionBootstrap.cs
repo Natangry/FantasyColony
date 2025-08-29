@@ -2,6 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Ensures a SelectionController exists at runtime in any scene.
+/// (Updated for marquee selection support)
 /// </summary>
 public static class SelectionBootstrap
 {

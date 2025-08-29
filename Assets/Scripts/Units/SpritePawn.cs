@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// A simple SNES-style sprite pawn that patrols a rectangle within the camera view.
@@ -7,6 +8,9 @@ using UnityEngine;
 [AddComponentMenu("Units/Sprite Pawn (Test)")]
 public class SpritePawn : MonoBehaviour
 {
+    // Registry for marquee selection
+    public static readonly HashSet<SpritePawn> Instances = new HashSet<SpritePawn>();
+
     [Header("Sprite")]
     [SerializeField] private int spriteWidthPx = 16;
     [SerializeField] private int spriteHeightPx = 24;
@@ -66,12 +70,12 @@ public class SpritePawn : MonoBehaviour
 
     private void OnEnable()
     {
-        SelectionController.OnSelectionChanged += OnSelectionChanged;
+        Instances.Add(this);
     }
 
     private void OnDisable()
     {
-        SelectionController.OnSelectionChanged -= OnSelectionChanged;
+        Instances.Remove(this);
     }
 
     void CreateVisual()
@@ -252,11 +256,6 @@ public class SpritePawn : MonoBehaviour
         rr.sharedMaterial = ringMat;
         var rc = ringGO.GetComponent<Collider>(); if (rc) UnityEngine.Object.Destroy(rc);
         ringGO.SetActive(false);
-    }
-
-    private void OnSelectionChanged(SpritePawn newlySelected)
-    {
-        SetSelected(newlySelected == this);
     }
 
     public void SetSelected(bool on)
