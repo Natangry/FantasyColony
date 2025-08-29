@@ -15,5 +15,6 @@ public static class BuildBootstrap
         if (go.GetComponent<BuildPaletteHUD>() == null) go.AddComponent<BuildPaletteHUD>();
         if (go.GetComponent<JobService>() == null) go.AddComponent<JobService>();
         if (go.GetComponent<BuildToggleHUD>() == null) go.AddComponent<BuildToggleHUD>();
+        if (go.GetComponent<BuildHotkeyListener>() == null) go.AddComponent<BuildHotkeyListener>();
     }
 }
