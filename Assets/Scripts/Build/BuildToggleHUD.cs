@@ -6,8 +6,9 @@ using UnityEngine;
 public class BuildToggleHUD : MonoBehaviour
 {
     [SerializeField] private Vector2 offset = new Vector2(12f, 12f);
-    [SerializeField] private float fontPct = 0.028f; // slightly smaller than speed label
-    [SerializeField] private float topExtra = 52f;   // push below speed/clock text
+    [SerializeField] private float fontPct = 0.028f;     // slightly smaller than speed label
+    [SerializeField] private float topExtraPct = 0.12f;  // below speed/clock text by a proportion of screen height
+    [SerializeField] private float minTopExtra = 64f;
 
     private GUIStyle _btn;
     private GUIStyle _btnActive;
@@ -30,6 +31,7 @@ public class BuildToggleHUD : MonoBehaviour
 
     private void OnGUI()
     {
+        if (IntroScreen.IsVisible) return; // hide on intro screen
         Ensure();
 
         var bm = BuildModeController.Instance;
@@ -42,6 +44,7 @@ public class BuildToggleHUD : MonoBehaviour
         string label = active ? "🔨 Exit Build (B)" : "🔨 Build (B)";
 
         float w = Mathf.Max(160f, fontSize * 10f);
+        float topExtra = Mathf.Max(minTopExtra, Screen.height * topExtraPct);
         Rect r = new Rect(Screen.width - w - offset.x, offset.y + topExtra, w, fontSize * 1.8f);
 
         if (GUI.Button(r, label, active ? _btnActive : _btn))

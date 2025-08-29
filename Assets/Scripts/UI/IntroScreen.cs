@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class IntroScreen : MonoBehaviour
 {
+    // Public flag so other HUDs (e.g., Build) can hide during the intro menu
+    public static bool IsVisible { get; private set; }
     [Header("Layout")]
     [SerializeField] private float titlePct = 0.18f;            // % of screen height for the title font size
     [SerializeField] private float buttonPct = 0.06f;           // % of screen height for button height
@@ -28,6 +30,8 @@ public class IntroScreen : MonoBehaviour
     private Texture2D sizeTex;
     private Texture2D sizeSelTex;
 
+    private void OnEnable() { IsVisible = true; }
+    private void OnDisable() { IsVisible = false; }
     private void EnsureStyles()
     {
         if (bgTex == null)
@@ -102,6 +106,8 @@ public class IntroScreen : MonoBehaviour
 
     private void OnGUI()
     {
+        // Keep public flag synced so other HUDs can hide while intro is up
+        IsVisible = showMenu;
         if (!showMenu) return;
 
         EnsureStyles();
@@ -181,8 +187,8 @@ public class IntroScreen : MonoBehaviour
     }
 
     // Called when Start is pressed: clear/hide the intro overlay.
-    private void OnStartGame()
-    {
+private void OnStartGame()
+{
         // Generate the selected grid map and frame the camera before hiding the menu.
         int idx = Mathf.Clamp(selectedMapIndex, 0, mapSizes.Length - 1);
         int size = mapSizes[idx];
@@ -201,6 +207,7 @@ public class IntroScreen : MonoBehaviour
         if (cal != null) cal.ResetCalendar(1, 1);
 
         showMenu = false;
+        IsVisible = false;
     }
 }
 
