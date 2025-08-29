@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -11,7 +10,7 @@ using UnityEngine.InputSystem;
 public class SelectionController : MonoBehaviour
 {
     public static SpritePawn Selected { get; private set; }
-    public static event Action<SpritePawn> OnSelectionChanged;
+    public static event System.Action<SpritePawn> OnSelectionChanged;
 
 #if ENABLE_INPUT_SYSTEM
     private InputAction _clickAction;
