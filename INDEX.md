@@ -40,6 +40,7 @@
 - **IntroBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs)
 - **IntroBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta)
 - **PauseBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PauseBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PauseBootstrap.cs)
+- **PauseBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PauseBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PauseBootstrap.cs.meta)
 - **PawnBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs)
 - **PawnBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs.meta)
 - **SelectionBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/SelectionBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/SelectionBootstrap.cs)
@@ -47,15 +48,26 @@
 - **WorldBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs)
 - **WorldBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Build.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build.meta)
+
 ## Assets/Scripts/Build
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Build)
 
 - **BuildBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildBootstrap.cs)
+- **BuildBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildBootstrap.cs.meta)
 - **BuildHotkeyListener.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildHotkeyListener.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildHotkeyListener.cs)
+- **BuildHotkeyListener.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildHotkeyListener.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildHotkeyListener.cs.meta)
 - **BuildModeController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildModeController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildModeController.cs)
+- **BuildModeController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildModeController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildModeController.cs.meta)
 - **BuildPaletteHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPaletteHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPaletteHUD.cs)
+- **BuildPaletteHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPaletteHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPaletteHUD.cs.meta)
 - **BuildPlacementTool.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPlacementTool.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPlacementTool.cs)
+- **BuildPlacementTool.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPlacementTool.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPlacementTool.cs.meta)
 - **BuildToggleHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildToggleHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildToggleHUD.cs)
+- **BuildToggleHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildToggleHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildToggleHUD.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -72,24 +84,46 @@
 - **PixelCameraHelper.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
 - **PixelCameraHelper.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Jobs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs.meta)
+
 ## Assets/Scripts/Jobs
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Jobs)
 
 - **JobService.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs/JobService.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs/JobService.cs)
+- **JobService.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs/JobService.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs/JobService.cs.meta)
 - **JobType.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs/JobType.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs/JobType.cs)
+- **JobType.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs/JobType.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs/JobType.cs.meta)
+
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Pawns.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns.meta)
 
 ## Assets/Scripts/Pawns
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Pawns)
 
 - **PawnJob.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns/PawnJob.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns/PawnJob.cs)
+- **PawnJob.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns/PawnJob.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns/PawnJob.cs.meta)
+
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Systems.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems.meta)
 
 ## Assets/Scripts/Systems
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Systems)
 
 - **ControlManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/ControlManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/ControlManager.cs)
+- **ControlManager.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/ControlManager.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/ControlManager.cs.meta)
 - **GameCalendar.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameCalendar.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameCalendar.cs)
+- **GameCalendar.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameCalendar.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameCalendar.cs.meta)
 - **GameClock.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameClock.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameClock.cs)
+- **GameClock.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameClock.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameClock.cs.meta)
 - **PauseController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
+- **PauseController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs.meta)
 - **PawnInteractionManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs)
 - **PawnInteractionManager.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs.meta)
 - **SelectionController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs)
@@ -104,9 +138,11 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI)
 
 - **ClockHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs)
+- **ClockHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs.meta)
 - **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
 - **IntroScreen.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs.meta)
 - **SelectionHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs)
+- **SelectionHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -128,11 +164,14 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World)
 
 - **Building.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/Building.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/Building.cs)
+- **Building.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/Building.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/Building.cs.meta)
+- **Buildings.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/Buildings.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/Buildings.meta)
 
 ## Assets/Scripts/World/Buildings
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World/Buildings)
 
 - **ConstructionBoard.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/Buildings/ConstructionBoard.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/Buildings/ConstructionBoard.cs)
+- **ConstructionBoard.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/Buildings/ConstructionBoard.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/Buildings/ConstructionBoard.cs.meta)
 
 ## Assets/Scripts/World
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World)
