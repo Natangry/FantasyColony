@@ -447,25 +447,25 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 37
+    "line": 43
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 43
+    "line": 49
   },
   {
     "kind": "method",
     "name": "OnStartGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 124
+    "line": 137
   },
   {
     "kind": "method",
     "name": "QuitGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 139
+    "line": 154
   },
   {
     "kind": "class",
