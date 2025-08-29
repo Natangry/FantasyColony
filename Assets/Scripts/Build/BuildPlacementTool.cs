@@ -1,0 +1,206 @@
+using System;
+using System.Reflection;
+using UnityEngine;
+
+/// <summary>
+/// Handles in-world placement of buildings while a placement tool is active.
+/// </summary>
+public class BuildPlacementTool : MonoBehaviour
+{
+    private BuildTool _tool = BuildTool.None;
+    private GameObject _ghost;
+    private bool _canPlace;
+    private Vector3 _snapWorldPos;
+    private Vector2Int _snapGridPos;
+
+    // Grid snapshot via reflection to avoid tight coupling
+    private float _tile = 1f; private int _w = 128; private int _h = 128;
+
+    private void LateUpdate()
+    {
+        if (_tool == BuildTool.None)
+        {
+            DestroyGhost();
+            return;
+        }
+
+        ReadGridInfo();
+        UpdateGhost();
+
+        if (Input.GetMouseButtonDown(1)) // cancel tool
+        {
+            SetTool(BuildTool.None);
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0)) // left-click to place
+        {
+            TryPlace();
+        }
+    }
+
+    public void SetTool(BuildTool tool)
+    {
+        _tool = tool;
+        if (_tool == BuildTool.None) DestroyGhost();
+    }
+
+    private void ReadGridInfo()
+    {
+        var grid = FindObjectOfTypeByName("SimpleGridMap");
+        _tile = 1f; _w = 128; _h = 128;
+        if (grid != null)
+        {
+            TryGetField(grid, "tileSize", ref _tile);
+            TryGetField(grid, "width", ref _w);
+            TryGetField(grid, "height", ref _h);
+        }
+    }
+
+    private void UpdateGhost()
+    {
+        var cam = Camera.main;
+        var m = Input.mousePosition;
+        Vector3 world = cam != null ? cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z))) : Vector3.zero;
+
+        // Snap to grid
+        float tx = Mathf.Round(world.x / _tile) * _tile;
+        float ty = Mathf.Round(world.y / _tile) * _tile;
+        _snapWorldPos = new Vector3(tx, ty, -0.1f);
+        _snapGridPos = new Vector2Int(Mathf.RoundToInt(tx / _tile), Mathf.RoundToInt(ty / _tile));
+
+        EnsureGhost();
+
+        // Validate
+        _canPlace = IsInsideGrid(_snapGridPos) && IsPlacementAllowedHere();
+
+        // Color
+        SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.7f) : new Color(0.9f, 0.2f, 0.2f, 0.7f));
+        _ghost.transform.position = _snapWorldPos;
+        _ghost.transform.localScale = Vector3.one * _tile;
+    }
+
+    private bool IsInsideGrid(Vector2Int p)
+    {
+        return p.x >= 0 && p.y >= 0 && p.x < _w && p.y < _h;
+    }
+
+    private bool IsPlacementAllowedHere()
+    {
+        if (_tool == BuildTool.PlaceConstructionBoard && BuildModeController.UniqueBuildingExists<ConstructionBoard>())
+            return false; // unique per map
+
+        // Check for any existing Building occupying this tile (1x1 for now)
+        var all = FindObjectsOfType<Building>();
+        foreach (var b in all)
+        {
+            if (b.Occupies(_snapGridPos)) return false;
+        }
+        return true;
+    }
+
+    private void TryPlace()
+    {
+        if (!_canPlace) return;
+
+        Transform parent = EnsureBuildingsParent();
+
+        switch (_tool)
+        {
+            case BuildTool.PlaceConstructionBoard:
+            {
+                var go = new GameObject("Construction Board");
+                go.transform.SetParent(parent, worldPositionStays: true);
+                go.transform.position = _snapWorldPos;
+
+                var board = go.AddComponent<ConstructionBoard>();
+                board.displayName = "Construction Board";
+                board.uniquePerMap = true;
+                board.size = new Vector2Int(1, 1);
+                board.OnPlaced(_snapGridPos, _tile);
+                break;
+            }
+        }
+
+        // After successful placement, clear tool
+        SetTool(BuildTool.None);
+    }
+
+    private void EnsureGhost()
+    {
+        if (_ghost != null) return;
+        _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        _ghost.name = "Build Ghost";
+        _ghost.layer = 0;
+        var mr = _ghost.GetComponent<MeshRenderer>();
+        mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+        SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.7f));
+    }
+
+    private void DestroyGhost()
+    {
+        if (_ghost != null)
+        {
+            Destroy(_ghost);
+            _ghost = null;
+        }
+    }
+
+    private void SetGhostColor(Color c)
+    {
+        var mr = _ghost != null ? _ghost.GetComponent<MeshRenderer>() : null;
+        if (mr != null && mr.sharedMaterial != null)
+        {
+            mr.sharedMaterial.color = c;
+        }
+    }
+
+    private Transform EnsureBuildingsParent()
+    {
+        var world = GameObject.Find("World");
+        if (world == null)
+        {
+            world = new GameObject("World");
+        }
+        var trans = world.transform.Find("Buildings");
+        if (trans == null)
+        {
+            var go = new GameObject("Buildings");
+            trans = go.transform;
+            trans.SetParent(world.transform, worldPositionStays: false);
+            trans.localPosition = Vector3.zero;
+        }
+        return trans;
+    }
+
+    private static Component FindObjectOfTypeByName(string typeName)
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            var t = asm.GetType(typeName);
+            if (t == null) continue;
+#if UNITY_2023_1_OR_NEWER
+            var comp = Object.FindAnyObjectByType(t) as Component;
+#else
+            var comp = Object.FindObjectOfType(t) as Component;
+#endif
+            if (comp != null) return comp;
+        }
+        return null;
+    }
+
+    private static void TryGetField<T>(Component c, string field, ref T value)
+    {
+        if (c == null) return;
+        var f = c.GetType().GetField(field, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        if (f != null)
+        {
+            object v = f.GetValue(c);
+            if (v is T tv) value = tv;
+            else
+            {
+                try { value = (T)System.Convert.ChangeType(v, typeof(T)); } catch { }
+            }
+        }
+    }
+}
