@@ -128,11 +128,20 @@ public static class PauseBootstrap
 #else
         var existing = Object.FindObjectOfType<PauseController>();
 #endif
-        if (existing != null) { spawned = true; return; }
+        GameObject go;
+        if (existing != null)
+        {
+            go = existing.gameObject;
+        }
+        else
+        {
+            go = new GameObject("PauseController (Auto)");
+            Object.DontDestroyOnLoad(go);
+            go.AddComponent<PauseController>();
+        }
 
-        var go = new GameObject("PauseController (Auto)");
-        Object.DontDestroyOnLoad(go);
-        go.AddComponent<PauseController>();
+        if (go.GetComponent<GameClock>() == null) go.AddComponent<GameClock>();
+        if (go.GetComponent<ClockHUD>() == null) go.AddComponent<ClockHUD>();
         spawned = true;
     }
 }
@@ -779,6 +788,118 @@ public class ControlManager : MonoBehaviour
 
 
 
+// ===== FILE: Assets/Scripts/Systems/GameClock.cs =====
+using System;
+using UnityEngine;
+
+/// <summary>
+/// Central 24-hour game clock that advances with Time.deltaTime (respects pause & speed).
+/// Exposes Day, Hour, Minute, and useful helpers for schedules/lighting.
+/// </summary>
+public class GameClock : MonoBehaviour
+{
+    [Header("Tuning")]
+    [Tooltip("Real-time seconds for one full in-game day at 1× speed.")]
+    [SerializeField] private float secondsPerGameDay = 600f; // 10 real minutes per game day by default
+
+    [Tooltip("Starting in-game time (24h clock).")]
+    [Range(0, 23)] [SerializeField] private int startHour = 8;
+    [Range(0, 59)] [SerializeField] private int startMinute = 0;
+
+    [Header("State (read-only)")]
+    [SerializeField] private int currentDay = 1;
+    [SerializeField] private float timeOfDaySeconds; // 0..secondsPerGameDay
+
+    public event Action<int> OnDayChanged;
+
+    public int Day => currentDay;
+    public float NormalizedDay => secondsPerGameDay <= 0f ? 0f : Mathf.Clamp01(timeOfDaySeconds / secondsPerGameDay);
+
+    public int Hour24
+    {
+        get
+        {
+            float hourLen = HourLengthSeconds;
+            return Mathf.FloorToInt(timeOfDaySeconds / hourLen) % 24;
+        }
+    }
+
+    public int Minute
+    {
+        get
+        {
+            float minuteLen = MinuteLengthSeconds;
+            return Mathf.FloorToInt(timeOfDaySeconds / minuteLen) % 60;
+        }
+    }
+
+    public int Second
+    {
+        get
+        {
+            float secondLen = SecondLengthSeconds;
+            return Mathf.FloorToInt(timeOfDaySeconds / secondLen) % 60;
+        }
+    }
+
+    public string TimeHHMM => $"{Hour24:00}:{Minute:00}";
+
+    private float HourLengthSeconds => secondsPerGameDay / 24f;
+    private float MinuteLengthSeconds => secondsPerGameDay / (24f * 60f);
+    private float SecondLengthSeconds => secondsPerGameDay / (24f * 60f * 60f);
+
+    private void Awake()
+    {
+        if (secondsPerGameDay <= 0f) secondsPerGameDay = 600f;
+        InitializeToStartTime();
+    }
+
+    private void Update()
+    {
+        // deltaTime respects pause & timeScale; perfect for the clock.
+        timeOfDaySeconds += Time.deltaTime;
+
+        if (timeOfDaySeconds >= secondsPerGameDay)
+        {
+            timeOfDaySeconds -= secondsPerGameDay;
+            currentDay = Mathf.Max(1, currentDay + 1);
+            try { OnDayChanged?.Invoke(currentDay); } catch { /* ignore listener errors */ }
+        }
+    }
+
+    /// <summary>Resets the clock to a specific day/hour/minute (seconds = 0).</summary>
+    public void ResetClock(int day, int hour, int minute)
+    {
+        currentDay = Mathf.Max(1, day);
+        SetTimeOfDay(hour, minute, 0);
+    }
+
+    private void InitializeToStartTime()
+    {
+        currentDay = Mathf.Max(1, currentDay);
+        SetTimeOfDay(startHour, startMinute, 0);
+    }
+
+    private void SetTimeOfDay(int hour, int minute, int second)
+    {
+        hour = Mathf.Clamp(hour, 0, 23);
+        minute = Mathf.Clamp(minute, 0, 59);
+        second = Mathf.Clamp(second, 0, 59);
+
+        // Map HH:MM:SS to our simulated-day seconds.
+        float realSecondsInDay = (hour * 3600f) + (minute * 60f) + second;
+        float t = realSecondsInDay / 86400f; // 0..1
+        timeOfDaySeconds = Mathf.Repeat(t * secondsPerGameDay, secondsPerGameDay);
+    }
+}
+
+// Convenience static accessor if desired elsewhere.
+public static class GameClockAPI
+{
+    public static GameClock Find() => UnityEngine.Object.FindObjectOfType<GameClock>();
+}
+
+
 // ===== FILE: Assets/Scripts/Systems/PauseController.cs =====
 using System;
 using UnityEngine;
@@ -1297,6 +1418,52 @@ public class SelectionController : MonoBehaviour
 }
 
 
+// ===== FILE: Assets/Scripts/UI/ClockHUD.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Minimal IMGUI overlay showing Day and 24h time (HH:MM). Placed at top-left.
+/// </summary>
+public class ClockHUD : MonoBehaviour
+{
+    [SerializeField] private Vector2 offset = new Vector2(12f, 12f);
+    [SerializeField] private float fontPct = 0.035f; // % of screen height
+
+    private GUIStyle _label;
+    private void Ensure()
+    {
+        if (_label == null)
+        {
+            _label = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.UpperLeft,
+                fontStyle = FontStyle.Bold
+            };
+            _label.normal.textColor = Color.white;
+        }
+    }
+
+    private void OnGUI()
+    {
+        var clock = GameClockAPI.Find();
+        if (clock == null) return;
+
+        Ensure();
+
+        _label.fontSize = Mathf.RoundToInt(Mathf.Max(14f, Screen.height * fontPct));
+        string text = $"Day {clock.Day} — {clock.TimeHHMM}";
+
+        // Shadow for legibility
+        Rect r = new Rect(offset.x, offset.y, Screen.width, Screen.height);
+        var shadow = new GUIStyle(_label);
+        shadow.normal.textColor = new Color(0f, 0f, 0f, 0.6f);
+        Rect rShadow = new Rect(r.x + 1, r.y + 1, r.width, r.height);
+        GUI.Label(rShadow, text, shadow);
+        GUI.Label(r, text, _label);
+    }
+}
+
+
 // ===== FILE: Assets/Scripts/UI/IntroScreen.cs =====
 using UnityEngine;
 
@@ -1491,6 +1658,10 @@ public class IntroScreen : MonoBehaviour
         // Spawn test pawns
         PawnBootstrap.SpawnSpritePawn();
         PawnBootstrap.SpawnSecondPawn();
+
+        // Reset the game clock to Day 1 at the configured start time.
+        var clock = GameClockAPI.Find();
+        if (clock != null) clock.ResetClock(1, 8, 0);
 
         showMenu = false;
     }

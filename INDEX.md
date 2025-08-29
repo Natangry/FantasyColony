@@ -66,6 +66,7 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Systems)
 
 - **ControlManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/ControlManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/ControlManager.cs)
+- **GameClock.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/GameClock.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/GameClock.cs)
 - **PauseController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
 - **PawnInteractionManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs)
 - **PawnInteractionManager.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs.meta)
@@ -80,6 +81,7 @@
 ## Assets/Scripts/UI
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI)
 
+- **ClockHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs)
 - **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
 - **IntroScreen.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs.meta)
 - **SelectionHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs)

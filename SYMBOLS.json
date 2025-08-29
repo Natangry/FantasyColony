@@ -253,6 +253,54 @@
   },
   {
     "kind": "class",
+    "name": "GameClock",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "GameClockAPI",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 106
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 59
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 65
+  },
+  {
+    "kind": "method",
+    "name": "ResetClock",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 80
+  },
+  {
+    "kind": "method",
+    "name": "InitializeToStartTime",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 85
+  },
+  {
+    "kind": "method",
+    "name": "SetTimeOfDay",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 91
+  },
+  {
+    "kind": "method",
+    "name": "Find",
+    "file": "Assets/Scripts/Systems/GameClock.cs",
+    "line": 108
+  },
+  {
+    "kind": "class",
     "name": "PauseController",
     "file": "Assets/Scripts/Systems/PauseController.cs",
     "line": 12
@@ -436,6 +484,24 @@
     "name": "Selected",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
     "line": 16
+  },
+  {
+    "kind": "class",
+    "name": "ClockHUD",
+    "file": "Assets/Scripts/UI/ClockHUD.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "Ensure",
+    "file": "Assets/Scripts/UI/ClockHUD.cs",
+    "line": 12
+  },
+  {
+    "kind": "method",
+    "name": "OnGUI",
+    "file": "Assets/Scripts/UI/ClockHUD.cs",
+    "line": 24
   },
   {
     "kind": "class",
