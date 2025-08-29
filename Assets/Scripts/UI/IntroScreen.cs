@@ -125,6 +125,8 @@ public class IntroScreen : MonoBehaviour
     {
         // Generate a small default grid map and frame the camera before hiding the menu.
         WorldBootstrap.GenerateDefaultGrid();
+        // Spawn a SNES-style sprite pawn that patrols the visible area.
+        PawnBootstrap.SpawnSpritePawn();
 
         showMenu = false;
         // The bootstrap GameObject is marked DontDestroyOnLoad, so we simply hide UI here.
