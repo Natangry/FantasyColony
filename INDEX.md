@@ -85,6 +85,11 @@
 - **PixelCameraHelper.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
 - **PixelCameraHelper.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta)
 
+## Assets/Scripts/Defs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Defs)
+
+- **Defs.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Defs.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Defs.cs)
+
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
 
@@ -108,6 +113,11 @@
 
 - **PawnJob.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns/PawnJob.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns/PawnJob.cs)
 - **PawnJob.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns/PawnJob.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns/PawnJob.cs.meta)
+
+## Assets/Scripts/Rendering
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Rendering)
+
+- **VisualFactory.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualFactory.cs)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -465,3 +475,13 @@
 - **VFXManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/VFXManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/VFXManager.asset)
 - **XRSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/XRSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/XRSettings.asset)
 - **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/README.md)
+
+## StreamingAssets/Defs/Buildings
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/StreamingAssets/Defs/Buildings)
+
+- **Core_Buildings.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/StreamingAssets/Defs/Buildings/Core_Buildings.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/StreamingAssets/Defs/Buildings/Core_Buildings.xml)
+
+## StreamingAssets/Defs/Visuals
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/StreamingAssets/Defs/Visuals)
+
+- **Core_Visuals.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/StreamingAssets/Defs/Visuals/Core_Visuals.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/StreamingAssets/Defs/Visuals/Core_Visuals.xml)

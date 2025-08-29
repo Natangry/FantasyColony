@@ -207,187 +207,181 @@
     "kind": "class",
     "name": "BuildPlacementTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 12
+    "line": 13
   },
   {
     "kind": "method",
     "name": "SyncToolFromController",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 37
+    "line": 38
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 49
+    "line": 50
   },
   {
     "kind": "method",
     "name": "GetMousePosition",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 59
+    "line": 61
   },
   {
     "kind": "method",
     "name": "LeftClickDown",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 69
+    "line": 71
   },
   {
     "kind": "method",
     "name": "RightClickDown",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 77
+    "line": 79
   },
   {
     "kind": "method",
     "name": "CancelPressed",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 85
+    "line": 87
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 93
+    "line": 95
   },
   {
     "kind": "method",
     "name": "ReadGridInfo",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 120
+    "line": 122
   },
   {
     "kind": "method",
     "name": "UpdateGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 177
+    "line": 178
   },
   {
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 237
+    "line": 239
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 244
+    "line": 246
   },
   {
     "kind": "method",
     "name": "RectOverlaps",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 263
+    "line": 265
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 269
+    "line": 271
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 311
+    "line": 317
   },
   {
     "kind": "method",
     "name": "EnsureMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 329
+    "line": 325
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 344
+    "line": 334
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 362
+    "line": 352
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 393
+    "line": 383
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 408
+    "line": 398
   },
   {
     "kind": "method",
     "name": "GetFootprint",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 416
+    "line": 406
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 427
+    "line": 417
   },
   {
     "kind": "method",
     "name": "CameraHasLayer",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 441
+    "line": 431
   },
   {
     "kind": "method",
     "name": "TryGetMouseOnGround",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 447
+    "line": 437
   },
   {
     "kind": "method",
-    "name": "PickVisibleLayer",
+    "name": "ResolveActiveVisual",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 475
-  },
-  {
-    "kind": "method",
-    "name": "CreateOverlayMaterial",
-    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 485
+    "line": 465
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 515
+    "line": 485
   },
   {
     "kind": "method",
     "name": "DestroyMarker",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 531
+    "line": 501
   },
   {
     "kind": "method",
     "name": "InvalidReason",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 541
+    "line": 511
   },
   {
     "kind": "method",
     "name": "CancelPlacement",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 552
+    "line": 522
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 566
+    "line": 536
   },
   {
     "kind": "class",
@@ -564,6 +558,54 @@
     "line": 35
   },
   {
+    "kind": "namespace",
+    "name": "FantasyColony.Defs",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 5
+  },
+  {
+    "kind": "namespace",
+    "name": "FantasyColony.Defs",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 43
+  },
+  {
+    "kind": "namespace",
+    "name": "FantasyColony.Defs",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 66
+  },
+  {
+    "kind": "class",
+    "name": "BuildingDef",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 12
+  },
+  {
+    "kind": "class",
+    "name": "VisualDef",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 30
+  },
+  {
+    "kind": "class",
+    "name": "DefDatabase",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 46
+  },
+  {
+    "kind": "class",
+    "name": "XmlDefLoader",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 69
+  },
+  {
+    "kind": "method",
+    "name": "LoadAll",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 50
+  },
+  {
     "kind": "class",
     "name": "JobService",
     "file": "Assets/Scripts/Jobs/JobService.cs",
@@ -646,6 +688,42 @@
     "name": "SetJob",
     "file": "Assets/Scripts/Pawns/PawnJob.cs",
     "line": 36
+  },
+  {
+    "kind": "class",
+    "name": "VisualFactory",
+    "file": "Assets/Scripts/Rendering/VisualFactory.cs",
+    "line": 3
+  },
+  {
+    "kind": "method",
+    "name": "CreateGhost",
+    "file": "Assets/Scripts/Rendering/VisualFactory.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "CreatePlaced",
+    "file": "Assets/Scripts/Rendering/VisualFactory.cs",
+    "line": 20
+  },
+  {
+    "kind": "method",
+    "name": "MakeMaterial",
+    "file": "Assets/Scripts/Rendering/VisualFactory.cs",
+    "line": 35
+  },
+  {
+    "kind": "method",
+    "name": "Orient",
+    "file": "Assets/Scripts/Rendering/VisualFactory.cs",
+    "line": 59
+  },
+  {
+    "kind": "method",
+    "name": "PickVisibleLayer",
+    "file": "Assets/Scripts/Rendering/VisualFactory.cs",
+    "line": 77
   },
   {
     "kind": "class",
