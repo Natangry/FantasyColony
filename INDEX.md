@@ -68,6 +68,7 @@
 - **BuildPlacementTool.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPlacementTool.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPlacementTool.cs.meta)
 - **BuildToggleHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildToggleHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildToggleHUD.cs)
 - **BuildToggleHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildToggleHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildToggleHUD.cs.meta)
+- **GridSpace.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/GridSpace.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/GridSpace.cs)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)

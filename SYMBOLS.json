@@ -213,97 +213,103 @@
     "kind": "method",
     "name": "LateUpdate",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 28
+    "line": 29
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 51
+    "line": 52
   },
   {
     "kind": "method",
     "name": "ReadGridInfo",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 57
+    "line": 58
   },
   {
     "kind": "method",
     "name": "UpdateGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 88
+    "line": 110
   },
   {
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 124
+    "line": 166
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 131
+    "line": 173
   },
   {
     "kind": "method",
     "name": "RectOverlaps",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 150
+    "line": 192
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 156
+    "line": 198
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 186
+    "line": 236
   },
   {
     "kind": "method",
     "name": "EnsureBuildingsParent",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 204
+    "line": 254
   },
   {
     "kind": "method",
     "name": "FindObjectOfTypeByName",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 222
+    "line": 272
   },
   {
     "kind": "method",
     "name": "GetCamera",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 253
+    "line": 303
   },
   {
     "kind": "method",
     "name": "GuessCenteredAnchor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 268
+    "line": 318
   },
   {
     "kind": "method",
     "name": "GetFootprint",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 273
+    "line": 326
+  },
+  {
+    "kind": "method",
+    "name": "OnGUI",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 337
   },
   {
     "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 282
+    "line": 347
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 287
+    "line": 352
   },
   {
     "kind": "class",
@@ -328,6 +334,18 @@
     "name": "MakeTex",
     "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
     "line": 65
+  },
+  {
+    "kind": "enum",
+    "name": "GridPlane",
+    "file": "Assets/Scripts/Build/GridSpace.cs",
+    "line": 1
+  },
+  {
+    "kind": "class",
+    "name": "GridSpace",
+    "file": "Assets/Scripts/Build/GridSpace.cs",
+    "line": 10
   },
   {
     "kind": "class",
