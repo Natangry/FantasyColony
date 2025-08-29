@@ -29,7 +29,8 @@ public static class PauseBootstrap
         }
 
         if (go.GetComponent<GameClock>() == null) go.AddComponent<GameClock>();
-        if (go.GetComponent<ClockHUD>() == null) go.AddComponent<ClockHUD>();
+        if (go.GetComponent<GameCalendar>() == null) go.AddComponent<GameCalendar>();
+        if (go.GetComponent<ClockHUD>() == null) go.AddComponent<ClockHUD>(); // draws under speed (top-right)
         spawned = true;
     }
 }
