@@ -11,6 +11,8 @@ public class BuildPlacementTool : MonoBehaviour
     private BuildTool _tool = BuildTool.None;
     private GameObject _ghost;
     private MeshRenderer _ghostMr;
+    private GameObject _marker;
+    private MeshRenderer _markerMr;
     private bool _canPlace;
     private Vector3 _snapWorldPos;
     private Vector2Int _snapGridPos;
@@ -44,16 +46,19 @@ public class BuildPlacementTool : MonoBehaviour
         _tool = tool;
         _footSize = GetFootprint();
         EnsureGhost();
+        EnsureMarker();
     }
 
     private void Update()
     {
         // Drive placement every frame
         SyncToolFromController();
+        ReadGridInfo(); // keep bounds/plane fresh
 
         if (_tool == BuildTool.None)
         {
             DestroyGhost();
+            DestroyMarker();
             return;
         }
 
@@ -125,15 +130,6 @@ public class BuildPlacementTool : MonoBehaviour
 
     private void UpdateGhost()
     {
-        // Keep local tool state in sync with the controller every frame
-        SyncToolFromController();
-        ReadGridInfo();
-
-        if (_tool == BuildTool.None)
-        {
-            DestroyGhost();
-            return;
-        }
         var cam = GetCamera();
         if (cam == null) return; // can't place without a camera
 
@@ -176,11 +172,19 @@ public class BuildPlacementTool : MonoBehaviour
 
         EnsureGhost();
 
-        // Color
+        // Color + transforms
         SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.35f) : new Color(0.9f, 0.2f, 0.2f, 0.35f));
         _ghost.transform.position = _snapWorldPos;
         _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f);
         _ghost.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
+
+        // Raw hit marker (tiny) at mouse world
+        if (_marker != null)
+        {
+            _marker.transform.position = world + (_plane == GridPlane.XZ ? Vector3.up * 0.03f : Vector3.forward * 0.01f);
+            _marker.transform.localScale = Vector3.one * _tile * 0.2f;
+            _marker.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
+        }
     }
 
     private bool IsInsideGrid(Vector2Int p, Vector2Int size)
@@ -271,6 +275,18 @@ public class BuildPlacementTool : MonoBehaviour
         // Remove collider on the ghost
         var col = _ghost.GetComponent<Collider>();
         if (col != null) Destroy(col);
+    }
+
+    private void EnsureMarker()
+    {
+        if (_marker != null) return;
+        _marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        _marker.name = "Build Marker";
+        _markerMr = _marker.GetComponent<MeshRenderer>();
+        var mat = new Material(Shader.Find("Unlit/Color"));
+        mat.color = new Color(1f, 1f, 0.2f, 0.85f);
+        _markerMr.sharedMaterial = mat;
+        var col = _marker.GetComponent<Collider>(); if (col != null) Destroy(col);
     }
 
     private Transform EnsureBuildingsParent()
@@ -364,8 +380,10 @@ public class BuildPlacementTool : MonoBehaviour
         style.fontSize = 14;
         string plane = _plane.ToString();
         string reason = _canPlace ? "" : InvalidReason();
-        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 360, 110), text, style);
+        string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
+        string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
+        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 460, 150), text, style);
     }
 
     private bool TryGetMouseOnGround(Camera cam, out Vector3 world)
@@ -402,6 +420,16 @@ public class BuildPlacementTool : MonoBehaviour
             {
                 if (_ghostMr.sharedMaterial != null) _ghostMr.sharedMaterial.color = c;
             }
+        }
+    }
+
+    private void DestroyMarker()
+    {
+        if (_marker != null)
+        {
+            Destroy(_marker);
+            _marker = null;
+            _markerMr = null;
         }
     }
 
