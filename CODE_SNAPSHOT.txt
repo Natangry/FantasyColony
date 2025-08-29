@@ -627,7 +627,6 @@ public class BuildPlacementTool : MonoBehaviour
     private GameObject _ghost;
     private MeshRenderer _ghostMr;
     private GameObject _marker;
-    private MeshRenderer _markerMr;
     private bool _canPlace;
     private Vector3 _snapWorldPos;
     private Vector2Int _snapGridPos;
@@ -942,7 +941,6 @@ public class BuildPlacementTool : MonoBehaviour
         _marker = SpriteVisualFactory2D.SpawnGhost(vdef.id, Vector2Int.one, _tile*0.2f, this.transform);
         var sr = _marker.GetComponent<SpriteRenderer>();
         if (sr != null) sr.color = new Color(1f,1f,0.2f,0.85f);
-        _markerMr = null;
     }
 
     private Transform EnsureBuildingsParent()
@@ -1126,7 +1124,6 @@ public class BuildPlacementTool : MonoBehaviour
         {
             Destroy(_marker);
             _marker = null;
-            _markerMr = null;
         }
     }
 
