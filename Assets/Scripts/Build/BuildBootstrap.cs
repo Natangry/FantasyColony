@@ -1,4 +1,5 @@
 using UnityEngine;
+using FantasyColony.Defs;
 
 public static class BuildBootstrap
 {
@@ -21,5 +22,8 @@ public static class BuildBootstrap
         if (go.GetComponent<JobService>() == null) go.AddComponent<JobService>();
         if (go.GetComponent<BuildToggleHUD>() == null) go.AddComponent<BuildToggleHUD>();
         if (go.GetComponent<BuildHotkeyListener>() == null) go.AddComponent<BuildHotkeyListener>();
+
+        DefDatabase.LoadAll();
+        VisualRegistry.Build(Application.isEditor);
     }
 }

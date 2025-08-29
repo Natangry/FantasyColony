@@ -305,8 +305,8 @@ public class BuildPlacementTool : MonoBehaviour
                 board.OnPlaced(_snapGridPos, _tile);
 
                 // Attach visual via defs
-                var vdef = _ghostVDef ?? new VisualDef();
-                VisualFactory.CreatePlaced(vdef, board.size, _tile, go.transform, _gridLayer, _plane, GetCamera());
+                var vdef = _ghostVDef ?? new VisualDef { id = "core.Visual.Board_Default" };
+                VisualRegistry.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
                 break;
             }
         }
@@ -319,7 +319,7 @@ public class BuildPlacementTool : MonoBehaviour
     {
         if (_ghost != null) return;
         var vdef = _ghostVDef ?? new VisualDef();
-        _ghost = VisualFactory.CreateGhost(vdef, _footSize, _tile, this.transform, _gridLayer, _plane, GetCamera());
+        _ghost = VisualRegistry.SpawnGhost(vdef.id ?? "core.Visual.Board_Default", _footSize, _tile, this.transform);
         _ghostMr = _ghost.GetComponent<MeshRenderer>();
     }
 
