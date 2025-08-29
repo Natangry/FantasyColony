@@ -12,7 +12,7 @@ public class PawnInteractionManager : MonoBehaviour
 {
     [SerializeField] private float minChatSeconds = 2.5f;
     [SerializeField] private float maxChatSeconds = 4.0f;
-    [SerializeField] private float extraRadiusPadding = 0.05f; // small fudge in world units
+    [SerializeField] private float extraRadiusPadding = 0.12f; // widen trigger to improve reliability
     [SerializeField] private float pairRetestCooldown = 2.0f;  // seconds after an interaction ends before same pair can retrigger
 
     // Remember last time two specific pawns interacted to avoid immediate retriggers.
@@ -50,7 +50,7 @@ public class PawnInteractionManager : MonoBehaviour
                 float dx = pa.x - pb.x;
                 float dz = pa.z - pb.z;
                 float dist2 = dx * dx + dz * dz;
-                float rad = a.CollisionRadius + b.CollisionRadius + extraRadiusPadding;
+                float rad = (a.CollisionRadius + b.CollisionRadius) * 1.05f + extraRadiusPadding;
                 if (dist2 > rad * rad) continue;
 
                 // Decide leader/follower
@@ -65,9 +65,10 @@ public class PawnInteractionManager : MonoBehaviour
 
                 // Start chat interaction
                 float seconds = Random.Range(minChatSeconds, maxChatSeconds);
-                var returnMarker = follower.CaptureCurrentMarker();
-                leader.BeginChatLeader(follower, seconds, returnMarker);
-                follower.BeginChatFollower(leader, seconds, returnMarker);
+                // Use midpoint as collision point so both agree on the same spot visually.
+                Vector3 collisionPoint = (pa + pb) * 0.5f;
+                leader.BeginChatLeader(follower, seconds, collisionPoint);
+                follower.BeginChatFollower(leader, seconds, collisionPoint);
 
                 // Per-pair cooldown
                 pairCooldownUntil[key] = now + pairRetestCooldown;

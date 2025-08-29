@@ -27,13 +27,12 @@ public static class PawnBootstrap
 
         var pawnGO = new GameObject("TestPawn");
         pawnGO.transform.SetParent(root.transform, false);
-        pawnGO.AddComponent<SpritePawn>(); // default pattern from component
+        pawnGO.AddComponent<SpritePawn>();
         return pawnGO;
     }
 
     /// <summary>
-    /// Spawns a second pawn with a distinct movement pattern (figure-8 / Lissajous).
-    /// Safe to call multiple times; only creates if not already present.
+    /// Spawns a second pawn. Safe to call multiple times; only creates if not already present.
     /// </summary>
     public static GameObject SpawnSecondPawn()
     {
@@ -47,9 +46,7 @@ public static class PawnBootstrap
 
         var pawn2 = new GameObject("TestPawn_2");
         pawn2.transform.SetParent(root.transform, false);
-        var sp = pawn2.AddComponent<SpritePawn>();
-        // Configure a clearly different walk pattern & speed.
-        sp.ConfigurePattern(SpritePawn.MovementPattern.Lissajous8, 2.4f);
+        pawn2.AddComponent<SpritePawn>(); // same visuals/behavior; will idle-wander by default
         return pawn2;
     }
 }
