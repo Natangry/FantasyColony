@@ -28,6 +28,7 @@ public class BuildPlacementTool : MonoBehaviour
     private float _tile = 1f; private int _w = 128; private int _h = 128;
     private Vector3 _gridMinWorld; // bottom-left world corner of tile (0,0)
     private bool _haveBounds;
+    private int _gridLayer = 0; // render layer to use for ghost/marker/visuals
 
     private Camera _cam;
     private static Sprite _whiteSprite;
@@ -139,6 +140,7 @@ public class BuildPlacementTool : MonoBehaviour
                     GridSpace.Plane = _plane;
                     _groundConst = b.center.z;
                     _gridMinWorld = new Vector3(b.min.x, b.min.y, _groundConst);
+                    _gridLayer = rend.gameObject.layer;
                     _haveBounds = true;
                 }
                 else
@@ -148,6 +150,7 @@ public class BuildPlacementTool : MonoBehaviour
                     GridSpace.Plane = _plane;
                     _groundConst = b.center.y;
                     _gridMinWorld = new Vector3(b.min.x, _groundConst, b.min.z);
+                    _gridLayer = rend.gameObject.layer;
                     _haveBounds = true;
                 }
             }
@@ -157,6 +160,7 @@ public class BuildPlacementTool : MonoBehaviour
                 _plane = GridPlane.XY;
                 GridSpace.Plane = _plane;
                 _groundConst = 0f;
+                _gridLayer = 0; // Default
             }
         }
         else
@@ -164,6 +168,7 @@ public class BuildPlacementTool : MonoBehaviour
             _plane = GridPlane.XY;
             GridSpace.Plane = _plane;
             _groundConst = 0f;
+            _gridLayer = 0;
         }
     }
 
@@ -307,7 +312,7 @@ public class BuildPlacementTool : MonoBehaviour
         // Use a Quad + Unlit/Color material to ensure visibility in all camera setups
         _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
         _ghost.name = "Build Ghost";
-        _ghost.layer = 0;
+        _ghost.layer = _gridLayer;
         _ghostMr = _ghost.GetComponent<MeshRenderer>();
         var mat = new Material(Shader.Find("Unlit/Color"));
         mat.color = new Color(0.2f, 0.9f, 0.2f, 0.35f);
@@ -322,6 +327,7 @@ public class BuildPlacementTool : MonoBehaviour
         if (_marker != null) return;
         _marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
         _marker.name = "Build Marker";
+        _marker.layer = _gridLayer;
         _markerMr = _marker.GetComponent<MeshRenderer>();
         var mat = new Material(Shader.Find("Unlit/Color"));
         mat.color = new Color(1f, 1f, 0.2f, 0.85f);
@@ -422,8 +428,14 @@ public class BuildPlacementTool : MonoBehaviour
         string reason = _canPlace ? "" : InvalidReason();
         string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
         string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
-        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 460, 150), text, style);
+        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nGridLayer: {_gridLayer}  CamHasLayer: {CameraHasLayer(_gridLayer)}\nGhostActive: {(_ghost!=null)}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 560, 170), text, style);
+    }
+
+    private bool CameraHasLayer(int layer)
+    {
+        var cam = GetCamera(); if (cam == null) return true;
+        return (cam.cullingMask & (1 << layer)) != 0;
     }
 
     private bool TryGetMouseOnGround(Camera cam, out Vector3 world)
