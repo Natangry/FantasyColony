@@ -428,9 +428,13 @@ public class BuildPlacementTool : MonoBehaviour
         string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
         string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
         Vector2 mpLegacy = Input.mousePosition;
-        Vector2 mpNIS = Vector2.zero; #if ENABLE_INPUT_SYSTEM
-        if (UnityEngine.InputSystem.Mouse.current!=null) mpNIS = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
-        #endif
+        Vector2 mpNIS = Vector2.zero;
+#if ENABLE_INPUT_SYSTEM
+        if (UnityEngine.InputSystem.Mouse.current != null)
+        {
+            mpNIS = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        }
+#endif
         string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nMouse Legacy: {mpLegacy.x:F0},{mpLegacy.y:F0}  NIS: {mpNIS.x:F0},{mpNIS.y:F0}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
         UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 680, 210), text, style);
     }
