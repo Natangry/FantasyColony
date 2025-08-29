@@ -23,6 +23,11 @@
 
 - **Scripts.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts.meta)
 
+## Assets/Scripts/Boot
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Boot)
+
+- **IntroBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs)
+
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
 

@@ -1,6 +1,18 @@
 [
   {
     "kind": "class",
+    "name": "IntroBootstrap",
+    "file": "Assets/Scripts/Boot/IntroBootstrap.cs",
+    "line": 7
+  },
+  {
+    "kind": "method",
+    "name": "EnsureIntro",
+    "file": "Assets/Scripts/Boot/IntroBootstrap.cs",
+    "line": 12
+  },
+  {
+    "kind": "class",
     "name": "IntroScreen",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
     "line": 7
