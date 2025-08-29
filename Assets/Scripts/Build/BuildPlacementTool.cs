@@ -15,6 +15,8 @@ public class BuildPlacementTool : MonoBehaviour
 
     // Grid snapshot via reflection to avoid tight coupling
     private float _tile = 1f; private int _w = 128; private int _h = 128;
+    private Vector3 _gridMinWorld; // bottom-left world corner of tile (0,0)
+    private bool _haveBounds;
 
     private void LateUpdate()
     {
@@ -49,11 +51,21 @@ public class BuildPlacementTool : MonoBehaviour
     {
         var grid = FindObjectOfTypeByName("SimpleGridMap");
         _tile = 1f; _w = 128; _h = 128;
+        _haveBounds = false;
         if (grid != null)
         {
             TryGetField(grid, "tileSize", ref _tile);
             TryGetField(grid, "width", ref _w);
             TryGetField(grid, "height", ref _h);
+
+            // Try to find a Renderer to get true world bounds
+            var rend = (grid as Component).GetComponentInChildren<Renderer>();
+            if (rend != null)
+            {
+                var b = rend.bounds;
+                _gridMinWorld = new Vector3(b.min.x, b.min.y, 0f);
+                _haveBounds = true;
+            }
         }
     }
 
@@ -63,11 +75,17 @@ public class BuildPlacementTool : MonoBehaviour
         var m = Input.mousePosition;
         Vector3 world = cam != null ? cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z))) : Vector3.zero;
 
-        // Snap to grid
-        float tx = Mathf.Round(world.x / _tile) * _tile;
-        float ty = Mathf.Round(world.y / _tile) * _tile;
-        _snapWorldPos = new Vector3(tx, ty, -0.1f);
-        _snapGridPos = new Vector2Int(Mathf.RoundToInt(tx / _tile), Mathf.RoundToInt(ty / _tile));
+        // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
+        Vector3 anchor = _haveBounds ? _gridMinWorld : Vector3.zero;
+
+        // Snap to grid anchored at bottom-left
+        float tx = Mathf.Round((world.x - anchor.x) / _tile) * _tile + anchor.x;
+        float ty = Mathf.Round((world.y - anchor.y) / _tile) * _tile + anchor.y;
+        _snapWorldPos = new Vector3(tx, ty, 0f);
+
+        int gx = Mathf.RoundToInt((tx - anchor.x) / _tile);
+        int gy = Mathf.RoundToInt((ty - anchor.y) / _tile);
+        _snapGridPos = new Vector2Int(gx, gy);
 
         EnsureGhost();
 
@@ -82,6 +100,8 @@ public class BuildPlacementTool : MonoBehaviour
 
     private bool IsInsideGrid(Vector2Int p)
     {
+        if (!_haveBounds) // be permissive if we don't know exact bounds
+            return p.x >= -_w && p.y >= -_h && p.x < _w * 2 && p.y < _h * 2;
         return p.x >= 0 && p.y >= 0 && p.x < _w && p.y < _h;
     }
 
