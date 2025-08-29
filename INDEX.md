@@ -8,7 +8,6 @@
 
 - **InputSystem_Actions.inputactions** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions)
 - **InputSystem_Actions.inputactions.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions.meta)
-- **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/IntroScreen.cs)
 - **Readme.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset)
 - **Readme.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset.meta)
 - **Scenes.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes.meta)
@@ -18,6 +17,22 @@
 
 - **SampleScene.unity** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/SampleScene.unity) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/SampleScene.unity)
 - **SampleScene.unity.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/SampleScene.unity.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/SampleScene.unity.meta)
+
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
+- **Scripts.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts.meta)
+
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **UI.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI.meta)
+
+## Assets/Scripts/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI)
+
+- **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
+- **IntroScreen.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs.meta)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)

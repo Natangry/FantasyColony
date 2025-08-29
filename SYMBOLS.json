@@ -2,14 +2,20 @@
   {
     "kind": "class",
     "name": "IntroScreen",
-    "file": "Assets/IntroScreen.cs",
+    "file": "Assets/Scripts/UI/IntroScreen.cs",
     "line": 7
   },
   {
     "kind": "method",
     "name": "OnStartGame",
-    "file": "Assets/IntroScreen.cs",
-    "line": 17
+    "file": "Assets/Scripts/UI/IntroScreen.cs",
+    "line": 31
+  },
+  {
+    "kind": "method",
+    "name": "QuitGame",
+    "file": "Assets/Scripts/UI/IntroScreen.cs",
+    "line": 81
   },
   {
     "kind": "class",
