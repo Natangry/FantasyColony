@@ -13,6 +13,8 @@ public class BuildPlacementTool : MonoBehaviour
     private bool _canPlace;
     private Vector3 _snapWorldPos;
     private Vector2Int _snapGridPos;
+    private Vector2Int _footSize = Vector2Int.one; // current tool footprint in tiles
+    private Vector3 _anchor;
 
     // Grid snapshot via reflection to avoid tight coupling
     private float _tile = 1f; private int _w = 128; private int _h = 128;
@@ -81,33 +83,36 @@ public class BuildPlacementTool : MonoBehaviour
         Vector3 world = cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z)));
 
         // Determine anchor for snapping: true bottom-left if we have bounds, else (0,0)
-        Vector3 anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
+        _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
+        _footSize = GetFootprint();
 
         // Snap to grid anchored at bottom-left
-        float tx = Mathf.Round((world.x - anchor.x) / _tile) * _tile + anchor.x;
-        float ty = Mathf.Round((world.y - anchor.y) / _tile) * _tile + anchor.y;
-        _snapWorldPos = new Vector3(tx, ty, 0f);
-
-        int gx = Mathf.RoundToInt((tx - anchor.x) / _tile);
-        int gy = Mathf.RoundToInt((ty - anchor.y) / _tile);
+        int gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
+        int gy = Mathf.RoundToInt((world.y - _anchor.y) / _tile);
+        gx = Mathf.Clamp(gx, -_w, _w * 2);
+        gy = Mathf.Clamp(gy, -_h, _h * 2);
+        // bottom-left of footprint
         _snapGridPos = new Vector2Int(gx, gy);
+        float cx = _anchor.x + ((gx + _footSize.x * 0.5f) * _tile);
+        float cy = _anchor.y + ((gy + _footSize.y * 0.5f) * _tile);
+        _snapWorldPos = new Vector3(cx, cy, 0f);
 
         EnsureGhost();
 
         // Validate
-        _canPlace = IsInsideGrid(_snapGridPos) && IsPlacementAllowedHere();
+        _canPlace = IsInsideGrid(_snapGridPos, _footSize) && IsPlacementAllowedHere();
 
         // Color
         SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.7f) : new Color(0.9f, 0.2f, 0.2f, 0.7f));
         _ghost.transform.position = _snapWorldPos;
-        _ghost.transform.localScale = Vector3.one * _tile;
+        _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f);
     }
 
-    private bool IsInsideGrid(Vector2Int p)
+    private bool IsInsideGrid(Vector2Int p, Vector2Int size)
     {
         if (!_haveBounds) // be permissive if we don't know exact bounds
-            return p.x >= -_w && p.y >= -_h && p.x < _w * 2 && p.y < _h * 2;
-        return p.x >= 0 && p.y >= 0 && p.x < _w && p.y < _h;
+            return p.x >= -_w && p.y >= -_h && p.x + size.x <= _w * 2 && p.y + size.y <= _h * 2;
+        return p.x >= 0 && p.y >= 0 && p.x + size.x <= _w && p.y + size.y <= _h;
     }
 
     private bool IsPlacementAllowedHere()
@@ -115,7 +120,7 @@ public class BuildPlacementTool : MonoBehaviour
         if (_tool == BuildTool.PlaceConstructionBoard && BuildModeController.UniqueBuildingExists<ConstructionBoard>())
             return false; // unique per map
 
-        // Check for any existing Building occupying this tile (1x1 for now)
+        // Check for any existing Building overlapping this footprint
         Building[] all;
 #if UNITY_2023_1_OR_NEWER
         all = UnityEngine.Object.FindObjectsByType<Building>(FindObjectsSortMode.None);
@@ -124,9 +129,15 @@ public class BuildPlacementTool : MonoBehaviour
 #endif
         foreach (var b in all)
         {
-            if (b.Occupies(_snapGridPos)) return false;
+            if (RectOverlaps(b.GridPos, b.size, _snapGridPos, _footSize)) return false;
         }
         return true;
+    }
+
+    private static bool RectOverlaps(Vector2Int aPos, Vector2Int aSize, Vector2Int bPos, Vector2Int bSize)
+    {
+        return aPos.x < bPos.x + bSize.x && aPos.x + aSize.x > bPos.x &&
+               aPos.y < bPos.y + bSize.y && aPos.y + aSize.y > bPos.y;
     }
 
     private void TryPlace()
@@ -141,12 +152,15 @@ public class BuildPlacementTool : MonoBehaviour
             {
                 var go = new GameObject("Construction Board");
                 go.transform.SetParent(parent, worldPositionStays: true);
-                go.transform.position = _snapWorldPos;
+                // Align to bottom-left tile of the footprint
+                float wx = _anchor.x + (_snapGridPos.x * _tile);
+                float wy = _anchor.y + (_snapGridPos.y * _tile);
+                go.transform.position = new Vector3(wx, wy, 0f);
 
                 var board = go.AddComponent<ConstructionBoard>();
                 board.displayName = "Construction Board";
                 board.uniquePerMap = true;
-                board.size = new Vector2Int(1, 1);
+                board.size = new Vector2Int(1, 3);
                 board.OnPlaced(_snapGridPos, _tile);
                 break;
             }
@@ -239,6 +253,15 @@ public class BuildPlacementTool : MonoBehaviour
     private Vector3 GuessCenteredAnchor()
     {
         return new Vector3(-_w * _tile * 0.5f, -_h * _tile * 0.5f, 0f);
+    }
+
+    private Vector2Int GetFootprint()
+    {
+        switch (_tool)
+        {
+            case BuildTool.PlaceConstructionBoard: return new Vector2Int(1, 3);
+            default: return Vector2Int.one;
+        }
     }
 
     private void SetGhostColor(Color c)

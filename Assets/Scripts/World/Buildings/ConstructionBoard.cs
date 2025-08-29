@@ -3,6 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// One-per-map station that offers the Builder job via slots.
+/// Footprint: 1x3 tiles (vertical), anchored at bottom-left.
 /// </summary>
 public class ConstructionBoard : Building
 {
@@ -14,7 +15,7 @@ public class ConstructionBoard : Building
         id = "construction_board";
         displayName = string.IsNullOrEmpty(displayName) ? "Construction Board" : displayName;
         uniquePerMap = true;
-        size = Vector2Int.one;
+        size = new Vector2Int(1, 3);
     }
 
     private void OnMouseUpAsButton()
@@ -37,21 +38,21 @@ public class ConstructionBoard : Building
         }
 
         // Visual stub: tint a quad so it's visible
-        var mr = GetComponent<MeshRenderer>();
+        var mr = GetComponentInChildren<MeshRenderer>();
         if (mr == null)
         {
-            var quad = GetComponent<MeshFilter>() == null ? GameObject.CreatePrimitive(PrimitiveType.Quad) : gameObject;
-            if (quad != gameObject)
-            {
-                quad.transform.SetParent(transform, false);
-                quad.transform.localPosition = Vector3.zero;
-            }
-            mr = GetComponentInChildren<MeshRenderer>();
+            var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            quad.name = "BoardVisual";
+            quad.transform.SetParent(transform, false);
+            mr = quad.GetComponent<MeshRenderer>();
         }
         if (mr != null)
         {
             if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
             mr.sharedMaterial.color = new Color(0.95f, 0.85f, 0.35f, 1f);
+            // Scale to 1x3 footprint
+            mr.transform.localScale = new Vector3(size.x * tileSize, size.y * tileSize, 1f);
+            mr.transform.localPosition = new Vector3((size.x * tileSize) * 0.5f, (size.y * tileSize) * 0.5f, 0f);
         }
     }
 
