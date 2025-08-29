@@ -32,6 +32,8 @@ public class BuildPlacementTool : MonoBehaviour
 
     private Camera _cam;
     private static Sprite _whiteSprite;
+    private Material _ghostMat;
+    private int _pickedLayer;
 
     private void SyncToolFromController()
     {
@@ -170,6 +172,7 @@ public class BuildPlacementTool : MonoBehaviour
             _groundConst = 0f;
             _gridLayer = 0;
         }
+        _pickedLayer = PickVisibleLayer(_gridLayer);
     }
 
     private void UpdateGhost()
@@ -309,17 +312,19 @@ public class BuildPlacementTool : MonoBehaviour
     private void EnsureGhost()
     {
         if (_ghost != null) return;
-        // Use a Quad + Unlit/Color material to ensure visibility in all camera setups
+        // Use a Quad + overlay material to ensure visibility in all camera setups
         _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
         _ghost.name = "Build Ghost";
-        _ghost.layer = _gridLayer;
+        _ghost.layer = _pickedLayer;
         _ghostMr = _ghost.GetComponent<MeshRenderer>();
-        var mat = new Material(Shader.Find("Unlit/Color"));
-        mat.color = new Color(0.2f, 0.9f, 0.2f, 0.35f);
-        _ghostMr.sharedMaterial = mat;
+        _ghostMat = CreateOverlayMaterial(new Color(0.2f, 0.9f, 0.2f, 0.35f));
+        _ghostMr.sharedMaterial = _ghostMat;
+        _ghostMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        _ghostMr.receiveShadows = false;
         // Remove collider on the ghost
         var col = _ghost.GetComponent<Collider>();
         if (col != null) Destroy(col);
+        _ghost.SetActive(true); _ghostMr.enabled = true;
     }
 
     private void EnsureMarker()
@@ -327,12 +332,14 @@ public class BuildPlacementTool : MonoBehaviour
         if (_marker != null) return;
         _marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
         _marker.name = "Build Marker";
-        _marker.layer = _gridLayer;
+        _marker.layer = _pickedLayer;
         _markerMr = _marker.GetComponent<MeshRenderer>();
-        var mat = new Material(Shader.Find("Unlit/Color"));
-        mat.color = new Color(1f, 1f, 0.2f, 0.85f);
+        var mat = CreateOverlayMaterial(new Color(1f, 1f, 0.2f, 0.85f));
         _markerMr.sharedMaterial = mat;
+        _markerMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        _markerMr.receiveShadows = false;
         var col = _marker.GetComponent<Collider>(); if (col != null) Destroy(col);
+        _marker.SetActive(true); _markerMr.enabled = true;
     }
 
     private Transform EnsureBuildingsParent()
@@ -464,6 +471,46 @@ public class BuildPlacementTool : MonoBehaviour
         Ray ray2 = new Ray(origin, dir);
         if (ground.Raycast(ray2, out float enter2)) { world = ray2.GetPoint(enter2); return true; }
         return true;
+    }
+
+    private int PickVisibleLayer(int preferred)
+    {
+        var cam = GetCamera();
+        if (cam == null) return preferred;
+        int mask = cam.cullingMask;
+        if ((mask & (1 << preferred)) != 0) return preferred;
+        for (int i = 0; i < 32; i++) if ((mask & (1 << i)) != 0) return i;
+        return 0; // Default fallback
+    }
+
+    private Material CreateOverlayMaterial(Color color)
+    {
+        Shader s = null;
+        // Prefer URP Unlit
+        s = Shader.Find("Universal Render Pipeline/Unlit");
+        if (s == null) s = Shader.Find("Unlit/Color");
+        if (s == null) s = Shader.Find("Standard");
+
+        var mat = new Material(s);
+        if (s != null && s.name.Contains("Standard"))
+        {
+            // Make Standard behave transparent
+            mat.SetFloat("_Mode", 3); // Transparent
+            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            mat.SetInt("_ZWrite", 0);
+            mat.DisableKeyword("_ALPHATEST_ON");
+            mat.EnableKeyword("_ALPHABLEND_ON");
+            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            mat.renderQueue = 3001;
+        }
+        else
+        {
+            // Unlit – ensure it renders after opaques
+            mat.renderQueue = 3001;
+        }
+        mat.color = color;
+        return mat;
     }
 
     private void SetGhostColor(Color c)
