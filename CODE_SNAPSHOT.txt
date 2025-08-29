@@ -247,6 +247,10 @@ public static class PixelCameraHelper
 // ===== FILE: Assets/Scripts/Systems/PauseController.cs =====
 using System;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+#endif
 
 /// <summary>
 /// Global pause toggle (Space). Pauses via Time.timeScale and shows a tiny overlay while paused.
@@ -260,12 +264,20 @@ public class PauseController : MonoBehaviour
     [Header("Overlay")]
     [SerializeField] private string pausedText = "PAUSED — press Space to resume";
 
+#if ENABLE_INPUT_SYSTEM
+    private InputAction _pauseAction;
+#endif
+
     private void Update()
     {
+#if ENABLE_INPUT_SYSTEM
+        // With the new Input System active, we use an InputAction (enabled in OnEnable).
+#else
         if (Input.GetKeyDown(KeyCode.Space))
         {
             SetPaused(!IsPaused);
         }
+#endif
     }
 
     public static void SetPaused(bool pause)
@@ -273,8 +285,41 @@ public class PauseController : MonoBehaviour
         if (IsPaused == pause) return;
         IsPaused = pause;
         Time.timeScale = IsPaused ? 0f : 1f;
+#if UNITY_EDITOR
+        Debug.Log($"Paused: {IsPaused}");
+#endif
         try { OnPauseChanged?.Invoke(IsPaused); } catch { /* no-op */ }
     }
+
+    private void TogglePause()
+    {
+        SetPaused(!IsPaused);
+    }
+
+#if ENABLE_INPUT_SYSTEM
+    private void OnEnable()
+    {
+        if (_pauseAction == null)
+        {
+            // Bind keyboard Space; also allow gamepad Start as a convenience.
+            _pauseAction = new InputAction("Pause", binding: "<Keyboard>/space");
+            _pauseAction.AddBinding("<Gamepad>/start");
+            _pauseAction.performed += OnPausePerformed;
+        }
+        _pauseAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (_pauseAction != null)
+            _pauseAction.Disable();
+    }
+
+    private void OnPausePerformed(InputAction.CallbackContext ctx)
+    {
+        TogglePause();
+    }
+#endif
 
     private void OnGUI()
     {
