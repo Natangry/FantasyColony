@@ -16,11 +16,20 @@ public static class PauseBootstrap
 #else
         var existing = Object.FindObjectOfType<PauseController>();
 #endif
-        if (existing != null) { spawned = true; return; }
+        GameObject go;
+        if (existing != null)
+        {
+            go = existing.gameObject;
+        }
+        else
+        {
+            go = new GameObject("PauseController (Auto)");
+            Object.DontDestroyOnLoad(go);
+            go.AddComponent<PauseController>();
+        }
 
-        var go = new GameObject("PauseController (Auto)");
-        Object.DontDestroyOnLoad(go);
-        go.AddComponent<PauseController>();
+        if (go.GetComponent<GameClock>() == null) go.AddComponent<GameClock>();
+        if (go.GetComponent<ClockHUD>() == null) go.AddComponent<ClockHUD>();
         spawned = true;
     }
 }

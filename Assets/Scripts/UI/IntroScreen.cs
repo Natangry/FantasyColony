@@ -192,6 +192,10 @@ public class IntroScreen : MonoBehaviour
         PawnBootstrap.SpawnSpritePawn();
         PawnBootstrap.SpawnSecondPawn();
 
+        // Reset the game clock to Day 1 at the configured start time.
+        var clock = GameClockAPI.Find();
+        if (clock != null) clock.ResetClock(1, 8, 0);
+
         showMenu = false;
     }
 }
