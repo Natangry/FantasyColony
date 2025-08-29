@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 // ReSharper disable Unity.PerformanceCriticalCodeInvocation
 
 /// <summary>
-/// WASD/Arrow camera panning when no pawn is controlled.
+/// Free camera: mouse-wheel zoom (always) + WASD/Arrow panning when no pawn is controlled.
 /// Uses unscaled time so you can pan while paused. Top-down, XZ only.
 /// </summary>
 [AddComponentMenu("Camera/Free Camera Controller")]
@@ -17,8 +17,8 @@ public class FreeCameraController : MonoBehaviour
     [SerializeField] private float boostMultiplier = 2f;
     [SerializeField] private bool clampToGrid = true;
     [SerializeField] private float clampMargin = 1f;
-    [Tooltip("Allow panning outside the grid by this many tiles in every direction.")]
-    [SerializeField] private float borderTiles = 20f;
+    [Header("Visibility Rule")]
+    [SerializeField, Tooltip("Keep at least this many on-screen pixels of the grid visible on each axis. Set to 1 for 'some part of grid must remain visible'.")] private float minVisiblePixels = 1f;
     
     [Header("Zoom")]
     [SerializeField] private float minOrtho = 3f;
@@ -131,7 +131,7 @@ public class FreeCameraController : MonoBehaviour
             TryFindGrid();
             if (_grid != null && Time.unscaledTime >= _skipClampUntil)
             {
-                ClampToGrid(ref pos, _cam, _grid, clampMargin, borderTiles);
+                EnsureGridVisibility(ref pos, _cam, _grid, clampMargin, Mathf.Max(0f, minVisiblePixels));
             }
         }
 
@@ -145,33 +145,72 @@ public class FreeCameraController : MonoBehaviour
             _skipClampUntil = Time.unscaledTime + 0.25f;
     }
 
-    private static void ClampToGrid(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin, float borderTiles)
+    /// <summary>
+    /// Ensures that at least 'minVisiblePixels' of the grid remains visible on each axis.
+    /// This allows near-infinite panning as long as a sliver of grid is still in view.
+    /// </summary>
+    private static void EnsureGridVisibility(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin, float minVisiblePixels)
     {
         float wWorld = grid.width * grid.tileSize;
         float hWorld = grid.height * grid.tileSize;
-        float border = Mathf.Max(0f, borderTiles) * grid.tileSize;
-        // Expand the allowable area by an invisible border outside the grid.
-        float minX = -border + margin;
-        float minZ = -border + margin;
-        float maxX = wWorld + border - margin;
-        float maxZ = hWorld + border - margin;
 
         // Subtract half view so camera doesn't show outside the grid.
         float halfH = cam.orthographicSize;
         float aspect = (Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f / 9f);
         float halfW = halfH * aspect;
 
-        float clampMinX = minX + halfW;
-        float clampMaxX = maxX - halfW;
-        float clampMinZ = minZ + halfH;
-        float clampMaxZ = maxZ - halfH;
+        // Grid rect (expanded by margin so we don't put the edge exactly on the viewport border)
+        float gMinX = 0f + margin;
+        float gMaxX = wWorld - margin;
+        float gMinZ = 0f + margin;
+        float gMaxZ = hWorld - margin;
 
-        // If the viewport is wider than the grid along an axis, skip clamping that axis (do NOT auto-center).
-        bool skipClampX = clampMinX > clampMaxX;
-        bool skipClampZ = clampMinZ > clampMaxZ;
+        // Camera rect from its center position
+        float cMinX = camPos.x - halfW;
+        float cMaxX = camPos.x + halfW;
+        float cMinZ = camPos.z - halfH;
+        float cMaxZ = camPos.z + halfH;
 
-        if (!skipClampX) camPos.x = Mathf.Clamp(camPos.x, clampMinX, clampMaxX);
-        if (!skipClampZ) camPos.z = Mathf.Clamp(camPos.z, clampMinZ, clampMaxZ);
+        // Required overlap in world units based on pixels (cap to grid size to avoid impossible requirements)
+        float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(cam));
+        float reqOverlapX = Mathf.Min(minVisiblePixels * upp, Mathf.Max(0f, gMaxX - gMinX));
+        float reqOverlapZ = Mathf.Min(minVisiblePixels * upp, Mathf.Max(0f, gMaxZ - gMinZ));
+
+        // --- X axis ---
+        {
+            float overlapX = Mathf.Min(cMaxX, gMaxX) - Mathf.Max(cMinX, gMinX);
+            if (overlapX < reqOverlapX)
+            {
+                // Compute minimal shift to achieve the required overlap.
+                float gridCenterX = 0.5f * (gMinX + gMaxX);
+                if (cMaxX <= gMinX) // camera fully left of grid
+                {
+                    float desiredCamMax = gMinX + reqOverlapX;
+                    camPos.x = desiredCamMax - halfW;
+                }
+                else if (cMinX >= gMaxX) // camera fully right of grid
+                {
+                    float desiredCamMin = gMaxX - reqOverlapX;
+                    camPos.x = desiredCamMin + halfW;
+                }
+                else // partial overlap: nudge toward grid center
+                {
+                    float dir = (camPos.x < gridCenterX) ? +1f : -1f;
+                    camPos.x += dir * (reqOverlapX - Mathf.Max(0f, overlapX));
+                }
+            }
+        }
+        // --- Z axis ---
+        {
+            float overlapZ = Mathf.Min(cMaxZ, gMaxZ) - Mathf.Max(cMinZ, gMinZ);
+            if (overlapZ < reqOverlapZ)
+            {
+                float gridCenterZ = 0.5f * (gMinZ + gMaxZ);
+                if (cMaxZ <= gMinZ) camPos.z = (gMinZ + reqOverlapZ) - halfH;                // fully below grid
+                else if (cMinZ >= gMaxZ) camPos.z = (gMaxZ - reqOverlapZ) + halfH;           // fully above grid
+                else camPos.z += ((camPos.z < gridCenterZ) ? +1f : -1f) * (reqOverlapZ - Mathf.Max(0f, overlapZ));
+            }
+        }
     }
 
     private Vector2 ReadMoveInput()
