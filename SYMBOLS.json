@@ -10,5 +10,35 @@
     "name": "OnStartGame",
     "file": "Assets/IntroScreen.cs",
     "line": 17
+  },
+  {
+    "kind": "class",
+    "name": "Readme",
+    "file": "Assets/TutorialInfo/Scripts/Readme.cs",
+    "line": 3
+  },
+  {
+    "kind": "class",
+    "name": "Section",
+    "file": "Assets/TutorialInfo/Scripts/Readme.cs",
+    "line": 12
+  },
+  {
+    "kind": "class",
+    "name": "ReadmeEditor",
+    "file": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "OnHeaderGUI",
+    "file": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+    "line": 94
+  },
+  {
+    "kind": "method",
+    "name": "OnInspectorGUI",
+    "file": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+    "line": 122
   }
 ]

@@ -1,11 +1,86 @@
 # Repository Index
 
 - **.gitignore** — [View](https://github.com/Natangry/FantasyColony/blob/main/.gitignore) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/.gitignore)
+- **.vsconfig** — [View](https://github.com/Natangry/FantasyColony/blob/main/.vsconfig) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/.vsconfig)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
 
+- **InputSystem_Actions.inputactions** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions)
+- **InputSystem_Actions.inputactions.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions.meta)
 - **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/IntroScreen.cs)
+- **Readme.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset)
+- **Readme.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset.meta)
+- **Scenes.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes.meta)
+
+## Assets/Scenes
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scenes)
+
+- **SampleScene.unity** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/SampleScene.unity) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/SampleScene.unity)
+- **SampleScene.unity.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes/SampleScene.unity.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes/SampleScene.unity.meta)
+
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
+- **Settings.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings.meta)
+
+## Assets/Settings
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Settings)
+
+- **DefaultVolumeProfile.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/DefaultVolumeProfile.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/DefaultVolumeProfile.asset)
+- **DefaultVolumeProfile.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/DefaultVolumeProfile.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/DefaultVolumeProfile.asset.meta)
+- **Mobile_Renderer.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/Mobile_Renderer.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/Mobile_Renderer.asset)
+- **Mobile_Renderer.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/Mobile_Renderer.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/Mobile_Renderer.asset.meta)
+- **Mobile_RPAsset.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/Mobile_RPAsset.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/Mobile_RPAsset.asset)
+- **Mobile_RPAsset.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/Mobile_RPAsset.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/Mobile_RPAsset.asset.meta)
+- **PC_Renderer.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/PC_Renderer.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/PC_Renderer.asset)
+- **PC_Renderer.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/PC_Renderer.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/PC_Renderer.asset.meta)
+- **PC_RPAsset.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/PC_RPAsset.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/PC_RPAsset.asset)
+- **PC_RPAsset.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/PC_RPAsset.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/PC_RPAsset.asset.meta)
+- **SampleSceneProfile.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/SampleSceneProfile.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/SampleSceneProfile.asset)
+- **SampleSceneProfile.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/SampleSceneProfile.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/SampleSceneProfile.asset.meta)
+- **UniversalRenderPipelineGlobalSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset)
+- **UniversalRenderPipelineGlobalSettings.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta)
+
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
+- **TutorialInfo.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo.meta)
+
+## Assets/TutorialInfo
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/TutorialInfo)
+
+- **Icons.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Icons.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Icons.meta)
+
+## Assets/TutorialInfo/Icons
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/TutorialInfo/Icons)
+
+- **URP.png** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Icons/URP.png) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Icons/URP.png)
+- **URP.png.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Icons/URP.png.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Icons/URP.png.meta)
+
+## Assets/TutorialInfo
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/TutorialInfo)
+
+- **Layout.wlt** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Layout.wlt) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Layout.wlt)
+- **Layout.wlt.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Layout.wlt.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Layout.wlt.meta)
+- **Scripts.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts.meta)
+
+## Assets/TutorialInfo/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/TutorialInfo/Scripts)
+
+- **Editor.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor.meta)
+
+## Assets/TutorialInfo/Scripts/Editor
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/TutorialInfo/Scripts/Editor)
+
+- **ReadmeEditor.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
+- **ReadmeEditor.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs.meta)
+
+## Assets/TutorialInfo/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/TutorialInfo/Scripts)
+
+- **Readme.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Readme.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Readme.cs)
+- **Readme.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Readme.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Readme.cs.meta)
 
 ## Docs/Colony
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Colony)
@@ -193,4 +268,38 @@
 - **Storyteller-and-Pacing-Director-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md)
 - **World-Metrics-Conditions-and-Triggers-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md)
 - **LICENSE** — [View](https://github.com/Natangry/FantasyColony/blob/main/LICENSE) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/LICENSE)
+
+## Packages
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Packages)
+
+- **manifest.json** — [View](https://github.com/Natangry/FantasyColony/blob/main/Packages/manifest.json) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Packages/manifest.json)
+- **packages-lock.json** — [View](https://github.com/Natangry/FantasyColony/blob/main/Packages/packages-lock.json) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Packages/packages-lock.json)
+
+## ProjectSettings
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/ProjectSettings)
+
+- **AudioManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/AudioManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/AudioManager.asset)
+- **ClusterInputManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ClusterInputManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ClusterInputManager.asset)
+- **DynamicsManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/DynamicsManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/DynamicsManager.asset)
+- **EditorBuildSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/EditorBuildSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/EditorBuildSettings.asset)
+- **EditorSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/EditorSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/EditorSettings.asset)
+- **GraphicsSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/GraphicsSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/GraphicsSettings.asset)
+- **InputManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/InputManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/InputManager.asset)
+- **MemorySettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/MemorySettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/MemorySettings.asset)
+- **MultiplayerManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/MultiplayerManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/MultiplayerManager.asset)
+- **NavMeshAreas.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/NavMeshAreas.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/NavMeshAreas.asset)
+- **PackageManagerSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/PackageManagerSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/PackageManagerSettings.asset)
+- **Physics2DSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/Physics2DSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/Physics2DSettings.asset)
+- **PresetManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/PresetManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/PresetManager.asset)
+- **ProjectSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ProjectSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ProjectSettings.asset)
+- **ProjectVersion.txt** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ProjectVersion.txt) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ProjectVersion.txt)
+- **QualitySettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/QualitySettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/QualitySettings.asset)
+- **ShaderGraphSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/ShaderGraphSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/ShaderGraphSettings.asset)
+- **TagManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/TagManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/TagManager.asset)
+- **TimeManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/TimeManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/TimeManager.asset)
+- **UnityConnectSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/UnityConnectSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/UnityConnectSettings.asset)
+- **URPProjectSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/URPProjectSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/URPProjectSettings.asset)
+- **VersionControlSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/VersionControlSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/VersionControlSettings.asset)
+- **VFXManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/VFXManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/VFXManager.asset)
+- **XRSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/XRSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/XRSettings.asset)
 - **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/README.md)
