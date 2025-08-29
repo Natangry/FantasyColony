@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public static class WorldBootstrap
 {
-    public static void GenerateDefaultGrid(int w = 32, int h = 32, float tile = 1f)
+    public static void GenerateDefaultGrid(int w = 128, int h = 128, float tile = 1f)
     {
         // Create/find root
         var root = GameObject.Find("World");

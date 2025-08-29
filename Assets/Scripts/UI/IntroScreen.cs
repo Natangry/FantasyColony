@@ -28,6 +28,12 @@ public class IntroScreen : MonoBehaviour
     [Header("Content")]
     [SerializeField] private string gameTitle = "Fantasy Colony";
 
+    [Header("Map Settings")]
+    [Tooltip("Select the starting map size.")]
+    [SerializeField] private string[] mapSizeLabels = new[] { "32×32", "64×64", "128×128", "256×256" };
+    [SerializeField] private int selectedMapIndex = 2; // Default to 128×128
+    private static readonly int[] mapSizes = { 32, 64, 128, 256 };
+
     private bool showMenu = true;
     private bool focusedFirstButton;
 
@@ -89,9 +95,16 @@ public class IntroScreen : MonoBehaviour
         {
             GUILayout.FlexibleSpace();
 
-            GUILayout.Label($"<b>{gameTitle}</b>", titleStyle);
+            GUILayout.Label($"{gameTitle}", titleStyle);
 
             GUILayout.Space(panelH * 0.06f);
+
+            // Map size selector
+            float sizeControlH = Mathf.Max(28f, buttonHeight * 0.6f);
+            int newIndex = GUILayout.Toolbar(selectedMapIndex, mapSizeLabels, GUILayout.Height(sizeControlH));
+            if (newIndex != selectedMapIndex) selectedMapIndex = Mathf.Clamp(newIndex, 0, mapSizeLabels.Length - 1);
+
+            GUILayout.Space(panelH * 0.02f);
 
             // Focus first button once so keyboard/gamepad users can press Enter/Space.
             if (!focusedFirstButton)
@@ -123,8 +136,10 @@ public class IntroScreen : MonoBehaviour
     // Called when Start is pressed: clear/hide the intro overlay.
     private void OnStartGame()
     {
-        // Generate a small default grid map and frame the camera before hiding the menu.
-        WorldBootstrap.GenerateDefaultGrid();
+        // Generate the selected grid map and frame the camera before hiding the menu.
+        int idx = Mathf.Clamp(selectedMapIndex, 0, mapSizes.Length - 1);
+        int size = mapSizes[idx];
+        WorldBootstrap.GenerateDefaultGrid(size, size, 1f);
         // Spawn a SNES-style sprite pawn that patrols the visible area.
         PawnBootstrap.SpawnSpritePawn();
         // Spawn a second pawn with a different walk pattern to test multi-unit behaviors.
