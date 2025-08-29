@@ -37,6 +37,9 @@ public class ConstructionBoard : Building
             js.SetSlots(this, JobType.Builder, builderSlots);
         }
 
+        // Set this object to the grid layer so camera can see it
+        gameObject.layer = DetectGridLayer();
+
         // Visual stub: quad rotated onto XZ so it's visible from top-down
         var mr = GetComponentInChildren<MeshRenderer>();
         if (mr == null)
@@ -46,10 +49,12 @@ public class ConstructionBoard : Building
             quad.transform.SetParent(transform, false);
             mr = quad.GetComponent<MeshRenderer>();
             quad.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            quad.layer = gameObject.layer;
+            var col = quad.GetComponent<Collider>(); if (col != null) Object.Destroy(col);
         }
         if (mr != null)
         {
-            if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+            if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Unlit/Color"));
             mr.sharedMaterial.color = new Color(0.95f, 0.85f, 0.35f, 1f);
             // Scale to 3x1 footprint (X=width, Z=depth)
             var t = mr.transform;
@@ -57,6 +62,32 @@ public class ConstructionBoard : Building
             t.localScale = new Vector3(size.x * tileSize, size.y * tileSize, 1f);
             t.localPosition = new Vector3((size.x * tileSize) * 0.5f, 0.01f, (size.y * tileSize) * 0.5f);
         }
+    }
+
+    private int DetectGridLayer()
+    {
+        // Try to find the grid's renderer & inherit its layer
+        var grid = FindAnyGridRenderer();
+        if (grid != null) return grid.gameObject.layer;
+        return 0; // Default
+    }
+
+    private static Renderer FindAnyGridRenderer()
+    {
+        var grid = Object.FindAnyObjectByType<Component>();
+        // Try a few common names first
+        var go = GameObject.Find("Grid");
+        if (go != null)
+        {
+            var r = go.GetComponentInChildren<Renderer>();
+            if (r != null) return r;
+        }
+        // Fallback: find any renderer tagged as ground or in root
+        foreach (var r in Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+        {
+            if (r.gameObject.name.ToLower().Contains("grid") || r.gameObject.name.ToLower().Contains("ground")) return r;
+        }
+        return null;
     }
 
     private void OnGUI()
