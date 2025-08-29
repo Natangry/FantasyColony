@@ -304,13 +304,17 @@ public class BuildPlacementTool : MonoBehaviour
 
                 // Attach visual via defs
                 var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
-                SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
+                var placed = SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
+                // Ensure render priority over ground
+                var sr = placed != null ? placed.GetComponent<SpriteRenderer>() : null; if (sr != null) sr.sortingOrder += 3;
+
+                // Clear ghosts and finalize tool state for unique-per-map
+                DestroyGhost();
+                DestroyMarker();
+                var bmc = BuildModeController.Instance; if (bmc != null && board.uniquePerMap) bmc.SetTool(BuildTool.None);
                 break;
             }
         }
-
-        // After successful placement, clear tool
-        SetTool(BuildTool.None);
     }
 
     private void EnsureGhost()
@@ -417,6 +421,7 @@ public class BuildPlacementTool : MonoBehaviour
     private void OnGUI()
     {
         SyncToolFromController();
+        GUI.depth = -1000; // draw on top of windows
         if (_tool == BuildTool.None) return;
         var style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.box);
         style.alignment = TextAnchor.UpperLeft;
