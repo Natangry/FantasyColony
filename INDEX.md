@@ -36,12 +36,20 @@
 - **IntroBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs)
 - **IntroBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta)
 - **PawnBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs)
+- **PawnBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs.meta)
 - **WorldBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs)
+- **WorldBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs.meta)
+
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Camera.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera.meta)
 
 ## Assets/Scripts/Camera
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Camera)
 
 - **PixelCameraHelper.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
+- **PixelCameraHelper.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -54,15 +62,27 @@
 - **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
 - **IntroScreen.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Units.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Units.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Units.meta)
+
 ## Assets/Scripts/Units
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Units)
 
 - **SpritePawn.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Units/SpritePawn.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Units/SpritePawn.cs)
+- **SpritePawn.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Units/SpritePawn.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Units/SpritePawn.cs.meta)
+
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **World.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World.meta)
 
 ## Assets/Scripts/World
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World)
 
 - **SimpleGridMap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/SimpleGridMap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/SimpleGridMap.cs)
+- **SimpleGridMap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/SimpleGridMap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/SimpleGridMap.cs.meta)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
