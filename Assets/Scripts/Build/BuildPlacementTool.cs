@@ -160,7 +160,7 @@ public class BuildPlacementTool : MonoBehaviour
                 var board = go.AddComponent<ConstructionBoard>();
                 board.displayName = "Construction Board";
                 board.uniquePerMap = true;
-                board.size = new Vector2Int(1, 3);
+                board.size = new Vector2Int(3, 1);
                 board.OnPlaced(_snapGridPos, _tile);
                 break;
             }
@@ -259,7 +259,7 @@ public class BuildPlacementTool : MonoBehaviour
     {
         switch (_tool)
         {
-            case BuildTool.PlaceConstructionBoard: return new Vector2Int(1, 3);
+            case BuildTool.PlaceConstructionBoard: return new Vector2Int(3, 1);
             default: return Vector2Int.one;
         }
     }
