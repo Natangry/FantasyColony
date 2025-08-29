@@ -16,7 +16,8 @@ public class BuildPlacementTool : MonoBehaviour
     private Vector2Int _snapGridPos;
     private Vector2Int _footSize = Vector2Int.one; // current tool footprint in tiles
     private Vector3 _anchor;
-    private float _groundY;
+    private float _groundConst; // y for XZ, z for XY
+    private GridPlane _plane = GridPlane.XY;
 
     // Grid snapshot via reflection to avoid tight coupling
     private float _tile = 1f; private int _w = 128; private int _h = 128;
@@ -66,23 +67,44 @@ public class BuildPlacementTool : MonoBehaviour
             TryGetField(grid, "width", ref _w);
             TryGetField(grid, "height", ref _h);
 
-            // Try to find a Renderer to get true world bounds (use X and Z on XZ plane)
+            // Try to find a Renderer to get true world bounds and deduce the plane
             var rend = (grid as Component).GetComponentInChildren<Renderer>();
             if (rend != null)
             {
                 var b = rend.bounds;
-                _gridMinWorld = new Vector3(b.min.x, 0f, b.min.z);
-                _groundY = b.min.y;
-                _haveBounds = true;
+                // Decide plane by which axis is thinnest
+                if (b.size.z < b.size.y && b.size.z < b.size.x)
+                {
+                    // XY world (thin Z)
+                    _plane = GridPlane.XY;
+                    GridSpace.Plane = _plane;
+                    _groundConst = b.center.z;
+                    _gridMinWorld = new Vector3(b.min.x, b.min.y, _groundConst);
+                    _haveBounds = true;
+                }
+                else
+                {
+                    // XZ world (thin Y)
+                    _plane = GridPlane.XZ;
+                    GridSpace.Plane = _plane;
+                    _groundConst = b.center.y;
+                    _gridMinWorld = new Vector3(b.min.x, _groundConst, b.min.z);
+                    _haveBounds = true;
+                }
             }
             else
             {
-                _groundY = 0f;
+                // Fallback: assume XY with z=0
+                _plane = GridPlane.XY;
+                GridSpace.Plane = _plane;
+                _groundConst = 0f;
             }
         }
         else
         {
-            _groundY = 0f;
+            _plane = GridPlane.XY;
+            GridSpace.Plane = _plane;
+            _groundConst = 0f;
         }
     }
 
@@ -91,9 +113,11 @@ public class BuildPlacementTool : MonoBehaviour
         var cam = GetCamera();
         if (cam == null) return; // can't place without a camera
 
-        // Raycast from camera to the ground plane at y = _groundY (XZ world)
+        // Raycast from camera to the detected ground plane
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        Plane ground = new Plane(Vector3.up, new Vector3(0f, _groundY, 0f));
+        Plane ground = _plane == GridPlane.XZ
+            ? new Plane(Vector3.up, new Vector3(0f, _groundConst, 0f))
+            : new Plane(Vector3.forward, new Vector3(0f, 0f, _groundConst));
         if (!ground.Raycast(ray, out float enter)) return;
         Vector3 world = ray.GetPoint(enter);
 
@@ -101,16 +125,33 @@ public class BuildPlacementTool : MonoBehaviour
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
 
-        // Snap to grid anchored at bottom-left (use X,Z)
-        int gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
-        int gy = Mathf.RoundToInt((world.z - _anchor.z) / _tile);
+        // Snap to grid anchored at bottom-left on the active plane
+        int gx, gy;
+        if (_plane == GridPlane.XZ)
+        {
+            gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
+            gy = Mathf.RoundToInt((world.z - _anchor.z) / _tile);
+        }
+        else
+        {
+            gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
+            gy = Mathf.RoundToInt((world.y - _anchor.y) / _tile);
+        }
         gx = Mathf.Clamp(gx, -_w, _w * 2);
         gy = Mathf.Clamp(gy, -_h, _h * 2);
         // bottom-left of footprint
         _snapGridPos = new Vector2Int(gx, gy);
         float cx = _anchor.x + ((gx + _footSize.x * 0.5f) * _tile);
-        float cz = _anchor.z + ((gy + _footSize.y * 0.5f) * _tile);
-        _snapWorldPos = new Vector3(cx, _groundY + 0.02f, cz); // slight lift to avoid z-fighting
+        if (_plane == GridPlane.XZ)
+        {
+            float cz = _anchor.z + ((gy + _footSize.y * 0.5f) * _tile);
+            _snapWorldPos = new Vector3(cx, _groundConst + 0.02f, cz);
+        }
+        else
+        {
+            float cy = _anchor.y + ((gy + _footSize.y * 0.5f) * _tile);
+            _snapWorldPos = new Vector3(cx, cy, _groundConst + 0.0f);
+        }
 
         _canPlace = IsInsideGrid(_snapGridPos, _footSize) && IsPlacementAllowedHere();
 
@@ -119,7 +160,8 @@ public class BuildPlacementTool : MonoBehaviour
         // Color
         SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.35f) : new Color(0.9f, 0.2f, 0.2f, 0.35f));
         _ghost.transform.position = _snapWorldPos;
-        _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f); // after rotation, x→X, y→Z
+        _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f);
+        _ghost.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
     }
 
     private bool IsInsideGrid(Vector2Int p, Vector2Int size)
@@ -166,10 +208,18 @@ public class BuildPlacementTool : MonoBehaviour
             {
                 var go = new GameObject("Construction Board");
                 go.transform.SetParent(parent, worldPositionStays: true);
-                // Align to bottom-left tile of the footprint (XZ world)
+                // Align to bottom-left tile of the footprint
                 float wx = _anchor.x + (_snapGridPos.x * _tile);
-                float wz = _anchor.z + (_snapGridPos.y * _tile);
-                go.transform.position = new Vector3(wx, _groundY, wz);
+                if (_plane == GridPlane.XZ)
+                {
+                    float wz = _anchor.z + (_snapGridPos.y * _tile);
+                    go.transform.position = new Vector3(wx, _groundConst, wz);
+                }
+                else
+                {
+                    float wy = _anchor.y + (_snapGridPos.y * _tile);
+                    go.transform.position = new Vector3(wx, wy, _groundConst);
+                }
 
                 var board = go.AddComponent<ConstructionBoard>();
                 board.displayName = "Construction Board";
@@ -197,8 +247,8 @@ public class BuildPlacementTool : MonoBehaviour
         }
         _ghostSr.sprite = _whiteSprite;
         _ghostSr.sortingOrder = 1000;
-        // Rotate the sprite so its plane lies on XZ (y up)
-        _ghost.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+        // Orient to active plane
+        _ghost.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
         SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.35f));
     }
 
@@ -268,7 +318,10 @@ public class BuildPlacementTool : MonoBehaviour
 
     private Vector3 GuessCenteredAnchor()
     {
-        return new Vector3(-_w * _tile * 0.5f, _groundY, -_h * _tile * 0.5f);
+        if (_plane == GridPlane.XZ)
+            return new Vector3(-_w * _tile * 0.5f, _groundConst, -_h * _tile * 0.5f);
+        else
+            return new Vector3(-_w * _tile * 0.5f, -_h * _tile * 0.5f, _groundConst);
     }
 
     private Vector2Int GetFootprint()
@@ -278,6 +331,18 @@ public class BuildPlacementTool : MonoBehaviour
             case BuildTool.PlaceConstructionBoard: return new Vector2Int(3, 1);
             default: return Vector2Int.one;
         }
+    }
+
+    // Optional tiny debug overlay to help diagnose placement in the wild
+    private void OnGUI()
+    {
+        if (_tool == BuildTool.None) return;
+        var style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.box);
+        style.alignment = TextAnchor.UpperLeft;
+        style.fontSize = 14;
+        string plane = _plane.ToString();
+        string text = $"Plane: {plane}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 200, 80), text, style);
     }
 
     private void SetGhostColor(Color c)
