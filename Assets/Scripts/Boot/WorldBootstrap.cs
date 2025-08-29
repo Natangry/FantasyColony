@@ -83,7 +83,8 @@ public static class WorldBootstrap
         float halfHeight = hWorld * 0.5f;
         float halfWidth = wWorld * 0.5f;
         float sizeToFit = Mathf.Max(halfHeight, halfWidth / Mathf.Max(0.1f, aspect));
-        cam.orthographicSize = sizeToFit * 1.1f;
+        // Keep a consistent default start zoom across all map sizes.
+        // Do not auto-fit; use the camera's existing orthographicSize configured in the scene.
     }
 }
 
