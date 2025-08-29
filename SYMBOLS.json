@@ -13,6 +13,18 @@
   },
   {
     "kind": "class",
+    "name": "InteractionBootstrap",
+    "file": "Assets/Scripts/Boot/InteractionBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "EnsureInteractionManager",
+    "file": "Assets/Scripts/Boot/InteractionBootstrap.cs",
+    "line": 11
+  },
+  {
+    "kind": "class",
     "name": "IntroBootstrap",
     "file": "Assets/Scripts/Boot/IntroBootstrap.cs",
     "line": 7
@@ -313,6 +325,24 @@
   },
   {
     "kind": "class",
+    "name": "PawnInteractionManager",
+    "file": "Assets/Scripts/Systems/PawnInteractionManager.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Systems/PawnInteractionManager.cs",
+    "line": 20
+  },
+  {
+    "kind": "method",
+    "name": "GetKey",
+    "file": "Assets/Scripts/Systems/PawnInteractionManager.cs",
+    "line": 77
+  },
+  {
+    "kind": "class",
     "name": "SelectionController",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
     "line": 14
@@ -474,52 +504,154 @@
     "line": 11
   },
   {
+    "kind": "enum",
+    "name": "InteractionState",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 61
+  },
+  {
+    "kind": "struct",
+    "name": "RouteMarker",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 76
+  },
+  {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 60
+    "line": 99
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 93
+    "line": 132
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 98
+    "line": 138
   },
   {
     "kind": "method",
     "name": "SetControlled",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 283
+    "line": 324
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 301
+    "line": 346
+  },
+  {
+    "kind": "method",
+    "name": "OnSelectionChanged",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 352
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 408
+    "line": 460
+  },
+  {
+    "kind": "method",
+    "name": "FinalizeTransform",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 533
+  },
+  {
+    "kind": "method",
+    "name": "BeginChatLeader",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 544
+  },
+  {
+    "kind": "method",
+    "name": "BeginChatFollower",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 551
+  },
+  {
+    "kind": "method",
+    "name": "EndInteraction",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 562
+  },
+  {
+    "kind": "method",
+    "name": "UpdateChatFollower",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 569
+  },
+  {
+    "kind": "method",
+    "name": "UpdateReturnToRoute",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 625
+  },
+  {
+    "kind": "method",
+    "name": "BuildRouteSegments",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 672
+  },
+  {
+    "kind": "method",
+    "name": "ProjectToRoute",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 686
+  },
+  {
+    "kind": "method",
+    "name": "RouteDistance",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 707
+  },
+  {
+    "kind": "method",
+    "name": "RouteAdvance",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 722
+  },
+  {
+    "kind": "method",
+    "name": "RouteEvaluate",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 749
+  },
+  {
+    "kind": "method",
+    "name": "WrapAngle",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 756
+  },
+  {
+    "kind": "method",
+    "name": "ShortestAngleDelta",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 764
   },
   {
     "kind": "method",
     "name": "ConfigurePattern",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 464
+    "line": 777
   },
   {
     "kind": "method",
     "name": "SetRingColor",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 474
+    "line": 787
+  },
+  {
+    "kind": "method",
+    "name": "CaptureCurrentMarker",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 800
   },
   {
     "kind": "class",

@@ -35,6 +35,8 @@
 
 - **CameraBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/CameraBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/CameraBootstrap.cs)
 - **CameraBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/CameraBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/CameraBootstrap.cs.meta)
+- **InteractionBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/InteractionBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/InteractionBootstrap.cs)
+- **InteractionBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/InteractionBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/InteractionBootstrap.cs.meta)
 - **IntroBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs)
 - **IntroBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs.meta)
 - **PauseBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PauseBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PauseBootstrap.cs)
@@ -65,6 +67,8 @@
 
 - **ControlManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/ControlManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/ControlManager.cs)
 - **PauseController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
+- **PawnInteractionManager.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs)
+- **PawnInteractionManager.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PawnInteractionManager.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PawnInteractionManager.cs.meta)
 - **SelectionController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs)
 - **SelectionController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs.meta)
 
