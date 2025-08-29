@@ -111,10 +111,12 @@ public class BuildPlacementTool : MonoBehaviour
         // Handle input
         if (LeftClickDown())
         {
+            Debug.Log("[BuildPlacementTool] Left click detected -> TryPlace");
             TryPlace();
         }
         else if (RightClickDown() || CancelPressed())
         {
+            Debug.Log("[BuildPlacementTool] Cancel detected -> CancelPlacement");
             CancelPlacement();
         }
     }
@@ -276,6 +278,7 @@ public class BuildPlacementTool : MonoBehaviour
         if (!_canPlace) return;
 
         Transform parent = EnsureBuildingsParent();
+        Debug.Log($"[BuildPlacementTool] Placing {_tool} at grid {_snapGridPos} world {_snapWorldPos}");
 
         switch (_tool)
         {
@@ -302,16 +305,28 @@ public class BuildPlacementTool : MonoBehaviour
                 board.size = new Vector2Int(3, 1);
                 board.OnPlaced(_snapGridPos, _tile);
 
-                // Attach visual via defs
+                // Attach visual via defs (2D sprite)
                 var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
                 var placed = SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile, go.transform);
-                // Ensure render priority over ground
-                var sr = placed != null ? placed.GetComponent<SpriteRenderer>() : null; if (sr != null) sr.sortingOrder += 3;
+                if (placed == null)
+                {
+                    Debug.LogError("[BuildPlacementTool] SpawnPlaced returned null – visual def missing?");
+                }
+                else
+                {
+                    // Ensure render priority over ground
+                    var sr = placed.GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        // Try to match pawn render ordering if available
+                        sr.sortingOrder += 3;
+                        sr.enabled = true;
+                    }
+                    placed.SetActive(true);
+                }
 
-                // Clear ghosts and finalize tool state for unique-per-map
-                DestroyGhost();
-                DestroyMarker();
-                var bmc = BuildModeController.Instance; if (bmc != null && board.uniquePerMap) bmc.SetTool(BuildTool.None);
+                // Clear previews and finalize tool state for unique-per-map
+                CleanupAfterPlacement(exitTool: board.uniquePerMap);
                 break;
             }
         }
@@ -422,7 +437,7 @@ public class BuildPlacementTool : MonoBehaviour
     {
         SyncToolFromController();
         GUI.depth = -1000; // draw on top of windows
-        if (_tool == BuildTool.None) return;
+        if (_tool == BuildTool.None) return; // only when a build tool is active
         var style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.box);
         style.alignment = TextAnchor.UpperLeft;
         style.fontSize = 14;
@@ -543,7 +558,28 @@ public class BuildPlacementTool : MonoBehaviour
         {
             SetTool(BuildTool.None);
         }
+        KillAllPreviews();
+    }
+
+    private void CleanupAfterPlacement(bool exitTool)
+    {
+        KillAllPreviews();
+        if (exitTool)
+        {
+            var bm = BuildModeController.Instance;
+            if (bm != null) bm.SetTool(BuildTool.None);
+            else SetTool(BuildTool.None);
+        }
+    }
+
+    private void KillAllPreviews()
+    {
         DestroyGhost();
+        DestroyMarker();
+        // belt & suspenders: nuke any stray preview sprites under our transform
+        foreach (var sr in GetComponentsInChildren<SpriteRenderer>(true))
+            if (sr.gameObject.name.Contains("Build Ghost") || sr.gameObject.name.Contains("Build Marker"))
+                Destroy(sr.gameObject);
     }
 
     private void DestroyGhost()

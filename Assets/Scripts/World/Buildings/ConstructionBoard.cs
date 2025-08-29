@@ -37,34 +37,11 @@ public class ConstructionBoard : Building
             js.SetSlots(this, JobType.Builder, builderSlots);
         }
 
-        // Set this object to the grid layer so camera can see it
-        gameObject.layer = DetectGridLayer();
-
-        // Visual stub: quad rotated onto XZ so it's visible from top-down
-        var mr = GetComponentInChildren<MeshRenderer>();
-        if (mr == null)
-        {
-            var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            quad.name = "BoardVisual";
-            quad.transform.SetParent(transform, false);
-            mr = quad.GetComponent<MeshRenderer>();
-            quad.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-            quad.layer = gameObject.layer;
-            var col = quad.GetComponent<Collider>(); if (col != null) Object.Destroy(col);
-        }
-        if (mr != null)
-        {
-            if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Unlit/Color"));
-            mr.sharedMaterial.color = new Color(0.95f, 0.85f, 0.35f, 1f);
-            // Scale to 3x1 footprint (X=width, Z=depth)
-            var t = mr.transform;
-            t.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-            t.localScale = new Vector3(size.x * tileSize, size.y * tileSize, 1f);
-            t.localPosition = new Vector3((size.x * tileSize) * 0.5f, 0.01f, (size.y * tileSize) * 0.5f);
-        }
+        // Visual now handled by SpriteVisualFactory2D from the placement tool.
+        // Keep logic & collider only.
     }
 
-    private int DetectGridLayer()
+    /*private int DetectGridLayer()
     {
         // Try to find the grid's renderer & inherit its layer
         var grid = FindAnyGridRenderer();
@@ -88,7 +65,7 @@ public class ConstructionBoard : Building
             if (r.gameObject.name.ToLower().Contains("grid") || r.gameObject.name.ToLower().Contains("ground")) return r;
         }
         return null;
-    }
+    }*/
 
     private void OnGUI()
     {
