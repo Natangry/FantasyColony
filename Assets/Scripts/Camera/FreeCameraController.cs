@@ -17,6 +17,8 @@ public class FreeCameraController : MonoBehaviour
     [SerializeField] private float boostMultiplier = 2f;
     [SerializeField] private bool clampToGrid = true;
     [SerializeField] private float clampMargin = 1f;
+    [Tooltip("Allow panning outside the grid by this many tiles in every direction.")]
+    [SerializeField] private float borderTiles = 20f;
     
     [Header("Zoom")]
     [SerializeField] private float minOrtho = 3f;
@@ -55,6 +57,13 @@ public class FreeCameraController : MonoBehaviour
 #endif
     }
 
+    private void OnEnable()
+    {
+        ControlManager.OnControlledChanged += OnControlledChanged;
+        if (_cam != null)
+            _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
+    }
+
 #if ENABLE_INPUT_SYSTEM
     private void OnEnable()
     {
@@ -80,10 +89,6 @@ public class FreeCameraController : MonoBehaviour
         _move.Enable();
         _boost.Enable();
         _scroll.Enable();
-
-        ControlManager.OnControlledChanged += OnControlledChanged;
-        if (_cam != null)
-            _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
     }
 
     private void OnDisable()
@@ -91,20 +96,16 @@ public class FreeCameraController : MonoBehaviour
         _move?.Disable();
         _boost?.Disable();
         _scroll?.Disable();
-        ControlManager.OnControlledChanged -= OnControlledChanged;
     }
 #endif
 
+    private void OnDisable() { ControlManager.OnControlledChanged -= OnControlledChanged; }
+
     private void Update()
     {
-        // Only active when no pawn is controlled
-        if (ControlManager.Controlled != null) return;
         if (_cam == null) return;
 
-        // --- Read inputs (move & zoom) ---
-        Vector2 input = ReadMoveInput();
-        if (input.sqrMagnitude > 1f) input.Normalize();
-        bool boost = ReadBoost();
+        // --- Zoom (always available, even while controlling a pawn) ---
         float scrollDelta = ReadScrollDelta(); // >0 means wheel up
 
         // --- Zoom (center-based) ---
@@ -122,6 +123,14 @@ public class FreeCameraController : MonoBehaviour
             _cam.orthographicSize = _targetOrtho;
         }
 
+        // If a pawn is controlled, skip free panning (follow script will move camera). Zoom above already applied.
+        if (ControlManager.Controlled != null) return;
+
+        // --- Read move input (free cam only) ---
+        Vector2 input = ReadMoveInput();
+        if (input.sqrMagnitude > 1f) input.Normalize();
+        bool boost = ReadBoost();
+
         // --- Pan (WASD/Arrows) ---
         float speed = moveSpeed * (boost ? boostMultiplier : 1f);
         Vector3 delta = new Vector3(input.x, 0f, input.y) * speed * Time.unscaledDeltaTime;
@@ -132,7 +141,7 @@ public class FreeCameraController : MonoBehaviour
             TryFindGrid();
             if (_grid != null && Time.unscaledTime >= _skipClampUntil)
             {
-                ClampToGrid(ref pos, _cam, _grid, clampMargin);
+                ClampToGrid(ref pos, _cam, _grid, clampMargin, borderTiles);
             }
         }
 
@@ -146,14 +155,16 @@ public class FreeCameraController : MonoBehaviour
             _skipClampUntil = Time.unscaledTime + 0.25f;
     }
 
-    private static void ClampToGrid(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin)
+    private static void ClampToGrid(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin, float borderTiles)
     {
         float wWorld = grid.width * grid.tileSize;
         float hWorld = grid.height * grid.tileSize;
-        float minX = 0f + margin;
-        float minZ = 0f + margin;
-        float maxX = wWorld - margin;
-        float maxZ = hWorld - margin;
+        float border = Mathf.Max(0f, borderTiles) * grid.tileSize;
+        // Expand the allowable area by an invisible border outside the grid.
+        float minX = -border + margin;
+        float minZ = -border + margin;
+        float maxX = wWorld + border - margin;
+        float maxZ = hWorld + border - margin;
 
         // Subtract half view so camera doesn't show outside the grid.
         float halfH = cam.orthographicSize;
