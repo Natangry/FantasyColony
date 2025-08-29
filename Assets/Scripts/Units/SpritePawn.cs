@@ -37,6 +37,9 @@ public class SpritePawn : MonoBehaviour
     [SerializeField] private MovementPattern pattern = MovementPattern.DiagonalLoop;
     [Tooltip("Legacy toggle kept for backward compatibility; 'pattern' now takes precedence.")]
     [SerializeField] private bool diagonalPatrol = true;
+    [Header("Interaction")]
+    [SerializeField] private float chatLateral = 0.8f;               // side-by-side offset
+    [SerializeField] private float chatApproachSmoothing = 8f;       // follower slot smoothing
     private Vector3 logicalPos; // continuous (unsnapped) position
 
     // Patrol corners (world-space)
@@ -50,6 +53,17 @@ public class SpritePawn : MonoBehaviour
     private Material ringMat;
     private GameObject ringGO;
     private bool isControlled;
+    public bool IsControlled => isControlled;
+    public bool IsInteractable => !isControlled && interactionState == InteractionState.None && Time.unscaledTime >= cooldownUntilUnscaled;
+    public float CollisionRadius => (collisionRadius > 0f ? collisionRadius : Mathf.Max(0.2f, (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit) * 0.6f));
+
+    // Interaction state
+    private enum InteractionState { None, ChatLeader, ChatFollower, ReturnToRoute }
+    private InteractionState interactionState = InteractionState.None;
+    private SpritePawn chatPartner;
+    private float chatUntilUnscaled;
+    private int chatSide = 1; // +1 right, -1 left relative to leader forward
+    private float cooldownUntilUnscaled;
     private bool isSelected;
 
     // Lissajous (figure-8) state
@@ -57,6 +71,31 @@ public class SpritePawn : MonoBehaviour
     private float lissaAmpX, lissaAmpZ;
     private float lissaCenterX, lissaCenterZ;
     private bool lissaReady;
+
+    // Route (rectangle/diagonal) helpers for return-to-route
+    public struct RouteMarker
+    {
+        public int seg;      // 0..3 for polyline segments
+        public float t;      // 0..1 along segment
+        public float lissaAngle; // used when Lissajous8
+        public bool isLissa;
+    }
+    private Vector3[] segA = new Vector3[4];
+    private Vector3[] segB = new Vector3[4];
+    private float[] segLen = new float[4];
+    private float[] cumLen = new float[5]; // cumLen[0]=0, cumLen[4]=total
+    private float totalLen;
+    private RouteMarker returnMarker, routeWalker; // used during ReturnToRoute
+    private int returnDir = +1; // +1 forward, -1 backward
+
+    // Movement bookkeeping
+    private Vector3 lastWorldPos;
+    private Vector3 lastVelocity;
+
+    [Header("Detection & Timing")]
+    [SerializeField] private float collisionRadius = -1f;        // <=0 = auto
+    [SerializeField] private float interactionCooldown = 2.0f;   // seconds after end
+    [SerializeField] private Vector2 chatDurationRange = new Vector2(2.5f, 4.0f);
 
     private void Awake()
     {
@@ -94,11 +133,13 @@ public class SpritePawn : MonoBehaviour
     private void OnEnable()
     {
         Instances.Add(this);
+        SelectionController.OnSelectionChanged += OnSelectionChanged;
     }
 
     private void OnDisable()
     {
         Instances.Remove(this);
+        SelectionController.OnSelectionChanged -= OnSelectionChanged;
     }
 
     void CreateVisual()
@@ -297,12 +338,21 @@ public class SpritePawn : MonoBehaviour
             if (ringMat.HasProperty("_Color")) ringMat.SetColor("_Color", col);
             if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", col);
         }
+        if (on && interactionState != InteractionState.None)
+        {
+            EndInteraction();
+        }
     }
 
     public void SetSelected(bool on)
     {
         isSelected = on;
         if (ringGO != null) ringGO.SetActive(on || isControlled);
+    }
+
+    private void OnSelectionChanged(SpritePawn newlySelected)
+    {
+        // keep existing behavior; noop required so event hook remains valid
     }
 
     bool InsideBody(int x, int y, int x0, int x1, int y0, int y1)
@@ -330,6 +380,7 @@ public class SpritePawn : MonoBehaviour
         {
             BuildPatrolFromCamera();
         }
+        BuildRouteSegments();
     }
 
     void BuildPatrolFromGrid(SimpleGridMap grid)
@@ -404,10 +455,31 @@ public class SpritePawn : MonoBehaviour
             corners[3] = new Vector3(minX, 0f, maxZ);
             cornerIndex = 1; // head toward the second corner first
         }
+        BuildRouteSegments();
     }
 
     private void Update()
     {
+        // If this pawn becomes player-controlled mid-interaction, cancel any interaction.
+        if (isControlled && interactionState != InteractionState.None)
+        {
+            EndInteraction();
+        }
+
+        // Interaction states (override normal movement when active)
+        if (interactionState == InteractionState.ChatFollower && chatPartner != null)
+        {
+            UpdateChatFollower();
+            FinalizeTransform();
+            return;
+        }
+        if (interactionState == InteractionState.ReturnToRoute)
+        {
+            UpdateReturnToRoute();
+            FinalizeTransform();
+            return;
+        }
+
         if (pattern == MovementPattern.Lissajous8 && lissaReady)
         {
             // Smooth figure-8: x = sin(t), z = sin(2t)
@@ -418,7 +490,7 @@ public class SpritePawn : MonoBehaviour
                 lissaCenterZ + lissaAmpZ * Mathf.Sin(2f * lissaT)
             );
             transform.position = PixelCameraHelper.SnapToPixelGrid(logicalPos, cam);
-            return;
+            FinalizeTransform(); return;
         }
 
         if (corners == null || corners.Length < 4) return;
@@ -456,6 +528,247 @@ public class SpritePawn : MonoBehaviour
 
         // Render at pixel-snapped position
         transform.position = PixelCameraHelper.SnapToPixelGrid(logicalPos, cam);
+        FinalizeTransform();
+    }
+
+    private void FinalizeTransform()
+    {
+        // velocity estimate for follower formation
+        Vector3 wp = transform.position;
+        lastVelocity = (Time.deltaTime > 1e-6f) ? (wp - lastWorldPos) / Time.deltaTime : lastVelocity;
+        lastVelocity.y = 0f;
+        lastWorldPos = wp;
+    }
+
+    // ---------- Interaction API ----------
+    public void BeginChatLeader(SpritePawn follower, float seconds, RouteMarker followerReturnMarker)
+    {
+        // Leader keeps moving as normal
+        interactionState = InteractionState.ChatLeader;
+        chatPartner = follower;
+        chatUntilUnscaled = Time.unscaledTime + Mathf.Clamp(seconds, chatDurationRange.x, chatDurationRange.y);
+    }
+
+    public void BeginChatFollower(SpritePawn leader, float seconds, RouteMarker returnToMarker)
+    {
+        if (isControlled) return; // controlled pawn cannot be follower
+        interactionState = InteractionState.ChatFollower;
+        chatPartner = leader;
+        chatUntilUnscaled = Time.unscaledTime + Mathf.Clamp(seconds, chatDurationRange.x, chatDurationRange.y);
+        returnMarker = returnToMarker;
+        // Randomly choose a side (left/right) unless leader is controlled; still random to keep variety.
+        chatSide = Random.value < 0.5f ? -1 : +1;
+    }
+
+    private void EndInteraction()
+    {
+        interactionState = InteractionState.None;
+        chatPartner = null;
+        cooldownUntilUnscaled = Time.unscaledTime + interactionCooldown;
+    }
+
+    private void UpdateChatFollower()
+    {
+        // While chatting, we walk side-by-side with the leader.
+        if (chatPartner == null) { EndInteraction(); return; }
+
+        // Desired slot next to leader:
+        Vector3 lp = chatPartner.transform.position;
+        Vector3 fwd = chatPartner.lastVelocity.sqrMagnitude > 1e-6f
+            ? chatPartner.lastVelocity.normalized
+            : Vector3.forward;
+        Vector3 right = Vector3.Cross(Vector3.up, fwd).normalized;
+        Vector3 slot = lp + right * (chatSide * chatLateral);
+
+        Vector3 to = slot - logicalPos; to.y = 0f;
+        float dist = to.magnitude;
+        if (dist > 1e-4f)
+        {
+            Vector3 dir = to / dist;
+            // Smooth approach to slot; reduce overshoot using a small factor
+            float approach = Mathf.Min(speed, dist * chatApproachSmoothing) * Time.deltaTime;
+            logicalPos += dir * approach;
+        }
+
+        // Time to end chat?
+        if (Time.unscaledTime >= chatUntilUnscaled)
+        {
+            // Begin return-to-route state.
+            // Establish current walker marker from our present position.
+            if (pattern == MovementPattern.Lissajous8)
+            {
+                routeWalker = new RouteMarker { isLissa = true, lissaAngle = lissaT };
+            }
+            else
+            {
+                routeWalker = ProjectToRoute(logicalPos);
+            }
+            // Choose shortest direction along route to returnMarker
+            if (pattern == MovementPattern.Lissajous8)
+            {
+                // Choose shortest wrapped angle
+                float a = routeWalker.lissaAngle;
+                float b = returnMarker.lissaAngle;
+                float d = ShortestAngleDelta(a, b);
+                returnDir = d >= 0f ? +1 : -1;
+            }
+            else
+            {
+                float fwdDist = RouteDistance(routeWalker, returnMarker, +1);
+                float backDist = RouteDistance(routeWalker, returnMarker, -1);
+                returnDir = (fwdDist <= backDist) ? +1 : -1;
+            }
+            interactionState = InteractionState.ReturnToRoute;
+            chatPartner = null;
+        }
+    }
+
+    private void UpdateReturnToRoute()
+    {
+        if (pattern == MovementPattern.Lissajous8)
+        {
+            float a = routeWalker.lissaAngle;
+            float b = returnMarker.lissaAngle;
+            float delta = ShortestAngleDelta(a, b);
+            float step = speed * Time.deltaTime; // angular speed units; we’re using 'speed' as omega for simplicity here
+            if (Mathf.Abs(delta) <= step)
+            {
+                lissaT = b;
+                interactionState = InteractionState.None;
+                cooldownUntilUnscaled = Time.unscaledTime + interactionCooldown;
+                return;
+            }
+            lissaT = WrapAngle(a + Mathf.Sign(delta) * step);
+            logicalPos = new Vector3(
+                lissaCenterX + lissaAmpX * Mathf.Sin(lissaT),
+                0.02f,
+                lissaCenterZ + lissaAmpZ * Mathf.Sin(2f * lissaT)
+            );
+            return;
+        }
+        else
+        {
+            // Advance along polyline toward returnMarker by distance = speed*dt
+            float step = speed * Time.deltaTime;
+            RouteAdvance(ref routeWalker, step, returnDir);
+            logicalPos = RouteEvaluate(routeWalker);
+
+            // Check arrival (small arclength remaining)
+            float remain = RouteDistance(routeWalker, returnMarker, returnDir);
+            float upp = PixelCameraHelper.WorldUnitsPerPixel(cam);
+            if (remain <= Mathf.Max(upp * 1.5f, 0.02f))
+            {
+                routeWalker = returnMarker;
+                logicalPos = RouteEvaluate(routeWalker);
+                // Sync patrol indices to the marker so we resume cleanly
+                cornerIndex = (routeWalker.seg + 1) % 4;
+                interactionState = InteractionState.None;
+                cooldownUntilUnscaled = Time.unscaledTime + interactionCooldown;
+            }
+        }
+    }
+
+    // ---------- Route helpers ----------
+    private void BuildRouteSegments()
+    {
+        if (pattern == MovementPattern.Lissajous8) return; // not used for lissajous
+        for (int i = 0; i < 4; i++)
+        {
+            int j = (i + 1) % 4;
+            segA[i] = new Vector3(corners[i].x, 0f, corners[i].z);
+            segB[i] = new Vector3(corners[j].x, 0f, corners[j].z);
+            segLen[i] = Vector3.Distance(segA[i], segB[i]);
+        }
+        cumLen[0] = 0f;
+        for (int i = 0; i < 4; i++) cumLen[i + 1] = cumLen[i] + segLen[i];
+        totalLen = cumLen[4];
+    }
+
+    private RouteMarker ProjectToRoute(Vector3 world)
+    {
+        RouteMarker m = new RouteMarker { isLissa = false, seg = 0, t = 0f };
+        float bestDist2 = float.PositiveInfinity;
+        for (int i = 0; i < 4; i++)
+        {
+            Vector3 a = segA[i];
+            Vector3 b = segB[i];
+            Vector3 ab = b - a;
+            float ab2 = Vector3.Dot(ab, ab);
+            float t = ab2 > 1e-6f ? Mathf.Clamp01(Vector3.Dot(world - a, ab) / ab2) : 0f;
+            Vector3 p = a + ab * t;
+            float d2 = (new Vector3(world.x, 0f, world.z) - p).sqrMagnitude;
+            if (d2 < bestDist2)
+            {
+                bestDist2 = d2; m.seg = i; m.t = t;
+            }
+        }
+        return m;
+    }
+
+    private float RouteDistance(RouteMarker a, RouteMarker b, int dir)
+    {
+        if (dir != -1) dir = +1;
+        float sa = cumLen[a.seg] + segLen[a.seg] * a.t;
+        float sb = cumLen[b.seg] + segLen[b.seg] * b.t;
+        if (dir > 0)
+        {
+            return (sb >= sa) ? (sb - sa) : (totalLen - (sa - sb));
+        }
+        else
+        {
+            return (sa >= sb) ? (sa - sb) : (totalLen - (sb - sa));
+        }
+    }
+
+    private void RouteAdvance(ref RouteMarker m, float distance, int dir)
+    {
+        if (dir != -1) dir = +1;
+        float s = cumLen[m.seg] + segLen[m.seg] * m.t;
+        if (dir > 0)
+        {
+            s += distance;
+            s = Mathf.Repeat(s, Mathf.Max(1e-6f, totalLen));
+        }
+        else
+        {
+            s -= distance;
+            s = Mathf.Repeat(s, Mathf.Max(1e-6f, totalLen));
+        }
+        // Convert back to seg/t
+        // Find segment by linear scan (only 4 segments)
+        int segIndex = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            if (s <= cumLen[i + 1]) { segIndex = i; break; }
+        }
+        float s0 = cumLen[segIndex];
+        float len = Mathf.Max(1e-6f, segLen[segIndex]);
+        m.seg = segIndex;
+        m.t = Mathf.Clamp01((s - s0) / len);
+    }
+
+    private Vector3 RouteEvaluate(RouteMarker m)
+    {
+        Vector3 a = segA[m.seg]; Vector3 b = segB[m.seg];
+        Vector3 p = Vector3.Lerp(a, b, Mathf.Clamp01(m.t));
+        return new Vector3(p.x, 0.02f, p.z);
+    }
+
+    private static float WrapAngle(float a)
+    {
+        const float TwoPi = Mathf.PI * 2f;
+        if (a >= 0f) return a % TwoPi;
+        float r = -a % TwoPi;
+        return (r == 0f) ? 0f : (TwoPi - r);
+    }
+    private static float ShortestAngleDelta(float from, float to)
+    {
+        float a = WrapAngle(from);
+        float b = WrapAngle(to);
+        float diff = b - a;
+        while (diff > Mathf.PI) diff -= Mathf.PI * 2f;
+        while (diff < -Mathf.PI) diff += Mathf.PI * 2f;
+        return diff;
     }
 
     /// <summary>
@@ -478,6 +791,21 @@ public class SpritePawn : MonoBehaviour
         {
             if (ringMat.HasProperty("_Color")) ringMat.SetColor("_Color", c);
             if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", c);
+        }
+    }
+
+    /// <summary>
+    /// Capture the current position along the pawn's route to return to later.
+    /// </summary>
+    public RouteMarker CaptureCurrentMarker()
+    {
+        if (pattern == MovementPattern.Lissajous8)
+        {
+            return new RouteMarker { isLissa = true, lissaAngle = WrapAngle(lissaT) };
+        }
+        else
+        {
+            return ProjectToRoute(logicalPos);
         }
     }
 }
