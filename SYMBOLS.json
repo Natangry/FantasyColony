@@ -495,115 +495,127 @@
     "kind": "class",
     "name": "SpritePawn",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 9
+    "line": 12
   },
   {
     "kind": "enum",
     "name": "InteractionState",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 69
+    "line": 78
   },
   {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 76
+    "line": 89
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 117
+    "line": 130
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 122
+    "line": 148
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 127
+    "line": 156
+  },
+  {
+    "kind": "method",
+    "name": "UpdateManualControl",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 196
   },
   {
     "kind": "method",
     "name": "UpdateIdleWander",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 159
+    "line": 237
   },
   {
     "kind": "method",
     "name": "PickNewWanderTarget",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 178
+    "line": 256
   },
   {
     "kind": "method",
     "name": "BeginChatLeader",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 226
+    "line": 304
   },
   {
     "kind": "method",
     "name": "BeginChatFollower",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 232
+    "line": 310
   },
   {
     "kind": "method",
     "name": "EndInteraction",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 242
+    "line": 320
   },
   {
     "kind": "method",
     "name": "UpdateChatFollower",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 249
+    "line": 327
   },
   {
     "kind": "method",
     "name": "UpdateReturnToPoint",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 281
+    "line": 359
   },
   {
     "kind": "method",
     "name": "FinalizeTransform",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 310
+    "line": 388
+  },
+  {
+    "kind": "method",
+    "name": "ReadMoveInput",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 395
   },
   {
     "kind": "method",
     "name": "CreateVisual",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 317
+    "line": 410
   },
   {
     "kind": "method",
     "name": "EnsureCollider",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 357
+    "line": 450
   },
   {
     "kind": "method",
     "name": "CreateSelectionRing",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 368
+    "line": 461
   },
   {
     "kind": "method",
     "name": "SetControlled",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 413
+    "line": 506
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 431
+    "line": 524
   },
   {
     "kind": "class",

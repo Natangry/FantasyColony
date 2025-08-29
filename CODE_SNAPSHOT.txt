@@ -1576,6 +1576,9 @@ public class SelectionHUD : MonoBehaviour
 // ===== FILE: Assets/Scripts/Units/SpritePawn.cs =====
 using System.Collections.Generic;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// SNES-style pawn that idly wanders around. Generates its own sprite and
@@ -1621,6 +1624,12 @@ public class SpritePawn : MonoBehaviour
     [SerializeField] private float wanderMaxWait = 1.2f;
     [SerializeField] private float wanderRepickSeconds = 6f;
 
+    [Header("Manual Control")]
+    [SerializeField] private float manualAccel = 20f;
+    [SerializeField] private float manualDecel = 30f;
+    private Vector2 manualInput;
+    private Vector3 manualVel;
+
     // Public properties
     public bool IsControlled => isControlled;
     public bool IsInteractable => !isControlled && interactionState == InteractionState.None && Time.unscaledTime >= cooldownUntilUnscaled;
@@ -1649,6 +1658,10 @@ public class SpritePawn : MonoBehaviour
     private int chatSide = 1; // +1 right, -1 left relative to leader forward
     private float cooldownUntilUnscaled;
     private Vector3 returnPoint;
+
+#if ENABLE_INPUT_SYSTEM
+    private InputAction _moveAction;
+#endif
 
     private void Awake()
     {
@@ -1694,11 +1707,27 @@ public class SpritePawn : MonoBehaviour
     private void OnEnable()
     {
         Instances.Add(this);
+#if ENABLE_INPUT_SYSTEM
+        if (_moveAction == null)
+        {
+            _moveAction = new InputAction("PawnMove", type: InputActionType.Value, binding: "2DVector");
+            _moveAction.AddCompositeBinding("2DVector")
+                .With("Up", "<Keyboard>/w").With("Up", "<Keyboard>/upArrow")
+                .With("Down", "<Keyboard>/s").With("Down", "<Keyboard>/downArrow")
+                .With("Left", "<Keyboard>/a").With("Left", "<Keyboard>/leftArrow")
+                .With("Right", "<Keyboard>/d").With("Right", "<Keyboard>/rightArrow");
+            _moveAction.AddBinding("<Gamepad>/leftStick");
+        }
+        _moveAction.Enable();
+#endif
     }
 
     private void OnDisable()
     {
         Instances.Remove(this);
+#if ENABLE_INPUT_SYSTEM
+        _moveAction?.Disable();
+#endif
     }
 
     private void Update()
@@ -1719,14 +1748,63 @@ public class SpritePawn : MonoBehaviour
             return;
         }
 
+        // Manual control overrides wandering
+        if (isControlled)
+        {
+            UpdateManualControl();
+            FinalizeTransform();
+            return;
+        }
+
+        // Default idle wandering movement
         UpdateIdleWander();
 
+        // Leader state: allow normal movement while timer runs
         if (interactionState == InteractionState.ChatLeader && Time.unscaledTime >= chatUntilUnscaled)
         {
             EndInteraction();
         }
 
         FinalizeTransform();
+    }
+
+    // ---------------- Manual control ----------------
+    private void UpdateManualControl()
+    {
+        Vector2 input = ReadMoveInput();
+        if (input.sqrMagnitude > 1f) input.Normalize();
+
+        // target velocity in world XZ plane at "speed"
+        Vector3 targetVel = new Vector3(input.x, 0f, input.y) * speed;
+
+        // accelerate/decelerate toward target
+        Vector3 delta = targetVel - manualVel;
+        float accel = (targetVel.sqrMagnitude > manualVel.sqrMagnitude) ? manualAccel : manualDecel;
+        Vector3 change = Vector3.ClampMagnitude(delta, accel * Time.deltaTime);
+        manualVel += change;
+
+        // move
+        logicalPos += manualVel * Time.deltaTime;
+
+        // clamp to grid if available
+        if (gridCache == null)
+        {
+#if UNITY_2022_2_OR_NEWER
+            gridCache = UnityEngine.Object.FindAnyObjectByType<SimpleGridMap>();
+#else
+            gridCache = UnityEngine.Object.FindObjectOfType<SimpleGridMap>();
+#endif
+        }
+        if (gridCache != null)
+        {
+            float minX = margin, minZ = margin;
+            float maxX = gridCache.width * gridCache.tileSize - margin;
+            float maxZ = gridCache.height * gridCache.tileSize - margin;
+            logicalPos.x = Mathf.Clamp(logicalPos.x, minX, maxX);
+            logicalPos.z = Mathf.Clamp(logicalPos.z, minZ, maxZ);
+        }
+
+        transform.position = PixelCameraHelper.SnapToPixelGrid(logicalPos, cam);
     }
 
     // --------------------------------------------------
@@ -1889,6 +1967,21 @@ public class SpritePawn : MonoBehaviour
         lastVelocity = (Time.deltaTime > 1e-6f) ? (wp - lastWorldPos) / Time.deltaTime : lastVelocity;
         lastVelocity.y = 0f;
         lastWorldPos = wp;
+    }
+
+    private Vector2 ReadMoveInput()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (_moveAction != null) return _moveAction.ReadValue<Vector2>();
+        return Vector2.zero;
+#else
+        float x = 0f, y = 0f;
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) x -= 1f;
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x += 1f;
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) y -= 1f;
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) y += 1f;
+        return new Vector2(x, y);
+#endif
     }
 
     private void CreateVisual()
