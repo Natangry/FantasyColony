@@ -25,7 +25,12 @@ public class ConstructionBoard : Building
     public override void OnPlaced(Vector2Int grid, float tile)
     {
         base.OnPlaced(grid, tile);
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js != null)
         {
             js.SetSlots(this, JobType.Builder, builderSlots);
@@ -54,7 +59,12 @@ public class ConstructionBoard : Building
     {
         if (!_showInspector) return;
 
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js == null) return;
 
         Rect r = new Rect(20f, Screen.height * 0.6f, Mathf.Max(260f, Screen.width * 0.22f), Screen.height * 0.35f);

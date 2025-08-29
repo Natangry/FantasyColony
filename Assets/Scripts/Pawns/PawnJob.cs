@@ -14,13 +14,23 @@ public class PawnJob : MonoBehaviour
 
     private void OnEnable()
     {
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js != null) js.RegisterPawn(this);
     }
 
     private void OnDisable()
     {
-        var js = FindObjectOfType<JobService>();
+        JobService js;
+#if UNITY_2023_1_OR_NEWER
+        js = UnityEngine.Object.FindFirstObjectByType<JobService>();
+#else
+        js = FindObjectOfType<JobService>();
+#endif
         if (js != null) js.UnregisterPawn(this);
     }
 
