@@ -634,6 +634,7 @@ public class BuildPlacementTool : MonoBehaviour
     private float _tile = 1f; private int _w = 128; private int _h = 128;
     private Vector3 _gridMinWorld; // bottom-left world corner of tile (0,0)
     private bool _haveBounds;
+    private int _gridLayer = 0; // render layer to use for ghost/marker/visuals
 
     private Camera _cam;
     private static Sprite _whiteSprite;
@@ -745,6 +746,7 @@ public class BuildPlacementTool : MonoBehaviour
                     GridSpace.Plane = _plane;
                     _groundConst = b.center.z;
                     _gridMinWorld = new Vector3(b.min.x, b.min.y, _groundConst);
+                    _gridLayer = rend.gameObject.layer;
                     _haveBounds = true;
                 }
                 else
@@ -754,6 +756,7 @@ public class BuildPlacementTool : MonoBehaviour
                     GridSpace.Plane = _plane;
                     _groundConst = b.center.y;
                     _gridMinWorld = new Vector3(b.min.x, _groundConst, b.min.z);
+                    _gridLayer = rend.gameObject.layer;
                     _haveBounds = true;
                 }
             }
@@ -763,6 +766,7 @@ public class BuildPlacementTool : MonoBehaviour
                 _plane = GridPlane.XY;
                 GridSpace.Plane = _plane;
                 _groundConst = 0f;
+                _gridLayer = 0; // Default
             }
         }
         else
@@ -770,6 +774,7 @@ public class BuildPlacementTool : MonoBehaviour
             _plane = GridPlane.XY;
             GridSpace.Plane = _plane;
             _groundConst = 0f;
+            _gridLayer = 0;
         }
     }
 
@@ -913,7 +918,7 @@ public class BuildPlacementTool : MonoBehaviour
         // Use a Quad + Unlit/Color material to ensure visibility in all camera setups
         _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
         _ghost.name = "Build Ghost";
-        _ghost.layer = 0;
+        _ghost.layer = _gridLayer;
         _ghostMr = _ghost.GetComponent<MeshRenderer>();
         var mat = new Material(Shader.Find("Unlit/Color"));
         mat.color = new Color(0.2f, 0.9f, 0.2f, 0.35f);
@@ -928,6 +933,7 @@ public class BuildPlacementTool : MonoBehaviour
         if (_marker != null) return;
         _marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
         _marker.name = "Build Marker";
+        _marker.layer = _gridLayer;
         _markerMr = _marker.GetComponent<MeshRenderer>();
         var mat = new Material(Shader.Find("Unlit/Color"));
         mat.color = new Color(1f, 1f, 0.2f, 0.85f);
@@ -1028,8 +1034,14 @@ public class BuildPlacementTool : MonoBehaviour
         string reason = _canPlace ? "" : InvalidReason();
         string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
         string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
-        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 460, 150), text, style);
+        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nGridLayer: {_gridLayer}  CamHasLayer: {CameraHasLayer(_gridLayer)}\nGhostActive: {(_ghost!=null)}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 560, 170), text, style);
+    }
+
+    private bool CameraHasLayer(int layer)
+    {
+        var cam = GetCamera(); if (cam == null) return true;
+        return (cam.cullingMask & (1 << layer)) != 0;
     }
 
     private bool TryGetMouseOnGround(Camera cam, out Vector3 world)
@@ -3687,6 +3699,9 @@ public class ConstructionBoard : Building
             js.SetSlots(this, JobType.Builder, builderSlots);
         }
 
+        // Set this object to the grid layer so camera can see it
+        gameObject.layer = DetectGridLayer();
+
         // Visual stub: quad rotated onto XZ so it's visible from top-down
         var mr = GetComponentInChildren<MeshRenderer>();
         if (mr == null)
@@ -3696,10 +3711,12 @@ public class ConstructionBoard : Building
             quad.transform.SetParent(transform, false);
             mr = quad.GetComponent<MeshRenderer>();
             quad.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            quad.layer = gameObject.layer;
+            var col = quad.GetComponent<Collider>(); if (col != null) Object.Destroy(col);
         }
         if (mr != null)
         {
-            if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+            if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Unlit/Color"));
             mr.sharedMaterial.color = new Color(0.95f, 0.85f, 0.35f, 1f);
             // Scale to 3x1 footprint (X=width, Z=depth)
             var t = mr.transform;
@@ -3707,6 +3724,32 @@ public class ConstructionBoard : Building
             t.localScale = new Vector3(size.x * tileSize, size.y * tileSize, 1f);
             t.localPosition = new Vector3((size.x * tileSize) * 0.5f, 0.01f, (size.y * tileSize) * 0.5f);
         }
+    }
+
+    private int DetectGridLayer()
+    {
+        // Try to find the grid's renderer & inherit its layer
+        var grid = FindAnyGridRenderer();
+        if (grid != null) return grid.gameObject.layer;
+        return 0; // Default
+    }
+
+    private static Renderer FindAnyGridRenderer()
+    {
+        var grid = Object.FindAnyObjectByType<Component>();
+        // Try a few common names first
+        var go = GameObject.Find("Grid");
+        if (go != null)
+        {
+            var r = go.GetComponentInChildren<Renderer>();
+            if (r != null) return r;
+        }
+        // Fallback: find any renderer tagged as ground or in root
+        foreach (var r in Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+        {
+            if (r.gameObject.name.ToLower().Contains("grid") || r.gameObject.name.ToLower().Contains("ground")) return r;
+        }
+        return null;
     }
 
     private void OnGUI()
