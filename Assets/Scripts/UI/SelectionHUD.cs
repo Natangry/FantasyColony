@@ -21,10 +21,19 @@ public class SelectionHUD : MonoBehaviour
     private GUIStyle _buttonStyle;
     private GUIStyle _labelStyle;
 
+    // Expose last-drawn HUD rects in SCREEN (bottom-left origin) space so SelectionController can ignore clicks over HUD.
+    public static Rect LastPanelRectBL { get; private set; }
+    public static Rect LastGizmoRectBL { get; private set; }
+
     private void OnGUI()
     {
         var selected = SelectionController.Selected;
-        if (selected == null) return;
+        if (selected == null)
+        {
+            LastPanelRectBL = Rect.zero;
+            LastGizmoRectBL = Rect.zero;
+            return;
+        }
 
         float sw = Screen.width;
         float sh = Screen.height;
@@ -35,15 +44,19 @@ public class SelectionHUD : MonoBehaviour
         float btnH = Mathf.Max(28f, sh * buttonHeightPct);
 
         // Panel rect (bottom-left anchor)
-        var panelRect = new Rect(margin, sh - panelH - margin, panelW, panelH);
+        var panelRectGUI = new Rect(margin, sh - panelH - margin, panelW, panelH);
 
         // Gizmo strip to the right of the panel
-        var gizmoRect = new Rect(panelRect.xMax + gizmoSpacing, panelRect.y, 0f, panelRect.height);
+        var gizmoRectGUI = new Rect(panelRectGUI.xMax + gizmoSpacing, panelRectGUI.y, Mathf.Max(160f, sw * 0.15f), panelRectGUI.height);
 
         EnsureStyles(sh);
 
+        // Update BL-space rects for input guarding
+        LastPanelRectBL = new Rect(panelRectGUI.xMin, sh - (panelRectGUI.yMin + panelRectGUI.height), panelRectGUI.width, panelRectGUI.height);
+        LastGizmoRectBL = new Rect(gizmoRectGUI.xMin, sh - (gizmoRectGUI.yMin + gizmoRectGUI.height), gizmoRectGUI.width, gizmoRectGUI.height);
+
         // Draw panel (blank content for now; just a header for visual structure)
-        GUILayout.BeginArea(panelRect, GUIContent.none, _panelStyle);
+        GUILayout.BeginArea(panelRectGUI, GUIContent.none, _panelStyle);
         {
             GUILayout.Label("Unit Info", _headerStyle);
             GUILayout.Space(btnH * 0.2f);
@@ -54,7 +67,7 @@ public class SelectionHUD : MonoBehaviour
         GUILayout.EndArea();
 
         // Gizmos
-        GUILayout.BeginArea(new Rect(gizmoRect.x, gizmoRect.y, Mathf.Max(160f, sw * 0.15f), gizmoRect.height));
+        GUILayout.BeginArea(gizmoRectGUI);
         {
             // Assume/Release Control
             bool isControlled = (ControlManager.Controlled == selected);

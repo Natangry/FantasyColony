@@ -27,6 +27,9 @@ public class SelectionController : MonoBehaviour
     private Vector2 _dragNow;
     private const float _dragThreshold = 6f; // pixels
 
+    // If a press began over HUD, ignore the whole press/drag/release sequence.
+    private bool _pressOverHUD;
+
     // GUI helpers
     private static Texture2D _texWhite;
 
@@ -53,6 +56,7 @@ public class SelectionController : MonoBehaviour
         if (mouse != null)
         {
             Vector2 pos = mouse.position.ReadValue();
+            if (IsOverHUD(pos)) { if (mouse.leftButton.wasPressedThisFrame) _pressOverHUD = true; return; }
             if (mouse.leftButton.wasPressedThisFrame) OnMouseDown(pos);
             if (mouse.leftButton.isPressed) OnMouseDrag(pos);
             if (mouse.leftButton.wasReleasedThisFrame) OnMouseUp(pos);
@@ -61,9 +65,15 @@ public class SelectionController : MonoBehaviour
 #endif
 
         // Legacy Input fallback
-        if (Input.GetMouseButtonDown(0)) OnMouseDown(Input.mousePosition);
-        if (Input.GetMouseButton(0)) OnMouseDrag(Input.mousePosition);
-        if (Input.GetMouseButtonUp(0)) OnMouseUp(Input.mousePosition);
+        Vector2 mpos = Input.mousePosition;
+        if (IsOverHUD(mpos))
+        {
+            if (Input.GetMouseButtonDown(0)) _pressOverHUD = true;
+            return;
+        }
+        if (Input.GetMouseButtonDown(0)) OnMouseDown(mpos);
+        if (Input.GetMouseButton(0)) OnMouseDrag(mpos);
+        if (Input.GetMouseButtonUp(0)) OnMouseUp(mpos);
     }
 
     public static void SetSelected(SpritePawn pawn)
@@ -125,6 +135,7 @@ public class SelectionController : MonoBehaviour
 
     private void OnMouseDown(Vector2 screenPosBL)
     {
+        if (_pressOverHUD) return;
         _dragStart = screenPosBL;
         _dragNow = screenPosBL;
         _dragging = false;
@@ -132,6 +143,7 @@ public class SelectionController : MonoBehaviour
 
     private void OnMouseDrag(Vector2 screenPosBL)
     {
+        if (_pressOverHUD) return;
         _dragNow = screenPosBL;
         if (!_dragging && Vector2.Distance(_dragStart, _dragNow) > _dragThreshold)
         {
@@ -141,6 +153,7 @@ public class SelectionController : MonoBehaviour
 
     private void OnMouseUp(Vector2 screenPosBL)
     {
+        if (_pressOverHUD) { _pressOverHUD = false; return; }
         _dragNow = screenPosBL;
         if (!_dragging)
         {
@@ -179,6 +192,15 @@ public class SelectionController : MonoBehaviour
         float yMin = Mathf.Min(aBL.y, bBL.y);
         float yMax = Mathf.Max(aBL.y, bBL.y);
         return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+    }
+
+    private bool IsOverHUD(Vector2 screenPosBL)
+    {
+        var p = SelectionHUD.LastPanelRectBL;
+        var g = SelectionHUD.LastGizmoRectBL;
+        bool overPanel = p.width > 0f && p.height > 0f && p.Contains(screenPosBL);
+        bool overGizmo = g.width > 0f && g.height > 0f && g.Contains(screenPosBL);
+        return overPanel || overGizmo;
     }
 
     private void OnGUI()
