@@ -41,6 +41,35 @@ public static class IntroBootstrap
 }
 
 
+// ===== FILE: Assets/Scripts/Boot/PauseBootstrap.cs =====
+using UnityEngine;
+
+public static class PauseBootstrap
+{
+    private static bool spawned;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void EnsurePauseController()
+    {
+#if NO_INTRO
+        // Even if NO_INTRO is defined, we still want pause in gameplay.
+#endif
+        if (spawned) return;
+#if UNITY_2022_2_OR_NEWER
+        var existing = Object.FindAnyObjectByType<PauseController>();
+#else
+        var existing = Object.FindObjectOfType<PauseController>();
+#endif
+        if (existing != null) { spawned = true; return; }
+
+        var go = new GameObject("PauseController (Auto)");
+        Object.DontDestroyOnLoad(go);
+        go.AddComponent<PauseController>();
+        spawned = true;
+    }
+}
+
+
 // ===== FILE: Assets/Scripts/Boot/PawnBootstrap.cs =====
 using UnityEngine;
 
@@ -213,6 +242,69 @@ public static class PixelCameraHelper
     }
 }
 
+
+
+// ===== FILE: Assets/Scripts/Systems/PauseController.cs =====
+using System;
+using UnityEngine;
+
+/// <summary>
+/// Global pause toggle (Space). Pauses via Time.timeScale and shows a tiny overlay while paused.
+/// </summary>
+[AddComponentMenu("Systems/Pause Controller")]
+public class PauseController : MonoBehaviour
+{
+    public static bool IsPaused { get; private set; }
+    public static event Action<bool> OnPauseChanged;
+
+    [Header("Overlay")]
+    [SerializeField] private string pausedText = "PAUSED — press Space to resume";
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SetPaused(!IsPaused);
+        }
+    }
+
+    public static void SetPaused(bool pause)
+    {
+        if (IsPaused == pause) return;
+        IsPaused = pause;
+        Time.timeScale = IsPaused ? 0f : 1f;
+        try { OnPauseChanged?.Invoke(IsPaused); } catch { /* no-op */ }
+    }
+
+    private void OnGUI()
+    {
+        if (!IsPaused) return;
+
+        var sw = Screen.width;
+        var sh = Screen.height;
+
+        float panelW = Mathf.Clamp(sw * 0.45f, 360f, 720f);
+        float panelH = Mathf.Clamp(sh * 0.18f, 120f, 240f);
+        var rect = new Rect((sw - panelW) * 0.5f, (sh - panelH) * 0.5f, panelW, panelH);
+
+        var box = new GUIStyle(GUI.skin.box)
+        {
+            padding = new RectOffset(20, 20, 20, 20)
+        };
+        var label = new GUIStyle(GUI.skin.label)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            wordWrap = true,
+            fontSize = Mathf.Max(16, Mathf.RoundToInt(sh * 0.03f))
+        };
+
+        GUILayout.BeginArea(rect, GUIContent.none, box);
+        GUILayout.FlexibleSpace();
+        GUILayout.Label(pausedText, label);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndArea();
+    }
+}
 
 
 // ===== FILE: Assets/Scripts/UI/IntroScreen.cs =====

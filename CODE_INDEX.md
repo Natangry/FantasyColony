@@ -1,9 +1,11 @@
 # Code Index (.cs)
 
 - `Assets/Scripts/Boot/IntroBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/IntroBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/IntroBootstrap.cs)
+- `Assets/Scripts/Boot/PauseBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PauseBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PauseBootstrap.cs)
 - `Assets/Scripts/Boot/PawnBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs)
 - `Assets/Scripts/Boot/WorldBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs)
 - `Assets/Scripts/Camera/PixelCameraHelper.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
+- `Assets/Scripts/Systems/PauseController.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
 - `Assets/Scripts/UI/IntroScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
 - `Assets/Scripts/Units/SpritePawn.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Units/SpritePawn.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Units/SpritePawn.cs)
 - `Assets/Scripts/World/SimpleGridMap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/SimpleGridMap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/SimpleGridMap.cs)

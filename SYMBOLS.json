@@ -13,6 +13,18 @@
   },
   {
     "kind": "class",
+    "name": "PauseBootstrap",
+    "file": "Assets/Scripts/Boot/PauseBootstrap.cs",
+    "line": 2
+  },
+  {
+    "kind": "method",
+    "name": "EnsurePauseController",
+    "file": "Assets/Scripts/Boot/PauseBootstrap.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
     "name": "PawnBootstrap",
     "file": "Assets/Scripts/Boot/PawnBootstrap.cs",
     "line": 6
@@ -58,6 +70,36 @@
     "name": "OrthoWorldBounds",
     "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
     "line": 35
+  },
+  {
+    "kind": "class",
+    "name": "PauseController",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 15
+  },
+  {
+    "kind": "method",
+    "name": "SetPaused",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 23
+  },
+  {
+    "kind": "method",
+    "name": "OnGUI",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 31
+  },
+  {
+    "kind": "property",
+    "name": "IsPaused",
+    "file": "Assets/Scripts/Systems/PauseController.cs",
+    "line": 10
   },
   {
     "kind": "class",
