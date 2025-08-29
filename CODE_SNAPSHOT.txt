@@ -254,6 +254,15 @@ public static class WorldBootstrap
             root = new GameObject("World");
         }
 
+        // Ensure Buildings container exists so placed stations have a parent
+        var buildings = root.transform.Find("Buildings");
+        if (buildings == null)
+        {
+            var goBuild = new GameObject("Buildings");
+            goBuild.transform.SetParent(root.transform, false);
+            goBuild.transform.localPosition = Vector3.zero;
+        }
+
         // Create/find grid
         var grid = root.GetComponentInChildren<SimpleGridMap>();
         if (grid == null)
@@ -328,6 +337,388 @@ public static class WorldBootstrap
     }
 }
 
+
+
+// ===== FILE: Assets/Scripts/Build/BuildBootstrap.cs =====
+using UnityEngine;
+
+public static class BuildBootstrap
+{
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    public static void Ensure()
+    {
+        var go = GameObject.Find("BuildSystems (Auto)");
+        if (go == null)
+        {
+            go = new GameObject("BuildSystems (Auto)");
+        }
+
+        if (go.GetComponent<BuildModeController>() == null) go.AddComponent<BuildModeController>();
+        if (go.GetComponent<BuildPaletteHUD>() == null) go.AddComponent<BuildPaletteHUD>();
+        if (go.GetComponent<JobService>() == null) go.AddComponent<JobService>();
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Build/BuildModeController.cs =====
+using UnityEngine;
+
+public enum BuildTool
+{
+    None = 0,
+    PlaceConstructionBoard = 1,
+}
+
+public class BuildModeController : MonoBehaviour
+{
+    public static BuildModeController Instance { get; private set; }
+
+    [SerializeField] private bool isActive;
+    [SerializeField] private BuildTool currentTool = BuildTool.None;
+
+    public bool IsActive => isActive;
+    public BuildTool CurrentTool => currentTool;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ToggleBuildMode();
+        }
+
+        // ESC cancels tool or exits build mode
+        if (isActive && Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (currentTool != BuildTool.None)
+                SetTool(BuildTool.None);
+            else
+                SetActive(false);
+        }
+    }
+
+    public void ToggleBuildMode() => SetActive(!isActive);
+
+    public void SetActive(bool active)
+    {
+        isActive = active;
+        if (!isActive) SetTool(BuildTool.None);
+    }
+
+    public void SetTool(BuildTool tool)
+    {
+        currentTool = tool;
+        var toolComp = GetComponent<BuildPlacementTool>();
+        if (toolComp == null) toolComp = gameObject.AddComponent<BuildPlacementTool>();
+        toolComp.SetTool(tool);
+    }
+
+    public static bool UniqueBuildingExists<T>() where T : Building
+    {
+        // "Any" is acceptable and faster in 2023+; fallback for older Unity.
+#if UNITY_2023_1_OR_NEWER
+        return Object.FindAnyObjectByType<T>() != null;
+#else
+        return Object.FindObjectOfType<T>() != null;
+#endif
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Build/BuildPaletteHUD.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Simple build palette shown only while Build Mode is active.
+/// </summary>
+public class BuildPaletteHUD : MonoBehaviour
+{
+    [SerializeField] private Vector2 offset = new Vector2(12f, 120f);
+    [SerializeField] private float widthPct = 0.22f;
+
+    private GUIStyle _box;
+    private GUIStyle _button;
+    private GUIStyle _label;
+
+    private void Ensure()
+    {
+        if (_box == null)
+        {
+            _box = new GUIStyle(GUI.skin.box);
+        }
+        if (_button == null)
+        {
+            _button = new GUIStyle(GUI.skin.button)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold
+            };
+        }
+        if (_label == null)
+        {
+            _label = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold };
+            _label.normal.textColor = Color.white;
+        }
+    }
+
+    private void OnGUI()
+    {
+        var bm = BuildModeController.Instance;
+        if (bm == null || !bm.IsActive) return;
+
+        Ensure();
+
+        float w = Mathf.Max(220f, Screen.width * widthPct);
+        Rect r = new Rect(offset.x, offset.y, w, Screen.height * 0.5f);
+        GUILayout.BeginArea(r, "Build Palette", _box);
+
+        GUILayout.Label("Stations", _label);
+        GUILayout.Space(6f);
+
+        // Construction Board entry
+        bool exists = BuildModeController.UniqueBuildingExists<ConstructionBoard>();
+        using (new GUILayout.HorizontalScope())
+        {
+            GUILayout.Label("Construction Board (Free)", GUILayout.ExpandWidth(true));
+            GUI.enabled = !exists;
+            if (GUILayout.Button(exists ? "Placed" : "Place", _button, GUILayout.Width(90f)))
+            {
+                bm.SetTool(BuildTool.PlaceConstructionBoard);
+            }
+            GUI.enabled = true;
+        }
+
+        GUILayout.FlexibleSpace();
+        GUILayout.Space(8f);
+        if (GUILayout.Button("Exit Build Mode (B)", _button, GUILayout.Height(32f)))
+        {
+            bm.SetActive(false);
+        }
+
+        GUILayout.EndArea();
+    }
+}
+
+internal struct GUIStateScope : System.IDisposable
+{
+    private readonly bool prev;
+    public GUIStateScope(bool enabled) { prev = GUI.enabled; GUI.enabled = enabled; }
+    public void Dispose() { GUI.enabled = prev; }
+}
+
+
+// ===== FILE: Assets/Scripts/Build/BuildPlacementTool.cs =====
+using System;
+using System.Reflection;
+using UnityEngine;
+
+/// <summary>
+/// Handles in-world placement of buildings while a placement tool is active.
+/// </summary>
+public class BuildPlacementTool : MonoBehaviour
+{
+    private BuildTool _tool = BuildTool.None;
+    private GameObject _ghost;
+    private bool _canPlace;
+    private Vector3 _snapWorldPos;
+    private Vector2Int _snapGridPos;
+
+    // Grid snapshot via reflection to avoid tight coupling
+    private float _tile = 1f; private int _w = 128; private int _h = 128;
+
+    private void LateUpdate()
+    {
+        if (_tool == BuildTool.None)
+        {
+            DestroyGhost();
+            return;
+        }
+
+        ReadGridInfo();
+        UpdateGhost();
+
+        if (Input.GetMouseButtonDown(1)) // cancel tool
+        {
+            SetTool(BuildTool.None);
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0)) // left-click to place
+        {
+            TryPlace();
+        }
+    }
+
+    public void SetTool(BuildTool tool)
+    {
+        _tool = tool;
+        if (_tool == BuildTool.None) DestroyGhost();
+    }
+
+    private void ReadGridInfo()
+    {
+        var grid = FindObjectOfTypeByName("SimpleGridMap");
+        _tile = 1f; _w = 128; _h = 128;
+        if (grid != null)
+        {
+            TryGetField(grid, "tileSize", ref _tile);
+            TryGetField(grid, "width", ref _w);
+            TryGetField(grid, "height", ref _h);
+        }
+    }
+
+    private void UpdateGhost()
+    {
+        var cam = Camera.main;
+        var m = Input.mousePosition;
+        Vector3 world = cam != null ? cam.ScreenToWorldPoint(new Vector3(m.x, m.y, Mathf.Abs(cam.transform.position.z))) : Vector3.zero;
+
+        // Snap to grid
+        float tx = Mathf.Round(world.x / _tile) * _tile;
+        float ty = Mathf.Round(world.y / _tile) * _tile;
+        _snapWorldPos = new Vector3(tx, ty, -0.1f);
+        _snapGridPos = new Vector2Int(Mathf.RoundToInt(tx / _tile), Mathf.RoundToInt(ty / _tile));
+
+        EnsureGhost();
+
+        // Validate
+        _canPlace = IsInsideGrid(_snapGridPos) && IsPlacementAllowedHere();
+
+        // Color
+        SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.7f) : new Color(0.9f, 0.2f, 0.2f, 0.7f));
+        _ghost.transform.position = _snapWorldPos;
+        _ghost.transform.localScale = Vector3.one * _tile;
+    }
+
+    private bool IsInsideGrid(Vector2Int p)
+    {
+        return p.x >= 0 && p.y >= 0 && p.x < _w && p.y < _h;
+    }
+
+    private bool IsPlacementAllowedHere()
+    {
+        if (_tool == BuildTool.PlaceConstructionBoard && BuildModeController.UniqueBuildingExists<ConstructionBoard>())
+            return false; // unique per map
+
+        // Check for any existing Building occupying this tile (1x1 for now)
+        var all = FindObjectsOfType<Building>();
+        foreach (var b in all)
+        {
+            if (b.Occupies(_snapGridPos)) return false;
+        }
+        return true;
+    }
+
+    private void TryPlace()
+    {
+        if (!_canPlace) return;
+
+        Transform parent = EnsureBuildingsParent();
+
+        switch (_tool)
+        {
+            case BuildTool.PlaceConstructionBoard:
+            {
+                var go = new GameObject("Construction Board");
+                go.transform.SetParent(parent, worldPositionStays: true);
+                go.transform.position = _snapWorldPos;
+
+                var board = go.AddComponent<ConstructionBoard>();
+                board.displayName = "Construction Board";
+                board.uniquePerMap = true;
+                board.size = new Vector2Int(1, 1);
+                board.OnPlaced(_snapGridPos, _tile);
+                break;
+            }
+        }
+
+        // After successful placement, clear tool
+        SetTool(BuildTool.None);
+    }
+
+    private void EnsureGhost()
+    {
+        if (_ghost != null) return;
+        _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        _ghost.name = "Build Ghost";
+        _ghost.layer = 0;
+        var mr = _ghost.GetComponent<MeshRenderer>();
+        mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+        SetGhostColor(new Color(0.2f, 0.9f, 0.2f, 0.7f));
+    }
+
+    private void DestroyGhost()
+    {
+        if (_ghost != null)
+        {
+            Destroy(_ghost);
+            _ghost = null;
+        }
+    }
+
+    private void SetGhostColor(Color c)
+    {
+        var mr = _ghost != null ? _ghost.GetComponent<MeshRenderer>() : null;
+        if (mr != null && mr.sharedMaterial != null)
+        {
+            mr.sharedMaterial.color = c;
+        }
+    }
+
+    private Transform EnsureBuildingsParent()
+    {
+        var world = GameObject.Find("World");
+        if (world == null)
+        {
+            world = new GameObject("World");
+        }
+        var trans = world.transform.Find("Buildings");
+        if (trans == null)
+        {
+            var go = new GameObject("Buildings");
+            trans = go.transform;
+            trans.SetParent(world.transform, worldPositionStays: false);
+            trans.localPosition = Vector3.zero;
+        }
+        return trans;
+    }
+
+    private static Component FindObjectOfTypeByName(string typeName)
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            var t = asm.GetType(typeName);
+            if (t == null) continue;
+#if UNITY_2023_1_OR_NEWER
+            var comp = Object.FindAnyObjectByType(t) as Component;
+#else
+            var comp = Object.FindObjectOfType(t) as Component;
+#endif
+            if (comp != null) return comp;
+        }
+        return null;
+    }
+
+    private static void TryGetField<T>(Component c, string field, ref T value)
+    {
+        if (c == null) return;
+        var f = c.GetType().GetField(field, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        if (f != null)
+        {
+            object v = f.GetValue(c);
+            if (v is T tv) value = tv;
+            else
+            {
+                try { value = (T)System.Convert.ChangeType(v, typeof(T)); } catch { }
+            }
+        }
+    }
+}
 
 
 // ===== FILE: Assets/Scripts/Camera/FollowControlledPawn.cs =====
@@ -745,6 +1136,147 @@ public static class PixelCameraHelper
     }
 }
 
+
+
+// ===== FILE: Assets/Scripts/Jobs/JobService.cs =====
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Central registry for job providers (buildings) and pawn job assignments.
+/// </summary>
+public class JobService : MonoBehaviour
+{
+    private class JobEntry
+    {
+        public int slots;
+        public readonly List<PawnJob> assigned = new List<PawnJob>();
+    }
+
+    // Building -> JobType -> JobEntry
+    private readonly Dictionary<Building, Dictionary<JobType, JobEntry>> _providers = new();
+
+    // All known pawns
+    private readonly List<PawnJob> _pawns = new();
+
+    public void RegisterPawn(PawnJob pj)
+    {
+        if (!_pawns.Contains(pj)) _pawns.Add(pj);
+    }
+
+    public void UnregisterPawn(PawnJob pj)
+    {
+        _pawns.Remove(pj);
+        foreach (var map in _providers.Values)
+        {
+            foreach (var e in map.Values)
+            {
+                e.assigned.Remove(pj);
+            }
+        }
+    }
+
+    public void SetSlots(Building b, JobType type, int slots)
+    {
+        if (b == null) return;
+        if (!_providers.TryGetValue(b, out var map))
+        {
+            map = new Dictionary<JobType, JobEntry>();
+            _providers[b] = map;
+        }
+        if (!map.TryGetValue(type, out var entry))
+        {
+            entry = new JobEntry();
+            map[type] = entry;
+        }
+        entry.slots = Mathf.Max(0, slots);
+
+        Rebalance(b, type, entry);
+    }
+
+    public List<PawnJob> AssignedFor(Building b, JobType type)
+    {
+        if (b == null) return new List<PawnJob>();
+        if (_providers.TryGetValue(b, out var map) && map.TryGetValue(type, out var e))
+        {
+            return e.assigned;
+        }
+        return new List<PawnJob>();
+    }
+
+    private void Rebalance(Building b, JobType type, JobEntry e)
+    {
+        // Remove overfill
+        while (e.assigned.Count > e.slots)
+        {
+            var pj = e.assigned[e.assigned.Count - 1];
+            e.assigned.RemoveAt(e.assigned.Count - 1);
+            if (pj != null && pj.AssignedBy == b) pj.SetJob(JobType.None, null);
+        }
+
+        // Fill underfill
+        if (e.assigned.Count < e.slots)
+        {
+            foreach (var pj in _pawns)
+            {
+                if (pj == null) continue;
+                if (!pj.IsIdle) continue;
+                e.assigned.Add(pj);
+                pj.SetJob(type, b);
+                if (e.assigned.Count >= e.slots) break;
+            }
+        }
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Jobs/JobType.cs =====
+public enum JobType
+{
+    None = 0,
+    Builder = 1,
+}
+
+public static class JobTypeExt
+{
+    public static string Name(this JobType t) => t.ToString();
+}
+
+
+// ===== FILE: Assets/Scripts/Pawns/PawnJob.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Minimal job holder for pawns; registers with JobService.
+/// </summary>
+public class PawnJob : MonoBehaviour
+{
+    [SerializeField] private JobType current = JobType.None;
+    [SerializeField] private Building assignedBy;
+
+    public bool IsIdle => current == JobType.None;
+    public JobType Current => current;
+    public Building AssignedBy => assignedBy;
+
+    private void OnEnable()
+    {
+        var js = FindObjectOfType<JobService>();
+        if (js != null) js.RegisterPawn(this);
+    }
+
+    private void OnDisable()
+    {
+        var js = FindObjectOfType<JobService>();
+        if (js != null) js.UnregisterPawn(this);
+    }
+
+    public void SetJob(JobType t, Building by)
+    {
+        current = t;
+        assignedBy = by;
+        name = gameObject.name; // keep name stable; could add suffix if desired
+    }
+}
 
 
 // ===== FILE: Assets/Scripts/Systems/ControlManager.cs =====
@@ -2555,6 +3087,144 @@ public class SpritePawn : MonoBehaviour
     {
         isSelected = on;
         if (ringGO != null) ringGO.SetActive(on || isControlled);
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/World/Building.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Base component for placeable buildings.
+/// </summary>
+public class Building : MonoBehaviour
+{
+    public string id = "building";
+    public string displayName = "Building";
+    public bool uniquePerMap = false;
+    public Vector2Int size = Vector2Int.one; // tiles wide/high
+
+    [Header("Runtime")]
+    [SerializeField] protected Vector2Int gridPos; // bottom-left tile of footprint
+    [SerializeField] protected float tileSize = 1f;
+
+    public Vector2Int GridPos => gridPos;
+
+    public virtual void OnPlaced(Vector2Int grid, float tile)
+    {
+        gridPos = grid;
+        tileSize = tile;
+
+        // Add a collider for clicks if missing
+        var col = GetComponent<BoxCollider2D>();
+        if (col == null) col = gameObject.AddComponent<BoxCollider2D>();
+        col.size = new Vector2(size.x * tileSize, size.y * tileSize);
+        col.offset = Vector2.zero;
+    }
+
+    public virtual void OnRemoved() { }
+
+    public bool Occupies(Vector2Int tile)
+    {
+        return tile.x >= gridPos.x && tile.x < gridPos.x + size.x && tile.y >= gridPos.y && tile.y < gridPos.y + size.y;
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/World/Buildings/ConstructionBoard.cs =====
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// One-per-map station that offers the Builder job via slots.
+/// </summary>
+public class ConstructionBoard : Building
+{
+    [SerializeField, Min(0)] private int builderSlots = 1;
+    private bool _showInspector;
+
+    private void Start()
+    {
+        id = "construction_board";
+        displayName = string.IsNullOrEmpty(displayName) ? "Construction Board" : displayName;
+        uniquePerMap = true;
+        size = Vector2Int.one;
+    }
+
+    private void OnMouseUpAsButton()
+    {
+        _showInspector = !_showInspector;
+    }
+
+    public override void OnPlaced(Vector2Int grid, float tile)
+    {
+        base.OnPlaced(grid, tile);
+        var js = FindObjectOfType<JobService>();
+        if (js != null)
+        {
+            js.SetSlots(this, JobType.Builder, builderSlots);
+        }
+
+        // Visual stub: tint a quad so it's visible
+        var mr = GetComponent<MeshRenderer>();
+        if (mr == null)
+        {
+            var quad = GetComponent<MeshFilter>() == null ? GameObject.CreatePrimitive(PrimitiveType.Quad) : gameObject;
+            if (quad != gameObject)
+            {
+                quad.transform.SetParent(transform, false);
+                quad.transform.localPosition = Vector3.zero;
+            }
+            mr = GetComponentInChildren<MeshRenderer>();
+        }
+        if (mr != null)
+        {
+            if (mr.sharedMaterial == null) mr.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+            mr.sharedMaterial.color = new Color(0.95f, 0.85f, 0.35f, 1f);
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (!_showInspector) return;
+
+        var js = FindObjectOfType<JobService>();
+        if (js == null) return;
+
+        Rect r = new Rect(20f, Screen.height * 0.6f, Mathf.Max(260f, Screen.width * 0.22f), Screen.height * 0.35f);
+        GUILayout.BeginArea(r, displayName, GUI.skin.window);
+
+        GUILayout.Label("Builder job", GUI.skin.label);
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("-", GUILayout.Width(32f)))
+        {
+            builderSlots = Mathf.Max(0, builderSlots - 1);
+            js.SetSlots(this, JobType.Builder, builderSlots);
+        }
+        GUILayout.Label($"Slots: {builderSlots}", GUILayout.Width(120f));
+        if (GUILayout.Button("+", GUILayout.Width(32f)))
+        {
+            builderSlots = Mathf.Min(99, builderSlots + 1);
+            js.SetSlots(this, JobType.Builder, builderSlots);
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(6f);
+        var assigned = js.AssignedFor(this, JobType.Builder);
+        GUILayout.Label($"Assigned ({assigned.Count})");
+        int show = Mathf.Min(assigned.Count, 5);
+        for (int i = 0; i < show; i++)
+        {
+            GUILayout.Label($"- {assigned[i].name}");
+        }
+        if (assigned.Count > show)
+        {
+            GUILayout.Label($"...and {assigned.Count - show} more");
+        }
+
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("Close")) _showInspector = false;
+        GUILayout.EndArea();
     }
 }
 
