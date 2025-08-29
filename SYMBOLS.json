@@ -13,6 +13,18 @@
   },
   {
     "kind": "class",
+    "name": "PawnBootstrap",
+    "file": "Assets/Scripts/Boot/PawnBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "SpawnSpritePawn",
+    "file": "Assets/Scripts/Boot/PawnBootstrap.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
     "name": "WorldBootstrap",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 6
@@ -22,6 +34,30 @@
     "name": "GenerateDefaultGrid",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "PixelCameraHelper",
+    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "WorldUnitsPerPixel",
+    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "SnapToPixelGrid",
+    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
+    "line": 24
+  },
+  {
+    "kind": "method",
+    "name": "OrthoWorldBounds",
+    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
+    "line": 35
   },
   {
     "kind": "class",
@@ -51,7 +87,25 @@
     "kind": "method",
     "name": "QuitGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 135
+    "line": 137
+  },
+  {
+    "kind": "class",
+    "name": "SpritePawn",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 33
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 185
   },
   {
     "kind": "class",
