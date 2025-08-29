@@ -123,6 +123,9 @@ public class IntroScreen : MonoBehaviour
     // Called when Start is pressed: clear/hide the intro overlay.
     private void OnStartGame()
     {
+        // Generate a small default grid map and frame the camera before hiding the menu.
+        WorldBootstrap.GenerateDefaultGrid();
+
         showMenu = false;
         // The bootstrap GameObject is marked DontDestroyOnLoad, so we simply hide UI here.
         // Additional game flow can be wired in later when a real title scene exists.
