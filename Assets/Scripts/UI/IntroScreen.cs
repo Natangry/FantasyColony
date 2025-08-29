@@ -127,6 +127,8 @@ public class IntroScreen : MonoBehaviour
         WorldBootstrap.GenerateDefaultGrid();
         // Spawn a SNES-style sprite pawn that patrols the visible area.
         PawnBootstrap.SpawnSpritePawn();
+        // Spawn a second pawn with a different walk pattern to test multi-unit behaviors.
+        PawnBootstrap.SpawnSecondPawn();
 
         showMenu = false;
         // The bootstrap GameObject is marked DontDestroyOnLoad, so we simply hide UI here.
