@@ -17,8 +17,13 @@ public static class IntroBootstrap
         if (spawnedOnce)
             return;
 
-        // If an IntroScreen already exists in the scene, do nothing.
-        if (Object.FindObjectOfType<IntroScreen>() != null)
+        // If an IntroScreen already exists in the scene (FindAnyObjectByType/FindObjectOfType), do nothing.
+#if UNITY_2022_2_OR_NEWER
+        var existing = Object.FindAnyObjectByType<IntroScreen>();
+#else
+        var existing = Object.FindObjectOfType<IntroScreen>();
+#endif
+        if (existing != null)
         {
             spawnedOnce = true;
             return;
