@@ -1,0 +1,11 @@
+# Glossary
+- **Pawn**: a colonist character.
+- **Workforce Job**: schedulable job assigned via a station shift.
+- **Autonomous Activity**: unschedulable activity (training, logistics, etc.).
+- **Gambit**: IF/THEN behavior rule stack for combat AI.
+- **Gizmo**: command UI button; base bars and sub-bars.
+- **Tag**: world state marker consumed/produced by Director rules.
+- **Director**: rule engine that evaluates tags and spawns quests/events.
+- **Building Designation**: a functional tag set on a built space (e.g., Bar, Workshop) that drives requirements and staffing.
+- **Service Point**: a special furniture/station with an interaction queue (Bar Counter, Altar, Till, Reception).
+- **Operational State**: Closed · Limited · Open · Excellent — computed from requirements/perks.
