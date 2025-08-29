@@ -14,6 +14,15 @@ public static class WorldBootstrap
             root = new GameObject("World");
         }
 
+        // Ensure Buildings container exists so placed stations have a parent
+        var buildings = root.transform.Find("Buildings");
+        if (buildings == null)
+        {
+            var goBuild = new GameObject("Buildings");
+            goBuild.transform.SetParent(root.transform, false);
+            goBuild.transform.localPosition = Vector3.zero;
+        }
+
         // Create/find grid
         var grid = root.GetComponentInChildren<SimpleGridMap>();
         if (grid == null)
