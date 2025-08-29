@@ -42,6 +42,7 @@ public class SpritePawn : MonoBehaviour
     private GameObject ringGO;
     private Material ringMat;
     private bool isSelected;
+    private bool isControlled;
 
     private void Awake()
     {
@@ -258,10 +259,28 @@ public class SpritePawn : MonoBehaviour
         ringGO.SetActive(false);
     }
 
+    public void SetControlled(bool on)
+    {
+        isControlled = on;
+        // Visual cue: brighten the ring if controlled
+        if (ringGO != null && ringMat != null)
+        {
+            // Slightly larger & brighter while controlled
+            float worldW = (float)spriteWidthPx / Mathf.Max(1, pixelsPerUnit);
+            float scale = worldW * (on ? 1.9f : 1.6f);
+            ringGO.transform.localScale = new Vector3(scale, scale, 1f);
+
+            var col = ringColor;
+            if (on) col = Color.Lerp(ringColor, Color.white, 0.3f);
+            if (ringMat.HasProperty("_Color")) ringMat.SetColor("_Color", col);
+            if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", col);
+        }
+    }
+
     public void SetSelected(bool on)
     {
         isSelected = on;
-        if (ringGO != null) ringGO.SetActive(on);
+        if (ringGO != null) ringGO.SetActive(on || isControlled);
     }
 
     bool InsideBody(int x, int y, int x0, int x1, int y0, int y1)

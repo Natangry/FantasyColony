@@ -22,6 +22,8 @@ public static class SelectionBootstrap
         var go = new GameObject("SelectionController (Auto)");
         Object.DontDestroyOnLoad(go);
         go.AddComponent<SelectionController>();
+        // HUD that draws the bottom-left info panel and right-side gizmos
+        go.AddComponent<SelectionHUD>();
         spawned = true;
     }
 }
