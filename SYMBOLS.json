@@ -259,6 +259,30 @@
   },
   {
     "kind": "class",
+    "name": "BuildToggleHUD",
+    "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "Ensure",
+    "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
+    "line": 14
+  },
+  {
+    "kind": "method",
+    "name": "OnGUI",
+    "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
+    "line": 30
+  },
+  {
+    "kind": "method",
+    "name": "MakeTex",
+    "file": "Assets/Scripts/Build/BuildToggleHUD.cs",
+    "line": 62
+  },
+  {
+    "kind": "class",
     "name": "FollowControlledPawn",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
     "line": 8
