@@ -37,6 +37,18 @@
   },
   {
     "kind": "class",
+    "name": "SelectionBootstrap",
+    "file": "Assets/Scripts/Boot/SelectionBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "EnsureSelectionController",
+    "file": "Assets/Scripts/Boot/SelectionBootstrap.cs",
+    "line": 11
+  },
+  {
+    "kind": "class",
     "name": "WorldBootstrap",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 6
@@ -145,6 +157,54 @@
   },
   {
     "kind": "class",
+    "name": "SelectionController",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 21
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 36
+  },
+  {
+    "kind": "method",
+    "name": "SetSelected",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 49
+  },
+  {
+    "kind": "method",
+    "name": "TrySelectFromScreen",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 56
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 73
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 87
+  },
+  {
+    "kind": "property",
+    "name": "Selected",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 13
+  },
+  {
+    "kind": "class",
     "name": "IntroScreen",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
     "line": 12
@@ -177,19 +237,43 @@
     "kind": "class",
     "name": "SpritePawn",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 8
+    "line": 9
   },
   {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 36
+    "line": 42
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 67
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 72
+  },
+  {
+    "kind": "method",
+    "name": "OnSelectionChanged",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 257
+  },
+  {
+    "kind": "method",
+    "name": "SetSelected",
+    "file": "Assets/Scripts/Units/SpritePawn.cs",
+    "line": 262
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Units/SpritePawn.cs",
-    "line": 243
+    "line": 338
   },
   {
     "kind": "class",

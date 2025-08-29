@@ -38,6 +38,8 @@
 - **PauseBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PauseBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PauseBootstrap.cs)
 - **PawnBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs)
 - **PawnBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/PawnBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/PawnBootstrap.cs.meta)
+- **SelectionBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/SelectionBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/SelectionBootstrap.cs)
+- **SelectionBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/SelectionBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/SelectionBootstrap.cs.meta)
 - **WorldBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs)
 - **WorldBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/WorldBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/WorldBootstrap.cs.meta)
 
@@ -56,6 +58,8 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Systems)
 
 - **PauseController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/PauseController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/PauseController.cs)
+- **SelectionController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs)
+- **SelectionController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Systems/SelectionController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Systems/SelectionController.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
