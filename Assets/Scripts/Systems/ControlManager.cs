@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+// ReSharper disable Unity.InefficientPropertyAccess
 /// <summary>
 /// Global "assume control" ownership. Exactly one pawn can be controlled at a time.
 /// </summary>
@@ -23,6 +24,7 @@ public class ControlManager : MonoBehaviour
         if (Controlled != null) Controlled.SetControlled(false);
         Controlled = pawn;
         Controlled.SetControlled(true);
+        SelectionController.SelectOnly(Controlled); // pin selection to the controlled pawn
         try { OnControlledChanged?.Invoke(Controlled); } catch { }
     }
 

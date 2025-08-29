@@ -15,6 +15,7 @@ public class SelectionController : MonoBehaviour
 {
     public static SpritePawn Selected { get; private set; }
     public static event Action<SpritePawn> OnSelectionChanged;
+    private static SelectionController _instance;
 
     private static readonly List<SpritePawn> _selectedGroup = new List<SpritePawn>();
     public static IReadOnlyList<SpritePawn> SelectedGroup => _selectedGroup;
@@ -47,6 +48,8 @@ public class SelectionController : MonoBehaviour
             _cam = any;
         }
     }
+    private void OnEnable() { _instance = this; }
+    private void OnDisable() { if (_instance == this) _instance = null; }
 
     private void Update()
     {
@@ -56,6 +59,13 @@ public class SelectionController : MonoBehaviour
         if (mouse != null)
         {
             Vector2 pos = mouse.position.ReadValue();
+            // If we are controlling a pawn, block selection input unless it's over HUD (so gizmos remain usable).
+            if (ControlManager.Controlled != null && !IsOverHUD(pos))
+            {
+                // Still allow HUD clicks to go through (handled in SelectionHUD)
+                _pressOverHUD = true;
+                return;
+            }
             if (IsOverHUD(pos)) { if (mouse.leftButton.wasPressedThisFrame) _pressOverHUD = true; return; }
             if (mouse.leftButton.wasPressedThisFrame) OnMouseDown(pos);
             if (mouse.leftButton.isPressed) OnMouseDrag(pos);
@@ -66,6 +76,13 @@ public class SelectionController : MonoBehaviour
 
         // Legacy Input fallback
         Vector2 mpos = Input.mousePosition;
+        if (ControlManager.Controlled != null && !IsOverHUD(mpos))
+        {
+            if (Input.GetMouseButtonDown(0)) _pressOverHUD = true;
+            // Ignore all selection while controlled (unless HUD)
+            return;
+        }
+
         if (IsOverHUD(mpos))
         {
             if (Input.GetMouseButtonDown(0)) _pressOverHUD = true;
@@ -88,6 +105,30 @@ public class SelectionController : MonoBehaviour
         try { OnSelectionChanged?.Invoke(Selected); } catch { /* no-op */ }
     }
 
+    /// <summary>
+    /// Clears the group and selects only the provided pawn. Used when assuming control.
+    /// </summary>
+    public static void SelectOnly(SpritePawn pawn)
+    {
+        if (_instance == null)
+        {
+            SetSelected(pawn);
+            return;
+        }
+        // Turn off previous rings
+        for (int i = 0; i < _selectedGroup.Count; i++)
+        {
+            var p = _selectedGroup[i];
+            if (p != null) p.SetSelected(false);
+        }
+        _selectedGroup.Clear();
+        if (pawn != null)
+        {
+            _selectedGroup.Add(pawn);
+            pawn.SetSelected(true);
+        }
+        SetSelected(pawn);
+    }
     private void ApplyGroupSelection(List<SpritePawn> newGroup)
     {
         // Turn off previous rings

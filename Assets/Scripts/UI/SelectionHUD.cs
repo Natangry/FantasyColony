@@ -77,6 +77,11 @@ public class SelectionHUD : MonoBehaviour
                 if (isControlled) ControlManager.ReleaseControl();
                 else ControlManager.AssumeControl(selected);
             }
+            // Keep selection pinned to controlled pawn even if HUD was clicked first
+            if (ControlManager.Controlled != null && SelectionController.Selected != ControlManager.Controlled)
+            {
+                SelectionController.SelectOnly(ControlManager.Controlled);
+            }
 
             GUILayout.Space(btnH * 0.25f);
             GUILayout.Label("Tip: WASD/Arrows to move when controlled.\nSpace = Pause. 1/2/3 = Speed.", _labelStyle);
