@@ -129,13 +129,13 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 39
+    "line": 41
   },
   {
     "kind": "method",
     "name": "TryFindGrid",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 47
+    "line": 49
   },
   {
     "kind": "method",
@@ -145,45 +145,57 @@
   },
   {
     "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 68
+  },
+  {
+    "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 88
+    "line": 93
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 101
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 97
+    "line": 103
   },
   {
     "kind": "method",
     "name": "OnControlledChanged",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 141
+    "line": 150
   },
   {
     "kind": "method",
     "name": "ClampToGrid",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 148
+    "line": 157
   },
   {
     "kind": "method",
     "name": "ReadMoveInput",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 175
+    "line": 186
   },
   {
     "kind": "method",
     "name": "ReadBoost",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 189
+    "line": 200
   },
   {
     "kind": "method",
     "name": "ReadScrollDelta",
     "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 198
+    "line": 209
   },
   {
     "kind": "class",
