@@ -647,26 +647,28 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureGhost();
     }
 
-    private void LateUpdate()
+    private void Update()
     {
+        // Drive placement every frame
+        SyncToolFromController();
+
         if (_tool == BuildTool.None)
         {
             DestroyGhost();
             return;
         }
 
-        ReadGridInfo();
+        // Update ghost & validity continuously
         UpdateGhost();
 
-        if (Input.GetMouseButtonDown(1)) // cancel tool
-        {
-            SetTool(BuildTool.None);
-            return;
-        }
-
-        if (Input.GetMouseButtonDown(0)) // left-click to place
+        // Handle input
+        if (Input.GetMouseButtonDown(0))
         {
             TryPlace();
+        }
+        else if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            CancelPlacement();
         }
     }
 
@@ -726,6 +728,7 @@ public class BuildPlacementTool : MonoBehaviour
     {
         // Keep local tool state in sync with the controller every frame
         SyncToolFromController();
+        ReadGridInfo();
 
         if (_tool == BuildTool.None)
         {
@@ -1012,6 +1015,20 @@ public class BuildPlacementTool : MonoBehaviour
         foreach (var b in all)
             if (RectOverlaps(b.GridPos, b.size, _snapGridPos, _footSize)) return $"(overlap with {b.displayName})";
         return "";
+    }
+
+    private void CancelPlacement()
+    {
+        var bm = BuildModeController.Instance;
+        if (bm != null)
+        {
+            bm.SetTool(BuildTool.None);
+        }
+        else
+        {
+            SetTool(BuildTool.None);
+        }
+        DestroyGhost();
     }
 
     private void DestroyGhost()
