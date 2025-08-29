@@ -1299,136 +1299,133 @@ public class SelectionController : MonoBehaviour
 // ===== FILE: Assets/Scripts/UI/IntroScreen.cs =====
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-/// <summary>
-/// Temporary intro overlay with Start / Quit buttons.
-/// This version scales its layout and fonts with the screen resolution so it remains readable on 720p–4K.
-/// </summary>
-[AddComponentMenu("UI/Intro Screen (Temporary)")]
 public class IntroScreen : MonoBehaviour
 {
-    [Header("Responsive Layout")]
-    [Tooltip("Panel size as a percentage of the screen (width, height).")]
-    [SerializeField] private Vector2 panelPercent = new Vector2(0.40f, 0.45f);
-
-    [Tooltip("Min/Max width (pixels) clamp for the panel.")]
-    [SerializeField] private Vector2 panelMinMaxW = new Vector2(420f, 900f);
-
-    [Tooltip("Min/Max height (pixels) clamp for the panel.")]
-    [SerializeField] private Vector2 panelMinMaxH = new Vector2(260f, 700f);
-
-    [Header("Typography (as % of screen height)")]
-    [SerializeField] private float titlePct = 0.060f;
-    [SerializeField] private float buttonPct = 0.035f;
+    [Header("Layout")]
+    [SerializeField] private float titlePct = 0.18f;           // % of screen height for the title font size
+    [SerializeField] private float buttonPct = 0.06f;          // % of screen height for button height
+    [SerializeField] private float minButtonHeight = 64f;      // hard floor so buttons are never tiny
+    [SerializeField] private Color backgroundColor = new Color(0.08f, 0.09f, 0.11f, 1f); // opaque
 
     [Header("Content")]
     [SerializeField] private string gameTitle = "Fantasy Colony";
 
     [Header("Map Settings")]
     [Tooltip("Select the starting map size.")]
-    [SerializeField] private string[] mapSizeLabels = new[] { "32×32", "64×64", "128×128", "256×256" };
-    [SerializeField] private int selectedMapIndex = 2; // Default to 128×128
+    [SerializeField] private string[] mapSizeLabels = { "32×32", "64×64", "128×128", "256×256" };
     private static readonly int[] mapSizes = { 32, 64, 128, 256 };
+    [SerializeField] private int selectedMapIndex = 2; // Default to 128×128
 
     private bool showMenu = true;
-    private bool focusedFirstButton;
-
     private GUIStyle titleStyle;
     private GUIStyle buttonStyle;
-    private GUIStyle boxStyle;
+    private GUIStyle bgStyle;
+    private Texture2D bgTex;
 
-    private void Awake()
+    private void EnsureStyles()
     {
-        // Ensure visible on first frame in case another script toggled this beforehand.
-        showMenu = true;
+        if (bgTex == null)
+        {
+            bgTex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+            bgTex.SetPixel(0, 0, backgroundColor);
+            bgTex.Apply();
+        }
+        if (bgStyle == null)
+        {
+            bgStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = bgTex },
+                border = new RectOffset(0, 0, 0, 0),
+                margin = new RectOffset(0, 0, 0, 0),
+                padding = new RectOffset(0, 0, 0, 0)
+            };
+        }
+        if (titleStyle == null)
+        {
+            titleStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold,
+                wordWrap = true
+            };
+            titleStyle.normal.textColor = Color.white;
+        }
+        if (buttonStyle == null)
+        {
+            buttonStyle = new GUIStyle(GUI.skin.button)
+            {
+                alignment = TextAnchor.MiddleCenter
+            };
+        }
     }
 
     private void OnGUI()
     {
-        if (!showMenu)
-            return;
+        if (!showMenu) return;
 
-        float sw = Screen.width;
-        float sh = Screen.height;
+        EnsureStyles();
 
-        // Compute responsive panel size with sensible clamps.
-        float panelW = Mathf.Clamp(sw * Mathf.Clamp01(panelPercent.x), panelMinMaxW.x, panelMinMaxW.y);
-        float panelH = Mathf.Clamp(sh * Mathf.Clamp01(panelPercent.y), panelMinMaxH.x, panelMinMaxH.y);
-        Rect panelRect = new Rect((sw - panelW) * 0.5f, (sh - panelH) * 0.5f, panelW, panelH);
+        // Full-screen opaque background
+        Rect full = new Rect(0, 0, Screen.width, Screen.height);
+        GUI.Box(full, GUIContent.none, bgStyle);
 
-        // Styles that scale with resolution.
-        int titleFontSize = Mathf.Max(18, Mathf.RoundToInt(sh * titlePct));
-        int buttonFontSize = Mathf.Max(12, Mathf.RoundToInt(sh * buttonPct));
-        float buttonHeight = Mathf.Max(40f, sh * 0.06f);
-        float contentPadding = Mathf.Round(panelH * 0.08f);
+        // Dynamic sizes based on screen height
+        float titleSize = Mathf.Max(32f, Screen.height * titlePct);
+        float btnH = Mathf.Max(minButtonHeight, Screen.height * buttonPct);
+
+        titleStyle.fontSize = Mathf.RoundToInt(titleSize);
+        buttonStyle.fontSize = Mathf.RoundToInt(btnH * 0.38f);
+
+        GUILayout.BeginArea(full);
+        GUILayout.BeginVertical();
+        GUILayout.FlexibleSpace();
 
         // Title
-        titleStyle = new GUIStyle(GUI.skin.label)
+        GUILayout.Label(gameTitle, titleStyle);
+        GUILayout.Space(btnH * 0.6f);
+
+        // Map size grid (2×2) with large, tappable buttons
+        float gridPadding = Mathf.Max(8f, btnH * 0.25f);
+        for (int row = 0; row < 2; row++)
         {
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = titleFontSize,
-            wordWrap = true,
-            richText = true
-        };
-
-        // Buttons
-        buttonStyle = new GUIStyle(GUI.skin.button)
-        {
-            fontSize = buttonFontSize
-        };
-
-        // Panel background
-        boxStyle = new GUIStyle(GUI.skin.box)
-        {
-            padding = new RectOffset(
-                Mathf.RoundToInt(contentPadding),
-                Mathf.RoundToInt(contentPadding),
-                Mathf.RoundToInt(contentPadding),
-                Mathf.RoundToInt(contentPadding))
-        };
-
-        GUILayout.BeginArea(panelRect, GUIContent.none, boxStyle);
-        {
-            GUILayout.FlexibleSpace();
-
-            GUILayout.Label($"{gameTitle}", titleStyle);
-
-            GUILayout.Space(panelH * 0.06f);
-
-            // Map size selector
-            float sizeControlH = Mathf.Max(28f, buttonHeight * 0.6f);
-            int newIndex = GUILayout.Toolbar(selectedMapIndex, mapSizeLabels, GUILayout.Height(sizeControlH));
-            if (newIndex != selectedMapIndex) selectedMapIndex = Mathf.Clamp(newIndex, 0, mapSizeLabels.Length - 1);
-
-            GUILayout.Space(panelH * 0.02f);
-
-            // Focus first button once so keyboard/gamepad users can press Enter/Space.
-            if (!focusedFirstButton)
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(gridPadding);
+            for (int col = 0; col < 2; col++)
             {
-                GUI.SetNextControlName("StartButton");
-            }
-            if (GUILayout.Button("Start", buttonStyle, GUILayout.Height(buttonHeight)))
-            {
-                OnStartGame();
-            }
-            if (!focusedFirstButton)
-            {
-                GUI.FocusControl("StartButton");
-                focusedFirstButton = true;
-            }
+                int i = row * 2 + col;
+                if (i >= mapSizeLabels.Length) break;
 
-            GUILayout.Space(panelH * 0.02f);
+                bool isActive = selectedMapIndex == i;
+                bool pressed = GUILayout.Toggle(isActive, mapSizeLabels[i], buttonStyle, GUILayout.Height(btnH), GUILayout.ExpandWidth(true));
+                if (pressed) selectedMapIndex = i;
 
-            if (GUILayout.Button("Quit", buttonStyle, GUILayout.Height(buttonHeight)))
-            {
-                QuitGame();
+                GUILayout.Space(gridPadding);
             }
-
-            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(gridPadding * 0.6f);
         }
+
+        GUILayout.Space(btnH * 0.4f);
+
+        // Start button (extra tall)
+        if (GUILayout.Button("Start", buttonStyle, GUILayout.Height(btnH * 1.2f)))
+        {
+            OnStartGame();
+        }
+        GUILayout.Space(gridPadding * 0.5f);
+
+        // Quit button
+        if (GUILayout.Button("Quit", buttonStyle, GUILayout.Height(btnH)))
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
+        GUILayout.FlexibleSpace();
+        GUILayout.EndVertical();
         GUILayout.EndArea();
     }
 
@@ -1439,24 +1436,12 @@ public class IntroScreen : MonoBehaviour
         int idx = Mathf.Clamp(selectedMapIndex, 0, mapSizes.Length - 1);
         int size = mapSizes[idx];
         WorldBootstrap.GenerateDefaultGrid(size, size, 1f);
-        // Spawn a SNES-style sprite pawn that patrols the visible area.
+
+        // Spawn test pawns
         PawnBootstrap.SpawnSpritePawn();
-        // Spawn a second pawn with a different walk pattern to test multi-unit behaviors.
         PawnBootstrap.SpawnSecondPawn();
 
         showMenu = false;
-        // The bootstrap GameObject is marked DontDestroyOnLoad, so we simply hide UI here.
-        // Additional game flow can be wired in later when a real title scene exists.
-    }
-
-    // Called when Quit is pressed: exit the game (or stop play mode in Editor).
-    private void QuitGame()
-    {
-#if UNITY_EDITOR
-        EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
     }
 }
 

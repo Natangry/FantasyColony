@@ -441,31 +441,25 @@
     "kind": "class",
     "name": "IntroScreen",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 12
+    "line": 2
   },
   {
     "kind": "method",
-    "name": "Awake",
+    "name": "EnsureStyles",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 43
+    "line": 25
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 49
+    "line": 62
   },
   {
     "kind": "method",
     "name": "OnStartGame",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 137
-  },
-  {
-    "kind": "method",
-    "name": "QuitGame",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 154
+    "line": 134
   },
   {
     "kind": "class",
