@@ -112,6 +112,7 @@ using UnityEngine;
 
 /// <summary>
 /// Ensures a SelectionController exists at runtime in any scene.
+/// (Updated for marquee selection support)
 /// </summary>
 public static class SelectionBootstrap
 {
@@ -417,25 +418,37 @@ public class PauseController : MonoBehaviour
 
 
 // ===== FILE: Assets/Scripts/Systems/SelectionController.cs =====
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
 /// <summary>
-/// Central click-to-select controller. Left click selects a SpritePawn (if any), click empty clears.
+/// Central selection controller.
+/// - Single click selects a pawn (click empty clears).
+/// - Drag-select (marquee) to select one or many pawns.
 /// </summary>
 [AddComponentMenu("Systems/Selection Controller")]
 public class SelectionController : MonoBehaviour
 {
     public static SpritePawn Selected { get; private set; }
-    public static event System.Action<SpritePawn> OnSelectionChanged;
+    public static event Action<SpritePawn> OnSelectionChanged;
 
-#if ENABLE_INPUT_SYSTEM
-    private InputAction _clickAction;
-#endif
+    private static readonly List<SpritePawn> _selectedGroup = new List<SpritePawn>();
+    public static IReadOnlyList<SpritePawn> SelectedGroup => _selectedGroup;
 
     private Camera _cam;
+
+    // Drag/marquee state (screen-space, origin bottom-left)
+    private bool _dragging;
+    private Vector2 _dragStart;
+    private Vector2 _dragNow;
+    private const float _dragThreshold = 6f; // pixels
+
+    // GUI helpers
+    private static Texture2D _texWhite;
 
     private void Awake()
     {
@@ -454,32 +467,58 @@ public class SelectionController : MonoBehaviour
 
     private void Update()
     {
+        // Handle mouse input for both legacy and new input systems.
 #if ENABLE_INPUT_SYSTEM
-        // New Input System uses the bound action in OnEnable().
-#else
-        if (Input.GetMouseButtonDown(0))
+        var mouse = Mouse.current;
+        if (mouse != null)
         {
-            Vector3 pos = Input.mousePosition;
-            TrySelectFromScreen(pos);
+            Vector2 pos = mouse.position.ReadValue();
+            if (mouse.leftButton.wasPressedThisFrame) OnMouseDown(pos);
+            if (mouse.leftButton.isPressed) OnMouseDrag(pos);
+            if (mouse.leftButton.wasReleasedThisFrame) OnMouseUp(pos);
+            return;
         }
 #endif
+
+        // Legacy Input fallback
+        if (Input.GetMouseButtonDown(0)) OnMouseDown(Input.mousePosition);
+        if (Input.GetMouseButton(0)) OnMouseDrag(Input.mousePosition);
+        if (Input.GetMouseButtonUp(0)) OnMouseUp(Input.mousePosition);
     }
 
     public static void SetSelected(SpritePawn pawn)
     {
-        if (Selected == pawn) return;
-        Selected = pawn;
+        if (Selected == pawn)
+        {
+            // Keep group as-is; still raise event for listeners.
+            try { OnSelectionChanged?.Invoke(Selected); } catch { }
+            return;
+        }
+        Selected = pawn; // primary selection
         try { OnSelectionChanged?.Invoke(Selected); } catch { /* no-op */ }
     }
 
-    private void TrySelectFromScreen(Vector3 screenPos)
+    private void ApplyGroupSelection(List<SpritePawn> newGroup)
     {
-        if (_cam == null) return;
-        var ray = _cam.ScreenPointToRay(screenPos);
-        if (Physics.Raycast(ray, out var hit, 1000f, ~0, QueryTriggerInteraction.Ignore))
+        // Turn off previous rings
+        for (int i = 0; i < _selectedGroup.Count; i++)
         {
-            var pawn = hit.collider.GetComponentInParent<SpritePawn>();
-            SetSelected(pawn);
+            var p = _selectedGroup[i];
+            if (p != null) p.SetSelected(false);
+        }
+
+        _selectedGroup.Clear();
+        if (newGroup != null && newGroup.Count > 0)
+        {
+            _selectedGroup.AddRange(newGroup);
+            // Turn on rings for new group
+            for (int i = 0; i < _selectedGroup.Count; i++)
+            {
+                var p = _selectedGroup[i];
+                if (p != null) p.SetSelected(true);
+            }
+            // Primary = first
+            SetSelected(_selectedGroup[0]);
         }
         else
         {
@@ -487,29 +526,113 @@ public class SelectionController : MonoBehaviour
         }
     }
 
-#if ENABLE_INPUT_SYSTEM
-    private void OnEnable()
+    private void SingleClickSelect(Vector2 screenPosBL)
     {
-        if (_clickAction == null)
+        if (_cam == null) return;
+        var ray = _cam.ScreenPointToRay(screenPosBL);
+        if (Physics.Raycast(ray, out var hit, 1000f, ~0, QueryTriggerInteraction.Ignore))
         {
-            _clickAction = new InputAction("SelectClick", binding: "<Mouse>/leftButton");
-            _clickAction.performed += ctx =>
-            {
-                var mouse = Mouse.current;
-                if (mouse == null) return;
-                TrySelectFromScreen(mouse.position.ReadValue());
-            };
+            var pawn = hit.collider != null ? hit.collider.GetComponentInParent<SpritePawn>() : null;
+            var list = new List<SpritePawn>();
+            if (pawn != null) list.Add(pawn);
+            ApplyGroupSelection(list);
         }
-        _clickAction.Enable();
+        else
+        {
+            ApplyGroupSelection(null);
+        }
     }
 
-    private void OnDisable()
+    private void OnMouseDown(Vector2 screenPosBL)
     {
-        if (_clickAction != null) _clickAction.Disable();
+        _dragStart = screenPosBL;
+        _dragNow = screenPosBL;
+        _dragging = false;
     }
-#endif
-}
 
+    private void OnMouseDrag(Vector2 screenPosBL)
+    {
+        _dragNow = screenPosBL;
+        if (!_dragging && Vector2.Distance(_dragStart, _dragNow) > _dragThreshold)
+        {
+            _dragging = true;
+        }
+    }
+
+    private void OnMouseUp(Vector2 screenPosBL)
+    {
+        _dragNow = screenPosBL;
+        if (!_dragging)
+        {
+            // Treat as a click
+            SingleClickSelect(screenPosBL);
+        }
+        else
+        {
+            // Marquee select
+            var rect = GetScreenRectBL(_dragStart, _dragNow);
+            var candidates = new List<SpritePawn>();
+            if (_cam != null)
+            {
+                foreach (var pawn in SpritePawn.Instances)
+                {
+                    if (pawn == null) continue;
+                    var wp = pawn.transform.position;
+                    var sp = _cam.WorldToScreenPoint(wp);
+                    if (sp.z < 0f) continue; // behind camera
+                    var p = new Vector2(sp.x, sp.y); // bottom-left origin
+                    if (rect.Contains(p))
+                    {
+                        candidates.Add(pawn);
+                    }
+                }
+            }
+            ApplyGroupSelection(candidates);
+        }
+        _dragging = false;
+    }
+
+    private static Rect GetScreenRectBL(Vector2 aBL, Vector2 bBL)
+    {
+        float xMin = Mathf.Min(aBL.x, bBL.x);
+        float xMax = Mathf.Max(aBL.x, bBL.x);
+        float yMin = Mathf.Min(aBL.y, bBL.y);
+        float yMax = Mathf.Max(aBL.y, bBL.y);
+        return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+    }
+
+    private void OnGUI()
+    {
+        if (!_dragging) return;
+
+        var sw = Screen.width;
+        var sh = Screen.height;
+
+        // Convert bottom-left rect to GUI-space (top-left origin)
+        var rBL = GetScreenRectBL(_dragStart, _dragNow);
+        var rGUI = new Rect(rBL.xMin, sh - rBL.yMax, rBL.width, rBL.height);
+
+        if (_texWhite == null)
+        {
+            _texWhite = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+            _texWhite.SetPixel(0, 0, Color.white);
+            _texWhite.Apply(false, false);
+        }
+
+        // Fill
+        var fillCol = new Color(0.2f, 0.6f, 1f, 0.15f);
+        var borderCol = new Color(0.2f, 0.6f, 1f, 0.9f);
+        GUI.color = fillCol;
+        GUI.DrawTexture(rGUI, _texWhite);
+        // Border
+        GUI.color = borderCol;
+        GUI.DrawTexture(new Rect(rGUI.xMin, rGUI.yMin, rGUI.width, 2f), _texWhite);
+        GUI.DrawTexture(new Rect(rGUI.xMin, rGUI.yMax - 2f, rGUI.width, 2f), _texWhite);
+        GUI.DrawTexture(new Rect(rGUI.xMin, rGUI.yMin, 2f, rGUI.height), _texWhite);
+        GUI.DrawTexture(new Rect(rGUI.xMax - 2f, rGUI.yMin, 2f, rGUI.height), _texWhite);
+        GUI.color = Color.white;
+    }
+}
 
 
 // ===== FILE: Assets/Scripts/UI/IntroScreen.cs =====
@@ -663,6 +786,7 @@ public class IntroScreen : MonoBehaviour
 
 // ===== FILE: Assets/Scripts/Units/SpritePawn.cs =====
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// A simple SNES-style sprite pawn that patrols a rectangle within the camera view.
@@ -671,6 +795,9 @@ using UnityEngine;
 [AddComponentMenu("Units/Sprite Pawn (Test)")]
 public class SpritePawn : MonoBehaviour
 {
+    // Registry for marquee selection
+    public static readonly HashSet<SpritePawn> Instances = new HashSet<SpritePawn>();
+
     [Header("Sprite")]
     [SerializeField] private int spriteWidthPx = 16;
     [SerializeField] private int spriteHeightPx = 24;
@@ -730,12 +857,12 @@ public class SpritePawn : MonoBehaviour
 
     private void OnEnable()
     {
-        SelectionController.OnSelectionChanged += OnSelectionChanged;
+        Instances.Add(this);
     }
 
     private void OnDisable()
     {
-        SelectionController.OnSelectionChanged -= OnSelectionChanged;
+        Instances.Remove(this);
     }
 
     void CreateVisual()
@@ -916,11 +1043,6 @@ public class SpritePawn : MonoBehaviour
         rr.sharedMaterial = ringMat;
         var rc = ringGO.GetComponent<Collider>(); if (rc) UnityEngine.Object.Destroy(rc);
         ringGO.SetActive(false);
-    }
-
-    private void OnSelectionChanged(SpritePawn newlySelected)
-    {
-        SetSelected(newlySelected == this);
     }
 
     public void SetSelected(bool on)
