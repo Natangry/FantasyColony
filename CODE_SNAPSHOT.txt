@@ -453,11 +453,8 @@ public class FreeCameraController : MonoBehaviour
         ControlManager.OnControlledChanged += OnControlledChanged;
         if (_cam != null)
             _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
-    }
 
 #if ENABLE_INPUT_SYSTEM
-    private void OnEnable()
-    {
         if (_move == null)
         {
             // 2D composite: WASD + Arrows + gamepad stick
@@ -469,28 +466,21 @@ public class FreeCameraController : MonoBehaviour
                 .With("Right", "<Keyboard>/d").With("Right", "<Keyboard>/rightArrow");
             _move.AddBinding("<Gamepad>/leftStick");
         }
-        if (_boost == null)
-        {
-            _boost = new InputAction("CamBoost", binding: "<Keyboard>/shift");
-        }
-        if (_scroll == null)
-        {
-            _scroll = new InputAction("CamScroll", binding: "<Mouse>/scroll"); // Vector2 (x,y)
-        }
-        _move.Enable();
-        _boost.Enable();
-        _scroll.Enable();
+        if (_boost == null) _boost = new InputAction("CamBoost", binding: "<Keyboard>/shift");
+        if (_scroll == null) _scroll = new InputAction("CamScroll", binding: "<Mouse>/scroll"); // Vector2 (x,y)
+        _move.Enable(); _boost.Enable(); _scroll.Enable();
+#endif
     }
 
     private void OnDisable()
     {
+        ControlManager.OnControlledChanged -= OnControlledChanged;
+#if ENABLE_INPUT_SYSTEM
         _move?.Disable();
         _boost?.Disable();
         _scroll?.Disable();
-    }
 #endif
-
-    private void OnDisable() { ControlManager.OnControlledChanged -= OnControlledChanged; }
+    }
 
     private void Update()
     {
