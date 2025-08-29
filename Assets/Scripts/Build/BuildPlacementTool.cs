@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using UnityEngine;
+using FantasyColony.Defs;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem; // New Input System support
 #endif
@@ -29,11 +30,11 @@ public class BuildPlacementTool : MonoBehaviour
     private Vector3 _gridMinWorld; // bottom-left world corner of tile (0,0)
     private bool _haveBounds;
     private int _gridLayer = 0; // render layer to use for ghost/marker/visuals
+    private string _activeBuildingDefId = "core.Building.ConstructionBoard";
+    private VisualDef _ghostVDef; // cached visual for the active building
 
     private Camera _cam;
     private static Sprite _whiteSprite;
-    private Material _ghostMat;
-    private int _pickedLayer;
 
     private void SyncToolFromController()
     {
@@ -53,6 +54,7 @@ public class BuildPlacementTool : MonoBehaviour
         _footSize = GetFootprint();
         EnsureGhost();
         EnsureMarker();
+        ResolveActiveVisual();
     }
 
     // --- Input helpers: support both legacy Input and the new Input System ---
@@ -172,7 +174,6 @@ public class BuildPlacementTool : MonoBehaviour
             _groundConst = 0f;
             _gridLayer = 0;
         }
-        _pickedLayer = PickVisibleLayer(_gridLayer);
     }
 
     private void UpdateGhost()
@@ -187,6 +188,7 @@ public class BuildPlacementTool : MonoBehaviour
         _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
         _footSize = GetFootprint();
         if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1); // belt & suspenders
+        if (_ghostVDef == null) ResolveActiveVisual();
 
         // Snap to grid anchored at bottom-left on the active plane
         int gx, gy;
@@ -301,6 +303,10 @@ public class BuildPlacementTool : MonoBehaviour
                 board.uniquePerMap = true;
                 board.size = new Vector2Int(3, 1);
                 board.OnPlaced(_snapGridPos, _tile);
+
+                // Attach visual via defs
+                var vdef = _ghostVDef ?? new VisualDef();
+                VisualFactory.CreatePlaced(vdef, board.size, _tile, go.transform, _gridLayer, _plane, GetCamera());
                 break;
             }
         }
@@ -312,34 +318,18 @@ public class BuildPlacementTool : MonoBehaviour
     private void EnsureGhost()
     {
         if (_ghost != null) return;
-        // Use a Quad + overlay material to ensure visibility in all camera setups
-        _ghost = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        _ghost.name = "Build Ghost";
-        _ghost.layer = _pickedLayer;
+        var vdef = _ghostVDef ?? new VisualDef();
+        _ghost = VisualFactory.CreateGhost(vdef, _footSize, _tile, this.transform, _gridLayer, _plane, GetCamera());
         _ghostMr = _ghost.GetComponent<MeshRenderer>();
-        _ghostMat = CreateOverlayMaterial(new Color(0.2f, 0.9f, 0.2f, 0.35f));
-        _ghostMr.sharedMaterial = _ghostMat;
-        _ghostMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        _ghostMr.receiveShadows = false;
-        // Remove collider on the ghost
-        var col = _ghost.GetComponent<Collider>();
-        if (col != null) Destroy(col);
-        _ghost.SetActive(true); _ghostMr.enabled = true;
     }
 
     private void EnsureMarker()
     {
         if (_marker != null) return;
-        _marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        _marker.name = "Build Marker";
-        _marker.layer = _pickedLayer;
+        var vdef = _ghostVDef ?? new VisualDef();
+        var markerColor = vdef.Color; markerColor.a = 0.85f;
+        _marker = VisualFactory.CreateGhost(new VisualDef{ color_rgba = ColorUtility.ToHtmlStringRGBA(markerColor), plane = vdef.plane, z_lift = 0.1f }, new Vector2Int(1,1), _tile, this.transform, _gridLayer, _plane, GetCamera());
         _markerMr = _marker.GetComponent<MeshRenderer>();
-        var mat = CreateOverlayMaterial(new Color(1f, 1f, 0.2f, 0.85f));
-        _markerMr.sharedMaterial = mat;
-        _markerMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        _markerMr.receiveShadows = false;
-        var col = _marker.GetComponent<Collider>(); if (col != null) Destroy(col);
-        _marker.SetActive(true); _markerMr.enabled = true;
     }
 
     private Transform EnsureBuildingsParent()
@@ -435,8 +425,8 @@ public class BuildPlacementTool : MonoBehaviour
         string reason = _canPlace ? "" : InvalidReason();
         string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
         string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
-        string text = $"Plane: {plane}\nTool: {_tool}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nGridLayer: {_gridLayer}  CamHasLayer: {CameraHasLayer(_gridLayer)}\nGhostActive: {(_ghost!=null)}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 560, 170), text, style);
+        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nGridLayer: {_gridLayer}  CamHasLayer: {CameraHasLayer(_gridLayer)}\nGhostActive: {(_ghost!=null)}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}";
+        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 620, 190), text, style);
     }
 
     private bool CameraHasLayer(int layer)
@@ -473,44 +463,24 @@ public class BuildPlacementTool : MonoBehaviour
         return true;
     }
 
-    private int PickVisibleLayer(int preferred)
+    private void ResolveActiveVisual()
     {
-        var cam = GetCamera();
-        if (cam == null) return preferred;
-        int mask = cam.cullingMask;
-        if ((mask & (1 << preferred)) != 0) return preferred;
-        for (int i = 0; i < 32; i++) if ((mask & (1 << i)) != 0) return i;
-        return 0; // Default fallback
-    }
+        // Ensure defs are loaded once
+        if (DefDatabase.Visuals.Count == 0) DefDatabase.LoadAll();
 
-    private Material CreateOverlayMaterial(Color color)
-    {
-        Shader s = null;
-        // Prefer URP Unlit
-        s = Shader.Find("Universal Render Pipeline/Unlit");
-        if (s == null) s = Shader.Find("Unlit/Color");
-        if (s == null) s = Shader.Find("Standard");
-
-        var mat = new Material(s);
-        if (s != null && s.name.Contains("Standard"))
+        // For now, only Construction Board is placed by this tool
+        // This maps to core.Building.ConstructionBoard → core.Visual.Board_Default
+        BuildingDef bdef = null;
+        DefDatabase.Buildings.TryGetValue("core.Building.ConstructionBoard", out bdef);
+        if (bdef == null)
         {
-            // Make Standard behave transparent
-            mat.SetFloat("_Mode", 3); // Transparent
-            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.DisableKeyword("_ALPHATEST_ON");
-            mat.EnableKeyword("_ALPHABLEND_ON");
-            mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            mat.renderQueue = 3001;
+            // synthesize a default
+            _ghostVDef = new VisualDef();
+            return;
         }
-        else
-        {
-            // Unlit – ensure it renders after opaques
-            mat.renderQueue = 3001;
-        }
-        mat.color = color;
-        return mat;
+        VisualDef vdef = null;
+        if (!string.IsNullOrEmpty(bdef.visual_ref)) DefDatabase.Visuals.TryGetValue(bdef.visual_ref, out vdef);
+        _ghostVDef = vdef ?? new VisualDef();
     }
 
     private void SetGhostColor(Color c)
