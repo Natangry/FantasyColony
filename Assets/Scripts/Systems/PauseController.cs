@@ -12,13 +12,18 @@ using UnityEngine.InputSystem.LowLevel;
 public class PauseController : MonoBehaviour
 {
     public static bool IsPaused { get; private set; }
+    public static float CurrentSpeed { get; private set; } = 1f; // 1x by default
     public static event Action<bool> OnPauseChanged;
 
     [Header("Overlay")]
-    [SerializeField] private string pausedText = "PAUSED — press Space to resume";
+    [SerializeField] private Vector2 indicatorPadding = new Vector2(12f, 8f);
+    [SerializeField] private float indicatorScale = 0.022f; // % of screen height for font sizing
 
 #if ENABLE_INPUT_SYSTEM
     private InputAction _pauseAction;
+    private InputAction _speed1Action;
+    private InputAction _speed2Action;
+    private InputAction _speed3Action;
 #endif
 
     private void Update()
@@ -28,8 +33,11 @@ public class PauseController : MonoBehaviour
 #else
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SetPaused(!IsPaused);
+            TogglePause();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SetSpeed(1f);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SetSpeed(2f);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SetSpeed(3f);
 #endif
     }
 
@@ -37,11 +45,22 @@ public class PauseController : MonoBehaviour
     {
         if (IsPaused == pause) return;
         IsPaused = pause;
-        Time.timeScale = IsPaused ? 0f : 1f;
+        ApplyTimeScale();
 #if UNITY_EDITOR
         Debug.Log($"Paused: {IsPaused}");
 #endif
         try { OnPauseChanged?.Invoke(IsPaused); } catch { /* no-op */ }
+    }
+
+    public static void SetSpeed(float s)
+    {
+        CurrentSpeed = Mathf.Clamp(s, 0.25f, 3f);
+        if (!IsPaused) ApplyTimeScale();
+    }
+
+    private static void ApplyTimeScale()
+    {
+        Time.timeScale = IsPaused ? 0f : CurrentSpeed;
     }
 
     private void TogglePause()
@@ -59,13 +78,37 @@ public class PauseController : MonoBehaviour
             _pauseAction.AddBinding("<Gamepad>/start");
             _pauseAction.performed += OnPausePerformed;
         }
+        if (_speed1Action == null)
+        {
+            _speed1Action = new InputAction("Speed1", binding: "<Keyboard>/1");
+            _speed1Action.performed += ctx => SetSpeed(1f);
+        }
+        if (_speed2Action == null)
+        {
+            _speed2Action = new InputAction("Speed2", binding: "<Keyboard>/2");
+            _speed2Action.performed += ctx => SetSpeed(2f);
+        }
+        if (_speed3Action == null)
+        {
+            _speed3Action = new InputAction("Speed3", binding: "<Keyboard>/3");
+            _speed3Action.performed += ctx => SetSpeed(3f);
+        }
         _pauseAction.Enable();
+        _speed1Action.Enable();
+        _speed2Action.Enable();
+        _speed3Action.Enable();
     }
 
     private void OnDisable()
     {
         if (_pauseAction != null)
             _pauseAction.Disable();
+        if (_speed1Action != null)
+            _speed1Action.Disable();
+        if (_speed2Action != null)
+            _speed2Action.Disable();
+        if (_speed3Action != null)
+            _speed3Action.Disable();
     }
 
     private void OnPausePerformed(InputAction.CallbackContext ctx)
@@ -76,30 +119,21 @@ public class PauseController : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!IsPaused) return;
-
+        // Top-right speed (and paused) indicator
         var sw = Screen.width;
         var sh = Screen.height;
 
-        float panelW = Mathf.Clamp(sw * 0.45f, 360f, 720f);
-        float panelH = Mathf.Clamp(sh * 0.18f, 120f, 240f);
-        var rect = new Rect((sw - panelW) * 0.5f, (sh - panelH) * 0.5f, panelW, panelH);
-
-        var box = new GUIStyle(GUI.skin.box)
-        {
-            padding = new RectOffset(20, 20, 20, 20)
-        };
         var label = new GUIStyle(GUI.skin.label)
         {
-            alignment = TextAnchor.MiddleCenter,
-            wordWrap = true,
-            fontSize = Mathf.Max(16, Mathf.RoundToInt(sh * 0.03f))
+            alignment = TextAnchor.UpperRight,
+            wordWrap = false,
+            fontSize = Mathf.Max(12, Mathf.RoundToInt(sh * indicatorScale))
         };
 
-        GUILayout.BeginArea(rect, GUIContent.none, box);
-        GUILayout.FlexibleSpace();
-        GUILayout.Label(pausedText, label);
-        GUILayout.FlexibleSpace();
-        GUILayout.EndArea();
+        string text = IsPaused ? $"Paused — Speed: {CurrentSpeed:0.##}×" : $"Speed: {CurrentSpeed:0.##}×";
+        Vector2 size = label.CalcSize(new GUIContent(text));
+        float x = sw - size.x - indicatorPadding.x;
+        float y = indicatorPadding.y;
+        GUI.Label(new Rect(x, y, size.x, size.y), text, label);
     }
 }
