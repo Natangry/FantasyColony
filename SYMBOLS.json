@@ -109,9 +109,21 @@
   },
   {
     "kind": "method",
-    "name": "Update",
+    "name": "Toggle",
     "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
     "line": 9
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
+    "line": 24
+  },
+  {
+    "kind": "method",
+    "name": "OnGUI",
+    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
+    "line": 34
   },
   {
     "kind": "enum",
@@ -171,25 +183,25 @@
     "kind": "struct",
     "name": "GUIStateScope",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 86
+    "line": 110
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 18
+    "line": 20
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 39
+    "line": 51
   },
   {
     "kind": "method",
     "name": "Dispose",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 91
+    "line": 115
   },
   {
     "kind": "class",
