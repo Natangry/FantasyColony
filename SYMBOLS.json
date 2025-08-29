@@ -87,25 +87,25 @@
     "kind": "class",
     "name": "ControlManager",
     "file": "Assets/Scripts/Systems/ControlManager.cs",
-    "line": 8
+    "line": 9
   },
   {
     "kind": "method",
     "name": "AssumeControl",
     "file": "Assets/Scripts/Systems/ControlManager.cs",
-    "line": 12
+    "line": 13
   },
   {
     "kind": "method",
     "name": "ReleaseControl",
     "file": "Assets/Scripts/Systems/ControlManager.cs",
-    "line": 28
+    "line": 30
   },
   {
     "kind": "property",
     "name": "Controlled",
     "file": "Assets/Scripts/Systems/ControlManager.cs",
-    "line": 10
+    "line": 11
   },
   {
     "kind": "class",
@@ -189,67 +189,85 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 35
+    "line": 36
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 51
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 52
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 50
+    "line": 53
   },
   {
     "kind": "method",
     "name": "SetSelected",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 78
+    "line": 95
+  },
+  {
+    "kind": "method",
+    "name": "SelectOnly",
+    "file": "Assets/Scripts/Systems/SelectionController.cs",
+    "line": 111
   },
   {
     "kind": "method",
     "name": "ApplyGroupSelection",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 90
+    "line": 132
   },
   {
     "kind": "method",
     "name": "SingleClickSelect",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 118
+    "line": 159
   },
   {
     "kind": "method",
     "name": "OnMouseDown",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 135
+    "line": 176
   },
   {
     "kind": "method",
     "name": "OnMouseDrag",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 143
+    "line": 184
   },
   {
     "kind": "method",
     "name": "OnMouseUp",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 153
+    "line": 194
   },
   {
     "kind": "method",
     "name": "GetScreenRectBL",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 187
+    "line": 228
   },
   {
     "kind": "method",
     "name": "IsOverHUD",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 196
+    "line": 237
   },
   {
     "kind": "method",
     "name": "OnGUI",
     "file": "Assets/Scripts/Systems/SelectionController.cs",
-    "line": 205
+    "line": 246
   },
   {
     "kind": "property",
