@@ -39,10 +39,10 @@ public class SpritePawn : MonoBehaviour
     // Visuals
     private GameObject quadGO;
     private Material mat;
-    private GameObject ringGO;
     private Material ringMat;
-    private bool isSelected;
+    private GameObject ringGO;
     private bool isControlled;
+    private bool isSelected;
 
     private void Awake()
     {
