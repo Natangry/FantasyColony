@@ -1,0 +1,14 @@
+[
+  {
+    "kind": "class",
+    "name": "IntroScreen",
+    "file": "Assets/IntroScreen.cs",
+    "line": 7
+  },
+  {
+    "kind": "method",
+    "name": "OnStartGame",
+    "file": "Assets/IntroScreen.cs",
+    "line": 17
+  }
+]
