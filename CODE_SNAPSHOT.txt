@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Ensures the main camera follows the currently controlled pawn.
+/// Ensures the main camera follows the currently controlled pawn and supports free WASD panning.
 /// </summary>
 public static class CameraBootstrap
 {
@@ -27,6 +27,10 @@ public static class CameraBootstrap
 
         if (cam.GetComponent<FollowControlledPawn>() == null)
             cam.gameObject.AddComponent<FollowControlledPawn>();
+
+        // Add free camera controls for when no pawn is controlled.
+        if (cam.GetComponent<FreeCameraController>() == null)
+            cam.gameObject.AddComponent<FreeCameraController>();
 
         added = true;
     }
@@ -280,9 +284,12 @@ public class FollowControlledPawn : MonoBehaviour
     [Header("Follow")]
     [SerializeField] private float smoothTime = 0.15f;
     [SerializeField] private bool snapOnAcquire = true;
-    [SerializeField] private bool pixelSnap = true;
+    [SerializeField] private bool pixelSnap = false; // disable by default to avoid double-quantization jitter
     [Tooltip("Optional XZ world offset from the pawn center.")]
     [SerializeField] private Vector2 offset = Vector2.zero;
+    [Header("Stability")]
+    [SerializeField] private bool useDeadZone = true;
+    [SerializeField] private float deadZonePixels = 0.75f;
 
     private Camera _cam;
     private Transform _target;
@@ -324,13 +331,32 @@ public class FollowControlledPawn : MonoBehaviour
         if (_target == null || _cam == null) return;
 
         // Desired position keeps current camera Y & rotation; moves X/Z toward target.
-        var desired = new Vector3(
+        Vector3 desired = new Vector3(
             _target.position.x + offset.x,
             _cam.transform.position.y,
             _target.position.z + offset.y
         );
 
-        var pos = Vector3.SmoothDamp(_cam.transform.position, desired, ref _vel, Mathf.Max(0.0001f, smoothTime));
+        Vector3 current = _cam.transform.position;
+
+        // Optional dead-zone measured in on-screen pixels to prevent micro hunting.
+        if (useDeadZone)
+        {
+            float dx = desired.x - current.x;
+            float dz = desired.z - current.z;
+            float dist = Mathf.Sqrt(dx * dx + dz * dz);
+            float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(_cam));
+            float threshold = upp * Mathf.Max(0f, deadZonePixels);
+            if (dist <= threshold)
+            {
+                var snapPos = pixelSnap ? SnapPosToPixelGrid(desired, _cam) : desired;
+                _cam.transform.position = snapPos;
+                _vel = Vector3.zero;
+                return;
+            }
+        }
+
+        Vector3 pos = Vector3.SmoothDamp(current, desired, ref _vel, Mathf.Max(0.0001f, smoothTime));
 
         if (pixelSnap)
             pos = SnapPosToPixelGrid(pos, _cam);
@@ -360,6 +386,170 @@ public class FollowControlledPawn : MonoBehaviour
         return worldPos;
     }
 }
+
+
+// ===== FILE: Assets/Scripts/Camera/FreeCameraController.cs =====
+using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
+/// <summary>
+/// WASD/Arrow camera panning when no pawn is controlled.
+/// Uses unscaled time so you can pan while paused. Top-down, XZ only.
+/// </summary>
+[AddComponentMenu("Camera/Free Camera Controller")]
+public class FreeCameraController : MonoBehaviour
+{
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float boostMultiplier = 2f;
+    [SerializeField] private bool clampToGrid = true;
+    [SerializeField] private float clampMargin = 1f;
+
+    private Camera _cam;
+    private SimpleGridMap _grid;
+
+#if ENABLE_INPUT_SYSTEM
+    private InputAction _move;
+    private InputAction _boost;
+#endif
+
+    private void Awake()
+    {
+        _cam = GetComponent<Camera>();
+        if (_cam == null) _cam = Camera.main;
+    }
+
+    private void TryFindGrid()
+    {
+        if (_grid != null) return;
+#if UNITY_2022_2_OR_NEWER
+        _grid = UnityEngine.Object.FindAnyObjectByType<SimpleGridMap>();
+#else
+        _grid = UnityEngine.Object.FindObjectOfType<SimpleGridMap>();
+#endif
+    }
+
+#if ENABLE_INPUT_SYSTEM
+    private void OnEnable()
+    {
+        if (_move == null)
+        {
+            // 2D composite: WASD + Arrows + gamepad stick
+            _move = new InputAction("CamMove", type: InputActionType.Value, binding: "2DVector");
+            _move.AddCompositeBinding("2DVector")
+                .With("Up", "<Keyboard>/w").With("Up", "<Keyboard>/upArrow")
+                .With("Down", "<Keyboard>/s").With("Down", "<Keyboard>/downArrow")
+                .With("Left", "<Keyboard>/a").With("Left", "<Keyboard>/leftArrow")
+                .With("Right", "<Keyboard>/d").With("Right", "<Keyboard>/rightArrow");
+            _move.AddBinding("<Gamepad>/leftStick");
+        }
+        if (_boost == null)
+        {
+            _boost = new InputAction("CamBoost", binding: "<Keyboard>/shift");
+        }
+        _move.Enable();
+        _boost.Enable();
+    }
+
+    private void OnDisable()
+    {
+        _move?.Disable();
+        _boost?.Disable();
+    }
+#endif
+
+    private void Update()
+    {
+        // Only active when no pawn is controlled
+        if (ControlManager.Controlled != null) return;
+        if (_cam == null) return;
+
+        Vector2 input = ReadMoveInput();
+        if (input.sqrMagnitude > 1f) input.Normalize();
+        bool boost = ReadBoost();
+
+        float speed = moveSpeed * (boost ? boostMultiplier : 1f);
+        Vector3 delta = new Vector3(input.x, 0f, input.y) * speed * Time.unscaledDeltaTime;
+        Vector3 pos = _cam.transform.position + delta;
+
+        if (clampToGrid)
+        {
+            TryFindGrid();
+            if (_grid != null)
+            {
+                ClampToGrid(ref pos, _cam, _grid, clampMargin);
+            }
+        }
+
+        _cam.transform.position = pos;
+    }
+
+    private static void ClampToGrid(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin)
+    {
+        float wWorld = grid.width * grid.tileSize;
+        float hWorld = grid.height * grid.tileSize;
+        float minX = 0f + margin;
+        float minZ = 0f + margin;
+        float maxX = wWorld - margin;
+        float maxZ = hWorld - margin;
+
+        // Subtract half view so camera doesn't show outside the grid.
+        float halfH = cam.orthographicSize;
+        float halfW = halfH * ((Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f / 9f));
+
+        float clampMinX = minX + halfW;
+        float clampMaxX = maxX - halfW;
+        float clampMinZ = minZ + halfH;
+        float clampMaxZ = maxZ - halfH;
+
+        // If the grid is smaller than the viewport, center the camera.
+        if (clampMinX > clampMaxX)
+        {
+            float cx = (minX + maxX) * 0.5f;
+            camPos.x = cx;
+        }
+        else
+        {
+            camPos.x = Mathf.Clamp(camPos.x, clampMinX, clampMaxX);
+        }
+
+        if (clampMinZ > clampMaxZ)
+        {
+            float cz = (minZ + maxZ) * 0.5f;
+            camPos.z = cz;
+        }
+        else
+        {
+            camPos.z = Mathf.Clamp(camPos.z, clampMinZ, clampMaxZ);
+        }
+    }
+
+    private Vector2 ReadMoveInput()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
+#else
+        float x = 0f, y = 0f;
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) x -= 1f;
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x += 1f;
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) y -= 1f;
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) y += 1f;
+        return new Vector2(x, y);
+#endif
+    }
+
+    private bool ReadBoost()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return _boost != null && _boost.IsPressed();
+#else
+        return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+#endif
+    }
+}
+
 
 
 // ===== FILE: Assets/Scripts/Camera/PixelCameraHelper.cs =====

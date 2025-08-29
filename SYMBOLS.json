@@ -81,43 +81,97 @@
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 20
+    "line": 23
   },
   {
     "kind": "method",
     "name": "OnEnable",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 26
+    "line": 29
   },
   {
     "kind": "method",
     "name": "OnDisable",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 37
+    "line": 40
   },
   {
     "kind": "method",
     "name": "OnControlledChanged",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 42
+    "line": 45
   },
   {
     "kind": "method",
     "name": "LateUpdate",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 51
+    "line": 54
   },
   {
     "kind": "method",
     "name": "SnapToTarget",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 70
+    "line": 92
   },
   {
     "kind": "method",
     "name": "SnapPosToPixelGrid",
     "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 84
+    "line": 106
+  },
+  {
+    "kind": "class",
+    "name": "FreeCameraController",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 26
+  },
+  {
+    "kind": "method",
+    "name": "TryFindGrid",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 32
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 44
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 64
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 71
+  },
+  {
+    "kind": "method",
+    "name": "ClampToGrid",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 97
+  },
+  {
+    "kind": "method",
+    "name": "ReadMoveInput",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 137
+  },
+  {
+    "kind": "method",
+    "name": "ReadBoost",
+    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
+    "line": 151
   },
   {
     "kind": "class",
