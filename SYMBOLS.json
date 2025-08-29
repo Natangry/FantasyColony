@@ -217,57 +217,57 @@
   },
   {
     "kind": "method",
-    "name": "LateUpdate",
+    "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 40
+    "line": 41
   },
   {
     "kind": "method",
-    "name": "SetTool",
+    "name": "LateUpdate",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 63
+    "line": 48
   },
   {
     "kind": "method",
     "name": "ReadGridInfo",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 69
+    "line": 71
   },
   {
     "kind": "method",
     "name": "UpdateGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 121
+    "line": 123
   },
   {
     "kind": "method",
     "name": "IsInsideGrid",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 185
+    "line": 186
   },
   {
     "kind": "method",
     "name": "IsPlacementAllowedHere",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 192
+    "line": 193
   },
   {
     "kind": "method",
     "name": "RectOverlaps",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 211
+    "line": 212
   },
   {
     "kind": "method",
     "name": "TryPlace",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 217
+    "line": 218
   },
   {
     "kind": "method",
     "name": "EnsureGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 258
+    "line": 260
   },
   {
     "kind": "method",
@@ -307,15 +307,21 @@
   },
   {
     "kind": "method",
+    "name": "InvalidReason",
+    "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
+    "line": 371
+  },
+  {
+    "kind": "method",
     "name": "SetGhostColor",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 370
+    "line": 382
   },
   {
     "kind": "method",
     "name": "DestroyGhost",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 375
+    "line": 392
   },
   {
     "kind": "class",
