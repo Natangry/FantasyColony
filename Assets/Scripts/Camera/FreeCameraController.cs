@@ -22,7 +22,7 @@ public class FreeCameraController : MonoBehaviour
     
     [Header("Zoom")]
     [SerializeField] private float minOrtho = 3f;
-    [SerializeField] private float maxOrtho = 60f;
+    [SerializeField] private float maxOrtho = 200f;
     [SerializeField] private float zoomSpeed = 8f;          // how fast orthographicSize changes per wheel notch
     [SerializeField] private bool smoothZoom = true;
     [SerializeField] private float zoomSmoothTime = 0.08f;  // unscaled seconds
