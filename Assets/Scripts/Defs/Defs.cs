@@ -52,14 +52,15 @@ namespace FantasyColony.Defs
         {
             Buildings.Clear();
             Visuals.Clear();
-            XmlDefLoader.LoadSet("Buildings", "StreamingAssets/Defs/Buildings", (BuildingDefSet set) =>
+            XmlDefLoader.LoadSet("Buildings", System.IO.Path.Combine(Application.streamingAssetsPath, "Defs/Buildings"), (BuildingDefSet set) =>
             {
                 foreach (var b in set.Items) if (!string.IsNullOrEmpty(b.id)) Buildings[b.id] = b;
             });
-            XmlDefLoader.LoadSet("Visuals", "StreamingAssets/Defs/Visuals", (VisualDefSet set) =>
+            XmlDefLoader.LoadSet("Visuals", System.IO.Path.Combine(Application.streamingAssetsPath, "Defs/Visuals"), (VisualDefSet set) =>
             {
                 foreach (var v in set.Items) if (!string.IsNullOrEmpty(v.id)) Visuals[v.id] = v;
             });
+            Debug.Log($"[Defs] Loaded Buildings={Buildings.Count}, Visuals={Visuals.Count} from {Application.streamingAssetsPath}");
         }
     }
 }
@@ -68,13 +69,18 @@ namespace FantasyColony.Defs
 {
     public static class XmlDefLoader
     {
-        public static void LoadSet<T>(string kind, string folder, Action<T> onLoaded)
+        public static void LoadSet<T>(string kind, string folderAbs, Action<T> onLoaded)
         {
             try
             {
-                var path = System.IO.Path.Combine(Application.dataPath, "..", folder);
-                if (!System.IO.Directory.Exists(path)) return;
-                foreach (var file in System.IO.Directory.GetFiles(path, "*.xml", System.IO.SearchOption.AllDirectories))
+                var path = folderAbs;
+                if (!System.IO.Directory.Exists(path))
+                {
+                    Debug.LogWarning($"[Defs] {kind} folder missing: {path}");
+                    return;
+                }
+                var files = System.IO.Directory.GetFiles(path, "*.xml", System.IO.SearchOption.AllDirectories);
+                foreach (var file in files)
                 {
                     var doc = System.IO.File.ReadAllText(file);
                     var ser = new XmlSerializer(typeof(T));
@@ -82,6 +88,7 @@ namespace FantasyColony.Defs
                     var obj = (T)ser.Deserialize(sr);
                     onLoaded?.Invoke(obj);
                 }
+                Debug.Log($"[Defs] {kind} loaded: {files.Length} files");
             }
             catch (Exception e)
             {
