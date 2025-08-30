@@ -84,8 +84,8 @@ public class IntroMenuOverlay : MonoBehaviour
         var bLarge  = BuildToggleButton(sizes.transform, "Large\n128×128",new Vector2( 70,  0), () => SetSize(MapSize.Large));
         var bHuge   = BuildToggleButton(sizes.transform, "Huge\n192×192", new Vector2( 210, 0), () => SetSize(MapSize.Huge));
 
-        // Initial visual state
-        Highlight(bLarge, true);
+        // Initial visual state (Large by default)
+        SetSize(MapSize.Large);
 
         // Start / Quit
         var start = BuildButton(panel.transform, "Start", new Vector2(0, -80));
