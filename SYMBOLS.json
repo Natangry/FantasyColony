@@ -199,6 +199,18 @@
   },
   {
     "kind": "class",
+    "name": "TestMapStarter",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "StartTestMap",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 16
+  },
+  {
+    "kind": "class",
     "name": "WorldBootstrap",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 6
@@ -1281,31 +1293,31 @@
     "kind": "class",
     "name": "IntroMenuOverlay",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 16
+    "line": 13
   },
   {
     "kind": "enum",
     "name": "MapSize",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 19
+    "line": 16
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 29
+    "line": 25
   },
   {
     "kind": "method",
     "name": "Show",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 36
+    "line": 32
   },
   {
     "kind": "method",
     "name": "Hide",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 43
+    "line": 39
   },
   {
     "kind": "class",
