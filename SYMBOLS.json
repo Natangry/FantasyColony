@@ -31,6 +31,12 @@
   },
   {
     "kind": "class",
+    "name": "BuildUIBootstrap",
+    "file": "Assets/Scripts/Boot/BuildUIBootstrap.cs",
+    "line": 10
+  },
+  {
+    "kind": "class",
     "name": "CameraBootstrap",
     "file": "Assets/Scripts/Boot/CameraBootstrap.cs",
     "line": 6
@@ -118,12 +124,6 @@
     "name": "GenerateDefaultGrid",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 8
-  },
-  {
-    "kind": "class",
-    "name": "BuildHUD",
-    "file": "Assets/Scripts/Build/BuildHUD.cs",
-    "line": 7
   },
   {
     "kind": "class",

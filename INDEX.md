@@ -62,6 +62,8 @@
 
 - **BuildBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BuildBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BuildBootstrap.cs)
 - **BuildBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BuildBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BuildBootstrap.cs.meta)
+- **BuildUIBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BuildUIBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BuildUIBootstrap.cs)
+- **BuildUIBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BuildUIBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BuildUIBootstrap.cs.meta)
 - **CameraBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/CameraBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/CameraBootstrap.cs)
 - **CameraBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/CameraBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/CameraBootstrap.cs.meta)
 - **InteractionBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/InteractionBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/InteractionBootstrap.cs)
@@ -85,8 +87,6 @@
 ## Assets/Scripts/Build
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Build)
 
-- **BuildHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildHUD.cs)
-- **BuildHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildHUD.cs.meta)
 - **BuildModeController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildModeController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildModeController.cs)
 - **BuildModeController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildModeController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildModeController.cs.meta)
 - **BuildPaletteHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPaletteHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPaletteHUD.cs)
