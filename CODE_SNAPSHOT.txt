@@ -1,3 +1,6 @@
+# Auto-generated code snapshot
+_Updated_: 2025-08-30 23:42:19 UTC
+
 // ===== FILE: Assets/Editor/CreateStartupConfigAsset.cs =====
 using UnityEditor;
 using UnityEngine;
@@ -40,7 +43,6 @@ public static class CreateStartupConfigAsset
         Debug.Log("[StartupConfig] Created at " + AssetPath + ". Set 'introScenePath' to your intro/title scene (as listed in Build Settings).");
     }
 }
-
 
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
@@ -208,10 +210,8 @@ namespace FantasyColony.EditorTools
 }
 #endif
 
-
 // ===== FILE: Assets/Scripts/Boot/IIntroOverlay.cs =====
 public interface IIntroOverlay { }
-
 
 // ===== FILE: Assets/Scripts/Boot/PawnBootstrap.cs =====
 using UnityEngine;
@@ -266,7 +266,6 @@ public static class PawnBootstrap
         return pawn2;
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Build/BuildModeController.cs =====
@@ -393,7 +392,6 @@ public enum BuildTool
     PlaceConstructionBoard
 }
 
-
 // ===== FILE: Assets/Scripts/Build/BuildPaletteHUD.cs =====
 using UnityEngine;
 using System.Collections.Generic;
@@ -516,7 +514,6 @@ public class BuildPaletteHUD : MonoBehaviour
         return list;
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Build/BuildPlacementTool.cs =====
 using UnityEngine;
@@ -957,7 +954,6 @@ public class BuildPlacementTool : MonoBehaviour
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Build/BuildToggleHUD.cs =====
 using UnityEngine;
 
@@ -1034,7 +1030,6 @@ public class BuildToggleHUD : MonoBehaviour
 }
 
 
-
 // ===== FILE: Assets/Scripts/Build/GridSpace.cs =====
 public enum GridPlane
 {
@@ -1049,7 +1044,6 @@ public static class GridSpace
 {
     public static GridPlane Plane = GridPlane.XY; // default to classic 2D
 }
-
 
 
 
@@ -1072,7 +1066,6 @@ public class GameStartupConfig : ScriptableObject
         return Resources.Load<GameStartupConfig>("GameStartupConfig");
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Core/Lifecycle/HardRestart.cs =====
@@ -1136,7 +1129,6 @@ public static class HardRestart
 }
 
 
-
 // ===== FILE: Assets/Scripts/Core/Lifecycle/LifecycleStage.cs =====
 using System;
 namespace FantasyColony.Core.Lifecycle
@@ -1180,7 +1172,6 @@ namespace FantasyColony.Core.Lifecycle
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Core/Lifecycle/StageAttributes.cs =====
 using System;
 namespace FantasyColony.Core.Lifecycle
@@ -1212,7 +1203,6 @@ namespace FantasyColony.Core.Lifecycle
     public sealed class OrderAfterAttribute : Attribute
     { public Type Type { get; } public OrderAfterAttribute(Type type) => Type = type; }
 }
-
 
 // ===== FILE: Assets/Scripts/Core/Lifecycle/StageRegistry.cs =====
 using System;
@@ -1339,7 +1329,6 @@ namespace FantasyColony.Core.Lifecycle
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Core/Lifecycle/StageRunner.cs =====
 using System;
 using System.Diagnostics;
@@ -1397,7 +1386,6 @@ namespace FantasyColony.Core.Lifecycle
         }
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Defs/BuildingDef.cs =====
 using System;
@@ -1463,7 +1451,6 @@ namespace FantasyColony.Defs
 }
 
 
-
 // ===== FILE: Assets/Scripts/Defs/Def.cs =====
 using System;
 
@@ -1495,7 +1482,6 @@ namespace FantasyColony.Defs
         Building = 2,
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Defs/DefDatabase.cs =====
@@ -1589,7 +1575,6 @@ namespace FantasyColony.Defs
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Defs/Defs.cs =====
 // Placeholder file to satisfy an existing .meta (Unity asset GUID).
 // Safe to remove later **from inside Unity** along with this file's .meta.
@@ -1597,7 +1582,6 @@ namespace FantasyColony.Defs
 {
     internal static class __DefsPlaceholder { }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Defs/Visual2DDef.cs =====
@@ -1647,7 +1631,6 @@ namespace FantasyColony.Defs
         public const string Root = "Visual2DDef";
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Defs/VisualDef.cs =====
@@ -1738,7 +1721,6 @@ public static class VisualDefExtensions
         }
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Defs/Xml/XmlDefLoader.cs =====
 using System;
@@ -1940,7 +1922,6 @@ namespace FantasyColony.Defs.Xml
         }
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Dev/Cheats/TestMapStarter.cs =====
@@ -2155,7 +2136,6 @@ public static class TestMapStarter
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Gameplay/Camera/CameraBootstrap.cs =====
 using UnityEngine;
 
@@ -2193,7 +2173,6 @@ public static class CameraBootstrap
         added = true;
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs =====
 using UnityEngine;
@@ -2310,7 +2289,6 @@ public class FollowControlledPawn : MonoBehaviour
         return worldPos;
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Gameplay/Camera/FreeCameraController.cs =====
 using UnityEngine;
@@ -2566,7 +2544,6 @@ public class FreeCameraController : MonoBehaviour
 }
 
 
-
 // ===== FILE: Assets/Scripts/Gameplay/Camera/PixelCameraHelper.cs =====
 using UnityEngine;
 
@@ -2609,7 +2586,6 @@ public static class PixelCameraHelper
         return (cam.transform.position.x - halfW, cam.transform.position.x + halfW, cam.transform.position.z - halfH, cam.transform.position.z + halfH);
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Gameplay/Systems/Build/BuildBootstrap.cs =====
@@ -2688,7 +2664,6 @@ public static class BuildBootstrap
 }
 
 
-
 // ===== FILE: Assets/Scripts/Gameplay/Systems/Interaction/InteractionBootstrap.cs =====
 using UnityEngine;
 
@@ -2716,7 +2691,6 @@ public static class InteractionBootstrap
         spawned = true;
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Gameplay/Systems/Selection/SelectionBootstrap.cs =====
 using UnityEngine;
@@ -2748,7 +2722,6 @@ public static class SelectionBootstrap
         spawned = true;
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Jobs/JobService.cs =====
@@ -2842,7 +2815,6 @@ public class JobService : MonoBehaviour
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Jobs/JobType.cs =====
 public enum JobType
 {
@@ -2854,7 +2826,6 @@ public static class JobTypeExt
 {
     public static string Name(this JobType t) => t.ToString();
 }
-
 
 // ===== FILE: Assets/Scripts/Mods/ModDiscovery.cs =====
 using System.Collections.Generic;
@@ -2906,7 +2877,6 @@ namespace FantasyColony.Mods
 }
 
 
-
 // ===== FILE: Assets/Scripts/Pawns/PawnJob.cs =====
 using UnityEngine;
 
@@ -2951,7 +2921,6 @@ public class PawnJob : MonoBehaviour
         name = gameObject.name; // keep name stable; could add suffix if desired
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Rendering/SpriteVisualFactory2D.cs =====
 using System.Collections.Generic;
@@ -3086,7 +3055,6 @@ public static class SpriteVisualFactory2D
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Rendering/VisualFactory.cs =====
 using FantasyColony.Defs;
 using UnityEngine;
@@ -3175,7 +3143,6 @@ public static class VisualFactory
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Systems/ControlManager.cs =====
 using System;
 using UnityEngine;
@@ -3215,7 +3182,6 @@ public class ControlManager : MonoBehaviour
         try { OnControlledChanged?.Invoke(null); } catch { }
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Systems/GameCalendar.cs =====
@@ -3382,7 +3348,6 @@ public static class GameCalendarAPI
 }
 
 
-
 // ===== FILE: Assets/Scripts/Systems/GameClock.cs =====
 using System;
 using UnityEngine;
@@ -3502,7 +3467,6 @@ public static class GameClockAPI
 #endif
     }
 }
-
 
 // ===== FILE: Assets/Scripts/Systems/PauseController.cs =====
 using System;
@@ -3645,7 +3609,6 @@ public class PauseController : MonoBehaviour
     }
 }
 
-
 // ===== FILE: Assets/Scripts/Systems/PawnInteractionManager.cs =====
 using System.Collections.Generic;
 using UnityEngine;
@@ -3739,7 +3702,6 @@ public class PawnInteractionManager : MonoBehaviour
     // Simple reusable list to avoid allocs
     private static readonly List<SpritePawn> ListCache = new List<SpritePawn>(16);
 }
-
 
 // ===== FILE: Assets/Scripts/Systems/SelectionController.cs =====
 using System;
@@ -4021,7 +3983,6 @@ public class SelectionController : MonoBehaviour
     }
 }
 
-
 // ===== FILE: Assets/Scripts/UI/ClockHUD.cs =====
 using UnityEngine;
 
@@ -4091,7 +4052,6 @@ public class ClockHUD : MonoBehaviour
         GUI.Label(r, text, _label);
     }
 }
-
 
 // ===== FILE: Assets/Scripts/UI/HUD/BuildUIBootstrap.cs =====
 using UnityEngine;
@@ -4252,7 +4212,6 @@ public static class BuildUIBootstrap
         legacyText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
     }
 }
-
 
 // ===== FILE: Assets/Scripts/UI/Intro/AppBootstrap.cs =====
 using System;
@@ -4472,7 +4431,6 @@ public static class AppBootstrap
 }
 
 
-
 // ===== FILE: Assets/Scripts/UI/Intro/IntroScreenShim.cs =====
 using UnityEngine;
 
@@ -4516,7 +4474,6 @@ public class IntroScreen : MonoBehaviour
     // Prevent accidental IMGUI drawing from legacy stubs.
     void OnGUI() { /* intentionally empty; real intro overlay is external */ }
 }
-
 
 // ===== FILE: Assets/Scripts/UI/IntroMenuOverlay.cs =====
 using System;
@@ -4759,7 +4716,6 @@ public class IntroMenuOverlay : MonoBehaviour, IIntroOverlay
 
 }
 
-
 // ===== FILE: Assets/Scripts/UI/IntroOverlayFallback.cs =====
 using System;
 using System.Linq;
@@ -4901,7 +4857,6 @@ public class IntroOverlayFallback : MonoBehaviour, IIntroOverlay
         Debug.LogWarning("[IntroFallback] No world bootstrap method found. Overlay hidden only.");
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/UI/PauseMenuController.cs =====
@@ -5100,7 +5055,6 @@ public class PauseMenuController : MonoBehaviour
 }
 
 
-
 // ===== FILE: Assets/Scripts/UI/SelectionHUD.cs =====
 using UnityEngine;
 
@@ -5228,7 +5182,6 @@ public class SelectionHUD : MonoBehaviour
         }
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Units/SpritePawn.cs =====
@@ -5786,7 +5739,6 @@ public class SpritePawn : MonoBehaviour
     }
 }
 
-
 // ===== FILE: Assets/Scripts/World/Building.cs =====
 using UnityEngine;
 
@@ -5827,7 +5779,6 @@ public class Building : MonoBehaviour
         return tile.x >= gridPos.x && tile.x < gridPos.x + size.x && tile.y >= gridPos.y && tile.y < gridPos.y + size.y;
     }
 }
-
 
 // ===== FILE: Assets/Scripts/World/Buildings/ConstructionBoard.cs =====
 using System.Collections.Generic;
@@ -5948,7 +5899,6 @@ public class ConstructionBoard : Building
     }
 }
 
-
 // ===== FILE: Assets/Scripts/World/MapGen/WorldBootstrap.cs =====
 using UnityEngine;
 
@@ -6048,7 +5998,6 @@ public static class WorldBootstrap
         // Do not auto-fit; use the camera's existing orthographicSize configured in the scene.
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/World/SimpleGridMap.cs =====
@@ -6217,7 +6166,6 @@ public class SimpleGridMap : MonoBehaviour
         if (m.HasProperty("_TintColor")) m.SetColor("_TintColor", c);
     }
 }
-
 
 
 // ===== FILE: Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs =====
@@ -6464,7 +6412,6 @@ public class ReadmeEditor : Editor
     }
 }
 
-
 // ===== FILE: Assets/TutorialInfo/Scripts/Readme.cs =====
 ﻿using System;
 using UnityEngine;
@@ -6483,6 +6430,8 @@ public class Readme : ScriptableObject
     }
 }
 
+// ===== FILE: Assets/test.cs =====
+//test
 
 // ===== FILE: Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs =====
 using System;
@@ -6627,7 +6576,6 @@ namespace XmlDefsTools.Emit
 }
 
 
-
 // ===== FILE: Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs =====
 using System;
 using System.Collections.Generic;
@@ -6750,7 +6698,6 @@ namespace XmlDefsTools.Emit
         }
     }
 }
-
 
 // ===== FILE: Tools/XmlDefsTools/Emit/XmlIndexWriter.cs =====
 using System;
@@ -6899,7 +6846,6 @@ namespace XmlDefsTools.Emit
     }
 }
 
-
 // ===== FILE: Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs =====
 using System;
 using System.Collections.Generic;
@@ -6946,7 +6892,6 @@ namespace XmlDefsTools.Emit
         }
     }
 }
-
 
 // ===== FILE: Tools/XmlDefsTools/Program.cs =====
 using System;
@@ -7049,7 +6994,6 @@ namespace XmlDefsTools
         }
     }
 }
-
 
 // ===== FILE: Tools/XmlDefsTools/Scan/XmlDefScanner.cs =====
 using System;
@@ -7176,7 +7120,6 @@ namespace XmlDefsTools.Scan
     }
 }
 
-
 // ===== FILE: Tools/XmlDefsTools/Util/CanonicalXml.cs =====
 using System;
 using System.IO;
@@ -7282,5 +7225,4 @@ namespace XmlDefsTools.Util
         }
     }
 }
-
 
