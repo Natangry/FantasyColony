@@ -1,3 +1,50 @@
+// ===== FILE: Assets/Scripts/Boot/BuildBootstrap.cs =====
+using UnityEngine;
+using FantasyColony.Defs;
+
+/// <summary>
+/// Guarantees build systems exist at runtime and that defs are loaded.
+/// This runs automatically after scene load.
+/// </summary>
+public static class BuildBootstrap
+{
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    public static void EnsureOnLoad()
+    {
+        Ensure();
+    }
+
+    public static void Ensure()
+    {
+        var go = GameObject.Find("BuildSystems (Auto)");
+        if (go == null)
+        {
+            go = new GameObject("BuildSystems (Auto)");
+        }
+
+        if (go.GetComponent<BuildModeController>() == null)
+            go.AddComponent<BuildModeController>();
+        if (go.GetComponent<BuildPlacementTool>() == null)
+            go.AddComponent<BuildPlacementTool>();
+
+        // Make sure defs are available
+        try
+        {
+            if (DefDatabase.Buildings == null || DefDatabase.Visuals == null ||
+                DefDatabase.Buildings.Count == 0 || DefDatabase.Visuals.Count == 0)
+            {
+                DefDatabase.LoadAll();
+            }
+        }
+        catch
+        {
+            // ignore – bring-up should still run with fallbacks
+        }
+    }
+}
+
+
+
 // ===== FILE: Assets/Scripts/Boot/CameraBootstrap.cs =====
 using UnityEngine;
 
@@ -339,39 +386,6 @@ public static class WorldBootstrap
 
 
 
-// ===== FILE: Assets/Scripts/Build/BuildBootstrap.cs =====
-using UnityEngine;
-using FantasyColony.Defs;
-
-public static class BuildBootstrap
-{
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)] private static void Auto() => Ensure();
-    public static void Ensure()
-    {
-        var go = GameObject.Find("BuildSystems (Auto)");
-        if (go == null)
-        {
-            go = new GameObject("BuildSystems (Auto)");
-        }
-
-        // Ensure single placement tool
-        var tools = go.GetComponents<BuildPlacementTool>();
-        for (int i = 1; i < tools.Length; i++) Object.Destroy(tools[i]);
-        if (tools.Length == 0) go.AddComponent<BuildPlacementTool>();
-
-        if (go.GetComponent<BuildModeController>() == null) go.AddComponent<BuildModeController>();
-        if (go.GetComponent<BuildPaletteHUD>() == null) go.AddComponent<BuildPaletteHUD>();
-        if (go.GetComponent<JobService>() == null) go.AddComponent<JobService>();
-        if (go.GetComponent<BuildToggleHUD>() == null) go.AddComponent<BuildToggleHUD>();
-        if (go.GetComponent<BuildHotkeyListener>() == null) go.AddComponent<BuildHotkeyListener>();
-
-        DefDatabase.LoadAll();
-        VisualRegistry.Build(Application.isEditor);
-        SpriteVisualFactory2D.Build();
-    }
-}
-
-
 // ===== FILE: Assets/Scripts/Build/BuildHotkeyListener.cs =====
 using UnityEngine;
 
@@ -527,14 +541,29 @@ using UnityEngine.UIElements;
 public class BuildPaletteHUD : MonoBehaviour
 {
     Vector2 _scroll;
-    Rect _panelRect = new Rect(16, 64, 480, 540);
+
+    BuildModeController Ctrl => BuildModeController.Instance;
+
+    Rect GetPanelRect()
+    {
+        // Responsive panel sizing for high-DPI / large resolutions
+        float w = Mathf.Clamp(Screen.width * 0.28f, 420f, 760f);
+        float h = Mathf.Clamp(Screen.height * 0.62f, 540f, 980f);
+        return new Rect(16, 64, w, h);
+    }
 
     void OnGUI()
     {
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
+        // Ensure systems exist (harmless if already present)
+        BuildBootstrap.Ensure();
+
+        var _panelRect = GetPanelRect();
+
         GUILayout.BeginArea(_panelRect, GUI.skin.window);
-        GUILayout.Label("Build Palette");
+        var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
+        GUILayout.Label("Build Palette" + activeName);
 
         // Try to enumerate building defs (fallback to a single Construction Board def if database not ready)
         var defs = GetPaletteDefs();
@@ -596,6 +625,7 @@ public class BuildPaletteHUD : MonoBehaviour
 using UnityEngine;
 using FantasyColony.Defs;
 using System.Linq;
+using System;
 using UnityObject = UnityEngine.Object;
 
 /// <summary>
@@ -617,6 +647,8 @@ public class BuildPlacementTool : MonoBehaviour
     BuildModeController ctrl;
     Camera cam;
     BuildTool active = BuildTool.None;
+
+    readonly Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0
 
     void Start()
     {
@@ -647,10 +679,12 @@ public class BuildPlacementTool : MonoBehaviour
         }
 
         // Move ghost to snapped mouse position
-        var mpos = Input.mousePosition;
-        var world = cam.ScreenToWorldPoint(new Vector3(mpos.x, mpos.y, -cam.transform.position.z));
-        world.z = 0f; // 2D XY plane
-        var snapped = SnapToGrid(world, def);
+        var ray = cam.ScreenPointToRay(Input.mousePosition);
+        Vector3 hit;
+        if (!groundPlane.Raycast(ray, out var enter))
+            return;
+        hit = ray.GetPoint(enter); // y == 0 plane
+        var snapped = SnapToGridXZ(hit, def);
         if (ghostGO != null)
         {
             ghostGO.transform.position = snapped;
@@ -661,6 +695,17 @@ public class BuildPlacementTool : MonoBehaviour
         {
             TryPlace(def, snapped);
         }
+    }
+
+    // Compute scale to ensure the sprite footprint matches def (in world units)
+    Vector3 ComputeScaleForSprite(Sprite sprite, BuildingDef def)
+    {
+        if (sprite == null) return new Vector3(def.width * tileSize, def.height * tileSize, 1f);
+        float spriteWorldWidth  = sprite.rect.width  / sprite.pixelsPerUnit;
+        float spriteWorldHeight = sprite.rect.height / sprite.pixelsPerUnit;
+        float sx = (def.width  * tileSize) / Mathf.Max(0.0001f, spriteWorldWidth);
+        float sy = (def.height * tileSize) / Mathf.Max(0.0001f, spriteWorldHeight);
+        return new Vector3(sx, sy, 1f);
     }
 
     Visual2DDef GetVisualDefFor(BuildingDef def)
@@ -682,12 +727,13 @@ public class BuildPlacementTool : MonoBehaviour
         return null;
     }
 
-    void ApplyScaleForSpriteOrFallback(GameObject go, BuildingDef def, Sprite spriteOrNull)
+    void ApplyScaleForSpriteOrFallbackXZ(GameObject go, BuildingDef def, Sprite spriteOrNull)
     {
-        if (spriteOrNull != null)
-            go.transform.localScale = Vector3.one; // rely on sprite PPU (hi-res 64 PPU)
-        else
-            go.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f); // fallback white unit sprite
+        var scale = ComputeScaleForSprite(spriteOrNull, def);
+        go.transform.localScale = scale;
+        // Lay the sprite flat on XZ ground (face +Y)
+        go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        // keep y slightly above ground to avoid z-fighting
     }
 
     void TryPlace(BuildingDef def, Vector3 pos)
@@ -711,8 +757,6 @@ public class BuildPlacementTool : MonoBehaviour
 
         // Instantiate placed object
         GameObject go = new GameObject(def.label ?? def.defName ?? "Building");
-        go.transform.position = pos;
-
         // Attach the specific behaviour for Construction Board MVP
         var board = go.AddComponent<ConstructionBoard>();
         // If your ConstructionBoard has an OnPlaced API, you can call it here:
@@ -722,7 +766,9 @@ public class BuildPlacementTool : MonoBehaviour
         var sr = go.AddComponent<SpriteRenderer>();
         var spr = LoadSpriteFor(def);
         if (spr != null) sr.sprite = spr; else sr.sprite = MakeUnitSprite();
-        ApplyScaleForSpriteOrFallback(go, def, spr);
+        ApplyScaleForSpriteOrFallbackXZ(go, def, spr);
+        // Set final position on ground with slight epsilon to avoid z-fighting
+        go.transform.position = new Vector3(pos.x, 0.01f, pos.z);
 
         ClearTool(); // place once for MVP
     }
@@ -733,14 +779,14 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureGhostDestroyed();
     }
 
-    Vector3 SnapToGrid(Vector3 world, BuildingDef def)
+    Vector3 SnapToGridXZ(Vector3 world, BuildingDef def)
     {
         float w = def.width * tileSize;
-        float h = def.height * tileSize;
-        // Snap to tile grid, keep pivot at center of the footprint
+        float d = def.height * tileSize;
+        // Snap to tile grid (XZ), keep pivot at center of the footprint
         float x = Mathf.Floor(world.x / tileSize) * tileSize + (w * 0.5f) - (tileSize * 0.5f);
-        float y = Mathf.Floor(world.y / tileSize) * tileSize + (h * 0.5f) - (tileSize * 0.5f);
-        return new Vector3(x, y, 0f);
+        float z = Mathf.Floor(world.z / tileSize) * tileSize + (d * 0.5f) - (tileSize * 0.5f);
+        return new Vector3(x, 0f, z);
     }
 
     void EnsureGhost(BuildingDef def)
@@ -760,7 +806,7 @@ public class BuildPlacementTool : MonoBehaviour
         var c = ghostSr.color;
         c.a = ghostAlpha;
         ghostSr.color = c;
-        ApplyScaleForSpriteOrFallback(ghostGO, def, spr);
+        ApplyScaleForSpriteOrFallbackXZ(ghostGO, def, spr);
     }
 
     void EnsureGhostDestroyed()

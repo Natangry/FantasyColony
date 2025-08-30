@@ -1,6 +1,24 @@
 [
   {
     "kind": "class",
+    "name": "BuildBootstrap",
+    "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "EnsureOnLoad",
+    "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "Ensure",
+    "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
+    "line": 15
+  },
+  {
+    "kind": "class",
     "name": "CameraBootstrap",
     "file": "Assets/Scripts/Boot/CameraBootstrap.cs",
     "line": 6
@@ -88,18 +106,6 @@
     "name": "GenerateDefaultGrid",
     "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
     "line": 8
-  },
-  {
-    "kind": "class",
-    "name": "BuildBootstrap",
-    "file": "Assets/Scripts/Build/BuildBootstrap.cs",
-    "line": 3
-  },
-  {
-    "kind": "method",
-    "name": "Ensure",
-    "file": "Assets/Scripts/Build/BuildBootstrap.cs",
-    "line": 7
   },
   {
     "kind": "class",
@@ -195,13 +201,13 @@
     "kind": "class",
     "name": "BuildPlacementTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 12
+    "line": 13
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 31
+    "line": 34
   },
   {
     "kind": "class",
