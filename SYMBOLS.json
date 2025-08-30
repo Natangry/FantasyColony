@@ -21,13 +21,13 @@
     "kind": "method",
     "name": "EnsureOnLoad",
     "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
-    "line": 12
+    "line": 15
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
-    "line": 16
+    "line": 19
   },
   {
     "kind": "class",
