@@ -1,0 +1,18 @@
+{
+  "_common": [
+    "id",
+    "schema",
+    "name_key",
+    "tags",
+    "version",
+    "requires"
+  ],
+  "AbilityDef": [
+    "id", "name_key", "tags", "version", "requires",
+    "icon", "cooldown", "cost", "range", "components"
+  ],
+  "ItemDef": [
+    "id", "name_key", "tags", "version", "requires",
+    "icon", "stackSize", "rarity", "components"
+  ]
+}

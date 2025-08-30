@@ -1,0 +1,46 @@
+name: Update XML Artifacts
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore Tools/XmlDefsTools/XmlDefsTools.csproj
+
+      - name: Build
+        run: dotnet build Tools/XmlDefsTools/XmlDefsTools.csproj -c Release --nologo
+
+      - name: Run XML tools
+        run: dotnet run --project Tools/XmlDefsTools/XmlDefsTools.csproj -c Release --no-build
+
+      - name: Commit changes (if any)
+        run: |
+          set -e
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add XML_INDEX.md XML_SNAPSHOT.txt Docs/Templates/Defs || true
+            git add Docs/XML_ARTIFACTS.md || true
+            git commit -m "[CI] Update XML index, snapshot, and templates"
+            git push
+          else
+            echo "No XML artifact changes to commit."
+          fi
