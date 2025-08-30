@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using FantasyColony.Defs;
+using UnityEngine.UIElements;
 
 public class BuildPaletteHUD : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class BuildPaletteHUD : MonoBehaviour
 
     void OnGUI()
     {
-        if (BuildModeController.Instance == null || !BuildModeController.Instance.IsBuildModeEnabled) return;
+        if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
         GUILayout.BeginArea(_panelRect, GUI.skin.window);
         GUILayout.Label("Build Palette");
@@ -37,27 +38,22 @@ public class BuildPaletteHUD : MonoBehaviour
 
     static List<BuildingDef> GetPaletteDefs()
     {
-        // If a DefDatabase exists, use it. Otherwise return a local fallback.
+        // Use static DefDatabase (no singleton). Otherwise return a local fallback.
         var list = new List<BuildingDef>();
-        try
+        if (DefDatabase.Buildings != null && DefDatabase.Buildings.Count > 0)
         {
-            var db = DefDatabase.Instance; // adjust if your singleton accessor differs
-            if (db != null && db.Buildings != null && db.Buildings.Count > 0)
+            foreach (var b in DefDatabase.Buildings)
             {
-                foreach (var b in db.Buildings)
-                {
-                    if (b.showInPalette) list.Add(b);
-                }
-                // If nothing was explicitly marked for palette, surface Construction Board if present
-                if (list.Count == 0)
-                {
-                    var cb = db.Buildings.FirstOrDefault(x => x.defName == "ConstructionBoard");
-                    if (cb != null) list.Add(cb);
-                }
-                if (list.Count > 0) return list;
+                if (b.showInPalette) list.Add(b);
             }
+            // If nothing was explicitly marked for palette, surface Construction Board if present
+            if (list.Count == 0)
+            {
+                var cb = DefDatabase.Buildings.FirstOrDefault(x => x.defName == "ConstructionBoard");
+                if (cb != null) list.Add(cb);
+            }
+            if (list.Count > 0) return list;
         }
-        catch { /* fall through to fallback */ }
 
         // Fallback minimal def for bring-up
         list.Add(new BuildingDef
