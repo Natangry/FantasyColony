@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using System.Text;
 
 public static class HardRestart
 {
@@ -14,6 +15,7 @@ public static class HardRestart
         DestroyIfExists("BuildCanvas (Auto)");
         DestroyIfExists("PauseCanvas (Auto)");
         DestroyIfExists("PauseMenuController");
+        DestroyAllOfType<EventSystem>();
 
         // Destroy any EventSystem we created
         var es = Object.FindFirstObjectByType<EventSystem>();
@@ -24,17 +26,36 @@ public static class HardRestart
         var flag = bb.GetField("_defsLoadedOnce", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         if (flag != null) flag.SetValue(null, false);
 
+        // Log all scenes in build settings
+        Debug.Log(GetBuildScenesLog());
+
+        // Prefer explicit config if present
+        var cfg = GameStartupConfig.Load();
+        if (cfg != null && !string.IsNullOrEmpty(cfg.introScenePath))
+        {
+            Debug.Log("[HardRestart] Restart using configured intro scene path: " + cfg.introScenePath);
+            SceneManager.LoadScene(cfg.introScenePath);
+            return;
+        }
+
         // Choose intro scene:
         // 1) The scene we launched into (BootSession)
         // 2) intro/title/menu heuristic
         // 3) index 0 fallback
-        int target = -1;
-        if (BootSession.InitialSceneIndex >= 0)
-            target = BootSession.InitialSceneIndex;
-        else
-            target = FindIntroSceneIndex();
-        Debug.Log("[HardRestart] Rebooting to scene index " + target + " (" + SceneUtility.GetScenePathByBuildIndex(target) + ")");
+        int target = (BootSession.InitialSceneIndex >= 0) ? BootSession.InitialSceneIndex : FindIntroSceneIndex();
+        var path = SceneUtility.GetScenePathByBuildIndex(target);
+        Debug.Log("[HardRestart] Restart using scene index " + target + " (" + path + ")");
         SceneManager.LoadScene(target);
+    }
+
+    static string GetBuildScenesLog()
+    {
+        int count = SceneManager.sceneCountInBuildSettings;
+        var sb = new StringBuilder();
+        sb.AppendLine("[HardRestart] Build Settings scenes:");
+        for (int i = 0; i < count; i++)
+            sb.AppendLine($"  [{i}] {SceneUtility.GetScenePathByBuildIndex(i)}");
+        return sb.ToString();
     }
 
     static int FindIntroSceneIndex()
@@ -50,6 +71,15 @@ public static class HardRestart
                 return i;
         }
         return 0;
+    }
+
+    static void DestroyAllOfType<T>() where T : Component
+    {
+        var arr = Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var c in arr)
+        {
+            Object.Destroy(c.gameObject);
+        }
     }
 
     static void DestroyIfExists(string name)
