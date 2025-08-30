@@ -49,6 +49,18 @@
   },
   {
     "kind": "class",
+    "name": "HardRestart",
+    "file": "Assets/Scripts/Boot/HardRestart.cs",
+    "line": 4
+  },
+  {
+    "kind": "method",
+    "name": "RebootToFirstScene",
+    "file": "Assets/Scripts/Boot/HardRestart.cs",
+    "line": 7
+  },
+  {
+    "kind": "class",
     "name": "InteractionBootstrap",
     "file": "Assets/Scripts/Boot/InteractionBootstrap.cs",
     "line": 6
@@ -1234,6 +1246,36 @@
     "name": "IsVisible",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
     "line": 6
+  },
+  {
+    "kind": "class",
+    "name": "PauseMenuController",
+    "file": "Assets/Scripts/UI/PauseMenuController.cs",
+    "line": 12
+  },
+  {
+    "kind": "method",
+    "name": "Toggle",
+    "file": "Assets/Scripts/UI/PauseMenuController.cs",
+    "line": 45
+  },
+  {
+    "kind": "method",
+    "name": "Show",
+    "file": "Assets/Scripts/UI/PauseMenuController.cs",
+    "line": 51
+  },
+  {
+    "kind": "method",
+    "name": "Hide",
+    "file": "Assets/Scripts/UI/PauseMenuController.cs",
+    "line": 59
+  },
+  {
+    "kind": "property",
+    "name": "IsPaused",
+    "file": "Assets/Scripts/UI/PauseMenuController.cs",
+    "line": 14
   },
   {
     "kind": "class",
