@@ -4,6 +4,7 @@ using System.Linq;
 // Assumes BuildingDef exists in your Defs namespace
 // If your project uses a different namespace, adjust the using accordingly.
 using FantasyColony.Defs;
+using UnityObject = UnityEngine.Object;
 
 public class BuildModeController : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class BuildModeController : MonoBehaviour
     }
 
     public bool IsBuildModeEnabled => _buildModeEnabled;
+    // Back-compat for existing HUD scripts
+    public bool IsActive => _buildModeEnabled;
     public BuildTool ActiveTool => _activeTool;
     public BuildingDef SelectedBuildingDef => _selectedBuildingDef;
 
@@ -59,7 +62,15 @@ public class BuildModeController : MonoBehaviour
     // Utility used by placement tool to enforce uniqueness of special buildings
     public bool UniqueBuildingExists<T>() where T : Component
     {
-        return FindObjectsOfType<T>().Length > 0;
+#if UNITY_2023_1_OR_NEWER
+        return UnityObject.FindAnyObjectByType<T>() != null;
+#elif UNITY_2022_2_OR_NEWER
+        return UnityObject.FindFirstObjectByType<T>() != null;
+#else
+#pragma warning disable 618
+        return UnityObject.FindObjectOfType<T>() != null;
+#pragma warning restore 618
+#endif
     }
 
     private void Update()

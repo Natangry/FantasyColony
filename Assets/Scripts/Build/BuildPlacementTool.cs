@@ -1,5 +1,6 @@
 using UnityEngine;
 using FantasyColony.Defs;
+using UnityObject = UnityEngine.Object;
 
 /// <summary>
 /// Minimal placement tool for the Construction Board bring-up:
@@ -69,7 +70,17 @@ public class BuildPlacementTool : MonoBehaviour
     void TryPlace(BuildingDef def, Vector3 pos)
     {
         // For MVP: explicitly handle uniqueness for ConstructionBoard
-        if (def.unique && FindObjectOfType<ConstructionBoard>() != null)
+        if (def.unique
+#if UNITY_2023_1_OR_NEWER
+            && UnityObject.FindAnyObjectByType<ConstructionBoard>() != null
+#elif UNITY_2022_2_OR_NEWER
+            && UnityObject.FindFirstObjectByType<ConstructionBoard>() != null
+#else
+#pragma warning disable 618
+            && FindObjectOfType<ConstructionBoard>() != null
+#pragma warning restore 618
+#endif
+            )
         {
             // silently ignore for now; could beep/flash UI
             return;

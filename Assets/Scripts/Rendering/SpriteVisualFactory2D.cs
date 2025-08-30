@@ -42,7 +42,7 @@ public static class SpriteVisualFactory2D
         if (_ghostPrefabs.Count == 0)
         {
             // synthesize a default visual so we see something
-            var v = new VisualDef { id = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
+            var v = new VisualDef { defName = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
             _ghostPrefabs[v.id] = MakeSpritePrefab(v, translucent:true);
             _placedPrefabs[v.id] = MakeSpritePrefab(v, translucent:false);
         }
