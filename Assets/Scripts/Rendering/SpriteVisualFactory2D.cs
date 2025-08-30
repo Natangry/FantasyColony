@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FantasyColony.Defs;
 using UnityEngine;
+using System.Linq;
 
 public static class SpriteVisualFactory2D
 {
@@ -69,7 +70,13 @@ public static class SpriteVisualFactory2D
     {
         var go = new GameObject(vdef.id + (translucent?".Ghost":".Placed"));
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = _white;
+        Sprite sprite = _white;
+        if (!string.IsNullOrEmpty(vdef.spritePath))
+        {
+            var loaded = Resources.Load<Sprite>(vdef.spritePath);
+            if (loaded != null) sprite = loaded;
+        }
+        sr.sprite = sprite;
         sr.sortingLayerName = _sortingLayer;
         sr.sortingOrder = _orderGround + (translucent?5:3);
         var c = vdef.Color; if (translucent) c.a *= 0.4f; sr.color = c;

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public class BuildPaletteHUD : MonoBehaviour
 {
     Vector2 _scroll;
-    Rect _panelRect = new Rect(16, 64, 320, 420);
+    Rect _panelRect = new Rect(16, 64, 480, 540);
 
     void OnGUI()
     {
