@@ -195,13 +195,13 @@
     "kind": "class",
     "name": "BuildPlacementTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 18
+    "line": 19
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 67
+    "line": 73
   },
   {
     "kind": "class",
