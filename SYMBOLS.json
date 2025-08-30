@@ -99,7 +99,7 @@
     "kind": "method",
     "name": "EnsureForCurrentScene",
     "file": "Assets/Scripts/Boot/BuildUIBootstrap.cs",
-    "line": 74
+    "line": 75
   },
   {
     "kind": "class",
