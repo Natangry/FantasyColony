@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-30 23:43:10 UTC
+_Updated_: 2025-08-30 23:51:30 UTC
 
 // ===== FILE: Assets/Editor/CreateStartupConfigAsset.cs =====
 using UnityEditor;
