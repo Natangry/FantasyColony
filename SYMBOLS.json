@@ -1297,6 +1297,18 @@
   },
   {
     "kind": "class",
+    "name": "IntroScreen",
+    "file": "Assets/Scripts/UI/IntroScreenShim.cs",
+    "line": 10
+  },
+  {
+    "kind": "method",
+    "name": "ShowIntro",
+    "file": "Assets/Scripts/UI/IntroScreenShim.cs",
+    "line": 28
+  },
+  {
+    "kind": "class",
     "name": "PauseMenuController",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
     "line": 12
