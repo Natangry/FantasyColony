@@ -10,6 +10,15 @@
 - **InputSystem_Actions.inputactions.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions.meta)
 - **Readme.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset)
 - **Readme.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset.meta)
+
+## Assets/Resources/Sprites
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Resources/Sprites)
+
+- **ConstructionBoard.png** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Resources/Sprites/ConstructionBoard.png) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Resources/Sprites/ConstructionBoard.png)
+
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
 - **Scenes.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scenes.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scenes.meta)
 
 ## Assets/Scenes
@@ -69,6 +78,7 @@
 - **BuildToggleHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildToggleHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildToggleHUD.cs)
 - **BuildToggleHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildToggleHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildToggleHUD.cs.meta)
 - **GridSpace.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/GridSpace.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/GridSpace.cs)
+- **GridSpace.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/GridSpace.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/GridSpace.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -85,20 +95,33 @@
 - **PixelCameraHelper.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
 - **PixelCameraHelper.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Defs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs.meta)
+
 ## Assets/Scripts/Defs
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Defs)
 
 - **BuildingDef.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/BuildingDef.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/BuildingDef.cs)
+- **BuildingDef.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/BuildingDef.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/BuildingDef.cs.meta)
 - **Def.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Def.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Def.cs)
+- **Def.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Def.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Def.cs.meta)
 - **DefDatabase.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/DefDatabase.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/DefDatabase.cs)
+- **DefDatabase.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/DefDatabase.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/DefDatabase.cs.meta)
 - **Defs.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Defs.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Defs.cs)
+- **Defs.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Defs.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Defs.cs.meta)
 - **Visual2DDef.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Visual2DDef.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Visual2DDef.cs)
+- **Visual2DDef.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Visual2DDef.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Visual2DDef.cs.meta)
 - **VisualDef.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/VisualDef.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/VisualDef.cs)
+- **VisualDef.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/VisualDef.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/VisualDef.cs.meta)
+- **Xml.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Xml.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Xml.meta)
 
 ## Assets/Scripts/Defs/Xml
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Defs/Xml)
 
 - **XmlDefLoader.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs)
+- **XmlDefLoader.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -113,10 +136,16 @@
 - **JobType.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs/JobType.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs/JobType.cs)
 - **JobType.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Jobs/JobType.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Jobs/JobType.cs.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Mods.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Mods.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Mods.meta)
+
 ## Assets/Scripts/Mods
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Mods)
 
 - **ModDiscovery.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Mods/ModDiscovery.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Mods/ModDiscovery.cs)
+- **ModDiscovery.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Mods/ModDiscovery.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Mods/ModDiscovery.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -129,12 +158,20 @@
 - **PawnJob.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns/PawnJob.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns/PawnJob.cs)
 - **PawnJob.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Pawns/PawnJob.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Pawns/PawnJob.cs.meta)
 
+## Assets/Scripts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
+
+- **Rendering.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering.meta)
+
 ## Assets/Scripts/Rendering
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Rendering)
 
 - **SpriteVisualFactory2D.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/SpriteVisualFactory2D.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/SpriteVisualFactory2D.cs)
+- **SpriteVisualFactory2D.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/SpriteVisualFactory2D.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/SpriteVisualFactory2D.cs.meta)
 - **VisualFactory.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualFactory.cs)
+- **VisualFactory.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualFactory.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualFactory.cs.meta)
 - **VisualRegistry.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualRegistry.cs)
+- **VisualRegistry.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualRegistry.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualRegistry.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -230,17 +267,49 @@
 - **UniversalRenderPipelineGlobalSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset)
 - **UniversalRenderPipelineGlobalSettings.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta)
 
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
+- **StreamingAssets.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets.meta)
+
+## Assets/StreamingAssets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets)
+
+- **Mods.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods.meta)
+
+## Assets/StreamingAssets/Mods
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods)
+
+- **Core.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core.meta)
+
+## Assets/StreamingAssets/Mods/Core
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core)
+
+- **Defs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs.meta)
+
+## Assets/StreamingAssets/Mods/Core/Defs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core/Defs)
+
+- **Buildings.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings.meta)
+
 ## Assets/StreamingAssets/Mods/Core/Defs/Buildings
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings)
 
 - **.keep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/.keep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/.keep)
 - **ConstructionBoard.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml)
+- **ConstructionBoard.xml.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml.meta)
+
+## Assets/StreamingAssets/Mods/Core/Defs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core/Defs)
+
+- **Visuals.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals.meta)
 
 ## Assets/StreamingAssets/Mods/Core/Defs/Visuals
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals)
 
 - **.keep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/.keep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/.keep)
 - **ConstructionBoardVisual.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml)
+- **ConstructionBoardVisual.xml.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml.meta)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
