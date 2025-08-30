@@ -6,4 +6,9 @@
   <sortingOrder>0</sortingOrder>
   <pivotX>0.5</pivotX>
   <pivotY>0.0</pivotY>
+  <scale>1.0</scale>
+  <plane>XY</plane>
+  <z_lift>0</z_lift>
+  <shader_hint>Sprites/Default</shader_hint>
+  <color_rgba>1,1,1,1</color_rgba>
 </Visual2DDef>
