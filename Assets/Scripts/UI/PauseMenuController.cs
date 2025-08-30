@@ -21,7 +21,12 @@ public class PauseMenuController : MonoBehaviour
     static void Init()
     {
         // Create a driver that survives scene loads
-        var existing = GameObject.FindObjectOfType<PauseMenuController>();
+        PauseMenuController existing = null;
+#if UNITY_2023_1_OR_NEWER
+        existing = FindFirstObjectByType<PauseMenuController>();
+#else
+        existing = FindObjectOfType<PauseMenuController>();
+#endif
         if (existing == null)
         {
             var go = new GameObject("PauseMenuController");
@@ -114,7 +119,7 @@ public class PauseMenuController : MonoBehaviour
         restart.onClick.AddListener(() =>
         {
             Hide();
-            HardRestart.RebootToFirstScene();
+            HardRestart.RebootToIntro();
         });
         var exit = BuildButton(panel.transform, "Exit", new Vector2(0, -80));
         exit.onClick.AddListener(() =>
