@@ -601,7 +601,7 @@ public static class BuildUIBootstrap
 #endif
     }
 
-    static void EnsureForCurrentScene()
+    public static void EnsureForCurrentScene()
     {
         var active = SceneManager.GetActiveScene().name;
         var canvas = GameObject.Find(CanvasName);
@@ -4455,6 +4455,7 @@ public class IntroMenuOverlay : MonoBehaviour
     public static void Hide()
     {
         if (_root != null) _root.SetActive(false);
+        BuildUIBootstrap.EnsureForCurrentScene();
     }
 
     static void EnsureEventSystem()
