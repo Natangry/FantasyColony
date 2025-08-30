@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BuildingDef>
+  <defName>ConstructionBoard</defName>
+  <width>3</width>
+  <height>1</height>
+  <unique>true</unique>
+  <showInPalette>true</showInPalette>
+  <visualRef>ConstructionBoardVisual</visualRef>
+</BuildingDef>

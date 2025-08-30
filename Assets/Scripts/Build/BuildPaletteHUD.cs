@@ -71,6 +71,9 @@ public class BuildPaletteHUD : MonoBehaviour
 
         GUILayout.Label("Stations", _label);
         GUILayout.Space(6f);
+        // Data-driven defs: show loaded XML defs count as a simple sanity check during bring-up.
+        GUILayout.Label("Defs loaded: " + FantasyColony.Defs.DefDatabase.TotalCount, _hint);
+
         _scroll = GUILayout.BeginScrollView(_scroll);
 
         // Construction Board entry
@@ -92,7 +95,7 @@ public class BuildPaletteHUD : MonoBehaviour
         if (bm.CurrentTool == BuildTool.PlaceConstructionBoard)
         {
             GUILayout.Space(6f);
-            GUILayout.Label("Tip: Move the mouse to position the ghost. Left-click to place, Right-click to cancel.", _hint);
+            GUILayout.Label("Tip: Move the mouse to position the ghost.\nLeft-click to place, Right-click to cancel.", _hint);
         }
 
         GUILayout.EndScrollView();
