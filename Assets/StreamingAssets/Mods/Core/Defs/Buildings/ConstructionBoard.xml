@@ -1,37 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<BuildingDef>
-  <!-- Identity & UI -->
-  <defName>ConstructionBoard</defName>
-  <label>Construction Board</label>
-  <description>A planning station for future construction.</description>
-  <category>Stations</category>
-  <showInPalette>true</showInPalette>
-  <unique>true</unique>
-
-  <!-- Footprint & orientation -->
-  <width>3</width>
-  <height>1</height>
-  <allowedRotations>N,E,S,W</allowedRotations>
-  <defaultRotation>N</defaultRotation>
-
-  <!-- Placement rules -->
-  <plane>XY</plane>
-
-  <!-- Pathing -->
-  <canPathThrough>false</canPathThrough>
-  <avoidanceRadius>0.35</avoidanceRadius>
-
-  <!-- Interactions -->
-  <interactTags>
-    <li>construction</li>
-    <li>board</li>
-  </interactTags>
-
-  <!-- Work only (no materials in v1) -->
-  <workToBuild>2.0</workToBuild>
-
-  <!-- Visual reference -->
-  <visualRef>ConstructionBoardVisual</visualRef>
-  <!-- TEMP legacy alias during migration -->
-  <visual_ref>ConstructionBoardVisual</visual_ref>
-</BuildingDef>
+<Defs>
+  <BuildingDef>
+    <defName>ConstructionBoard</defName>
+    <label>Construction Board</label>
+    <category>Stations</category>
+    <width>3</width>
+    <height>1</height>
+    <unique>true</unique>
+    <allowedRotations>N,E,S,W</allowedRotations>
+    <workToBuild>2.0</workToBuild>
+    <interactTags>
+      <li>construction</li>
+      <li>board</li>
+    </interactTags>
+    <visualRef>ConstructionBoardVisual</visualRef>
+    <showInPalette>true</showInPalette>
+  </BuildingDef>
+</Defs>
