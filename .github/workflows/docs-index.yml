@@ -1,14 +1,14 @@
-name: Refresh repository indexes & snapshots
+name: Regenerate & commit indexes/snapshots (on any push)
 
 on:
-  push:
-  workflow_dispatch:
+  push:              # regenerate whenever code changes are pushed/merged
+  workflow_dispatch: # manual runs if needed
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  regenerate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (full history)
@@ -16,42 +16,129 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET (if indexers exist)
+      # --- XML: run your generator if present (keeps XML samples under Docs/Templates/Defs) ---
+      - name: Setup .NET (for XML tools)
         if: ${{ hashFiles('Tools/**/*.csproj') != '' }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Run repository indexers (best-effort)
+      - name: Generate XML artifacts (best-effort)
         shell: bash
         run: |
-          set -e
-          # If your repo has scripts or projects that generate indexes/snapshots, run them conditionally.
-          if [ -f Tools/Build/generate-index.sh ]; then
-            bash Tools/Build/generate-index.sh || true
-          fi
-          if [ -f Tools/DocsIndex/DocsIndex.csproj ]; then
-            dotnet run --project Tools/DocsIndex/DocsIndex.csproj || true
-          fi
-          if [ -f Tools/Indexing/Indexing.csproj ]; then
-            dotnet run --project Tools/Indexing/Indexing.csproj || true
+          set -euo pipefail
+          # If your XML generator project exists, run it (writes into Docs/Templates/Defs/**)
+          if [ -f Tools/XmlDefsTools/XmlDefsTools.csproj ]; then
+            dotnet run --project Tools/XmlDefsTools/XmlDefsTools.csproj || true
           fi
 
-      - name: Stage & commit index/snapshot files if changed (robust)
+      # --- CODE: regenerate CODE_SNAPSHOT.txt, CODE_INDEX.md, SYMBOLS.json from tracked .cs files ---
+      - name: Regenerate code snapshot, index, and symbols
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
+
+          REPO="${GITHUB_REPOSITORY}"
+          # Try to resolve a friendly ref for "View/Raw" links
+          REF_NAME="${GITHUB_REF_NAME:-${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}}"
+          NOW="$(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+
+          # Collect tracked C# files deterministically
+          mapfile -t CS_FILES < <(git ls-files \
+            | grep -E '\.cs$' \
+            | grep -Ev '^(Library|Temp|Build|obj|\.git)/' \
+            | sort)
+
+          #### CODE_SNAPSHOT.txt ####
+          {
+            echo "# Auto-generated code snapshot"
+            echo "_Updated_: ${NOW}"
+            echo
+            for f in "${CS_FILES[@]}"; do
+              echo "// ===== FILE: ${f} ====="
+              cat "${f}"
+              echo
+            done
+          } > CODE_SNAPSHOT.txt
+
+          #### CODE_INDEX.md ####
+          {
+            echo "# Code Index"
+            echo
+            echo "_Updated_: ${NOW}"
+            echo
+            for f in "${CS_FILES[@]}"; do
+              view="https://github.com/${REPO}/blob/${REF_NAME}/${f}"
+              raw="https://raw.githubusercontent.com/${REPO}/${REF_NAME}/${f}"
+              echo "- \`${f}\` — [View](${view}) · [Raw](${raw})"
+            done
+          } > CODE_INDEX.md
+
+          #### SYMBOLS.json (lightweight namespace/type/method map with 1-based line numbers) ####
+          tmp_symbols="$(mktemp)"
+          echo '{ "files": [' > "${tmp_symbols}"
+          first_file=1
+          for f in "${CS_FILES[@]}"; do
+            json="$(awk '
+              BEGIN {
+                ns=""; type=""; firstSym=1
+                printf("{ \"file\": \"%s\", \"symbols\": [", FILENAME)
+              }
+              {
+                line=NR
+                # namespace
+                if ($0 ~ /^[ \t]*namespace[ \t]+[A-Za-z_][A-Za-z0-9_.]*/) {
+                  match($0, /namespace[ \t]+([A-Za-z_][A-Za-z0-9_.]*)/, m)
+                  ns=m[1]
+                  sym=sprintf("{\\"kind\\":\\"namespace\\",\\"name\\":\\"%s\\",\\"line\\":%d}", ns, line)
+                  printf(firstSym ? "%s" : ",%s", sym); firstSym=0
+                }
+                # type: class/struct/interface/enum
+                if ($0 ~ /^[ \t]*(public|internal|protected|private)?[ \t]*(sealed|abstract|static)?[ \t]*(class|struct|interface|enum)[ \t]+[A-Za-z_][A-Za-z0-9_]*/) {
+                  match($0, /(class|struct|interface|enum)[ \t]+([A-Za-z_][A-Za-z0-9_]*)/, t)
+                  kind=t[1]; type=t[2]
+                  sym=sprintf("{\\"kind\\":\\"%s\\",\\"name\\":\\"%s\\",\\"namespace\\":\\"%s\\",\\"line\\":%d}", kind, type, ns, line)
+                  printf(firstSym ? "%s" : ",%s", sym); firstSym=0
+                }
+                # methods (best-effort): access? static? return? Name( ... ) {
+                if ($0 ~ /^[ \t]*(public|private|protected|internal)[^;{=]*\([^\)]*\)[ \t]*\{/ ) {
+                  match($0, /([A-Za-z_][A-Za-z0-9_]*)[ \t]*\(/, m)
+                  if (m[1] != "") {
+                    mname=m[1]
+                    sym=sprintf("{\\"kind\\":\\"method\\",\\"name\\":\\"%s\\",\\"type\\":\\"%s\\",\\"namespace\\":\\"%s\\",\\"line\\":%d}", mname, type, ns, line)
+                    printf(firstSym ? "%s" : ",%s", sym); firstSym=0
+                  }
+                }
+              }
+              END { printf("] }") }
+            ' "${f}")"
+            if [ $first_file -eq 1 ]; then
+              printf "%s" "${json}" >> "${tmp_symbols}"
+              first_file=0
+            else
+              printf ",%s" "${json}" >> "${tmp_symbols}"
+            fi
+          done
+          echo '] }' >> "${tmp_symbols}"
+          mv "${tmp_symbols}" SYMBOLS.json
+
+      # --- COMMIT: stage known outputs and commit only if staged diff exists ---
+      - name: Commit regenerated files if changed
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Explicit, safe staging of the known outputs. Missing paths are ignored.
-          git add INDEX.md Docs/INDEX.md CODE_INDEX.md CODE_SNAPSHOT.txt SYMBOLS.json XML_INDEX.md XML_SNAPSHOT.txt 2>/dev/null || true
-          # Keep XML samples/schemas where your live links point.
+          # Stage code artifacts
+          git add CODE_SNAPSHOT.txt CODE_INDEX.md SYMBOLS.json 2>/dev/null || true
+          # Stage docs indexes if you keep them current (optional but harmless)
+          git add INDEX.md Docs/INDEX.md 2>/dev/null || true
+          # Stage XML samples/schemas where live links point
           git add Docs/Templates/Defs/ 2>/dev/null || true
 
-          # Commit only if something is staged
           if ! git diff --cached --quiet --exit-code; then
-            git commit -m "ci: refresh repository index & XML samples"
+            git commit -m "ci: regenerate indexes & snapshots [skip ci]"
             git push
           else
             echo "No index changes"
