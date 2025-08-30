@@ -4,6 +4,9 @@ using System.Linq;
 // Assumes BuildingDef exists in your Defs namespace
 // If your project uses a different namespace, adjust the using accordingly.
 using FantasyColony.Defs;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 using UnityObject = UnityEngine.Object;
 
 public class BuildModeController : MonoBehaviour
@@ -90,8 +93,16 @@ public class BuildModeController : MonoBehaviour
             Instance = this;
         }
 
-        // Basic hotkey (B) to toggle build mode
-        if (Input.GetKeyDown(KeyCode.B))
+        // Basic hotkey (B) to toggle build mode (support both input backends)
+        bool pressed = false;
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null)
+            pressed |= Keyboard.current.bKey.wasPressedThisFrame;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
+        pressed |= Input.GetKeyDown(KeyCode.B);
+#endif
+        if (pressed)
         {
             ToggleBuildMode();
             Debug.Log("[Build] Toggled via B → " + (_buildModeEnabled ? "ON" : "OFF"));

@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+#endif
 
 /// <summary>
 /// Creates a uGUI Build toggle (Canvas + Button) at runtime for gameplay scenes only.
@@ -30,6 +34,44 @@ public static class BuildUIBootstrap
         return s.Contains("intro") || s.Contains("menu") || s.Contains("title");
     }
 
+    static void EnsureEventSystem()
+    {
+        var es = Object.FindFirstObjectByType<EventSystem>();
+        if (es == null)
+        {
+            var go = new GameObject("EventSystem", typeof(EventSystem));
+            es = go.GetComponent<EventSystem>();
+            Object.DontDestroyOnLoad(go);
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        // Prefer the new Input System UI module
+        var inputSys = es.GetComponent<InputSystemUIInputModule>();
+        if (inputSys == null)
+        {
+            // Remove legacy module if present
+            var legacy = es.GetComponent<StandaloneInputModule>();
+            if (legacy != null) Object.Destroy(legacy);
+            inputSys = es.gameObject.AddComponent<InputSystemUIInputModule>();
+            Debug.Log("[BuildUI] Attached InputSystemUIInputModule to EventSystem.");
+        }
+#else
+        // Fall back to legacy StandaloneInputModule
+        var legacy = es.GetComponent<StandaloneInputModule>();
+        if (legacy == null)
+        {
+            // Remove new module if it exists (project might be in 'Both' mode)
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var inputSys = es.GetComponent<Component>();
+#endif
+            var newMod = es.GetComponent("InputSystemUIInputModule");
+            if (newMod != null) Object.Destroy(newMod as Component);
+            es.gameObject.AddComponent<StandaloneInputModule>();
+            Debug.Log("[BuildUI] Attached StandaloneInputModule to EventSystem.");
+        }
+#endif
+    }
+
     static void EnsureForCurrentScene()
     {
         var active = SceneManager.GetActiveScene().name;
@@ -43,18 +85,18 @@ public static class BuildUIBootstrap
 
         if (canvas == null)
         {
+            EnsureEventSystem();
             BuildToggleCanvas();
+        }
+        else
+        {
+            EnsureEventSystem();
         }
     }
 
     static void BuildToggleCanvas()
     {
-        // Ensure there is an EventSystem
-        if (Object.FindFirstObjectByType<EventSystem>() == null)
-        {
-            var es = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-            Object.DontDestroyOnLoad(es);
-        }
+        // EventSystem ensured by EnsureEventSystem()
 
         var go = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         Object.DontDestroyOnLoad(go);
@@ -81,6 +123,7 @@ public static class BuildUIBootstrap
 
         var img = btnGO.GetComponent<Image>();
         img.color = new Color(0.85f, 0.85f, 0.85f, 0.9f);
+        img.raycastTarget = true;
 
         var btn = btnGO.GetComponent<Button>();
         btn.onClick.AddListener(() =>
