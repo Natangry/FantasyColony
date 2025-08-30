@@ -1,5 +1,6 @@
 using UnityEngine;
 using FantasyColony.Defs;
+using System.Linq;
 
 /// <summary>
 /// Guarantees build systems exist at runtime and that defs are loaded.
@@ -13,7 +14,7 @@ public static class BuildBootstrap
         Ensure();
     }
 
-    public static void Ensure()
+    public static GameObject Ensure()
     {
         var go = GameObject.Find("BuildSystems (Auto)");
         if (go == null)
@@ -39,6 +40,18 @@ public static class BuildBootstrap
         {
             // ignore – bring-up should still run with fallbacks
         }
+
+        // Ensure there is a HUD
+        var hud = GameObject.Find("BuildHUD (Auto)");
+        if (hud == null)
+        {
+            hud = new GameObject("BuildHUD (Auto)");
+            hud.AddComponent<BuildHUD>();
+            hud.AddComponent<BuildPaletteHUD>();
+            Debug.Log("[BuildBootstrap] Spawned BuildHUD + Palette");
+        }
+
+        return go;
     }
 }
 

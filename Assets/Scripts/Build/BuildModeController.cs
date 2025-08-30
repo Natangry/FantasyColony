@@ -19,7 +19,15 @@ public class BuildModeController : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
     public bool IsBuildModeEnabled => _buildModeEnabled;
@@ -79,6 +87,7 @@ public class BuildModeController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.B))
         {
             ToggleBuildMode();
+            Debug.Log("[Build] Toggled via B → " + (_buildModeEnabled ? "ON" : "OFF"));
         }
         // ESC cancels current tool
         if (Input.GetKeyDown(KeyCode.Escape))

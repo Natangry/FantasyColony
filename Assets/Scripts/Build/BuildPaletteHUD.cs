@@ -21,7 +21,7 @@ public class BuildPaletteHUD : MonoBehaviour
     {
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
-        // Ensure systems exist (harmless if already present)
+        // Self-heal to guarantee systems are present
         BuildBootstrap.Ensure();
 
         var _panelRect = GetPanelRect();
