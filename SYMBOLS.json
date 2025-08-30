@@ -24,160 +24,10 @@
     "line": 26
   },
   {
-    "kind": "class",
-    "name": "AppBootstrap",
-    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 12
-  },
-  {
-    "kind": "class",
-    "name": "AppBootstrapRunner",
-    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 206
-  },
-  {
-    "kind": "method",
-    "name": "IsIntroVisible",
-    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 34
-  },
-  {
-    "kind": "method",
-    "name": "ShowIntroOverlay",
-    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 41
-  },
-  {
-    "kind": "method",
-    "name": "HideIntroOverlay",
-    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 51
-  },
-  {
-    "kind": "class",
-    "name": "BootSession",
-    "file": "Assets/Scripts/Boot/BootSession.cs",
-    "line": 7
-  },
-  {
-    "kind": "property",
-    "name": "InitialSceneIndex",
-    "file": "Assets/Scripts/Boot/BootSession.cs",
-    "line": 9
-  },
-  {
-    "kind": "property",
-    "name": "InitialScenePath",
-    "file": "Assets/Scripts/Boot/BootSession.cs",
-    "line": 10
-  },
-  {
-    "kind": "class",
-    "name": "BuildBootstrap",
-    "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
-    "line": 9
-  },
-  {
-    "kind": "method",
-    "name": "EnsureOnLoad",
-    "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
-    "line": 15
-  },
-  {
-    "kind": "method",
-    "name": "Ensure",
-    "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
-    "line": 19
-  },
-  {
-    "kind": "class",
-    "name": "BuildUIBootstrap",
-    "file": "Assets/Scripts/Boot/BuildUIBootstrap.cs",
-    "line": 14
-  },
-  {
-    "kind": "method",
-    "name": "EnsureForCurrentScene",
-    "file": "Assets/Scripts/Boot/BuildUIBootstrap.cs",
-    "line": 74
-  },
-  {
-    "kind": "class",
-    "name": "CameraBootstrap",
-    "file": "Assets/Scripts/Boot/CameraBootstrap.cs",
-    "line": 6
-  },
-  {
-    "kind": "method",
-    "name": "EnsureCameraFollower",
-    "file": "Assets/Scripts/Boot/CameraBootstrap.cs",
-    "line": 11
-  },
-  {
-    "kind": "class",
-    "name": "GameStartupConfig",
-    "file": "Assets/Scripts/Boot/GameStartupConfig.cs",
-    "line": 8
-  },
-  {
-    "kind": "method",
-    "name": "Load",
-    "file": "Assets/Scripts/Boot/GameStartupConfig.cs",
-    "line": 12
-  },
-  {
-    "kind": "class",
-    "name": "HardRestart",
-    "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 5
-  },
-  {
-    "kind": "method",
-    "name": "RebootToIntro",
-    "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 8
-  },
-  {
     "kind": "interface",
     "name": "IIntroOverlay",
     "file": "Assets/Scripts/Boot/IIntroOverlay.cs",
     "line": 1
-  },
-  {
-    "kind": "class",
-    "name": "InteractionBootstrap",
-    "file": "Assets/Scripts/Boot/InteractionBootstrap.cs",
-    "line": 6
-  },
-  {
-    "kind": "method",
-    "name": "EnsureInteractionManager",
-    "file": "Assets/Scripts/Boot/InteractionBootstrap.cs",
-    "line": 11
-  },
-  {
-    "kind": "class",
-    "name": "IntroBootstrap",
-    "file": "Assets/Scripts/Boot/IntroBootstrap.cs",
-    "line": 7
-  },
-  {
-    "kind": "method",
-    "name": "EnsureIntro",
-    "file": "Assets/Scripts/Boot/IntroBootstrap.cs",
-    "line": 12
-  },
-  {
-    "kind": "class",
-    "name": "PauseBootstrap",
-    "file": "Assets/Scripts/Boot/PauseBootstrap.cs",
-    "line": 2
-  },
-  {
-    "kind": "method",
-    "name": "EnsurePauseController",
-    "file": "Assets/Scripts/Boot/PauseBootstrap.cs",
-    "line": 8
   },
   {
     "kind": "class",
@@ -196,96 +46,6 @@
     "name": "SpawnSecondPawn",
     "file": "Assets/Scripts/Boot/PawnBootstrap.cs",
     "line": 37
-  },
-  {
-    "kind": "class",
-    "name": "SelectionBootstrap",
-    "file": "Assets/Scripts/Boot/SelectionBootstrap.cs",
-    "line": 7
-  },
-  {
-    "kind": "method",
-    "name": "EnsureSelectionController",
-    "file": "Assets/Scripts/Boot/SelectionBootstrap.cs",
-    "line": 12
-  },
-  {
-    "kind": "class",
-    "name": "TestMapStarter",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 13
-  },
-  {
-    "kind": "method",
-    "name": "StartTestMap",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 15
-  },
-  {
-    "kind": "method",
-    "name": "TryStartWorld",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 39
-  },
-  {
-    "kind": "method",
-    "name": "InvokeStarter",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 109
-  },
-  {
-    "kind": "method",
-    "name": "FindMethod",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 123
-  },
-  {
-    "kind": "method",
-    "name": "MatchesSignature",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 126
-  },
-  {
-    "kind": "method",
-    "name": "FindTypeByPreferredNames",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 138
-  },
-  {
-    "kind": "method",
-    "name": "SafeGetTypes",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 151
-  },
-  {
-    "kind": "method",
-    "name": "EnsurePawnInteractionManager",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 159
-  },
-  {
-    "kind": "method",
-    "name": "SpawnTwoTestPawnsNearCenter",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 172
-  },
-  {
-    "kind": "method",
-    "name": "CreateSpritePawn",
-    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 194
-  },
-  {
-    "kind": "class",
-    "name": "WorldBootstrap",
-    "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
-    "line": 6
-  },
-  {
-    "kind": "method",
-    "name": "GenerateDefaultGrid",
-    "file": "Assets/Scripts/Boot/WorldBootstrap.cs",
-    "line": 8
   },
   {
     "kind": "class",
@@ -403,141 +163,27 @@
   },
   {
     "kind": "class",
-    "name": "FollowControlledPawn",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
+    "name": "GameStartupConfig",
+    "file": "Assets/Scripts/Core/Config/GameStartupConfig.cs",
     "line": 8
   },
   {
     "kind": "method",
-    "name": "Awake",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 23
-  },
-  {
-    "kind": "method",
-    "name": "OnEnable",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 29
-  },
-  {
-    "kind": "method",
-    "name": "OnDisable",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 40
-  },
-  {
-    "kind": "method",
-    "name": "OnControlledChanged",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 45
-  },
-  {
-    "kind": "method",
-    "name": "LateUpdate",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 54
-  },
-  {
-    "kind": "method",
-    "name": "SnapToTarget",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 92
-  },
-  {
-    "kind": "method",
-    "name": "SnapPosToPixelGrid",
-    "file": "Assets/Scripts/Camera/FollowControlledPawn.cs",
-    "line": 106
+    "name": "Load",
+    "file": "Assets/Scripts/Core/Config/GameStartupConfig.cs",
+    "line": 12
   },
   {
     "kind": "class",
-    "name": "FreeCameraController",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 13
+    "name": "HardRestart",
+    "file": "Assets/Scripts/Core/Lifecycle/HardRestart.cs",
+    "line": 5
   },
   {
     "kind": "method",
-    "name": "Awake",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 41
-  },
-  {
-    "kind": "method",
-    "name": "TryFindGrid",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 49
-  },
-  {
-    "kind": "method",
-    "name": "OnEnable",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 59
-  },
-  {
-    "kind": "method",
-    "name": "OnDisable",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 83
-  },
-  {
-    "kind": "method",
-    "name": "Update",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 93
-  },
-  {
-    "kind": "method",
-    "name": "OnControlledChanged",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 140
-  },
-  {
-    "kind": "method",
-    "name": "EnsureGridVisibility",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 152
-  },
-  {
-    "kind": "method",
-    "name": "ReadMoveInput",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 215
-  },
-  {
-    "kind": "method",
-    "name": "ReadBoost",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 229
-  },
-  {
-    "kind": "method",
-    "name": "ReadScrollDelta",
-    "file": "Assets/Scripts/Camera/FreeCameraController.cs",
-    "line": 238
-  },
-  {
-    "kind": "class",
-    "name": "PixelCameraHelper",
-    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
-    "line": 6
-  },
-  {
-    "kind": "method",
-    "name": "WorldUnitsPerPixel",
-    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
-    "line": 11
-  },
-  {
-    "kind": "method",
-    "name": "SnapToPixelGrid",
-    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
-    "line": 24
-  },
-  {
-    "kind": "method",
-    "name": "OrthoWorldBounds",
-    "file": "Assets/Scripts/Camera/PixelCameraHelper.cs",
-    "line": 35
+    "name": "RebootToIntro",
+    "file": "Assets/Scripts/Core/Lifecycle/HardRestart.cs",
+    "line": 8
   },
   {
     "kind": "namespace",
@@ -1006,6 +652,264 @@
     "name": "Bool",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
     "line": 190
+  },
+  {
+    "kind": "class",
+    "name": "TestMapStarter",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 13
+  },
+  {
+    "kind": "method",
+    "name": "StartTestMap",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 15
+  },
+  {
+    "kind": "method",
+    "name": "TryStartWorld",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 39
+  },
+  {
+    "kind": "method",
+    "name": "InvokeStarter",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 109
+  },
+  {
+    "kind": "method",
+    "name": "FindMethod",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 123
+  },
+  {
+    "kind": "method",
+    "name": "MatchesSignature",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 126
+  },
+  {
+    "kind": "method",
+    "name": "FindTypeByPreferredNames",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 138
+  },
+  {
+    "kind": "method",
+    "name": "SafeGetTypes",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 151
+  },
+  {
+    "kind": "method",
+    "name": "EnsurePawnInteractionManager",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 159
+  },
+  {
+    "kind": "method",
+    "name": "SpawnTwoTestPawnsNearCenter",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 172
+  },
+  {
+    "kind": "method",
+    "name": "CreateSpritePawn",
+    "file": "Assets/Scripts/Dev/Cheats/TestMapStarter.cs",
+    "line": 194
+  },
+  {
+    "kind": "class",
+    "name": "CameraBootstrap",
+    "file": "Assets/Scripts/Gameplay/Camera/CameraBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "EnsureCameraFollower",
+    "file": "Assets/Scripts/Gameplay/Camera/CameraBootstrap.cs",
+    "line": 11
+  },
+  {
+    "kind": "class",
+    "name": "FollowControlledPawn",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 23
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 29
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 40
+  },
+  {
+    "kind": "method",
+    "name": "OnControlledChanged",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 45
+  },
+  {
+    "kind": "method",
+    "name": "LateUpdate",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 54
+  },
+  {
+    "kind": "method",
+    "name": "SnapToTarget",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 92
+  },
+  {
+    "kind": "method",
+    "name": "SnapPosToPixelGrid",
+    "file": "Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs",
+    "line": 106
+  },
+  {
+    "kind": "class",
+    "name": "FreeCameraController",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 13
+  },
+  {
+    "kind": "method",
+    "name": "Awake",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 41
+  },
+  {
+    "kind": "method",
+    "name": "TryFindGrid",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 49
+  },
+  {
+    "kind": "method",
+    "name": "OnEnable",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 59
+  },
+  {
+    "kind": "method",
+    "name": "OnDisable",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 83
+  },
+  {
+    "kind": "method",
+    "name": "Update",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 93
+  },
+  {
+    "kind": "method",
+    "name": "OnControlledChanged",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 140
+  },
+  {
+    "kind": "method",
+    "name": "EnsureGridVisibility",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 152
+  },
+  {
+    "kind": "method",
+    "name": "ReadMoveInput",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 215
+  },
+  {
+    "kind": "method",
+    "name": "ReadBoost",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 229
+  },
+  {
+    "kind": "method",
+    "name": "ReadScrollDelta",
+    "file": "Assets/Scripts/Gameplay/Camera/FreeCameraController.cs",
+    "line": 238
+  },
+  {
+    "kind": "class",
+    "name": "PixelCameraHelper",
+    "file": "Assets/Scripts/Gameplay/Camera/PixelCameraHelper.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "WorldUnitsPerPixel",
+    "file": "Assets/Scripts/Gameplay/Camera/PixelCameraHelper.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "SnapToPixelGrid",
+    "file": "Assets/Scripts/Gameplay/Camera/PixelCameraHelper.cs",
+    "line": 24
+  },
+  {
+    "kind": "method",
+    "name": "OrthoWorldBounds",
+    "file": "Assets/Scripts/Gameplay/Camera/PixelCameraHelper.cs",
+    "line": 35
+  },
+  {
+    "kind": "class",
+    "name": "BuildBootstrap",
+    "file": "Assets/Scripts/Gameplay/Systems/Build/BuildBootstrap.cs",
+    "line": 9
+  },
+  {
+    "kind": "method",
+    "name": "EnsureOnLoad",
+    "file": "Assets/Scripts/Gameplay/Systems/Build/BuildBootstrap.cs",
+    "line": 15
+  },
+  {
+    "kind": "method",
+    "name": "Ensure",
+    "file": "Assets/Scripts/Gameplay/Systems/Build/BuildBootstrap.cs",
+    "line": 19
+  },
+  {
+    "kind": "class",
+    "name": "InteractionBootstrap",
+    "file": "Assets/Scripts/Gameplay/Systems/Interaction/InteractionBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "EnsureInteractionManager",
+    "file": "Assets/Scripts/Gameplay/Systems/Interaction/InteractionBootstrap.cs",
+    "line": 11
+  },
+  {
+    "kind": "class",
+    "name": "SelectionBootstrap",
+    "file": "Assets/Scripts/Gameplay/Systems/Selection/SelectionBootstrap.cs",
+    "line": 7
+  },
+  {
+    "kind": "method",
+    "name": "EnsureSelectionController",
+    "file": "Assets/Scripts/Gameplay/Systems/Selection/SelectionBootstrap.cs",
+    "line": 12
   },
   {
     "kind": "class",
@@ -1627,18 +1531,6 @@
   },
   {
     "kind": "class",
-    "name": "IntroScreen",
-    "file": "Assets/Scripts/UI/IntroScreenShim.cs",
-    "line": 10
-  },
-  {
-    "kind": "method",
-    "name": "ShowIntro",
-    "file": "Assets/Scripts/UI/IntroScreenShim.cs",
-    "line": 28
-  },
-  {
-    "kind": "class",
     "name": "PauseMenuController",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
     "line": 13
@@ -1696,6 +1588,60 @@
     "name": "LastGizmoRectBL",
     "file": "Assets/Scripts/UI/SelectionHUD.cs",
     "line": 26
+  },
+  {
+    "kind": "class",
+    "name": "BuildUIBootstrap",
+    "file": "Assets/Scripts/UI/HUD/BuildUIBootstrap.cs",
+    "line": 14
+  },
+  {
+    "kind": "method",
+    "name": "EnsureForCurrentScene",
+    "file": "Assets/Scripts/UI/HUD/BuildUIBootstrap.cs",
+    "line": 74
+  },
+  {
+    "kind": "class",
+    "name": "AppBootstrap",
+    "file": "Assets/Scripts/UI/Intro/AppBootstrap.cs",
+    "line": 12
+  },
+  {
+    "kind": "class",
+    "name": "AppBootstrapRunner",
+    "file": "Assets/Scripts/UI/Intro/AppBootstrap.cs",
+    "line": 206
+  },
+  {
+    "kind": "method",
+    "name": "IsIntroVisible",
+    "file": "Assets/Scripts/UI/Intro/AppBootstrap.cs",
+    "line": 34
+  },
+  {
+    "kind": "method",
+    "name": "ShowIntroOverlay",
+    "file": "Assets/Scripts/UI/Intro/AppBootstrap.cs",
+    "line": 41
+  },
+  {
+    "kind": "method",
+    "name": "HideIntroOverlay",
+    "file": "Assets/Scripts/UI/Intro/AppBootstrap.cs",
+    "line": 51
+  },
+  {
+    "kind": "class",
+    "name": "IntroScreen",
+    "file": "Assets/Scripts/UI/Intro/IntroScreenShim.cs",
+    "line": 10
+  },
+  {
+    "kind": "method",
+    "name": "ShowIntro",
+    "file": "Assets/Scripts/UI/Intro/IntroScreenShim.cs",
+    "line": 28
   },
   {
     "kind": "class",
@@ -1900,6 +1846,18 @@
     "name": "OnGUI",
     "file": "Assets/Scripts/World/Buildings/ConstructionBoard.cs",
     "line": 69
+  },
+  {
+    "kind": "class",
+    "name": "WorldBootstrap",
+    "file": "Assets/Scripts/World/MapGen/WorldBootstrap.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "GenerateDefaultGrid",
+    "file": "Assets/Scripts/World/MapGen/WorldBootstrap.cs",
+    "line": 8
   },
   {
     "kind": "class",

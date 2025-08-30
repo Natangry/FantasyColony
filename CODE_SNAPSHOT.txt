@@ -209,722 +209,8 @@ namespace FantasyColony.EditorTools
 #endif
 
 
-// ===== FILE: Assets/Scripts/Boot/AppBootstrap.cs =====
-using System;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-/// <summary>
-/// App-level bootstrap that ensures an Intro overlay exists/appears at boot *without* relying on Unity scenes.
-/// It discovers your project's real Intro/Title/Menu MonoBehaviour via reflection and shows it. If none
-/// exists, it spawns a tiny fallback overlay so you're never stuck on a blank scene.
-/// </summary>
-public static class AppBootstrap
-{
-    // Only consider intro-like components when they implement IIntroOverlay or match these hints.
-    static readonly string[] IntroTypeHints = { "intro", "title" };
-    static readonly string[] VisibleFieldNames = { "showMenu", "isVisible", "visible", "IsVisible" };
-    static readonly string[] ShowMethodNames = { "Show", "Open", "Enable", "ShowMenu", "ShowIntro", "SetVisible", "SetActive" };
-    static readonly string[] HideMethodNames = { "Hide", "Close", "Disable", "HideMenu", "HideIntro", "SetVisible", "SetActive" };
-
-    // Runs very early; still do a delayed check after first frame in case other boot code spawns the overlay a bit later.
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
-    static void EnsureIntroEarly()
-    {
-        // Always ensure our own overlay exists and is shown (Large default)
-        IntroMenuOverlay.Ensure();
-        IntroMenuOverlay.Show();
-        PauseMenuController.HideIfPresent();
-        MakeRunner(); // ensures we also re-check shortly after boot
-        TryShowIntroOverlay("AfterAssembliesLoaded");
-        SceneManager.activeSceneChanged += (_, __) => TryShowIntroOverlay("activeSceneChanged");
-    }
-
-    /// <summary>Returns true if an intro-like overlay is visible.</summary>
-    public static bool IsIntroVisible()
-    {
-        var intro = UnityEngine.Object.FindObjectOfType<IntroMenuOverlay>(true);
-        return intro != null && intro.gameObject.activeInHierarchy;
-    }
-
-    /// <summary>Shows the intro overlay (prefer the project's real one; otherwise spawn a fallback).</summary>
-    public static void ShowIntroOverlay()
-    {
-        IntroMenuOverlay.Show();
-        if (TryShowIntroOverlay("explicit call")) return;
-        // If project has no intro overlay type, create a simple fallback UI.
-        IntroOverlayFallback.SpawnIfNeeded();
-        Debug.Log("[AppBootstrap] Spawned IntroOverlayFallback (no real intro overlay found).");
-    }
-
-    /// <summary>Hides any intro overlay (real or fallback).</summary>
-    public static void HideIntroOverlay()
-    {
-        var intro = UnityEngine.Object.FindObjectOfType<IntroMenuOverlay>(true);
-        if (intro != null) intro.gameObject.SetActive(false);
-        BuildUIBootstrap.EnsureForCurrentScene();
-    }
-
-    // --- internals ---
-
-    static bool TryShowIntroOverlay(string reason)
-    {
-        var comp = FindIntroComponentInScene();
-        if (comp == null)
-        {
-            // Maybe the type exists but no instance yet; try instantiating the first matching type
-            var t = FindIntroType();
-            if (t != null)
-            {
-                var go = new GameObject(t.Name + " (Auto)");
-                comp = (MonoBehaviour)go.AddComponent(t);
-            }
-        }
-        if (comp == null) return false;
-
-        bool handled = TryInvokeShow(comp);
-        if (!handled) handled |= TrySetVisibleFlag(comp, true);
-        if (!handled)
-        {
-            comp.gameObject.SetActive(true);
-            handled = true;
-        }
-        if (handled)
-            Debug.Log($"[AppBootstrap] Intro overlay shown via '{comp.GetType().Name}' ({reason}).");
-        return handled;
-    }
-
-    static MonoBehaviour FindIntroComponentInScene()
-    {
-        var all = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        // First, look for explicit intro overlays.
-        foreach (var mb in all)
-        {
-            if (mb is IntroScreen) continue;
-            if (mb is PauseMenuController) continue;
-            if (mb is IIntroOverlay) return mb;
-        }
-
-        // Fallback: heuristics based on type name hints (intro/title only).
-        foreach (var mb in all)
-        {
-            if (mb is IntroScreen) continue;
-            if (mb is PauseMenuController) continue;
-            var n = mb.GetType().Name.ToLowerInvariant();
-            if (IntroTypeHints.Any(h => n.Contains(h))) return mb;
-        }
-        return null;
-    }
-
-    static Type FindIntroType()
-    {
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            Type[] types;
-            try { types = asm.GetTypes(); } catch { continue; }
-            foreach (var t in types)
-            {
-                if (!typeof(MonoBehaviour).IsAssignableFrom(t)) continue;
-                if (typeof(IIntroOverlay).IsAssignableFrom(t)) return t;
-                var n = t.Name.ToLowerInvariant();
-                if (IntroTypeHints.Any(h => n.Contains(h))) return t;
-            }
-        }
-        return null;
-    }
-
-    static bool TryGetVisibleFlag(MonoBehaviour comp, out bool value)
-    {
-        value = false;
-        var t = comp.GetType();
-        foreach (var name in VisibleFieldNames)
-        {
-            var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (f != null && f.FieldType == typeof(bool))
-            {
-                value = (bool)f.GetValue(comp);
-                return true;
-            }
-            var p = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (p != null && p.PropertyType == typeof(bool) && p.CanRead)
-            {
-                value = (bool)p.GetValue(comp, null);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    static bool TrySetVisibleFlag(MonoBehaviour comp, bool visible)
-    {
-        var t = comp.GetType();
-        foreach (var name in VisibleFieldNames)
-        {
-            var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (f != null && f.FieldType == typeof(bool))
-            {
-                f.SetValue(comp, visible);
-                return true;
-            }
-            var p = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (p != null && p.PropertyType == typeof(bool) && p.CanWrite)
-            {
-                p.SetValue(comp, visible, null);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    static bool TryInvokeShow(MonoBehaviour comp)
-    {
-        var t = comp.GetType();
-        foreach (var m in ShowMethodNames)
-        {
-            var mi = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
-            if (mi != null) { mi.Invoke(comp, null); return true; }
-
-            var miBool = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
-            if (miBool != null) { miBool.Invoke(comp, new object[] { true }); return true; }
-        }
-        return false;
-    }
-
-    static bool TryInvokeHide(MonoBehaviour comp)
-    {
-        var t = comp.GetType();
-        foreach (var m in HideMethodNames)
-        {
-            var mi = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
-            if (mi != null) { mi.Invoke(comp, null); return true; }
-
-            var miBool = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
-            if (miBool != null) { miBool.Invoke(comp, new object[] { false }); return true; }
-        }
-        return false;
-    }
-
-    static void MakeRunner()
-    {
-        if (UnityEngine.Object.FindFirstObjectByType<AppBootstrapRunner>() != null) return;
-        var go = new GameObject("AppBootstrap (Auto)");
-        UnityEngine.Object.DontDestroyOnLoad(go);
-        go.AddComponent<AppBootstrapRunner>();
-    }
-
-    /// <summary>Hidden runner to perform a delayed re-check after boot (next frame).</summary>
-    sealed class AppBootstrapRunner : MonoBehaviour
-    {
-        void Start() { StartCoroutine(DelayedCheck()); }
-        System.Collections.IEnumerator DelayedCheck()
-        {
-            yield return null; // next frame
-            TryShowIntroOverlay("DelayedCheck");
-        }
-    }
-}
-
-
-
-// ===== FILE: Assets/Scripts/Boot/BootSession.cs =====
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-/// <summary>
-/// Records the scene the app launched into so we can "full reboot" back to it.
-/// </summary>
-public static class BootSession
-{
-    public static int InitialSceneIndex { get; private set; } = -1;
-    public static string InitialScenePath { get; private set; } = null;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void Capture()
-    {
-        var active = SceneManager.GetActiveScene();
-        InitialSceneIndex = active.buildIndex;
-        InitialScenePath = active.path;
-        Debug.Log($"[BootSession] Captured initial scene index={InitialSceneIndex} path={InitialScenePath}");
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Boot/BuildBootstrap.cs =====
-using UnityEngine;
-using FantasyColony.Defs;
-using System.Linq;
-
-/// <summary>
-/// Guarantees build systems exist at runtime and that defs are loaded.
-/// This runs automatically after scene load.
-/// </summary>
-public static class BuildBootstrap
-{
-    // Ensure we load defs once per run to avoid races where DB appears empty
-    static bool _defsLoadedOnce = false;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    public static void EnsureOnLoad()
-    {
-        Ensure();
-    }
-
-    public static GameObject Ensure()
-    {
-        var go = GameObject.Find("BuildSystems (Auto)");
-        if (go == null)
-        {
-            go = new GameObject("BuildSystems (Auto)");
-            Object.DontDestroyOnLoad(go);
-        }
-
-        if (go.GetComponent<BuildModeController>() == null)
-            go.AddComponent<BuildModeController>();
-        if (go.GetComponent<BuildPlacementTool>() == null)
-            go.AddComponent<BuildPlacementTool>();
-
-        // Make sure defs are available (force an eager first-load once per run)
-        if (!_defsLoadedOnce)
-        {
-            try
-            {
-                DefDatabase.LoadAll();
-                _defsLoadedOnce = true;
-            }
-            catch
-            {
-                // ignore – bring-up should still run with fallbacks
-            }
-        }
-        else
-        {
-            try
-            {
-                if (DefDatabase.Buildings == null || DefDatabase.Visuals == null ||
-                    DefDatabase.Buildings.Count == 0 || DefDatabase.Visuals.Count == 0)
-                    DefDatabase.LoadAll();
-            }
-            catch
-            {
-                // ignore – bring-up should still run with fallbacks
-            }
-        }
-
-        // Ensure there is a palette HUD
-        var pal = GameObject.Find("BuildPalette (Auto)");
-        if (pal == null)
-        {
-            pal = new GameObject("BuildPalette (Auto)");
-            pal.AddComponent<BuildPaletteHUD>();
-            Object.DontDestroyOnLoad(pal);
-            Debug.Log("[BuildBootstrap] Spawned BuildPalette");
-        }
-
-        return go;
-    }
-}
-
-
-
-// ===== FILE: Assets/Scripts/Boot/BuildUIBootstrap.cs =====
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
-#endif
-
-/// <summary>
-/// Creates a uGUI Build toggle (Canvas + Button) at runtime for gameplay scenes only.
-/// Avoids IMGUI artifacts and scales with resolution automatically.
-/// </summary>
-public static class BuildUIBootstrap
-{
-    const string CanvasName = "BuildCanvas (Auto)";
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    static void Init()
-    {
-        SceneManager.activeSceneChanged += OnSceneChanged;
-        EnsureForCurrentScene();
-    }
-
-    static void OnSceneChanged(Scene from, Scene to)
-    {
-        EnsureForCurrentScene();
-    }
-
-    static bool IsIntroLike(string sceneName)
-    {
-        if (string.IsNullOrEmpty(sceneName)) return false;
-        var s = sceneName.ToLowerInvariant();
-        return s.Contains("intro") || s.Contains("title");
-    }
-
-    static void EnsureEventSystem()
-    {
-        var es = Object.FindFirstObjectByType<EventSystem>();
-        if (es == null)
-        {
-            var go = new GameObject("EventSystem", typeof(EventSystem));
-            es = go.GetComponent<EventSystem>();
-            Object.DontDestroyOnLoad(go);
-        }
-
-#if ENABLE_INPUT_SYSTEM
-        // Prefer the new Input System UI module
-        var inputSys = es.GetComponent<InputSystemUIInputModule>();
-        if (inputSys == null)
-        {
-            // Remove legacy module if present
-            var legacy = es.GetComponent<StandaloneInputModule>();
-            if (legacy != null) Object.Destroy(legacy);
-            inputSys = es.gameObject.AddComponent<InputSystemUIInputModule>();
-            Debug.Log("[BuildUI] Attached InputSystemUIInputModule to EventSystem.");
-        }
-#else
-        // Fall back to legacy StandaloneInputModule
-        var legacy = es.GetComponent<StandaloneInputModule>();
-        if (legacy == null)
-        {
-            // Remove new module if it exists (project might be in 'Both' mode)
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            var inputSys = es.GetComponent<Component>();
-#endif
-            var newMod = es.GetComponent("InputSystemUIInputModule");
-            if (newMod != null) Object.Destroy(newMod as Component);
-            es.gameObject.AddComponent<StandaloneInputModule>();
-            Debug.Log("[BuildUI] Attached StandaloneInputModule to EventSystem.");
-        }
-#endif
-    }
-
-    public static void EnsureForCurrentScene()
-    {
-        var active = SceneManager.GetActiveScene().name;
-        var canvas = GameObject.Find(CanvasName);
-
-        // Destroy/hide if on an intro/menu scene or any intro overlay is visible
-        bool introOverlayVisible = AppBootstrap.IsIntroVisible() || IntroMenuOverlay.IsOpen;
-
-        if (IsIntroLike(active) || introOverlayVisible)
-        {
-            // Destroy if present in intro/menu scenes or intro overlay
-            if (canvas != null) Object.Destroy(canvas);
-            return;
-        }
-
-        if (canvas == null)
-        {
-            EnsureEventSystem();
-            BuildToggleCanvas();
-        }
-        else
-        {
-            EnsureEventSystem();
-        }
-    }
-
-    static void BuildToggleCanvas()
-    {
-        // EventSystem ensured by EnsureEventSystem()
-
-        var go = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-        Object.DontDestroyOnLoad(go);
-
-        var canvas = go.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 5000; // draw on top of world
-
-        var scaler = go.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-
-        // Build button
-        var btnGO = new GameObject("BuildButton", typeof(RectTransform), typeof(Image), typeof(Button));
-        btnGO.transform.SetParent(go.transform, false);
-        var rt = btnGO.GetComponent<RectTransform>();
-        rt.anchorMin = new Vector2(0, 1);
-        rt.anchorMax = new Vector2(0, 1);
-        rt.pivot = new Vector2(0, 1);
-        rt.anchoredPosition = new Vector2(16, -16);
-        rt.sizeDelta = new Vector2(180, 48);
-
-        var img = btnGO.GetComponent<Image>();
-        img.color = new Color(0.85f, 0.85f, 0.85f, 0.9f);
-        img.raycastTarget = true;
-
-        var btn = btnGO.GetComponent<Button>();
-        btn.onClick.AddListener(() =>
-        {
-            BuildBootstrap.Ensure();
-            if (BuildModeController.Instance != null)
-                BuildModeController.Instance.ToggleBuildMode();
-        });
-
-        // Label
-        var txtGO = new GameObject("Text", typeof(RectTransform));
-        txtGO.transform.SetParent(btnGO.transform, false);
-        var trt = txtGO.GetComponent<RectTransform>();
-        trt.anchorMin = Vector2.zero;
-        trt.anchorMax = Vector2.one;
-        trt.offsetMin = Vector2.zero;
-        trt.offsetMax = Vector2.zero;
-
-        // Use legacy Text if available; otherwise leave default button visuals
-        var legacyText = txtGO.AddComponent<Text>();
-        legacyText.text = "Build  [B]";
-        legacyText.alignment = TextAnchor.MiddleCenter;
-        legacyText.color = Color.black;
-        legacyText.fontSize = 24;
-        legacyText.raycastTarget = false;
-        legacyText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Boot/CameraBootstrap.cs =====
-using UnityEngine;
-
-/// <summary>
-/// Ensures the main camera follows the currently controlled pawn and supports free WASD panning.
-/// </summary>
-public static class CameraBootstrap
-{
-    private static bool added;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void EnsureCameraFollower()
-    {
-        if (added) return;
-        var cam = Camera.main;
-        if (cam == null)
-        {
-            // Minimal fallback camera; WorldBootstrap may reconfigure later.
-            var go = new GameObject("Main Camera");
-            cam = go.AddComponent<Camera>();
-            go.tag = "MainCamera";
-            cam.orthographic = true;
-            cam.orthographicSize = 10f;
-            cam.transform.position = new Vector3(0f, 10f, 0f);
-            cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-        }
-
-        if (cam.GetComponent<FollowControlledPawn>() == null)
-            cam.gameObject.AddComponent<FollowControlledPawn>();
-
-        // Add free camera controls for when no pawn is controlled.
-        if (cam.GetComponent<FreeCameraController>() == null)
-            cam.gameObject.AddComponent<FreeCameraController>();
-
-        added = true;
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Boot/GameStartupConfig.cs =====
-using UnityEngine;
-
-/// <summary>
-/// Simple ScriptableObject that lets us explicitly pick the Intro scene for restarts.
-/// Create/inspect at Assets/Resources/GameStartupConfig.asset
-/// </summary>
-[CreateAssetMenu(menuName = "FantasyColony/Game Startup Config", fileName = "GameStartupConfig")]
-public class GameStartupConfig : ScriptableObject
-{
-    [Tooltip("Scene path (as in Build Settings) to use for 'Restart'. Leave empty to auto-detect.")]
-    public string introScenePath;
-
-    public static GameStartupConfig Load()
-    {
-        // The asset is optional; returns null if not present.
-        return Resources.Load<GameStartupConfig>("GameStartupConfig");
-    }
-}
-
-
-
-// ===== FILE: Assets/Scripts/Boot/HardRestart.cs =====
-using UnityEngine;
-using UnityEngine.EventSystems;
-using System.Collections;
-using System.Text;
-
-public static class HardRestart
-{
-    public static void RebootToIntro()
-    {
-        Time.timeScale = 1f;
-
-        // Cancel/close gameplay overlays and systems
-        DestroyIfExists("BuildSystems (Auto)");
-        DestroyIfExists("BuildPalette (Auto)");
-        DestroyIfExists("BuildCanvas (Auto)");
-        DestroyIfExists("PauseCanvas (Auto)");
-        DestroyIfExists("PauseMenuController");
-        DestroyIfExists("BuildPalette (Auto)");
-        DestroyAllOfType<EventSystem>();
-        DestroyAllOfType<BuildModeController>();
-        DestroyAllOfType<BuildPlacementTool>();
-        DestroyAllOfType<BuildPaletteHUD>();
-        DestroyAllOfType<SimpleGridMap>();
-
-        // Reset bootstrap singletons/flags
-        var bb = typeof(BuildBootstrap);
-        var flag = bb.GetField("_defsLoadedOnce", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-        if (flag != null) flag.SetValue(null, false);
-
-        // Clean up assets to mimic a fresh boot
-        Resources.UnloadUnusedAssets();
-        System.GC.Collect();
-
-        // Show our intro overlay (Large default) regardless of scene usage
-        IntroMenuOverlay.Ensure();
-        IntroMenuOverlay.Show();
-        AppBootstrap.ShowIntroOverlay(); // also try project-specific intro if it exists
-
-        Debug.Log("[HardRestart] Returned to Intro overlay (scene-less).");
-    }
-
-    // --- helpers ---
-
-    static void DestroyAllOfType<T>() where T : Component
-    {
-        var arr = Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var c in arr)
-        {
-            Object.Destroy(c.gameObject);
-        }
-    }
-
-    static void DestroyIfExists(string name)
-    {
-        var go = GameObject.Find(name);
-        if (go != null) Object.Destroy(go);
-    }
-}
-
-
-
 // ===== FILE: Assets/Scripts/Boot/IIntroOverlay.cs =====
 public interface IIntroOverlay { }
-
-
-// ===== FILE: Assets/Scripts/Boot/InteractionBootstrap.cs =====
-using UnityEngine;
-
-/// <summary>
-/// Ensures a PawnInteractionManager exists at runtime to coordinate pawn-to-pawn interactions.
-/// </summary>
-public static class InteractionBootstrap
-{
-    private static bool spawned;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void EnsureInteractionManager()
-    {
-        if (spawned) return;
-#if UNITY_2022_2_OR_NEWER
-        var existing = Object.FindAnyObjectByType<PawnInteractionManager>();
-#else
-        var existing = Object.FindObjectOfType<PawnInteractionManager>();
-#endif
-        if (existing != null) { spawned = true; return; }
-
-        var go = new GameObject("PawnInteractionManager (Auto)");
-        Object.DontDestroyOnLoad(go);
-        go.AddComponent<PawnInteractionManager>();
-        spawned = true;
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Boot/IntroBootstrap.cs =====
-using UnityEngine;
-
-/// <summary>
-/// Ensures the temporary IntroScreen (Start/Quit) exists when the game boots,
-/// independent of scene setup or build order.
-/// </summary>
-public static class IntroBootstrap
-{
-    private static bool spawnedOnce;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void EnsureIntro()
-    {
-#if NO_INTRO
-        return;
-#endif
-        if (spawnedOnce)
-            return;
-
-        // If an IntroScreen already exists in the scene (FindAnyObjectByType/FindObjectOfType), do nothing.
-#if UNITY_2022_2_OR_NEWER
-        var existing = Object.FindAnyObjectByType<IntroScreen>();
-#else
-        var existing = Object.FindObjectOfType<IntroScreen>();
-#endif
-        if (existing != null)
-        {
-            spawnedOnce = true;
-            return;
-        }
-
-        // Otherwise, create one.
-        var go = new GameObject("IntroScreen (Auto)");
-        // Keep it alive across scene loads; the IntroScreen script can hide/clear itself on Start.
-        Object.DontDestroyOnLoad(go);
-        go.AddComponent<IntroScreen>();
-
-        spawnedOnce = true;
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Boot/PauseBootstrap.cs =====
-using UnityEngine;
-
-public static class PauseBootstrap
-{
-    private static bool spawned;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void EnsurePauseController()
-    {
-#if NO_INTRO
-        // Even if NO_INTRO is defined, we still want pause in gameplay.
-#endif
-        if (spawned) return;
-#if UNITY_2022_2_OR_NEWER
-        var existing = Object.FindAnyObjectByType<PauseController>();
-#else
-        var existing = Object.FindObjectOfType<PauseController>();
-#endif
-        GameObject go;
-        if (existing != null)
-        {
-            go = existing.gameObject;
-        }
-        else
-        {
-            go = new GameObject("PauseController (Auto)");
-            Object.DontDestroyOnLoad(go);
-            go.AddComponent<PauseController>();
-        }
-
-        if (go.GetComponent<GameClock>() == null) go.AddComponent<GameClock>();
-        if (go.GetComponent<GameCalendar>() == null) go.AddComponent<GameCalendar>();
-        if (go.GetComponent<ClockHUD>() == null) go.AddComponent<ClockHUD>(); // draws under speed (top-right)
-        spawned = true;
-    }
-}
 
 
 // ===== FILE: Assets/Scripts/Boot/PawnBootstrap.cs =====
@@ -978,354 +264,6 @@ public static class PawnBootstrap
         pawn2.transform.SetParent(root.transform, false);
         pawn2.AddComponent<SpritePawn>(); // same visuals/behavior; will idle-wander by default
         return pawn2;
-    }
-}
-
-
-
-// ===== FILE: Assets/Scripts/Boot/SelectionBootstrap.cs =====
-using UnityEngine;
-
-/// <summary>
-/// Ensures a SelectionController exists at runtime in any scene.
-/// (Updated for marquee selection support)
-/// </summary>
-public static class SelectionBootstrap
-{
-    private static bool spawned;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void EnsureSelectionController()
-    {
-        if (spawned) return;
-#if UNITY_2022_2_OR_NEWER
-        var existing = Object.FindAnyObjectByType<SelectionController>();
-#else
-        var existing = Object.FindObjectOfType<SelectionController>();
-#endif
-        if (existing != null) { spawned = true; return; }
-
-        var go = new GameObject("SelectionController (Auto)");
-        Object.DontDestroyOnLoad(go);
-        go.AddComponent<SelectionController>();
-        // HUD that draws the bottom-left info panel and right-side gizmos
-        go.AddComponent<SelectionHUD>();
-        spawned = true;
-    }
-}
-
-
-
-// ===== FILE: Assets/Scripts/Boot/TestMapStarter.cs =====
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
-
-/// <summary>
-/// Bridge used by the new Intro screen's Start button.
-/// Creates/loads a simple test world and guarantees two wandering SpritePawns are present.
-/// It prefers WorldBootstrap.GenerateDefaultGrid(int,int,float) but falls back to other common starters.
-/// Returns true on success so the Intro overlay can hide itself.
-/// </summary>
-public static class TestMapStarter
-{
-    public static bool StartTestMap(int width, int height)
-    {
-        try
-        {
-            if (!TryStartWorld(width, height))
-            {
-                Debug.LogError("[TestMapStarter] Failed to start world (no suitable world bootstrap method found).");
-                return false;
-            }
-
-            EnsurePawnInteractionManager();
-            SpawnTwoTestPawnsNearCenter(width, height);
-
-            Debug.Log("[TestMapStarter] Test map started with two SpritePawns.");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[TestMapStarter] Exception during StartTestMap: {ex}");
-            return false;
-        }
-    }
-
-    // --- World start --------------------------------------------------------
-
-    private static bool TryStartWorld(int w, int h)
-    {
-        // 1) Prefer an explicit WorldBootstrap.GenerateDefaultGrid(int,int,float) if present.
-        var worldType = FindTypeByPreferredNames(new[]
-        {
-            "WorldBootstrap","GameBootstrap","WorldBuilder","MapGenerator","GridBootstrap","WorldInitializer","GameInit"
-        });
-
-        if (worldType != null)
-        {
-            var methods = worldType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-
-            // Try the most likely signatures first.
-            var direct =
-                FindMethod(methods, "GenerateDefaultGrid", typeof(void), new[] { typeof(int), typeof(int), typeof(float) }) ??
-                FindMethod(methods, "GenerateDefaultGrid", typeof(void), new[] { typeof(int), typeof(int) }) ??
-                FindMethod(methods, "StartNewGame",      typeof(void), new[] { typeof(int), typeof(int), typeof(float) }) ??
-                FindMethod(methods, "StartNewGame",      typeof(void), new[] { typeof(int), typeof(int) }) ??
-                FindMethod(methods, "GenerateWorld",     typeof(void), Type.EmptyTypes) ??
-                FindMethod(methods, "CreateWorld",       typeof(void), Type.EmptyTypes) ??
-                FindMethod(methods, "CreateGrid",        typeof(void), new[] { typeof(int), typeof(int) }) ??
-                FindMethod(methods, "InitWorld",         typeof(void), Type.EmptyTypes) ??
-                FindMethod(methods, "BootWorld",         typeof(void), Type.EmptyTypes);
-
-            if (direct != null)
-            {
-                InvokeStarter(worldType, direct, w, h);
-                return true;
-            }
-        }
-
-        // 2) Robust sweep across all assemblies/types/methods using preferred name fragments.
-        var typeHints   = new[] { "WorldBootstrap", "GameBootstrap", "WorldBuilder", "MapGenerator", "GridBootstrap", "WorldInitializer", "GameInit" };
-        var methodHints = new[] { "GenerateDefaultGrid", "StartNewGame", "StartGame", "GenerateWorld", "CreateWorld", "CreateGrid", "InitWorld", "BootWorld" };
-
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            foreach (var t in SafeGetTypes(asm))
-            {
-                if (!typeHints.Any(h => t.Name.IndexOf(h, StringComparison.OrdinalIgnoreCase) >= 0))
-                    continue;
-
-                foreach (var m in t.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
-                {
-                    if (!methodHints.Any(h => m.Name.IndexOf(h, StringComparison.OrdinalIgnoreCase) >= 0))
-                        continue;
-
-                    // Try (int,int,float), then (int,int), then ().
-                    if (MatchesSignature(m, typeof(void), new[] { typeof(int), typeof(int), typeof(float) }))
-                    {
-                        InvokeStarter(t, m, w, h);
-                        return true;
-                    }
-                    if (MatchesSignature(m, typeof(void), new[] { typeof(int), typeof(int) }))
-                    {
-                        InvokeStarter(t, m, w, h);
-                        return true;
-                    }
-                    if (MatchesSignature(m, typeof(void), Type.EmptyTypes))
-                    {
-                        InvokeStarter(t, m);
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static void InvokeStarter(Type type, MethodInfo method, int w = 0, int h = 0)
-    {
-        object instance = method.IsStatic ? null : Activator.CreateInstance(type);
-        var ps = method.GetParameters();
-
-        object[] args;
-        if (ps.Length == 3) args = new object[] { w, h, 1f };     // (int,int,float) default tile size
-        else if (ps.Length == 2) args = new object[] { w, h };     // (int,int)
-        else args = Array.Empty<object>();                         // ()
-
-        method.Invoke(instance, args);
-        Debug.Log($"[TestMapStarter] Started via {type.FullName}.{method.Name}({string.Join(",", ps.Select(p => p.ParameterType.Name))})");
-    }
-
-    private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, string name, Type returnType, Type[] parameters)
-        => methods.FirstOrDefault(m => m.Name == name && MatchesSignature(m, returnType, parameters));
-
-    private static bool MatchesSignature(MethodInfo m, Type returnType, IReadOnlyList<Type> parameters)
-    {
-        if (m.ReturnType != returnType) return false;
-        var ps = m.GetParameters();
-        if (ps.Length != parameters.Count) return false;
-        for (int i = 0; i < ps.Length; i++)
-        {
-            if (ps[i].ParameterType != parameters[i]) return false;
-        }
-        return true;
-    }
-
-    private static Type FindTypeByPreferredNames(IEnumerable<string> preferredNames)
-    {
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            foreach (var t in SafeGetTypes(asm))
-            {
-                if (preferredNames.Any(n => t.Name.Equals(n, StringComparison.Ordinal) || t.FullName.EndsWith("." + n, StringComparison.Ordinal)))
-                    return t;
-            }
-        }
-        return null;
-    }
-
-    private static IEnumerable<Type> SafeGetTypes(Assembly a)
-    {
-        try { return a.GetTypes(); }
-        catch { return Array.Empty<Type>(); }
-    }
-
-    // --- Managers & pawns ---------------------------------------------------
-
-    private static void EnsurePawnInteractionManager()
-    {
-        _ = UnityEngine.Object.FindFirstObjectByType<MonoBehaviour>(UnityEngine.FindObjectsInactive.Include);
-        var pim = UnityEngine.Object.FindFirstObjectByType<PawnInteractionManager>(UnityEngine.FindObjectsInactive.Include);
-        if (pim != null) return;
-
-        var root = GameObject.Find("GameSystems (Auto)") ?? new GameObject("GameSystems (Auto)");
-        if (root.scene.name == null) UnityEngine.Object.DontDestroyOnLoad(root);
-
-        root.AddComponent<PawnInteractionManager>();
-        Debug.Log("[TestMapStarter] Ensured PawnInteractionManager.");
-    }
-
-    private static void SpawnTwoTestPawnsNearCenter(int width, int height)
-    {
-        // Heuristic center: try camera center projection; otherwise origin.
-        Vector3 center = Vector3.zero;
-
-        var cam = Camera.main;
-        if (cam != null)
-        {
-            // Project to ground plane at y = 0
-            var ray = cam.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f));
-            if (new Plane(Vector3.up, Vector3.zero).Raycast(ray, out var dist))
-                center = ray.GetPoint(dist);
-        }
-
-        float tile = 1f;
-        Vector3 aPos = center + new Vector3(-0.5f * tile, 0f, 0f);
-        Vector3 bPos = center + new Vector3(+0.5f * tile, 0f, 0f);
-
-        CreateSpritePawn("TestPawn_A", aPos);
-        CreateSpritePawn("TestPawn_B", bPos);
-    }
-
-    private static void CreateSpritePawn(string name, Vector3 position)
-    {
-        var go = new GameObject(name);
-        go.transform.position = position;
-
-        // Ensure selectable/collidable with existing 3D ray-based selection.
-        var col = go.AddComponent<SphereCollider>();
-        col.radius = 0.25f;
-
-        var rb = go.AddComponent<Rigidbody>();
-        rb.isKinematic = true;
-        rb.useGravity = false;
-
-        go.AddComponent<SpritePawn>();
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Boot/WorldBootstrap.cs =====
-using UnityEngine;
-
-/// <summary>
-/// One-time helper to generate a small default grid world and frame the camera.
-/// </summary>
-public static class WorldBootstrap
-{
-    public static void GenerateDefaultGrid(int w = 128, int h = 128, float tile = 1f)
-    {
-        // Create/find root
-        var root = GameObject.Find("World");
-        if (root == null)
-        {
-            root = new GameObject("World");
-        }
-
-        // Ensure Buildings container exists so placed stations have a parent
-        var buildings = root.transform.Find("Buildings");
-        if (buildings == null)
-        {
-            var goBuild = new GameObject("Buildings");
-            goBuild.transform.SetParent(root.transform, false);
-            goBuild.transform.localPosition = Vector3.zero;
-        }
-
-        // Create/find grid
-        var grid = root.GetComponentInChildren<SimpleGridMap>();
-        if (grid == null)
-        {
-            var gridGO = new GameObject("Grid");
-            gridGO.transform.SetParent(root.transform, false);
-            grid = gridGO.AddComponent<SimpleGridMap>();
-        }
-
-        grid.Build(w, h, tile, grid.colorA, grid.colorB);
-
-        EnsureDirectionalLight();
-        FrameCameraToGrid(grid);
-    }
-
-    static void EnsureDirectionalLight()
-    {
-        Light dir = null;
-#if UNITY_2022_2_OR_NEWER
-        var lights = Object.FindObjectsByType<Light>(FindObjectsSortMode.None);
-        foreach (var l in lights) { if (l != null && l.type == LightType.Directional) { dir = l; break; } }
-#else
-        var lights = Object.FindObjectsOfType<Light>();
-        foreach (var l in lights) { if (l != null && l.type == LightType.Directional) { dir = l; break; } }
-#endif
-        if (dir == null)
-        {
-            var go = new GameObject("Directional Light");
-            dir = go.AddComponent<Light>();
-            dir.type = LightType.Directional;
-            dir.intensity = 1.0f;
-            go.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
-        }
-    }
-
-    static void FrameCameraToGrid(SimpleGridMap grid)
-    {
-        var cam = Camera.main;
-        if (cam == null)
-        {
-            var camGO = new GameObject("Main Camera");
-            cam = camGO.AddComponent<Camera>();
-            // Make sure it's tagged correctly so Camera.main works later.
-            camGO.tag = "MainCamera";
-        }
-
-        // Orthographic top-down
-        cam.orthographic = true;
-        cam.nearClipPlane = 0.1f;
-        cam.farClipPlane = 100f;
-        cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-
-        // Compute world center
-        float wWorld = grid.width * grid.tileSize;
-        float hWorld = grid.height * grid.tileSize;
-        var center = new Vector3(
-            (grid.width * grid.tileSize) * 0.5f - (grid.tileSize * 0.5f),
-            0f,
-            (grid.height * grid.tileSize) * 0.5f - (grid.tileSize * 0.5f)
-        );
-
-        // Position camera above center
-        cam.transform.position = new Vector3(center.x, 10f, center.z);
-
-        // Fit orthographic size to show most of the grid with a small margin
-        float aspect = (Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f / 9f);
-        float halfHeight = hWorld * 0.5f;
-        float halfWidth = wWorld * 0.5f;
-        float sizeToFit = Mathf.Max(halfHeight, halfWidth / Mathf.Max(0.1f, aspect));
-        // Keep a consistent default start zoom across all map sizes.
-        // Do not auto-fit; use the camera's existing orthographicSize configured in the scene.
     }
 }
 
@@ -2115,418 +1053,85 @@ public static class GridSpace
 
 
 
-// ===== FILE: Assets/Scripts/Camera/FollowControlledPawn.cs =====
+// ===== FILE: Assets/Scripts/Core/Config/GameStartupConfig.cs =====
 using UnityEngine;
 
 /// <summary>
-/// When a pawn is assumed controlled, center the camera on it and smoothly follow.
-/// Stops following when control is released.
+/// Simple ScriptableObject that lets us explicitly pick the Intro scene for restarts.
+/// Create/inspect at Assets/Resources/GameStartupConfig.asset
 /// </summary>
-[AddComponentMenu("Camera/Follow Controlled Pawn")]
-public class FollowControlledPawn : MonoBehaviour
+[CreateAssetMenu(menuName = "FantasyColony/Game Startup Config", fileName = "GameStartupConfig")]
+public class GameStartupConfig : ScriptableObject
 {
-    [Header("Follow")]
-    [SerializeField] private float smoothTime = 0.15f;
-    [SerializeField] private bool snapOnAcquire = true;
-    [SerializeField] private bool pixelSnap = false; // disable by default to avoid double-quantization jitter
-    [Tooltip("Optional XZ world offset from the pawn center.")]
-    [SerializeField] private Vector2 offset = Vector2.zero;
-    [Header("Stability")]
-    [SerializeField] private bool useDeadZone = true;
-    [SerializeField] private float deadZonePixels = 0.75f;
+    [Tooltip("Scene path (as in Build Settings) to use for 'Restart'. Leave empty to auto-detect.")]
+    public string introScenePath;
 
-    private Camera _cam;
-    private Transform _target;
-    private Vector3 _vel; // SmoothDamp velocity
-
-    private void Awake()
+    public static GameStartupConfig Load()
     {
-        _cam = GetComponent<Camera>();
-        if (_cam == null) _cam = Camera.main;
-    }
-
-    private void OnEnable()
-    {
-        ControlManager.OnControlledChanged += OnControlledChanged;
-        // If a pawn is already controlled at startup, target it immediately.
-        if (ControlManager.Controlled != null)
-        {
-            _target = ControlManager.Controlled.transform;
-            if (snapOnAcquire) SnapToTarget();
-        }
-    }
-
-    private void OnDisable()
-    {
-        ControlManager.OnControlledChanged -= OnControlledChanged;
-    }
-
-    private void OnControlledChanged(SpritePawn pawn)
-    {
-        _target = pawn ? pawn.transform : null;
-        if (_target != null && snapOnAcquire)
-        {
-            SnapToTarget();
-        }
-    }
-
-    private void LateUpdate()
-    {
-        if (_target == null || _cam == null) return;
-
-        // Desired position keeps current camera Y & rotation; moves X/Z toward target.
-        Vector3 desired = new Vector3(
-            _target.position.x + offset.x,
-            _cam.transform.position.y,
-            _target.position.z + offset.y
-        );
-
-        Vector3 current = _cam.transform.position;
-
-        // Optional dead-zone measured in on-screen pixels to prevent micro hunting.
-        if (useDeadZone)
-        {
-            float dx = desired.x - current.x;
-            float dz = desired.z - current.z;
-            float dist = Mathf.Sqrt(dx * dx + dz * dz);
-            float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(_cam));
-            float threshold = upp * Mathf.Max(0f, deadZonePixels);
-            if (dist <= threshold)
-            {
-                var snapPos = pixelSnap ? SnapPosToPixelGrid(desired, _cam) : desired;
-                _cam.transform.position = snapPos;
-                _vel = Vector3.zero;
-                return;
-            }
-        }
-
-        Vector3 pos = Vector3.SmoothDamp(current, desired, ref _vel, Mathf.Max(0.0001f, smoothTime));
-
-        if (pixelSnap)
-            pos = SnapPosToPixelGrid(pos, _cam);
-
-        _cam.transform.position = pos;
-    }
-
-    private void SnapToTarget()
-    {
-        if (_target == null || _cam == null) return;
-        var pos = new Vector3(
-            _target.position.x + offset.x,
-            _cam.transform.position.y,
-            _target.position.z + offset.y
-        );
-        if (pixelSnap)
-            pos = SnapPosToPixelGrid(pos, _cam);
-        _cam.transform.position = pos;
-        _vel = Vector3.zero;
-    }
-
-    private static Vector3 SnapPosToPixelGrid(Vector3 worldPos, Camera cam)
-    {
-        float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(cam));
-        worldPos.x = Mathf.Round(worldPos.x / upp) * upp;
-        worldPos.z = Mathf.Round(worldPos.z / upp) * upp;
-        return worldPos;
-    }
-}
-
-
-// ===== FILE: Assets/Scripts/Camera/FreeCameraController.cs =====
-using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
-// ReSharper disable Unity.InefficientPropertyAccess
-// ReSharper disable Unity.PerformanceCriticalCodeInvocation
-
-/// <summary>
-/// Free camera: mouse-wheel zoom (always) + WASD/Arrow panning when no pawn is controlled.
-/// Uses unscaled time so you can pan while paused. Top-down, XZ only.
-/// </summary>
-[AddComponentMenu("Camera/Free Camera Controller")]
-public class FreeCameraController : MonoBehaviour
-{
-    [Header("Movement")]
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private float boostMultiplier = 2f;
-    [SerializeField] private bool clampToGrid = true;
-    [SerializeField] private float clampMargin = 1f;
-    [Header("Visibility Rule")]
-    [SerializeField, Tooltip("Keep at least this many on-screen pixels of the grid visible on each axis. Set to 1 for 'some part of grid must remain visible'.")] private float minVisiblePixels = 1f;
-    
-    [Header("Zoom")]
-    [SerializeField] private float minOrtho = 3f;
-    [SerializeField] private float maxOrtho = 200f;
-    [SerializeField] private float zoomSpeed = 8f;          // how fast orthographicSize changes per wheel notch
-    [SerializeField] private bool smoothZoom = true;
-    [SerializeField] private float zoomSmoothTime = 0.08f;  // unscaled seconds
-
-    private Camera _cam;
-    private SimpleGridMap _grid;
-    private float _targetOrtho;
-    private float _zoomVel;
-    private float _skipClampUntil; // unscaled time
-
-#if ENABLE_INPUT_SYSTEM
-    private InputAction _move;
-    private InputAction _boost;
-    private InputAction _scroll;
-#endif
-
-    private void Awake()
-    {
-        _cam = GetComponent<Camera>();
-        if (_cam == null) _cam = Camera.main;
-        if (_cam != null)
-            _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
-    }
-
-    private void TryFindGrid()
-    {
-        if (_grid != null) return;
-#if UNITY_2022_2_OR_NEWER
-        _grid = UnityEngine.Object.FindAnyObjectByType<SimpleGridMap>();
-#else
-        _grid = UnityEngine.Object.FindObjectOfType<SimpleGridMap>();
-#endif
-    }
-
-    private void OnEnable()
-    {
-        ControlManager.OnControlledChanged += OnControlledChanged;
-        if (_cam != null)
-            _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
-
-#if ENABLE_INPUT_SYSTEM
-        if (_move == null)
-        {
-            // 2D composite: WASD + Arrows + gamepad stick
-            _move = new InputAction("CamMove", type: InputActionType.Value, binding: "2DVector");
-            _move.AddCompositeBinding("2DVector")
-                .With("Up", "<Keyboard>/w").With("Up", "<Keyboard>/upArrow")
-                .With("Down", "<Keyboard>/s").With("Down", "<Keyboard>/downArrow")
-                .With("Left", "<Keyboard>/a").With("Left", "<Keyboard>/leftArrow")
-                .With("Right", "<Keyboard>/d").With("Right", "<Keyboard>/rightArrow");
-            _move.AddBinding("<Gamepad>/leftStick");
-        }
-        if (_boost == null) _boost = new InputAction("CamBoost", binding: "<Keyboard>/shift");
-        if (_scroll == null) _scroll = new InputAction("CamScroll", binding: "<Mouse>/scroll"); // Vector2 (x,y)
-        _move.Enable(); _boost.Enable(); _scroll.Enable();
-#endif
-    }
-
-    private void OnDisable()
-    {
-        ControlManager.OnControlledChanged -= OnControlledChanged;
-#if ENABLE_INPUT_SYSTEM
-        _move?.Disable();
-        _boost?.Disable();
-        _scroll?.Disable();
-#endif
-    }
-
-    private void Update()
-    {
-        if (_cam == null) return;
-
-        // --- Zoom (always available, even while controlling a pawn) ---
-        float scrollDelta = ReadScrollDelta(); // >0 means wheel up
-
-        // --- Zoom (center-based) ---
-        if (Mathf.Abs(scrollDelta) > 0.0001f)
-        {
-            // Wheel up (positive) -> zoom in -> smaller ortho size
-            _targetOrtho = Mathf.Clamp(_targetOrtho - scrollDelta * zoomSpeed, minOrtho, maxOrtho);
-        }
-        if (smoothZoom)
-        {
-            _cam.orthographicSize = Mathf.SmoothDamp(_cam.orthographicSize, _targetOrtho, ref _zoomVel, Mathf.Max(0.0001f, zoomSmoothTime), Mathf.Infinity, Time.unscaledDeltaTime);
-        }
-        else
-        {
-            _cam.orthographicSize = _targetOrtho;
-        }
-
-        // If a pawn is controlled, skip free panning (follow script will move camera). Zoom above already applied.
-        if (ControlManager.Controlled != null) return;
-
-        // --- Read move input (free cam only) ---
-        Vector2 input = ReadMoveInput();
-        if (input.sqrMagnitude > 1f) input.Normalize();
-        bool boost = ReadBoost();
-
-        // --- Pan (WASD/Arrows) ---
-        float speed = moveSpeed * (boost ? boostMultiplier : 1f);
-        Vector3 delta = new Vector3(input.x, 0f, input.y) * speed * Time.unscaledDeltaTime;
-        Vector3 pos = _cam.transform.position + delta;
-
-        if (clampToGrid)
-        {
-            TryFindGrid();
-            if (_grid != null && Time.unscaledTime >= _skipClampUntil)
-            {
-                EnsureGridVisibility(ref pos, _cam, _grid, clampMargin, Mathf.Max(0f, minVisiblePixels));
-            }
-        }
-
-        _cam.transform.position = pos;
-    }
-
-    private void OnControlledChanged(SpritePawn pawn)
-    {
-        // When control is released (pawn == null), give a short grace window so clamp doesn't snap us.
-        if (pawn == null)
-            _skipClampUntil = Time.unscaledTime + 0.25f;
-    }
-
-    /// <summary>
-    /// Ensures that at least 'minVisiblePixels' of the grid remains visible on each axis.
-    /// This allows near-infinite panning as long as a sliver of grid is still in view.
-    /// </summary>
-    private static void EnsureGridVisibility(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin, float minVisiblePixels)
-    {
-        float wWorld = grid.width * grid.tileSize;
-        float hWorld = grid.height * grid.tileSize;
-
-        // Subtract half view so camera doesn't show outside the grid.
-        float halfH = cam.orthographicSize;
-        float aspect = (Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f / 9f);
-        float halfW = halfH * aspect;
-
-        // Grid rect (expanded by margin so we don't put the edge exactly on the viewport border)
-        float gMinX = 0f + margin;
-        float gMaxX = wWorld - margin;
-        float gMinZ = 0f + margin;
-        float gMaxZ = hWorld - margin;
-
-        // Camera rect from its center position
-        float cMinX = camPos.x - halfW;
-        float cMaxX = camPos.x + halfW;
-        float cMinZ = camPos.z - halfH;
-        float cMaxZ = camPos.z + halfH;
-
-        // Required overlap in world units based on pixels (cap to grid size to avoid impossible requirements)
-        float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(cam));
-        float reqOverlapX = Mathf.Min(minVisiblePixels * upp, Mathf.Max(0f, gMaxX - gMinX));
-        float reqOverlapZ = Mathf.Min(minVisiblePixels * upp, Mathf.Max(0f, gMaxZ - gMinZ));
-
-        // --- X axis ---
-        {
-            float overlapX = Mathf.Min(cMaxX, gMaxX) - Mathf.Max(cMinX, gMinX);
-            if (overlapX < reqOverlapX)
-            {
-                // Compute minimal shift to achieve the required overlap.
-                float gridCenterX = 0.5f * (gMinX + gMaxX);
-                if (cMaxX <= gMinX) // camera fully left of grid
-                {
-                    float desiredCamMax = gMinX + reqOverlapX;
-                    camPos.x = desiredCamMax - halfW;
-                }
-                else if (cMinX >= gMaxX) // camera fully right of grid
-                {
-                    float desiredCamMin = gMaxX - reqOverlapX;
-                    camPos.x = desiredCamMin + halfW;
-                }
-                else // partial overlap: nudge toward grid center
-                {
-                    float dir = (camPos.x < gridCenterX) ? +1f : -1f;
-                    camPos.x += dir * (reqOverlapX - Mathf.Max(0f, overlapX));
-                }
-            }
-        }
-        // --- Z axis ---
-        {
-            float overlapZ = Mathf.Min(cMaxZ, gMaxZ) - Mathf.Max(cMinZ, gMinZ);
-            if (overlapZ < reqOverlapZ)
-            {
-                float gridCenterZ = 0.5f * (gMinZ + gMaxZ);
-                if (cMaxZ <= gMinZ) camPos.z = (gMinZ + reqOverlapZ) - halfH;                // fully below grid
-                else if (cMinZ >= gMaxZ) camPos.z = (gMaxZ - reqOverlapZ) + halfH;           // fully above grid
-                else camPos.z += ((camPos.z < gridCenterZ) ? +1f : -1f) * (reqOverlapZ - Mathf.Max(0f, overlapZ));
-            }
-        }
-    }
-
-    private Vector2 ReadMoveInput()
-    {
-#if ENABLE_INPUT_SYSTEM
-        return _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
-#else
-        float x = 0f, y = 0f;
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) x -= 1f;
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x += 1f;
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) y -= 1f;
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) y += 1f;
-        return new Vector2(x, y);
-#endif
-    }
-
-    private bool ReadBoost()
-    {
-#if ENABLE_INPUT_SYSTEM
-        return _boost != null && _boost.IsPressed();
-#else
-        return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-#endif
-    }
-
-    private float ReadScrollDelta()
-    {
-#if ENABLE_INPUT_SYSTEM
-        // New Input System: mouse scroll is in "lines" per frame (y positive = scroll up)
-        if (_scroll == null) return 0f;
-        Vector2 v = _scroll.ReadValue<Vector2>();
-        return v.y;
-#else
-        // Legacy Input: positive y = scroll up
-        return Input.mouseScrollDelta.y;
-#endif
+        // The asset is optional; returns null if not present.
+        return Resources.Load<GameStartupConfig>("GameStartupConfig");
     }
 }
 
 
 
-// ===== FILE: Assets/Scripts/Camera/PixelCameraHelper.cs =====
+// ===== FILE: Assets/Scripts/Core/Lifecycle/HardRestart.cs =====
 using UnityEngine;
+using UnityEngine.EventSystems;
+using System.Collections;
+using System.Text;
 
-/// <summary>
-/// Utilities for pixel-perfect math with an orthographic camera.
-/// </summary>
-public static class PixelCameraHelper
+public static class HardRestart
 {
-    /// <summary>
-    /// World units per on-screen pixel for the given camera.
-    /// </summary>
-    public static float WorldUnitsPerPixel(Camera cam)
+    public static void RebootToIntro()
     {
-        if (cam == null) cam = Camera.main;
-        if (cam == null) return 1f / 100f; // safe fallback
-        // For an ortho camera, vertical world size is 2 * orthographicSize.
-        // Divide by screen height (pixels) to get units-per-pixel.
-        float h = Screen.height > 0 ? Screen.height : 1080f;
-        return (2f * cam.orthographicSize) / h;
+        Time.timeScale = 1f;
+
+        // Cancel/close gameplay overlays and systems
+        DestroyIfExists("BuildSystems (Auto)");
+        DestroyIfExists("BuildPalette (Auto)");
+        DestroyIfExists("BuildCanvas (Auto)");
+        DestroyIfExists("PauseCanvas (Auto)");
+        DestroyIfExists("PauseMenuController");
+        DestroyIfExists("BuildPalette (Auto)");
+        DestroyAllOfType<EventSystem>();
+        DestroyAllOfType<BuildModeController>();
+        DestroyAllOfType<BuildPlacementTool>();
+        DestroyAllOfType<BuildPaletteHUD>();
+        DestroyAllOfType<SimpleGridMap>();
+
+        // Reset bootstrap singletons/flags
+        var bb = typeof(BuildBootstrap);
+        var flag = bb.GetField("_defsLoadedOnce", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        if (flag != null) flag.SetValue(null, false);
+
+        // Clean up assets to mimic a fresh boot
+        Resources.UnloadUnusedAssets();
+        System.GC.Collect();
+
+        // Show our intro overlay (Large default) regardless of scene usage
+        IntroMenuOverlay.Ensure();
+        IntroMenuOverlay.Show();
+        AppBootstrap.ShowIntroOverlay(); // also try project-specific intro if it exists
+
+        Debug.Log("[HardRestart] Returned to Intro overlay (scene-less).");
     }
 
-    /// <summary>
-    /// Snap a world position to the camera's pixel grid (X/Z for top-down).
-    /// </summary>
-    public static Vector3 SnapToPixelGrid(Vector3 worldPos, Camera cam)
+    // --- helpers ---
+
+    static void DestroyAllOfType<T>() where T : Component
     {
-        float upp = Mathf.Max(1e-5f, WorldUnitsPerPixel(cam));
-        worldPos.x = Mathf.Round(worldPos.x / upp) * upp;
-        worldPos.z = Mathf.Round(worldPos.z / upp) * upp;
-        return worldPos;
+        var arr = Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var c in arr)
+        {
+            Object.Destroy(c.gameObject);
+        }
     }
 
-    /// <summary>
-    /// Returns the world-space rectangle (minX,maxX,minZ,maxZ) visible by the camera.
-    /// </summary>
-    public static (float minX, float maxX, float minZ, float maxZ) OrthoWorldBounds(Camera cam)
+    static void DestroyIfExists(string name)
     {
-        float halfH = cam.orthographicSize;
-        float halfW = halfH * ((Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f/9f));
-        return (cam.transform.position.x - halfW, cam.transform.position.x + halfW, cam.transform.position.z - halfH, cam.transform.position.z + halfH);
+        var go = GameObject.Find(name);
+        if (go != null) Object.Destroy(go);
     }
 }
 
@@ -3333,6 +1938,814 @@ namespace FantasyColony.Defs.Xml
             if (string.Equals(s, "false", StringComparison.OrdinalIgnoreCase)) return false;
             return defaultValue;
         }
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Dev/Cheats/TestMapStarter.cs =====
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+
+/// <summary>
+/// Bridge used by the new Intro screen's Start button.
+/// Creates/loads a simple test world and guarantees two wandering SpritePawns are present.
+/// It prefers WorldBootstrap.GenerateDefaultGrid(int,int,float) but falls back to other common starters.
+/// Returns true on success so the Intro overlay can hide itself.
+/// </summary>
+public static class TestMapStarter
+{
+    public static bool StartTestMap(int width, int height)
+    {
+        try
+        {
+            if (!TryStartWorld(width, height))
+            {
+                Debug.LogError("[TestMapStarter] Failed to start world (no suitable world bootstrap method found).");
+                return false;
+            }
+
+            EnsurePawnInteractionManager();
+            SpawnTwoTestPawnsNearCenter(width, height);
+
+            Debug.Log("[TestMapStarter] Test map started with two SpritePawns.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[TestMapStarter] Exception during StartTestMap: {ex}");
+            return false;
+        }
+    }
+
+    // --- World start --------------------------------------------------------
+
+    private static bool TryStartWorld(int w, int h)
+    {
+        // 1) Prefer an explicit WorldBootstrap.GenerateDefaultGrid(int,int,float) if present.
+        var worldType = FindTypeByPreferredNames(new[]
+        {
+            "WorldBootstrap","GameBootstrap","WorldBuilder","MapGenerator","GridBootstrap","WorldInitializer","GameInit"
+        });
+
+        if (worldType != null)
+        {
+            var methods = worldType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            // Try the most likely signatures first.
+            var direct =
+                FindMethod(methods, "GenerateDefaultGrid", typeof(void), new[] { typeof(int), typeof(int), typeof(float) }) ??
+                FindMethod(methods, "GenerateDefaultGrid", typeof(void), new[] { typeof(int), typeof(int) }) ??
+                FindMethod(methods, "StartNewGame",      typeof(void), new[] { typeof(int), typeof(int), typeof(float) }) ??
+                FindMethod(methods, "StartNewGame",      typeof(void), new[] { typeof(int), typeof(int) }) ??
+                FindMethod(methods, "GenerateWorld",     typeof(void), Type.EmptyTypes) ??
+                FindMethod(methods, "CreateWorld",       typeof(void), Type.EmptyTypes) ??
+                FindMethod(methods, "CreateGrid",        typeof(void), new[] { typeof(int), typeof(int) }) ??
+                FindMethod(methods, "InitWorld",         typeof(void), Type.EmptyTypes) ??
+                FindMethod(methods, "BootWorld",         typeof(void), Type.EmptyTypes);
+
+            if (direct != null)
+            {
+                InvokeStarter(worldType, direct, w, h);
+                return true;
+            }
+        }
+
+        // 2) Robust sweep across all assemblies/types/methods using preferred name fragments.
+        var typeHints   = new[] { "WorldBootstrap", "GameBootstrap", "WorldBuilder", "MapGenerator", "GridBootstrap", "WorldInitializer", "GameInit" };
+        var methodHints = new[] { "GenerateDefaultGrid", "StartNewGame", "StartGame", "GenerateWorld", "CreateWorld", "CreateGrid", "InitWorld", "BootWorld" };
+
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            foreach (var t in SafeGetTypes(asm))
+            {
+                if (!typeHints.Any(h => t.Name.IndexOf(h, StringComparison.OrdinalIgnoreCase) >= 0))
+                    continue;
+
+                foreach (var m in t.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
+                {
+                    if (!methodHints.Any(h => m.Name.IndexOf(h, StringComparison.OrdinalIgnoreCase) >= 0))
+                        continue;
+
+                    // Try (int,int,float), then (int,int), then ().
+                    if (MatchesSignature(m, typeof(void), new[] { typeof(int), typeof(int), typeof(float) }))
+                    {
+                        InvokeStarter(t, m, w, h);
+                        return true;
+                    }
+                    if (MatchesSignature(m, typeof(void), new[] { typeof(int), typeof(int) }))
+                    {
+                        InvokeStarter(t, m, w, h);
+                        return true;
+                    }
+                    if (MatchesSignature(m, typeof(void), Type.EmptyTypes))
+                    {
+                        InvokeStarter(t, m);
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static void InvokeStarter(Type type, MethodInfo method, int w = 0, int h = 0)
+    {
+        object instance = method.IsStatic ? null : Activator.CreateInstance(type);
+        var ps = method.GetParameters();
+
+        object[] args;
+        if (ps.Length == 3) args = new object[] { w, h, 1f };     // (int,int,float) default tile size
+        else if (ps.Length == 2) args = new object[] { w, h };     // (int,int)
+        else args = Array.Empty<object>();                         // ()
+
+        method.Invoke(instance, args);
+        Debug.Log($"[TestMapStarter] Started via {type.FullName}.{method.Name}({string.Join(",", ps.Select(p => p.ParameterType.Name))})");
+    }
+
+    private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, string name, Type returnType, Type[] parameters)
+        => methods.FirstOrDefault(m => m.Name == name && MatchesSignature(m, returnType, parameters));
+
+    private static bool MatchesSignature(MethodInfo m, Type returnType, IReadOnlyList<Type> parameters)
+    {
+        if (m.ReturnType != returnType) return false;
+        var ps = m.GetParameters();
+        if (ps.Length != parameters.Count) return false;
+        for (int i = 0; i < ps.Length; i++)
+        {
+            if (ps[i].ParameterType != parameters[i]) return false;
+        }
+        return true;
+    }
+
+    private static Type FindTypeByPreferredNames(IEnumerable<string> preferredNames)
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            foreach (var t in SafeGetTypes(asm))
+            {
+                if (preferredNames.Any(n => t.Name.Equals(n, StringComparison.Ordinal) || t.FullName.EndsWith("." + n, StringComparison.Ordinal)))
+                    return t;
+            }
+        }
+        return null;
+    }
+
+    private static IEnumerable<Type> SafeGetTypes(Assembly a)
+    {
+        try { return a.GetTypes(); }
+        catch { return Array.Empty<Type>(); }
+    }
+
+    // --- Managers & pawns ---------------------------------------------------
+
+    private static void EnsurePawnInteractionManager()
+    {
+        _ = UnityEngine.Object.FindFirstObjectByType<MonoBehaviour>(UnityEngine.FindObjectsInactive.Include);
+        var pim = UnityEngine.Object.FindFirstObjectByType<PawnInteractionManager>(UnityEngine.FindObjectsInactive.Include);
+        if (pim != null) return;
+
+        var root = GameObject.Find("GameSystems (Auto)") ?? new GameObject("GameSystems (Auto)");
+        if (root.scene.name == null) UnityEngine.Object.DontDestroyOnLoad(root);
+
+        root.AddComponent<PawnInteractionManager>();
+        Debug.Log("[TestMapStarter] Ensured PawnInteractionManager.");
+    }
+
+    private static void SpawnTwoTestPawnsNearCenter(int width, int height)
+    {
+        // Heuristic center: try camera center projection; otherwise origin.
+        Vector3 center = Vector3.zero;
+
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            // Project to ground plane at y = 0
+            var ray = cam.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f));
+            if (new Plane(Vector3.up, Vector3.zero).Raycast(ray, out var dist))
+                center = ray.GetPoint(dist);
+        }
+
+        float tile = 1f;
+        Vector3 aPos = center + new Vector3(-0.5f * tile, 0f, 0f);
+        Vector3 bPos = center + new Vector3(+0.5f * tile, 0f, 0f);
+
+        CreateSpritePawn("TestPawn_A", aPos);
+        CreateSpritePawn("TestPawn_B", bPos);
+    }
+
+    private static void CreateSpritePawn(string name, Vector3 position)
+    {
+        var go = new GameObject(name);
+        go.transform.position = position;
+
+        // Ensure selectable/collidable with existing 3D ray-based selection.
+        var col = go.AddComponent<SphereCollider>();
+        col.radius = 0.25f;
+
+        var rb = go.AddComponent<Rigidbody>();
+        rb.isKinematic = true;
+        rb.useGravity = false;
+
+        go.AddComponent<SpritePawn>();
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Camera/CameraBootstrap.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Ensures the main camera follows the currently controlled pawn and supports free WASD panning.
+/// </summary>
+public static class CameraBootstrap
+{
+    private static bool added;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void EnsureCameraFollower()
+    {
+        if (added) return;
+        var cam = Camera.main;
+        if (cam == null)
+        {
+            // Minimal fallback camera; WorldBootstrap may reconfigure later.
+            var go = new GameObject("Main Camera");
+            cam = go.AddComponent<Camera>();
+            go.tag = "MainCamera";
+            cam.orthographic = true;
+            cam.orthographicSize = 10f;
+            cam.transform.position = new Vector3(0f, 10f, 0f);
+            cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        }
+
+        if (cam.GetComponent<FollowControlledPawn>() == null)
+            cam.gameObject.AddComponent<FollowControlledPawn>();
+
+        // Add free camera controls for when no pawn is controlled.
+        if (cam.GetComponent<FreeCameraController>() == null)
+            cam.gameObject.AddComponent<FreeCameraController>();
+
+        added = true;
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Camera/FollowControlledPawn.cs =====
+using UnityEngine;
+
+/// <summary>
+/// When a pawn is assumed controlled, center the camera on it and smoothly follow.
+/// Stops following when control is released.
+/// </summary>
+[AddComponentMenu("Camera/Follow Controlled Pawn")]
+public class FollowControlledPawn : MonoBehaviour
+{
+    [Header("Follow")]
+    [SerializeField] private float smoothTime = 0.15f;
+    [SerializeField] private bool snapOnAcquire = true;
+    [SerializeField] private bool pixelSnap = false; // disable by default to avoid double-quantization jitter
+    [Tooltip("Optional XZ world offset from the pawn center.")]
+    [SerializeField] private Vector2 offset = Vector2.zero;
+    [Header("Stability")]
+    [SerializeField] private bool useDeadZone = true;
+    [SerializeField] private float deadZonePixels = 0.75f;
+
+    private Camera _cam;
+    private Transform _target;
+    private Vector3 _vel; // SmoothDamp velocity
+
+    private void Awake()
+    {
+        _cam = GetComponent<Camera>();
+        if (_cam == null) _cam = Camera.main;
+    }
+
+    private void OnEnable()
+    {
+        ControlManager.OnControlledChanged += OnControlledChanged;
+        // If a pawn is already controlled at startup, target it immediately.
+        if (ControlManager.Controlled != null)
+        {
+            _target = ControlManager.Controlled.transform;
+            if (snapOnAcquire) SnapToTarget();
+        }
+    }
+
+    private void OnDisable()
+    {
+        ControlManager.OnControlledChanged -= OnControlledChanged;
+    }
+
+    private void OnControlledChanged(SpritePawn pawn)
+    {
+        _target = pawn ? pawn.transform : null;
+        if (_target != null && snapOnAcquire)
+        {
+            SnapToTarget();
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (_target == null || _cam == null) return;
+
+        // Desired position keeps current camera Y & rotation; moves X/Z toward target.
+        Vector3 desired = new Vector3(
+            _target.position.x + offset.x,
+            _cam.transform.position.y,
+            _target.position.z + offset.y
+        );
+
+        Vector3 current = _cam.transform.position;
+
+        // Optional dead-zone measured in on-screen pixels to prevent micro hunting.
+        if (useDeadZone)
+        {
+            float dx = desired.x - current.x;
+            float dz = desired.z - current.z;
+            float dist = Mathf.Sqrt(dx * dx + dz * dz);
+            float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(_cam));
+            float threshold = upp * Mathf.Max(0f, deadZonePixels);
+            if (dist <= threshold)
+            {
+                var snapPos = pixelSnap ? SnapPosToPixelGrid(desired, _cam) : desired;
+                _cam.transform.position = snapPos;
+                _vel = Vector3.zero;
+                return;
+            }
+        }
+
+        Vector3 pos = Vector3.SmoothDamp(current, desired, ref _vel, Mathf.Max(0.0001f, smoothTime));
+
+        if (pixelSnap)
+            pos = SnapPosToPixelGrid(pos, _cam);
+
+        _cam.transform.position = pos;
+    }
+
+    private void SnapToTarget()
+    {
+        if (_target == null || _cam == null) return;
+        var pos = new Vector3(
+            _target.position.x + offset.x,
+            _cam.transform.position.y,
+            _target.position.z + offset.y
+        );
+        if (pixelSnap)
+            pos = SnapPosToPixelGrid(pos, _cam);
+        _cam.transform.position = pos;
+        _vel = Vector3.zero;
+    }
+
+    private static Vector3 SnapPosToPixelGrid(Vector3 worldPos, Camera cam)
+    {
+        float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(cam));
+        worldPos.x = Mathf.Round(worldPos.x / upp) * upp;
+        worldPos.z = Mathf.Round(worldPos.z / upp) * upp;
+        return worldPos;
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Camera/FreeCameraController.cs =====
+using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+// ReSharper disable Unity.InefficientPropertyAccess
+// ReSharper disable Unity.PerformanceCriticalCodeInvocation
+
+/// <summary>
+/// Free camera: mouse-wheel zoom (always) + WASD/Arrow panning when no pawn is controlled.
+/// Uses unscaled time so you can pan while paused. Top-down, XZ only.
+/// </summary>
+[AddComponentMenu("Camera/Free Camera Controller")]
+public class FreeCameraController : MonoBehaviour
+{
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float boostMultiplier = 2f;
+    [SerializeField] private bool clampToGrid = true;
+    [SerializeField] private float clampMargin = 1f;
+    [Header("Visibility Rule")]
+    [SerializeField, Tooltip("Keep at least this many on-screen pixels of the grid visible on each axis. Set to 1 for 'some part of grid must remain visible'.")] private float minVisiblePixels = 1f;
+    
+    [Header("Zoom")]
+    [SerializeField] private float minOrtho = 3f;
+    [SerializeField] private float maxOrtho = 200f;
+    [SerializeField] private float zoomSpeed = 8f;          // how fast orthographicSize changes per wheel notch
+    [SerializeField] private bool smoothZoom = true;
+    [SerializeField] private float zoomSmoothTime = 0.08f;  // unscaled seconds
+
+    private Camera _cam;
+    private SimpleGridMap _grid;
+    private float _targetOrtho;
+    private float _zoomVel;
+    private float _skipClampUntil; // unscaled time
+
+#if ENABLE_INPUT_SYSTEM
+    private InputAction _move;
+    private InputAction _boost;
+    private InputAction _scroll;
+#endif
+
+    private void Awake()
+    {
+        _cam = GetComponent<Camera>();
+        if (_cam == null) _cam = Camera.main;
+        if (_cam != null)
+            _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
+    }
+
+    private void TryFindGrid()
+    {
+        if (_grid != null) return;
+#if UNITY_2022_2_OR_NEWER
+        _grid = UnityEngine.Object.FindAnyObjectByType<SimpleGridMap>();
+#else
+        _grid = UnityEngine.Object.FindObjectOfType<SimpleGridMap>();
+#endif
+    }
+
+    private void OnEnable()
+    {
+        ControlManager.OnControlledChanged += OnControlledChanged;
+        if (_cam != null)
+            _targetOrtho = Mathf.Max(0.01f, _cam.orthographicSize);
+
+#if ENABLE_INPUT_SYSTEM
+        if (_move == null)
+        {
+            // 2D composite: WASD + Arrows + gamepad stick
+            _move = new InputAction("CamMove", type: InputActionType.Value, binding: "2DVector");
+            _move.AddCompositeBinding("2DVector")
+                .With("Up", "<Keyboard>/w").With("Up", "<Keyboard>/upArrow")
+                .With("Down", "<Keyboard>/s").With("Down", "<Keyboard>/downArrow")
+                .With("Left", "<Keyboard>/a").With("Left", "<Keyboard>/leftArrow")
+                .With("Right", "<Keyboard>/d").With("Right", "<Keyboard>/rightArrow");
+            _move.AddBinding("<Gamepad>/leftStick");
+        }
+        if (_boost == null) _boost = new InputAction("CamBoost", binding: "<Keyboard>/shift");
+        if (_scroll == null) _scroll = new InputAction("CamScroll", binding: "<Mouse>/scroll"); // Vector2 (x,y)
+        _move.Enable(); _boost.Enable(); _scroll.Enable();
+#endif
+    }
+
+    private void OnDisable()
+    {
+        ControlManager.OnControlledChanged -= OnControlledChanged;
+#if ENABLE_INPUT_SYSTEM
+        _move?.Disable();
+        _boost?.Disable();
+        _scroll?.Disable();
+#endif
+    }
+
+    private void Update()
+    {
+        if (_cam == null) return;
+
+        // --- Zoom (always available, even while controlling a pawn) ---
+        float scrollDelta = ReadScrollDelta(); // >0 means wheel up
+
+        // --- Zoom (center-based) ---
+        if (Mathf.Abs(scrollDelta) > 0.0001f)
+        {
+            // Wheel up (positive) -> zoom in -> smaller ortho size
+            _targetOrtho = Mathf.Clamp(_targetOrtho - scrollDelta * zoomSpeed, minOrtho, maxOrtho);
+        }
+        if (smoothZoom)
+        {
+            _cam.orthographicSize = Mathf.SmoothDamp(_cam.orthographicSize, _targetOrtho, ref _zoomVel, Mathf.Max(0.0001f, zoomSmoothTime), Mathf.Infinity, Time.unscaledDeltaTime);
+        }
+        else
+        {
+            _cam.orthographicSize = _targetOrtho;
+        }
+
+        // If a pawn is controlled, skip free panning (follow script will move camera). Zoom above already applied.
+        if (ControlManager.Controlled != null) return;
+
+        // --- Read move input (free cam only) ---
+        Vector2 input = ReadMoveInput();
+        if (input.sqrMagnitude > 1f) input.Normalize();
+        bool boost = ReadBoost();
+
+        // --- Pan (WASD/Arrows) ---
+        float speed = moveSpeed * (boost ? boostMultiplier : 1f);
+        Vector3 delta = new Vector3(input.x, 0f, input.y) * speed * Time.unscaledDeltaTime;
+        Vector3 pos = _cam.transform.position + delta;
+
+        if (clampToGrid)
+        {
+            TryFindGrid();
+            if (_grid != null && Time.unscaledTime >= _skipClampUntil)
+            {
+                EnsureGridVisibility(ref pos, _cam, _grid, clampMargin, Mathf.Max(0f, minVisiblePixels));
+            }
+        }
+
+        _cam.transform.position = pos;
+    }
+
+    private void OnControlledChanged(SpritePawn pawn)
+    {
+        // When control is released (pawn == null), give a short grace window so clamp doesn't snap us.
+        if (pawn == null)
+            _skipClampUntil = Time.unscaledTime + 0.25f;
+    }
+
+    /// <summary>
+    /// Ensures that at least 'minVisiblePixels' of the grid remains visible on each axis.
+    /// This allows near-infinite panning as long as a sliver of grid is still in view.
+    /// </summary>
+    private static void EnsureGridVisibility(ref Vector3 camPos, Camera cam, SimpleGridMap grid, float margin, float minVisiblePixels)
+    {
+        float wWorld = grid.width * grid.tileSize;
+        float hWorld = grid.height * grid.tileSize;
+
+        // Subtract half view so camera doesn't show outside the grid.
+        float halfH = cam.orthographicSize;
+        float aspect = (Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f / 9f);
+        float halfW = halfH * aspect;
+
+        // Grid rect (expanded by margin so we don't put the edge exactly on the viewport border)
+        float gMinX = 0f + margin;
+        float gMaxX = wWorld - margin;
+        float gMinZ = 0f + margin;
+        float gMaxZ = hWorld - margin;
+
+        // Camera rect from its center position
+        float cMinX = camPos.x - halfW;
+        float cMaxX = camPos.x + halfW;
+        float cMinZ = camPos.z - halfH;
+        float cMaxZ = camPos.z + halfH;
+
+        // Required overlap in world units based on pixels (cap to grid size to avoid impossible requirements)
+        float upp = Mathf.Max(1e-6f, PixelCameraHelper.WorldUnitsPerPixel(cam));
+        float reqOverlapX = Mathf.Min(minVisiblePixels * upp, Mathf.Max(0f, gMaxX - gMinX));
+        float reqOverlapZ = Mathf.Min(minVisiblePixels * upp, Mathf.Max(0f, gMaxZ - gMinZ));
+
+        // --- X axis ---
+        {
+            float overlapX = Mathf.Min(cMaxX, gMaxX) - Mathf.Max(cMinX, gMinX);
+            if (overlapX < reqOverlapX)
+            {
+                // Compute minimal shift to achieve the required overlap.
+                float gridCenterX = 0.5f * (gMinX + gMaxX);
+                if (cMaxX <= gMinX) // camera fully left of grid
+                {
+                    float desiredCamMax = gMinX + reqOverlapX;
+                    camPos.x = desiredCamMax - halfW;
+                }
+                else if (cMinX >= gMaxX) // camera fully right of grid
+                {
+                    float desiredCamMin = gMaxX - reqOverlapX;
+                    camPos.x = desiredCamMin + halfW;
+                }
+                else // partial overlap: nudge toward grid center
+                {
+                    float dir = (camPos.x < gridCenterX) ? +1f : -1f;
+                    camPos.x += dir * (reqOverlapX - Mathf.Max(0f, overlapX));
+                }
+            }
+        }
+        // --- Z axis ---
+        {
+            float overlapZ = Mathf.Min(cMaxZ, gMaxZ) - Mathf.Max(cMinZ, gMinZ);
+            if (overlapZ < reqOverlapZ)
+            {
+                float gridCenterZ = 0.5f * (gMinZ + gMaxZ);
+                if (cMaxZ <= gMinZ) camPos.z = (gMinZ + reqOverlapZ) - halfH;                // fully below grid
+                else if (cMinZ >= gMaxZ) camPos.z = (gMaxZ - reqOverlapZ) + halfH;           // fully above grid
+                else camPos.z += ((camPos.z < gridCenterZ) ? +1f : -1f) * (reqOverlapZ - Mathf.Max(0f, overlapZ));
+            }
+        }
+    }
+
+    private Vector2 ReadMoveInput()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
+#else
+        float x = 0f, y = 0f;
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) x -= 1f;
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) x += 1f;
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) y -= 1f;
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) y += 1f;
+        return new Vector2(x, y);
+#endif
+    }
+
+    private bool ReadBoost()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return _boost != null && _boost.IsPressed();
+#else
+        return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+#endif
+    }
+
+    private float ReadScrollDelta()
+    {
+#if ENABLE_INPUT_SYSTEM
+        // New Input System: mouse scroll is in "lines" per frame (y positive = scroll up)
+        if (_scroll == null) return 0f;
+        Vector2 v = _scroll.ReadValue<Vector2>();
+        return v.y;
+#else
+        // Legacy Input: positive y = scroll up
+        return Input.mouseScrollDelta.y;
+#endif
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Camera/PixelCameraHelper.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Utilities for pixel-perfect math with an orthographic camera.
+/// </summary>
+public static class PixelCameraHelper
+{
+    /// <summary>
+    /// World units per on-screen pixel for the given camera.
+    /// </summary>
+    public static float WorldUnitsPerPixel(Camera cam)
+    {
+        if (cam == null) cam = Camera.main;
+        if (cam == null) return 1f / 100f; // safe fallback
+        // For an ortho camera, vertical world size is 2 * orthographicSize.
+        // Divide by screen height (pixels) to get units-per-pixel.
+        float h = Screen.height > 0 ? Screen.height : 1080f;
+        return (2f * cam.orthographicSize) / h;
+    }
+
+    /// <summary>
+    /// Snap a world position to the camera's pixel grid (X/Z for top-down).
+    /// </summary>
+    public static Vector3 SnapToPixelGrid(Vector3 worldPos, Camera cam)
+    {
+        float upp = Mathf.Max(1e-5f, WorldUnitsPerPixel(cam));
+        worldPos.x = Mathf.Round(worldPos.x / upp) * upp;
+        worldPos.z = Mathf.Round(worldPos.z / upp) * upp;
+        return worldPos;
+    }
+
+    /// <summary>
+    /// Returns the world-space rectangle (minX,maxX,minZ,maxZ) visible by the camera.
+    /// </summary>
+    public static (float minX, float maxX, float minZ, float maxZ) OrthoWorldBounds(Camera cam)
+    {
+        float halfH = cam.orthographicSize;
+        float halfW = halfH * ((Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f/9f));
+        return (cam.transform.position.x - halfW, cam.transform.position.x + halfW, cam.transform.position.z - halfH, cam.transform.position.z + halfH);
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Systems/Build/BuildBootstrap.cs =====
+using UnityEngine;
+using FantasyColony.Defs;
+using System.Linq;
+
+/// <summary>
+/// Guarantees build systems exist at runtime and that defs are loaded.
+/// This runs automatically after scene load.
+/// </summary>
+public static class BuildBootstrap
+{
+    // Ensure we load defs once per run to avoid races where DB appears empty
+    static bool _defsLoadedOnce = false;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    public static void EnsureOnLoad()
+    {
+        Ensure();
+    }
+
+    public static GameObject Ensure()
+    {
+        var go = GameObject.Find("BuildSystems (Auto)");
+        if (go == null)
+        {
+            go = new GameObject("BuildSystems (Auto)");
+            Object.DontDestroyOnLoad(go);
+        }
+
+        if (go.GetComponent<BuildModeController>() == null)
+            go.AddComponent<BuildModeController>();
+        if (go.GetComponent<BuildPlacementTool>() == null)
+            go.AddComponent<BuildPlacementTool>();
+
+        // Make sure defs are available (force an eager first-load once per run)
+        if (!_defsLoadedOnce)
+        {
+            try
+            {
+                DefDatabase.LoadAll();
+                _defsLoadedOnce = true;
+            }
+            catch
+            {
+                // ignore – bring-up should still run with fallbacks
+            }
+        }
+        else
+        {
+            try
+            {
+                if (DefDatabase.Buildings == null || DefDatabase.Visuals == null ||
+                    DefDatabase.Buildings.Count == 0 || DefDatabase.Visuals.Count == 0)
+                    DefDatabase.LoadAll();
+            }
+            catch
+            {
+                // ignore – bring-up should still run with fallbacks
+            }
+        }
+
+        // Ensure there is a palette HUD
+        var pal = GameObject.Find("BuildPalette (Auto)");
+        if (pal == null)
+        {
+            pal = new GameObject("BuildPalette (Auto)");
+            pal.AddComponent<BuildPaletteHUD>();
+            Object.DontDestroyOnLoad(pal);
+            Debug.Log("[BuildBootstrap] Spawned BuildPalette");
+        }
+
+        return go;
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Systems/Interaction/InteractionBootstrap.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Ensures a PawnInteractionManager exists at runtime to coordinate pawn-to-pawn interactions.
+/// </summary>
+public static class InteractionBootstrap
+{
+    private static bool spawned;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void EnsureInteractionManager()
+    {
+        if (spawned) return;
+#if UNITY_2022_2_OR_NEWER
+        var existing = Object.FindAnyObjectByType<PawnInteractionManager>();
+#else
+        var existing = Object.FindObjectOfType<PawnInteractionManager>();
+#endif
+        if (existing != null) { spawned = true; return; }
+
+        var go = new GameObject("PawnInteractionManager (Auto)");
+        Object.DontDestroyOnLoad(go);
+        go.AddComponent<PawnInteractionManager>();
+        spawned = true;
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Gameplay/Systems/Selection/SelectionBootstrap.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Ensures a SelectionController exists at runtime in any scene.
+/// (Updated for marquee selection support)
+/// </summary>
+public static class SelectionBootstrap
+{
+    private static bool spawned;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void EnsureSelectionController()
+    {
+        if (spawned) return;
+#if UNITY_2022_2_OR_NEWER
+        var existing = Object.FindAnyObjectByType<SelectionController>();
+#else
+        var existing = Object.FindObjectOfType<SelectionController>();
+#endif
+        if (existing != null) { spawned = true; return; }
+
+        var go = new GameObject("SelectionController (Auto)");
+        Object.DontDestroyOnLoad(go);
+        go.AddComponent<SelectionController>();
+        // HUD that draws the bottom-left info panel and right-side gizmos
+        go.AddComponent<SelectionHUD>();
+        spawned = true;
     }
 }
 
@@ -4680,6 +4093,431 @@ public class ClockHUD : MonoBehaviour
 }
 
 
+// ===== FILE: Assets/Scripts/UI/HUD/BuildUIBootstrap.cs =====
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+#endif
+
+/// <summary>
+/// Creates a uGUI Build toggle (Canvas + Button) at runtime for gameplay scenes only.
+/// Avoids IMGUI artifacts and scales with resolution automatically.
+/// </summary>
+public static class BuildUIBootstrap
+{
+    const string CanvasName = "BuildCanvas (Auto)";
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    static void Init()
+    {
+        SceneManager.activeSceneChanged += OnSceneChanged;
+        EnsureForCurrentScene();
+    }
+
+    static void OnSceneChanged(Scene from, Scene to)
+    {
+        EnsureForCurrentScene();
+    }
+
+    static bool IsIntroLike(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName)) return false;
+        var s = sceneName.ToLowerInvariant();
+        return s.Contains("intro") || s.Contains("title");
+    }
+
+    static void EnsureEventSystem()
+    {
+        var es = Object.FindFirstObjectByType<EventSystem>();
+        if (es == null)
+        {
+            var go = new GameObject("EventSystem", typeof(EventSystem));
+            es = go.GetComponent<EventSystem>();
+            Object.DontDestroyOnLoad(go);
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        // Prefer the new Input System UI module
+        var inputSys = es.GetComponent<InputSystemUIInputModule>();
+        if (inputSys == null)
+        {
+            // Remove legacy module if present
+            var legacy = es.GetComponent<StandaloneInputModule>();
+            if (legacy != null) Object.Destroy(legacy);
+            inputSys = es.gameObject.AddComponent<InputSystemUIInputModule>();
+            Debug.Log("[BuildUI] Attached InputSystemUIInputModule to EventSystem.");
+        }
+#else
+        // Fall back to legacy StandaloneInputModule
+        var legacy = es.GetComponent<StandaloneInputModule>();
+        if (legacy == null)
+        {
+            // Remove new module if it exists (project might be in 'Both' mode)
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var inputSys = es.GetComponent<Component>();
+#endif
+            var newMod = es.GetComponent("InputSystemUIInputModule");
+            if (newMod != null) Object.Destroy(newMod as Component);
+            es.gameObject.AddComponent<StandaloneInputModule>();
+            Debug.Log("[BuildUI] Attached StandaloneInputModule to EventSystem.");
+        }
+#endif
+    }
+
+    public static void EnsureForCurrentScene()
+    {
+        var active = SceneManager.GetActiveScene().name;
+        var canvas = GameObject.Find(CanvasName);
+
+        // Destroy/hide if on an intro/menu scene or any intro overlay is visible
+        bool introOverlayVisible = AppBootstrap.IsIntroVisible() || IntroMenuOverlay.IsOpen;
+
+        if (IsIntroLike(active) || introOverlayVisible)
+        {
+            // Destroy if present in intro/menu scenes or intro overlay
+            if (canvas != null) Object.Destroy(canvas);
+            return;
+        }
+
+        if (canvas == null)
+        {
+            EnsureEventSystem();
+            BuildToggleCanvas();
+        }
+        else
+        {
+            EnsureEventSystem();
+        }
+    }
+
+    static void BuildToggleCanvas()
+    {
+        // EventSystem ensured by EnsureEventSystem()
+
+        var go = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        Object.DontDestroyOnLoad(go);
+
+        var canvas = go.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 5000; // draw on top of world
+
+        var scaler = go.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        // Build button
+        var btnGO = new GameObject("BuildButton", typeof(RectTransform), typeof(Image), typeof(Button));
+        btnGO.transform.SetParent(go.transform, false);
+        var rt = btnGO.GetComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0, 1);
+        rt.anchorMax = new Vector2(0, 1);
+        rt.pivot = new Vector2(0, 1);
+        rt.anchoredPosition = new Vector2(16, -16);
+        rt.sizeDelta = new Vector2(180, 48);
+
+        var img = btnGO.GetComponent<Image>();
+        img.color = new Color(0.85f, 0.85f, 0.85f, 0.9f);
+        img.raycastTarget = true;
+
+        var btn = btnGO.GetComponent<Button>();
+        btn.onClick.AddListener(() =>
+        {
+            BuildBootstrap.Ensure();
+            if (BuildModeController.Instance != null)
+                BuildModeController.Instance.ToggleBuildMode();
+        });
+
+        // Label
+        var txtGO = new GameObject("Text", typeof(RectTransform));
+        txtGO.transform.SetParent(btnGO.transform, false);
+        var trt = txtGO.GetComponent<RectTransform>();
+        trt.anchorMin = Vector2.zero;
+        trt.anchorMax = Vector2.one;
+        trt.offsetMin = Vector2.zero;
+        trt.offsetMax = Vector2.zero;
+
+        // Use legacy Text if available; otherwise leave default button visuals
+        var legacyText = txtGO.AddComponent<Text>();
+        legacyText.text = "Build  [B]";
+        legacyText.alignment = TextAnchor.MiddleCenter;
+        legacyText.color = Color.black;
+        legacyText.fontSize = 24;
+        legacyText.raycastTarget = false;
+        legacyText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/UI/Intro/AppBootstrap.cs =====
+using System;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+/// <summary>
+/// App-level bootstrap that ensures an Intro overlay exists/appears at boot *without* relying on Unity scenes.
+/// It discovers your project's real Intro/Title/Menu MonoBehaviour via reflection and shows it. If none
+/// exists, it spawns a tiny fallback overlay so you're never stuck on a blank scene.
+/// </summary>
+public static class AppBootstrap
+{
+    // Only consider intro-like components when they implement IIntroOverlay or match these hints.
+    static readonly string[] IntroTypeHints = { "intro", "title" };
+    static readonly string[] VisibleFieldNames = { "showMenu", "isVisible", "visible", "IsVisible" };
+    static readonly string[] ShowMethodNames = { "Show", "Open", "Enable", "ShowMenu", "ShowIntro", "SetVisible", "SetActive" };
+    static readonly string[] HideMethodNames = { "Hide", "Close", "Disable", "HideMenu", "HideIntro", "SetVisible", "SetActive" };
+
+    // Runs very early; still do a delayed check after first frame in case other boot code spawns the overlay a bit later.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+    static void EnsureIntroEarly()
+    {
+        // Always ensure our own overlay exists and is shown (Large default)
+        IntroMenuOverlay.Ensure();
+        IntroMenuOverlay.Show();
+        PauseMenuController.HideIfPresent();
+        MakeRunner(); // ensures we also re-check shortly after boot
+        TryShowIntroOverlay("AfterAssembliesLoaded");
+        SceneManager.activeSceneChanged += (_, __) => TryShowIntroOverlay("activeSceneChanged");
+    }
+
+    /// <summary>Returns true if an intro-like overlay is visible.</summary>
+    public static bool IsIntroVisible()
+    {
+        var intro = UnityEngine.Object.FindObjectOfType<IntroMenuOverlay>(true);
+        return intro != null && intro.gameObject.activeInHierarchy;
+    }
+
+    /// <summary>Shows the intro overlay (prefer the project's real one; otherwise spawn a fallback).</summary>
+    public static void ShowIntroOverlay()
+    {
+        IntroMenuOverlay.Show();
+        if (TryShowIntroOverlay("explicit call")) return;
+        // If project has no intro overlay type, create a simple fallback UI.
+        IntroOverlayFallback.SpawnIfNeeded();
+        Debug.Log("[AppBootstrap] Spawned IntroOverlayFallback (no real intro overlay found).");
+    }
+
+    /// <summary>Hides any intro overlay (real or fallback).</summary>
+    public static void HideIntroOverlay()
+    {
+        var intro = UnityEngine.Object.FindObjectOfType<IntroMenuOverlay>(true);
+        if (intro != null) intro.gameObject.SetActive(false);
+        BuildUIBootstrap.EnsureForCurrentScene();
+    }
+
+    // --- internals ---
+
+    static bool TryShowIntroOverlay(string reason)
+    {
+        var comp = FindIntroComponentInScene();
+        if (comp == null)
+        {
+            // Maybe the type exists but no instance yet; try instantiating the first matching type
+            var t = FindIntroType();
+            if (t != null)
+            {
+                var go = new GameObject(t.Name + " (Auto)");
+                comp = (MonoBehaviour)go.AddComponent(t);
+            }
+        }
+        if (comp == null) return false;
+
+        bool handled = TryInvokeShow(comp);
+        if (!handled) handled |= TrySetVisibleFlag(comp, true);
+        if (!handled)
+        {
+            comp.gameObject.SetActive(true);
+            handled = true;
+        }
+        if (handled)
+            Debug.Log($"[AppBootstrap] Intro overlay shown via '{comp.GetType().Name}' ({reason}).");
+        return handled;
+    }
+
+    static MonoBehaviour FindIntroComponentInScene()
+    {
+        var all = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        // First, look for explicit intro overlays.
+        foreach (var mb in all)
+        {
+            if (mb is IntroScreen) continue;
+            if (mb is PauseMenuController) continue;
+            if (mb is IIntroOverlay) return mb;
+        }
+
+        // Fallback: heuristics based on type name hints (intro/title only).
+        foreach (var mb in all)
+        {
+            if (mb is IntroScreen) continue;
+            if (mb is PauseMenuController) continue;
+            var n = mb.GetType().Name.ToLowerInvariant();
+            if (IntroTypeHints.Any(h => n.Contains(h))) return mb;
+        }
+        return null;
+    }
+
+    static Type FindIntroType()
+    {
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            Type[] types;
+            try { types = asm.GetTypes(); } catch { continue; }
+            foreach (var t in types)
+            {
+                if (!typeof(MonoBehaviour).IsAssignableFrom(t)) continue;
+                if (typeof(IIntroOverlay).IsAssignableFrom(t)) return t;
+                var n = t.Name.ToLowerInvariant();
+                if (IntroTypeHints.Any(h => n.Contains(h))) return t;
+            }
+        }
+        return null;
+    }
+
+    static bool TryGetVisibleFlag(MonoBehaviour comp, out bool value)
+    {
+        value = false;
+        var t = comp.GetType();
+        foreach (var name in VisibleFieldNames)
+        {
+            var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (f != null && f.FieldType == typeof(bool))
+            {
+                value = (bool)f.GetValue(comp);
+                return true;
+            }
+            var p = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (p != null && p.PropertyType == typeof(bool) && p.CanRead)
+            {
+                value = (bool)p.GetValue(comp, null);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static bool TrySetVisibleFlag(MonoBehaviour comp, bool visible)
+    {
+        var t = comp.GetType();
+        foreach (var name in VisibleFieldNames)
+        {
+            var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (f != null && f.FieldType == typeof(bool))
+            {
+                f.SetValue(comp, visible);
+                return true;
+            }
+            var p = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (p != null && p.PropertyType == typeof(bool) && p.CanWrite)
+            {
+                p.SetValue(comp, visible, null);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static bool TryInvokeShow(MonoBehaviour comp)
+    {
+        var t = comp.GetType();
+        foreach (var m in ShowMethodNames)
+        {
+            var mi = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+            if (mi != null) { mi.Invoke(comp, null); return true; }
+
+            var miBool = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
+            if (miBool != null) { miBool.Invoke(comp, new object[] { true }); return true; }
+        }
+        return false;
+    }
+
+    static bool TryInvokeHide(MonoBehaviour comp)
+    {
+        var t = comp.GetType();
+        foreach (var m in HideMethodNames)
+        {
+            var mi = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+            if (mi != null) { mi.Invoke(comp, null); return true; }
+
+            var miBool = t.GetMethod(m, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(bool) }, null);
+            if (miBool != null) { miBool.Invoke(comp, new object[] { false }); return true; }
+        }
+        return false;
+    }
+
+    static void MakeRunner()
+    {
+        if (UnityEngine.Object.FindFirstObjectByType<AppBootstrapRunner>() != null) return;
+        var go = new GameObject("AppBootstrap (Auto)");
+        UnityEngine.Object.DontDestroyOnLoad(go);
+        go.AddComponent<AppBootstrapRunner>();
+    }
+
+    /// <summary>Hidden runner to perform a delayed re-check after boot (next frame).</summary>
+    sealed class AppBootstrapRunner : MonoBehaviour
+    {
+        void Start() { StartCoroutine(DelayedCheck()); }
+        System.Collections.IEnumerator DelayedCheck()
+        {
+            yield return null; // next frame
+            TryShowIntroOverlay("DelayedCheck");
+        }
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/UI/Intro/IntroScreenShim.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Compatibility shim for legacy code that references `IntroScreen`.
+/// Delegates behavior to AppBootstrap's intro overlay discovery/show/hide.
+/// This allows existing calls like `IntroScreen.ShowIntro()` and checks of
+/// `IntroScreen.IsVisible` to keep working without depending on a specific
+/// intro implementation or scene.
+/// </summary>
+public class IntroScreen : MonoBehaviour
+{
+    /// <summary>
+    /// Returns whether any intro/title/menu overlay is currently visible.
+    /// </summary>
+    public static bool IsVisible
+    {
+        get => IntroMenuOverlay.IsOpen || AppBootstrap.IsIntroVisible();
+        set
+        {
+            if (value) IntroMenuOverlay.Show();
+            else IntroMenuOverlay.Hide();
+        }
+    }
+
+    /// <summary>
+    /// Legacy entry point to show the intro overlay.
+    /// </summary>
+    public static void ShowIntro() => IntroMenuOverlay.Show();
+
+    /// <summary>
+    /// If some legacy bootstrap does `new GameObject(...).AddComponent<IntroScreen>()`,
+    /// keep the object around but delegate visibility to AppBootstrap.
+    /// </summary>
+    void Awake()
+    {
+        // Do not create any UI here; AppBootstrap handles discovery/fallback.
+        DontDestroyOnLoad(gameObject);
+    }
+
+    // Prevent accidental IMGUI drawing from legacy stubs.
+    void OnGUI() { /* intentionally empty; real intro overlay is external */ }
+}
+
+
 // ===== FILE: Assets/Scripts/UI/IntroMenuOverlay.cs =====
 using System;
 using UnityEngine;
@@ -5064,51 +4902,6 @@ public class IntroOverlayFallback : MonoBehaviour, IIntroOverlay
     }
 }
 
-
-
-// ===== FILE: Assets/Scripts/UI/IntroScreenShim.cs =====
-using UnityEngine;
-
-/// <summary>
-/// Compatibility shim for legacy code that references `IntroScreen`.
-/// Delegates behavior to AppBootstrap's intro overlay discovery/show/hide.
-/// This allows existing calls like `IntroScreen.ShowIntro()` and checks of
-/// `IntroScreen.IsVisible` to keep working without depending on a specific
-/// intro implementation or scene.
-/// </summary>
-public class IntroScreen : MonoBehaviour
-{
-    /// <summary>
-    /// Returns whether any intro/title/menu overlay is currently visible.
-    /// </summary>
-    public static bool IsVisible
-    {
-        get => IntroMenuOverlay.IsOpen || AppBootstrap.IsIntroVisible();
-        set
-        {
-            if (value) IntroMenuOverlay.Show();
-            else IntroMenuOverlay.Hide();
-        }
-    }
-
-    /// <summary>
-    /// Legacy entry point to show the intro overlay.
-    /// </summary>
-    public static void ShowIntro() => IntroMenuOverlay.Show();
-
-    /// <summary>
-    /// If some legacy bootstrap does `new GameObject(...).AddComponent<IntroScreen>()`,
-    /// keep the object around but delegate visibility to AppBootstrap.
-    /// </summary>
-    void Awake()
-    {
-        // Do not create any UI here; AppBootstrap handles discovery/fallback.
-        DontDestroyOnLoad(gameObject);
-    }
-
-    // Prevent accidental IMGUI drawing from legacy stubs.
-    void OnGUI() { /* intentionally empty; real intro overlay is external */ }
-}
 
 
 // ===== FILE: Assets/Scripts/UI/PauseMenuController.cs =====
@@ -6154,6 +5947,108 @@ public class ConstructionBoard : Building
         GUILayout.EndArea();
     }
 }
+
+
+// ===== FILE: Assets/Scripts/World/MapGen/WorldBootstrap.cs =====
+using UnityEngine;
+
+/// <summary>
+/// One-time helper to generate a small default grid world and frame the camera.
+/// </summary>
+public static class WorldBootstrap
+{
+    public static void GenerateDefaultGrid(int w = 128, int h = 128, float tile = 1f)
+    {
+        // Create/find root
+        var root = GameObject.Find("World");
+        if (root == null)
+        {
+            root = new GameObject("World");
+        }
+
+        // Ensure Buildings container exists so placed stations have a parent
+        var buildings = root.transform.Find("Buildings");
+        if (buildings == null)
+        {
+            var goBuild = new GameObject("Buildings");
+            goBuild.transform.SetParent(root.transform, false);
+            goBuild.transform.localPosition = Vector3.zero;
+        }
+
+        // Create/find grid
+        var grid = root.GetComponentInChildren<SimpleGridMap>();
+        if (grid == null)
+        {
+            var gridGO = new GameObject("Grid");
+            gridGO.transform.SetParent(root.transform, false);
+            grid = gridGO.AddComponent<SimpleGridMap>();
+        }
+
+        grid.Build(w, h, tile, grid.colorA, grid.colorB);
+
+        EnsureDirectionalLight();
+        FrameCameraToGrid(grid);
+    }
+
+    static void EnsureDirectionalLight()
+    {
+        Light dir = null;
+#if UNITY_2022_2_OR_NEWER
+        var lights = Object.FindObjectsByType<Light>(FindObjectsSortMode.None);
+        foreach (var l in lights) { if (l != null && l.type == LightType.Directional) { dir = l; break; } }
+#else
+        var lights = Object.FindObjectsOfType<Light>();
+        foreach (var l in lights) { if (l != null && l.type == LightType.Directional) { dir = l; break; } }
+#endif
+        if (dir == null)
+        {
+            var go = new GameObject("Directional Light");
+            dir = go.AddComponent<Light>();
+            dir.type = LightType.Directional;
+            dir.intensity = 1.0f;
+            go.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+        }
+    }
+
+    static void FrameCameraToGrid(SimpleGridMap grid)
+    {
+        var cam = Camera.main;
+        if (cam == null)
+        {
+            var camGO = new GameObject("Main Camera");
+            cam = camGO.AddComponent<Camera>();
+            // Make sure it's tagged correctly so Camera.main works later.
+            camGO.tag = "MainCamera";
+        }
+
+        // Orthographic top-down
+        cam.orthographic = true;
+        cam.nearClipPlane = 0.1f;
+        cam.farClipPlane = 100f;
+        cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+
+        // Compute world center
+        float wWorld = grid.width * grid.tileSize;
+        float hWorld = grid.height * grid.tileSize;
+        var center = new Vector3(
+            (grid.width * grid.tileSize) * 0.5f - (grid.tileSize * 0.5f),
+            0f,
+            (grid.height * grid.tileSize) * 0.5f - (grid.tileSize * 0.5f)
+        );
+
+        // Position camera above center
+        cam.transform.position = new Vector3(center.x, 10f, center.z);
+
+        // Fit orthographic size to show most of the grid with a small margin
+        float aspect = (Screen.height > 0) ? (Screen.width / (float)Screen.height) : (16f / 9f);
+        float halfHeight = hWorld * 0.5f;
+        float halfWidth = wWorld * 0.5f;
+        float sizeToFit = Mathf.Max(halfHeight, halfWidth / Mathf.Max(0.1f, aspect));
+        // Keep a consistent default start zoom across all map sizes.
+        // Do not auto-fit; use the camera's existing orthographicSize configured in the scene.
+    }
+}
+
 
 
 // ===== FILE: Assets/Scripts/World/SimpleGridMap.cs =====
