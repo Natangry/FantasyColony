@@ -112,7 +112,8 @@ public class BuildPaletteHUD : MonoBehaviour
             unique = true,
             showInPalette = true,
             visualRef = "ConstructionBoardVisual",
-            category = "Stations"
+            category = "Stations",
+            allowedRotations = new List<string> { "N" }
         });
         return list;
     }
