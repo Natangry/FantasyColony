@@ -1,180 +1,210 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
 /// <summary>
-/// Single-entry bridge the Intro menu calls to start the existing test map.
-/// Tries the project's direct world bootstrap first, then robust fallbacks.
-/// Verifies grid exists and optionally spawns test pawns.
+/// Bridge used by the new Intro screen's Start button.
+/// Creates/loads a simple test world and guarantees two wandering SpritePawns are present.
+/// It prefers WorldBootstrap.GenerateDefaultGrid(int,int,float) but falls back to other common starters.
+/// Returns true on success so the Intro overlay can hide itself.
 /// </summary>
 public static class TestMapStarter
 {
-    /// <summary>
-    /// Start the test map with the given dimensions. Returns true on success.
-    /// </summary>
     public static bool StartTestMap(int width, int height)
     {
-        // Unpause just in case
-        if (Time.timeScale != 1f) Time.timeScale = 1f;
-
-        // Prefer a direct call path first if present in this project:
-        // WorldBootstrap.GenerateDefaultGrid(int,int)
-        if (InvokeIfExists("WorldBootstrap", "GenerateDefaultGrid", new object[] { width, height }, new[] { typeof(int), typeof(int) }))
+        try
         {
-            Debug.Log($"[TestMapStarter] Started via WorldBootstrap.GenerateDefaultGrid({width},{height})");
-            if (!VerifyGridUp()) return false;
-            TrySpawnTestPawns();
+            if (!TryStartWorld(width, height))
+            {
+                Debug.LogError("[TestMapStarter] Failed to start world (no suitable world bootstrap method found).");
+                return false;
+            }
+
+            EnsurePawnInteractionManager();
+            SpawnTwoTestPawnsNearCenter(width, height);
+
+            Debug.Log("[TestMapStarter] Test map started with two SpritePawns.");
             return true;
         }
-
-        // Robust ordered search across common types and method names/signatures
-        if (TryStartWorldRobust(width, height, out var selected))
+        catch (Exception ex)
         {
-            Debug.Log("[TestMapStarter] Started via " + selected);
-            if (!VerifyGridUp()) return false;
-            TrySpawnTestPawns();
-            return true;
-        }
-
-        Debug.LogError("[TestMapStarter] Could not find a world start method. Nothing was started.");
-        return false;
-    }
-
-    // -------- helpers --------
-
-    static bool VerifyGridUp()
-    {
-        // Wait one frame-equivalent: caller (Intro UI) will call us synchronously;
-        // in practice most generators finish same frame. We just check presence.
-        var grid = UnityEngine.Object.FindFirstObjectByType<SimpleGridMap>();
-        if (grid == null)
-        {
-            Debug.LogError("[TestMapStarter] SimpleGridMap not found after start. Did the generator run?");
+            Debug.LogError($"[TestMapStarter] Exception during StartTestMap: {ex}");
             return false;
         }
-        return true;
     }
 
-    static void TrySpawnTestPawns()
-    {
-        // If any pawns/agents already exist, skip.
-        var anyPawn = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-            .Any(mb =>
-            {
-                var n = mb.GetType().Name.ToLowerInvariant();
-                return n.Contains("pawn") || n.Contains("agent") || n.Contains("actor");
-            });
-        if (anyPawn) return;
+    // --- World start --------------------------------------------------------
 
-        // Try a few likely entrypoints to spawn default/test pawns
-        string[] typeHints = { "Pawn", "Actor", "Agent", "Spawner", "Bootstrap" };
-        string[] methodNames = { "SpawnTestPawns", "SpawnDefaultPawns", "SpawnPawns", "CreateTestActors", "CreateDefaultPawns" };
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            Type[] types;
-            try { types = asm.GetTypes(); } catch { continue; }
-            foreach (var t in types)
-            {
-                var tn = t.Name.ToLowerInvariant();
-                if (!typeHints.Any(h => tn.Contains(h.ToLowerInvariant()))) continue;
-                foreach (var mn in methodNames)
-                {
-                    // Try (int) then ()
-                    var mi_i = t.GetMethod(mn, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(int) }, null);
-                    if (mi_i != null) { mi_i.Invoke(null, new object[] { 2 }); Debug.Log($"[TestMapStarter] {t.Name}.{mn}(2)"); return; }
-                    var mi_0 = t.GetMethod(mn, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, Type.EmptyTypes, null);
-                    if (mi_0 != null) { mi_0.Invoke(null, null); Debug.Log($"[TestMapStarter] {t.Name}.{mn}()"); return; }
-                }
-            }
-        }
-        // Not fatal if we couldn't spawn them.
-        Debug.Log("[TestMapStarter] No pawn spawner found; map started without test pawns.");
-    }
-
-    static bool TryStartWorldRobust(int w, int h, out string selected)
+    private static bool TryStartWorld(int w, int h)
     {
-        selected = null;
-        string[] typeOrder =
+        // 1) Prefer an explicit WorldBootstrap.GenerateDefaultGrid(int,int,float) if present.
+        var worldType = FindTypeByPreferredNames(new[]
         {
             "WorldBootstrap","GameBootstrap","WorldBuilder","MapGenerator","GridBootstrap","WorldInitializer","GameInit"
-        };
-        string[] methodOrder =
-        {
-            "GenerateDefaultGrid","StartNewGame","StartGame","GenerateWorld","CreateWorld","CreateGrid","InitWorld","BootWorld"
-        };
+        });
 
-        var asms = AppDomain.CurrentDomain.GetAssemblies();
-        // Preferred type list first
-        foreach (var tName in typeOrder)
+        if (worldType != null)
         {
-            var t = FindExactType(asms, tName);
-            if (t == null) continue;
-            foreach (var mName in methodOrder)
+            var methods = worldType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            // Try the most likely signatures first.
+            var direct =
+                FindMethod(methods, "GenerateDefaultGrid", typeof(void), new[] { typeof(int), typeof(int), typeof(float) }) ??
+                FindMethod(methods, "GenerateDefaultGrid", typeof(void), new[] { typeof(int), typeof(int) }) ??
+                FindMethod(methods, "StartNewGame",      typeof(void), new[] { typeof(int), typeof(int), typeof(float) }) ??
+                FindMethod(methods, "StartNewGame",      typeof(void), new[] { typeof(int), typeof(int) }) ??
+                FindMethod(methods, "GenerateWorld",     typeof(void), Type.EmptyTypes) ??
+                FindMethod(methods, "CreateWorld",       typeof(void), Type.EmptyTypes) ??
+                FindMethod(methods, "CreateGrid",        typeof(void), new[] { typeof(int), typeof(int) }) ??
+                FindMethod(methods, "InitWorld",         typeof(void), Type.EmptyTypes) ??
+                FindMethod(methods, "BootWorld",         typeof(void), Type.EmptyTypes);
+
+            if (direct != null)
             {
-                if (InvokeMatchedSignature(t, mName, w, h, out selected)) return true;
+                InvokeStarter(worldType, direct, w, h);
+                return true;
             }
         }
-        // Broad sweep across *Bootstrap/*Generator/*Builder
-        foreach (var asm in asms)
+
+        // 2) Robust sweep across all assemblies/types/methods using preferred name fragments.
+        var typeHints   = new[] { "WorldBootstrap", "GameBootstrap", "WorldBuilder", "MapGenerator", "GridBootstrap", "WorldInitializer", "GameInit" };
+        var methodHints = new[] { "GenerateDefaultGrid", "StartNewGame", "StartGame", "GenerateWorld", "CreateWorld", "CreateGrid", "InitWorld", "BootWorld" };
+
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
         {
-            Type[] types;
-            try { types = asm.GetTypes(); } catch { continue; }
-            foreach (var t in types)
+            foreach (var t in SafeGetTypes(asm))
             {
-                var tn = t.Name.ToLowerInvariant();
-                if (!tn.Contains("bootstrap") && !tn.Contains("generator") && !tn.Contains("builder")) continue;
-                foreach (var mName in methodOrder)
+                if (!typeHints.Any(h => t.Name.IndexOf(h, StringComparison.OrdinalIgnoreCase) >= 0))
+                    continue;
+
+                foreach (var m in t.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
                 {
-                    if (InvokeMatchedSignature(t, mName, w, h, out selected)) return true;
+                    if (!methodHints.Any(h => m.Name.IndexOf(h, StringComparison.OrdinalIgnoreCase) >= 0))
+                        continue;
+
+                    // Try (int,int,float), then (int,int), then ().
+                    if (MatchesSignature(m, typeof(void), new[] { typeof(int), typeof(int), typeof(float) }))
+                    {
+                        InvokeStarter(t, m, w, h);
+                        return true;
+                    }
+                    if (MatchesSignature(m, typeof(void), new[] { typeof(int), typeof(int) }))
+                    {
+                        InvokeStarter(t, m, w, h);
+                        return true;
+                    }
+                    if (MatchesSignature(m, typeof(void), Type.EmptyTypes))
+                    {
+                        InvokeStarter(t, m);
+                        return true;
+                    }
                 }
             }
         }
+
         return false;
     }
 
-    static bool InvokeMatchedSignature(Type t, string method, int w, int h, out string selected)
+    private static void InvokeStarter(Type type, MethodInfo method, int w = 0, int h = 0)
     {
-        selected = null;
-        // (int,int)
-        var mi_ii = t.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(int), typeof(int) }, null);
-        if (mi_ii != null) { mi_ii.Invoke(null, new object[] { w, h }); selected = $"{t.Name}.{method}(int,int)"; return true; }
-        // (Vector2Int)
-        var v2 = typeof(Vector2Int);
-        var mi_v = t.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new[] { v2 }, null);
-        if (mi_v != null) { mi_v.Invoke(null, new object[] { new Vector2Int(w, h) }); selected = $"{t.Name}.{method}(Vector2Int)"; return true; }
-        // ()
-        var mi_0 = t.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, Type.EmptyTypes, null);
-        if (mi_0 != null) { mi_0.Invoke(null, null); selected = $"{t.Name}.{method}()"; return true; }
-        // (string preset)
-        var mi_s = t.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new[] { typeof(string) }, null);
-        if (mi_s != null) { mi_s.Invoke(null, new object[] { "Large" }); selected = $"{t.Name}.{method}(string)"; return true; }
-        return false;
+        object instance = method.IsStatic ? null : Activator.CreateInstance(type);
+        var ps = method.GetParameters();
+
+        object[] args;
+        if (ps.Length == 3) args = new object[] { w, h, 1f };     // (int,int,float) default tile size
+        else if (ps.Length == 2) args = new object[] { w, h };     // (int,int)
+        else args = Array.Empty<object>();                         // ()
+
+        method.Invoke(instance, args);
+        Debug.Log($"[TestMapStarter] Started via {type.FullName}.{method.Name}({string.Join(",", ps.Select(p => p.ParameterType.Name))})");
     }
 
-    static bool InvokeIfExists(string typeName, string methodName, object[] args, Type[] sig)
+    private static MethodInfo FindMethod(IEnumerable<MethodInfo> methods, string name, Type returnType, Type[] parameters)
+        => methods.FirstOrDefault(m => m.Name == name && MatchesSignature(m, returnType, parameters));
+
+    private static bool MatchesSignature(MethodInfo m, Type returnType, IReadOnlyList<Type> parameters)
     {
-        var asms = AppDomain.CurrentDomain.GetAssemblies();
-        var t = FindExactType(asms, typeName);
-        if (t == null) return false;
-        var mi = t.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, sig, null);
-        if (mi == null) return false;
-        mi.Invoke(null, args);
+        if (m.ReturnType != returnType) return false;
+        var ps = m.GetParameters();
+        if (ps.Length != parameters.Count) return false;
+        for (int i = 0; i < ps.Length; i++)
+        {
+            if (ps[i].ParameterType != parameters[i]) return false;
+        }
         return true;
     }
 
-    static Type FindExactType(Assembly[] asms, string name)
+    private static Type FindTypeByPreferredNames(IEnumerable<string> preferredNames)
     {
-        foreach (var asm in asms)
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
         {
-            Type[] types;
-            try { types = asm.GetTypes(); } catch { continue; }
-            foreach (var t in types)
+            foreach (var t in SafeGetTypes(asm))
             {
-                if (t.Name.Equals(name, StringComparison.Ordinal)) return t;
+                if (preferredNames.Any(n => t.Name.Equals(n, StringComparison.Ordinal) || t.FullName.EndsWith("." + n, StringComparison.Ordinal)))
+                    return t;
             }
         }
         return null;
     }
-}
 
+    private static IEnumerable<Type> SafeGetTypes(Assembly a)
+    {
+        try { return a.GetTypes(); }
+        catch { return Array.Empty<Type>(); }
+    }
+
+    // --- Managers & pawns ---------------------------------------------------
+
+    private static void EnsurePawnInteractionManager()
+    {
+        var existing = UnityEngine.Object.FindObjectOfType<MonoBehaviour>(true);
+        var pim = UnityEngine.Object.FindObjectOfType<PawnInteractionManager>(true);
+        if (pim != null) return;
+
+        var root = GameObject.Find("GameSystems (Auto)") ?? new GameObject("GameSystems (Auto)");
+        if (root.scene.name == null) UnityEngine.Object.DontDestroyOnLoad(root);
+
+        root.AddComponent<PawnInteractionManager>();
+        Debug.Log("[TestMapStarter] Ensured PawnInteractionManager.");
+    }
+
+    private static void SpawnTwoTestPawnsNearCenter(int width, int height)
+    {
+        // Heuristic center: try camera center projection; otherwise origin.
+        Vector3 center = Vector3.zero;
+
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            // Project to ground plane at y = 0
+            var ray = cam.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f));
+            if (new Plane(Vector3.up, Vector3.zero).Raycast(ray, out var dist))
+                center = ray.GetPoint(dist);
+        }
+
+        float tile = 1f;
+        Vector3 aPos = center + new Vector3(-0.5f * tile, 0f, 0f);
+        Vector3 bPos = center + new Vector3(+0.5f * tile, 0f, 0f);
+
+        CreateSpritePawn("TestPawn_A", aPos);
+        CreateSpritePawn("TestPawn_B", bPos);
+    }
+
+    private static void CreateSpritePawn(string name, Vector3 position)
+    {
+        var go = new GameObject(name);
+        go.transform.position = position;
+
+        // Ensure selectable/collidable with existing 3D ray-based selection.
+        var col = go.AddComponent<SphereCollider>();
+        col.radius = 0.25f;
+
+        var rb = go.AddComponent<Rigidbody>();
+        rb.isKinematic = true;
+        rb.useGravity = false;
+
+        go.AddComponent<SpritePawn>();
+    }
+}
