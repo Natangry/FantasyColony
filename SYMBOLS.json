@@ -1257,13 +1257,13 @@
     "kind": "method",
     "name": "SetVisible",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 26
+    "line": 37
   },
   {
     "kind": "method",
     "name": "ShowIntro",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 36
+    "line": 47
   },
   {
     "kind": "property",
@@ -1287,19 +1287,19 @@
     "kind": "method",
     "name": "Toggle",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 50
+    "line": 52
   },
   {
     "kind": "method",
     "name": "Show",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 56
+    "line": 58
   },
   {
     "kind": "method",
     "name": "Hide",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 65
+    "line": 67
   },
   {
     "kind": "property",
