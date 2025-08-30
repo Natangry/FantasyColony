@@ -233,11 +233,13 @@
 ## Assets/StreamingAssets/Mods/Core/Defs/Buildings
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings)
 
+- **.keep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/.keep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/.keep)
 - **ConstructionBoard.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml)
 
 ## Assets/StreamingAssets/Mods/Core/Defs/Visuals
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals)
 
+- **.keep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/.keep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/.keep)
 - **ConstructionBoardVisual.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml)
 
 ## Assets
@@ -440,6 +442,9 @@
 
 - **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/.gitkeep)
 - **_AllSchemas.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/_AllSchemas.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/_AllSchemas.xml)
+- **AbilityDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/AbilityDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/AbilityDef.xml)
+- **BuildingDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/BuildingDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/BuildingDef.xml)
+- **ItemDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/ItemDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/ItemDef.xml)
 - **Visual2Def.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/Visual2Def.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/Visual2Def.xml)
 
 ## Docs/Tools

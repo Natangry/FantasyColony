@@ -421,809 +421,310 @@ public class BuildHotkeyListener : MonoBehaviour
 
 // ===== FILE: Assets/Scripts/Build/BuildModeController.cs =====
 using UnityEngine;
-
-public enum BuildTool
-{
-    None = 0,
-    PlaceConstructionBoard = 1,
-}
+using System;
+using System.Linq;
+// Assumes BuildingDef exists in your Defs namespace
+// If your project uses a different namespace, adjust the using accordingly.
+using FantasyColony.Defs;
 
 public class BuildModeController : MonoBehaviour
 {
     public static BuildModeController Instance { get; private set; }
 
-    [SerializeField] private bool isActive;
-    [SerializeField] private BuildTool currentTool = BuildTool.None;
+    [Header("State")]
+    [SerializeField] private bool _buildModeEnabled = false;
+    [SerializeField] private BuildTool _activeTool = BuildTool.None;
 
-    public bool IsActive => isActive;
-    public BuildTool CurrentTool => currentTool;
+    // Selected def for placement-oriented tools (e.g., PlaceConstructionBoard)
+    [SerializeField] private BuildingDef _selectedBuildingDef;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            ToggleBuildMode();
-        }
+    public bool IsBuildModeEnabled => _buildModeEnabled;
+    public BuildTool ActiveTool => _activeTool;
+    public BuildingDef SelectedBuildingDef => _selectedBuildingDef;
 
-        // ESC cancels tool or exits build mode
-        if (isActive && Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (currentTool != BuildTool.None)
-                SetTool(BuildTool.None);
-            else
-                SetActive(false);
-        }
+    public void ToggleBuildMode()
+    {
+        SetBuildMode(!_buildModeEnabled);
     }
 
-    public void ToggleBuildMode() => SetActive(!isActive);
-
-    public void SetActive(bool active)
+    public void SetBuildMode(bool on)
     {
-        isActive = active;
-        if (!isActive) SetTool(BuildTool.None);
+        _buildModeEnabled = on;
+        if (!on) ClearTool();
+    }
+
+    public void SetPlacingBuilding(BuildingDef def)
+    {
+        _selectedBuildingDef = def;
+        SetTool(BuildTool.PlaceConstructionBoard);
+    }
+
+    public void ClearTool()
+    {
+        _activeTool = BuildTool.None;
+        var tool = GetComponent<BuildPlacementTool>();
+        if (tool != null) tool.SetTool(BuildTool.None);
     }
 
     public void SetTool(BuildTool tool)
     {
-        currentTool = tool;
+        _activeTool = tool;
         var toolComp = GetComponent<BuildPlacementTool>();
-        if (toolComp == null) toolComp = gameObject.AddComponent<BuildPlacementTool>();
-        toolComp.SetTool(tool);
+        if (toolComp != null) toolComp.SetTool(tool);
     }
 
-    public static bool UniqueBuildingExists<T>() where T : Building
+    // Utility used by placement tool to enforce uniqueness of special buildings
+    public bool UniqueBuildingExists<T>() where T : Component
     {
-        // "Any" is acceptable and faster in 2023+; fallback for older Unity.
-#if UNITY_2023_1_OR_NEWER
-        return Object.FindAnyObjectByType<T>() != null;
-#else
-        return Object.FindObjectOfType<T>() != null;
-#endif
+        return FindObjectsOfType<T>().Length > 0;
     }
+
+    private void Update()
+    {
+        // Basic hotkey (B) to toggle build mode
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ToggleBuildMode();
+        }
+        // ESC cancels current tool
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ClearTool();
+        }
+    }
+}
+
+public enum BuildTool
+{
+    None,
+    PlaceConstructionBoard
 }
 
 
 // ===== FILE: Assets/Scripts/Build/BuildPaletteHUD.cs =====
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using FantasyColony.Defs;
 
-/// <summary>
-/// Simple build palette shown only while Build Mode is active.
-/// </summary>
 public class BuildPaletteHUD : MonoBehaviour
 {
-    [SerializeField] private Vector2 offset = new Vector2(12f, 120f);
-    [SerializeField] private float widthPct = 0.28f;
-    [SerializeField] private float heightPct = 0.65f;
-    [SerializeField] private float fontPct = 0.03f; // scale with resolution
-    [SerializeField] private float buttonHPct = 0.05f;
+    Vector2 _scroll;
+    Rect _panelRect = new Rect(16, 64, 320, 420);
 
-    private GUIStyle _box;
-    private GUIStyle _button;
-    private GUIStyle _label;
-    private Vector2 _scroll;
-    private GUIStyle _itemLabel;
-    private GUIStyle _hint;
-
-    private void Ensure()
+    void OnGUI()
     {
-        if (_box == null)
+        if (BuildModeController.Instance == null || !BuildModeController.Instance.IsBuildModeEnabled) return;
+
+        GUILayout.BeginArea(_panelRect, GUI.skin.window);
+        GUILayout.Label("Build Palette");
+
+        // Try to enumerate building defs (fallback to a single Construction Board def if database not ready)
+        var defs = GetPaletteDefs();
+        _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.ExpandHeight(true));
+        foreach (var def in defs)
         {
-            _box = new GUIStyle(GUI.skin.box);
-        }
-        if (_button == null)
-        {
-            _button = new GUIStyle(GUI.skin.button)
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(200));
+            if (GUILayout.Button("Select", GUILayout.Width(80)))
             {
-                alignment = TextAnchor.MiddleCenter,
-                fontStyle = FontStyle.Bold
-            };
-        }
-        if (_label == null)
-        {
-            _label = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold };
-            _label.normal.textColor = Color.white;
-        }
-        if (_itemLabel == null)
-        {
-            _itemLabel = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft };
-            _itemLabel.normal.textColor = Color.white;
-        }
-        if (_hint == null)
-        {
-            _hint = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Italic };
-            _hint.normal.textColor = new Color(1f, 1f, 1f, 0.85f);
-        }
-    }
-
-    private void OnGUI()
-    {
-        var bm = BuildModeController.Instance;
-        if (IntroScreen.IsVisible) return; // never show on intro
-        if (bm == null || !bm.IsActive) return;
-
-        Ensure();
-
-        int fontSize = Mathf.RoundToInt(Mathf.Max(14f, Screen.height * fontPct));
-        _button.fontSize = fontSize;
-        _label.fontSize = fontSize;
-        _itemLabel.fontSize = Mathf.RoundToInt(fontSize * 0.9f);
-        _hint.fontSize = Mathf.RoundToInt(fontSize * 0.85f);
-        _hint.wordWrap = true;
-
-        float w = Mathf.Max(260f, Screen.width * widthPct);
-        float h = Mathf.Max(260f, Screen.height * heightPct);
-        Rect r = new Rect(offset.x, offset.y, w, h);
-        GUILayout.BeginArea(r, "Build Palette", _box);
-
-        GUILayout.Label("Stations", _label);
-        GUILayout.Space(6f);
-        // Data-driven defs: show loaded XML defs count as a simple sanity check during bring-up.
-        GUILayout.Label("Defs loaded: " + FantasyColony.Defs.DefDatabase.TotalCount, _hint);
-
-        _scroll = GUILayout.BeginScrollView(_scroll);
-
-        // Construction Board entry
-        bool exists = BuildModeController.UniqueBuildingExists<ConstructionBoard>();
-        using (new GUILayout.HorizontalScope())
-        {
-            GUILayout.Label("Construction Board (Free)", _itemLabel, GUILayout.ExpandWidth(true));
-            GUI.enabled = !exists;
-            float btnH = Mathf.Max(32f, Screen.height * buttonHPct);
-            float btnW = Mathf.Max(120f, _button.CalcSize(new GUIContent(exists ? "Placed" : "Place")).x + 24f);
-            btnW = Mathf.Max(btnW, fontSize * 6f);
-            if (GUILayout.Button(exists ? "Placed" : "Place", _button, GUILayout.Width(btnW), GUILayout.Height(btnH)))
-            {
-                bm.SetTool(BuildTool.PlaceConstructionBoard);
+                // For now we only have a placement tool for Construction Board.
+                // Down the road this can dispatch different tools per def.category/type.
+                BuildModeController.Instance.SetPlacingBuilding(def);
             }
-            GUI.enabled = true;
+            GUILayout.EndHorizontal();
         }
-
-        if (bm.CurrentTool == BuildTool.PlaceConstructionBoard)
-        {
-            GUILayout.Space(6f);
-            GUILayout.Label("Tip: Move the mouse to position the ghost.\nLeft-click to place, Right-click to cancel.", _hint);
-        }
-
         GUILayout.EndScrollView();
-
-        GUILayout.FlexibleSpace();
-        GUILayout.Space(8f);
-        if (GUILayout.Button("Exit Build Mode (B)", _button, GUILayout.Height(Mathf.Max(36f, Screen.height * (buttonHPct * 0.9f)))))
-        {
-            bm.SetActive(false);
-        }
 
         GUILayout.EndArea();
     }
-}
 
-internal struct GUIStateScope : System.IDisposable
-{
-    private readonly bool prev;
-    public GUIStateScope(bool enabled) { prev = GUI.enabled; GUI.enabled = enabled; }
-    public void Dispose() { GUI.enabled = prev; }
+    static List<BuildingDef> GetPaletteDefs()
+    {
+        // If a DefDatabase exists, use it. Otherwise return a local fallback.
+        var list = new List<BuildingDef>();
+        try
+        {
+            var db = DefDatabase.Instance; // adjust if your singleton accessor differs
+            if (db != null && db.Buildings != null && db.Buildings.Count > 0)
+            {
+                foreach (var b in db.Buildings)
+                {
+                    if (b.showInPalette) list.Add(b);
+                }
+                // If nothing was explicitly marked for palette, surface Construction Board if present
+                if (list.Count == 0)
+                {
+                    var cb = db.Buildings.FirstOrDefault(x => x.defName == "ConstructionBoard");
+                    if (cb != null) list.Add(cb);
+                }
+                if (list.Count > 0) return list;
+            }
+        }
+        catch { /* fall through to fallback */ }
+
+        // Fallback minimal def for bring-up
+        list.Add(new BuildingDef
+        {
+            defName = "ConstructionBoard",
+            label = "Construction Board",
+            width = 3,
+            height = 1,
+            unique = true,
+            showInPalette = true,
+            visualRef = "ConstructionBoardVisual",
+            category = "Stations"
+        });
+        return list;
+    }
 }
 
 
 // ===== FILE: Assets/Scripts/Build/BuildPlacementTool.cs =====
-using System;
-using System.Reflection;
 using UnityEngine;
 using FantasyColony.Defs;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem; // New Input System support
-#endif
 
 /// <summary>
-/// Handles in-world placement of buildings while a placement tool is active.
-/// This version targets a top-down world on the XZ plane (y = up).
+/// Minimal placement tool for the Construction Board bring-up:
+///  - Shows a snapping ghost to the grid
+///  - Left-click to place; ESC to cancel (handled by controller too)
+///  - Enforces uniqueness for ConstructionBoard
 /// </summary>
 public class BuildPlacementTool : MonoBehaviour
 {
-    private BuildTool _tool = BuildTool.None;
-    private GameObject _ghost;
-    private MeshRenderer _ghostMr;
-    private GameObject _marker;
-    private bool _canPlace;
-    private Vector3 _snapWorldPos;
-    private Vector2Int _snapGridPos;
-    private Vector2Int _footSize = Vector2Int.one; // current tool footprint in tiles
-    private Vector3 _anchor;
-    private float _groundConst; // y for XZ, z for XY
-    private GridPlane _plane = GridPlane.XY;
+    [Header("Grid")]
+    public float tileSize = 1f;
 
-    // Grid snapshot via reflection to avoid tight coupling
-    private float _tile = 1f; private int _w = 128; private int _h = 128;
-    private Vector3 _gridMinWorld; // bottom-left world corner of tile (0,0)
-    private bool _haveBounds;
-    private int _gridLayer = 0; // render layer to use for ghost/marker/visuals
-    private string _activeBuildingDefId = "core.Building.ConstructionBoard";
-    private VisualDef _ghostVDef; // cached visual for the active building
-    private string _lastPlaceStatus = string.Empty;
+    [Header("Ghost")]
+    public float ghostAlpha = 0.5f;
+    GameObject ghostGO;
+    SpriteRenderer ghostSr;
 
-    private Camera _cam;
-    private static Sprite _whiteSprite;
+    BuildModeController ctrl;
+    Camera cam;
+    BuildTool active = BuildTool.None;
 
-    private void SyncToolFromController()
+    void Start()
     {
-        var bm = BuildModeController.Instance;
-        if (bm == null) return;
-        if (_tool != bm.CurrentTool)
-        {
-            _tool = bm.CurrentTool;
-        }
-        // Always refresh footprint (avoid stale 1x1)
-        _footSize = GetFootprint();
+        ctrl = GetComponent<BuildModeController>();
+        cam  = Camera.main;
     }
 
     public void SetTool(BuildTool tool)
     {
-        _tool = tool;
-        _footSize = GetFootprint();
-        EnsureGhost();
-        EnsureMarker();
-        ResolveActiveVisual();
-    }
-
-    // --- Input helpers: support both legacy Input and the new Input System ---
-    private Vector2 GetMousePosition()
-    {
-#if ENABLE_INPUT_SYSTEM
-        if (Mouse.current != null)
+        active = tool;
+        EnsureGhostDestroyed();
+        if (active == BuildTool.PlaceConstructionBoard && ctrl.SelectedBuildingDef != null)
         {
-            return Mouse.current.position.ReadValue();
+            EnsureGhost(ctrl.SelectedBuildingDef);
         }
-#endif
-        return Input.mousePosition;
     }
 
-    private bool LeftClickDown()
+    void Update()
     {
-#if ENABLE_INPUT_SYSTEM
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) return true;
-#endif
-        return Input.GetMouseButtonDown(0);
-    }
+        if (active == BuildTool.None) return;
+        if (cam == null) cam = Camera.main;
 
-    private bool RightClickDown()
-    {
-#if ENABLE_INPUT_SYSTEM
-        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame) return true;
-#endif
-        return Input.GetMouseButtonDown(1);
-    }
-
-    private bool CancelPressed()
-    {
-#if ENABLE_INPUT_SYSTEM
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) return true;
-#endif
-        return Input.GetKeyDown(KeyCode.Escape);
-    }
-
-    private void Update()
-    {
-        // Drive placement every frame
-        SyncToolFromController();
-        ReadGridInfo(); // keep bounds/plane fresh
-
-        if (_tool == BuildTool.None)
+        var def = ctrl.SelectedBuildingDef;
+        if (def == null)
         {
-            KillAllPreviews();
+            ClearTool();
             return;
         }
 
-        // Update ghost & validity continuously
-        UpdateGhost();
-
-        // Handle input
-        if (LeftClickDown())
+        // Move ghost to snapped mouse position
+        var mpos = Input.mousePosition;
+        var world = cam.ScreenToWorldPoint(new Vector3(mpos.x, mpos.y, -cam.transform.position.z));
+        world.z = 0f; // 2D XY plane
+        var snapped = SnapToGrid(world, def);
+        if (ghostGO != null)
         {
-            Debug.Log("[BuildPlacementTool] Left click detected -> TryPlace");
-            TryPlace();
+            ghostGO.transform.position = snapped;
         }
-        else if (RightClickDown() || CancelPressed())
-        {
-            Debug.Log("[BuildPlacementTool] Cancel detected -> CancelPlacement");
-            CancelPlacement();
-        }
-    }
 
-    private void ReadGridInfo()
-    {
-        var grid = FindObjectOfTypeByName("SimpleGridMap");
-        _tile = 1f; _w = 128; _h = 128;
-        _haveBounds = false;
-        if (grid != null)
+        // Click to place
+        if (Input.GetMouseButtonDown(0))
         {
-            TryGetField(grid, "tileSize", ref _tile);
-            TryGetField(grid, "width", ref _w);
-            TryGetField(grid, "height", ref _h);
-
-            // Try to find a Renderer to get true world bounds and deduce the plane
-            var rend = (grid as Component).GetComponentInChildren<Renderer>();
-            if (rend != null)
-            {
-                var b = rend.bounds;
-                // Decide plane by which axis is thinnest
-                if (b.size.z < b.size.y && b.size.z < b.size.x)
-                {
-                    // XY world (thin Z)
-                    _plane = GridPlane.XY;
-                    GridSpace.Plane = _plane;
-                    _groundConst = b.center.z;
-                    _gridMinWorld = new Vector3(b.min.x, b.min.y, _groundConst);
-                    _gridLayer = rend.gameObject.layer;
-                    _haveBounds = true;
-                }
-                else
-                {
-                    // XZ world (thin Y)
-                    _plane = GridPlane.XZ;
-                    GridSpace.Plane = _plane;
-                    _groundConst = b.center.y;
-                    _gridMinWorld = new Vector3(b.min.x, _groundConst, b.min.z);
-                    _gridLayer = rend.gameObject.layer;
-                    _haveBounds = true;
-                }
-            }
-            else
-            {
-                // Fallback: assume XY with z=0
-                _plane = GridPlane.XY;
-                GridSpace.Plane = _plane;
-                _groundConst = 0f;
-                _gridLayer = 0; // Default
-            }
-        }
-        else
-        {
-            _plane = GridPlane.XY;
-            GridSpace.Plane = _plane;
-            _groundConst = 0f;
-            _gridLayer = 0;
+            TryPlace(def, snapped);
         }
     }
 
-    private void UpdateGhost()
+    void TryPlace(BuildingDef def, Vector3 pos)
     {
-        var cam = GetCamera();
-        if (cam == null) return; // can't place without a camera
-
-        if (!TryGetMouseOnGround(cam, out var world)) return;
-        // show marker even before we know if placement is valid
-        if (_marker == null) EnsureMarker();
-        _anchor = _haveBounds ? _gridMinWorld : GuessCenteredAnchor();
-        _footSize = GetFootprint();
-        if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1); // belt & suspenders
-        if (_ghostVDef == null) ResolveActiveVisual();
-
-        // Snap to grid anchored at bottom-left on the active plane
-        int gx, gy;
-        if (_plane == GridPlane.XZ)
+        // For MVP: explicitly handle uniqueness for ConstructionBoard
+        if (def.unique && FindObjectOfType<ConstructionBoard>() != null)
         {
-            gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
-            gy = Mathf.RoundToInt((world.z - _anchor.z) / _tile);
-        }
-        else
-        {
-            gx = Mathf.RoundToInt((world.x - _anchor.x) / _tile);
-            gy = Mathf.RoundToInt((world.y - _anchor.y) / _tile);
-        }
-        gx = Mathf.Clamp(gx, -_w, _w * 2);
-        gy = Mathf.Clamp(gy, -_h, _h * 2);
-        // bottom-left of footprint
-        _snapGridPos = new Vector2Int(gx, gy);
-        float cx = _anchor.x + ((gx + _footSize.x * 0.5f) * _tile);
-        if (_plane == GridPlane.XZ)
-        {
-            float cz = _anchor.z + ((gy + _footSize.y * 0.5f) * _tile);
-            _snapWorldPos = new Vector3(cx, _groundConst + 0.02f, cz);
-        }
-        else
-        {
-            float cy = _anchor.y + ((gy + _footSize.y * 0.5f) * _tile);
-            _snapWorldPos = new Vector3(cx, cy, _groundConst + 0.0f);
-        }
-
-        _canPlace = IsInsideGrid(_snapGridPos, _footSize) && IsPlacementAllowedHere();
-
-        EnsureGhost();
-
-        // Color + transforms
-        SetGhostColor(_canPlace ? new Color(0.2f, 0.9f, 0.2f, 0.35f) : new Color(0.9f, 0.2f, 0.2f, 0.35f));
-        _ghost.transform.position = _snapWorldPos;
-        _ghost.transform.localScale = new Vector3(_footSize.x * _tile, _footSize.y * _tile, 1f);
-        _ghost.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
-
-        // Raw hit marker (tiny) at mouse world
-        if (_marker != null)
-        {
-            _marker.transform.position = new Vector3(world.x, world.y, -0.02f);
-            _marker.transform.localScale = Vector3.one * Mathf.Max(0.1f,_tile*0.2f);
-            _marker.transform.rotation = _plane == GridPlane.XZ ? Quaternion.Euler(-90f, 0f, 0f) : Quaternion.identity;
-        }
-    }
-
-    private bool IsInsideGrid(Vector2Int p, Vector2Int size)
-    {
-        if (!_haveBounds) // be permissive if we don't know exact bounds
-            return p.x >= -_w && p.y >= -_h && p.x + size.x <= _w * 2 && p.y + size.y <= _h * 2;
-        return p.x >= 0 && p.y >= 0 && p.x + size.x <= _w && p.y + size.y <= _h;
-    }
-
-    private bool IsPlacementAllowedHere()
-    {
-        if (_tool == BuildTool.PlaceConstructionBoard && BuildModeController.UniqueBuildingExists<ConstructionBoard>())
-            return false; // unique per map
-
-        // Check for any existing Building overlapping this footprint
-        Building[] all;
-#if UNITY_2023_1_OR_NEWER
-        all = UnityEngine.Object.FindObjectsByType<Building>(FindObjectsSortMode.None);
-#else
-        all = FindObjectsOfType<Building>();
-#endif
-        foreach (var b in all)
-        {
-            if (RectOverlaps(b.GridPos, b.size, _snapGridPos, _footSize)) return false;
-        }
-        return true;
-    }
-
-    private static bool RectOverlaps(Vector2Int aPos, Vector2Int aSize, Vector2Int bPos, Vector2Int bSize)
-    {
-        return aPos.x < bPos.x + bSize.x && aPos.x + aSize.x > bPos.x &&
-               aPos.y < bPos.y + bSize.y && aPos.y + aSize.y > bPos.y;
-    }
-
-    private void TryPlace()
-    {
-        // Ensure we're using the latest tool info
-        SyncToolFromController();
-        if (_tool == BuildTool.PlaceConstructionBoard) _footSize = new Vector2Int(3, 1);
-
-        if (!_canPlace) return;
-
-        Transform parent = EnsurePlacedParent2D() ?? EnsureBuildingsParent();
-        Debug.Log($"[BuildPlacementTool] Placing {_tool} at grid {_snapGridPos} world {_snapWorldPos}");
-
-        switch (_tool)
-        {
-            case BuildTool.PlaceConstructionBoard:
-            {
-                var go = new GameObject("Construction Board");
-                go.transform.SetParent(parent, worldPositionStays: false);
-                // Align to bottom-left tile of the footprint
-                float wx = _anchor.x + (_snapGridPos.x * _tile);
-                if (_plane == GridPlane.XZ)
-                {
-                    float wz = _anchor.z + (_snapGridPos.y * _tile);
-                    go.transform.position = new Vector3(wx, _groundConst, wz);
-                }
-                else
-                {
-                    float wy = _anchor.y + (_snapGridPos.y * _tile);
-                    go.transform.position = new Vector3(wx, wy, 0f);
-                }
-
-                var board = go.AddComponent<ConstructionBoard>();
-                board.displayName = "Construction Board";
-                board.uniquePerMap = true;
-                board.size = new Vector2Int(3, 1);
-                board.OnPlaced(_snapGridPos, _tile);
-
-                // Attach visual via defs (2D sprite)
-                var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
-                var placed = SpriteVisualFactory2D.SpawnPlaced(vdef.id, board.size, _tile <= 0 ? 1f : _tile, go.transform);
-                if (placed == null)
-                {
-                    Debug.LogError("[BuildPlacementTool] SpawnPlaced returned null – visual def missing?");
-                    _lastPlaceStatus = "ERR: no visual";
-                }
-                else
-                {
-                    // Ensure render priority & layer similar to pawns
-                    var sr = placed.GetComponent<SpriteRenderer>();
-                    if (sr != null)
-                    {
-                        sr.sortingLayerName = SpriteVisualFactory2D.SortingLayerName;
-                        sr.sortingOrder = SpriteVisualFactory2D.GroundOrder + 3;
-                        sr.enabled = true;
-                    }
-                    placed.SetActive(true);
-                    _lastPlaceStatus = "OK";
-                }
-
-                // Clear previews and finalize tool state for unique-per-map
-                CleanupAfterPlacement(exitTool: board.uniquePerMap);
-                break;
-            }
-        }
-    }
-
-    private void EnsureGhost()
-    {
-        if (_ghost != null) return;
-        var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
-        _ghost = SpriteVisualFactory2D.SpawnGhost(vdef.id, _footSize, _tile, this.transform);
-        var sr = _ghost.GetComponent<SpriteRenderer>();
-        if (sr != null) sr.sortingOrder += 2; // ensure on top of ground
-        _ghostMr = null;
-    }
-
-    private void EnsureMarker()
-    {
-        if (_marker != null) return;
-        var vdef = _ghostVDef ?? new VisualDef{ id = "core.Visual.Board_Default", plane = "XY" };
-        _marker = SpriteVisualFactory2D.SpawnGhost(vdef.id, Vector2Int.one, _tile*0.2f, this.transform);
-        var sr = _marker.GetComponent<SpriteRenderer>();
-        if (sr != null) sr.color = new Color(1f,1f,0.2f,0.85f);
-    }
-
-    private Transform EnsureBuildingsParent()
-    {
-        var world = GameObject.Find("World");
-        if (world == null)
-        {
-            world = new GameObject("World");
-        }
-        var trans = world.transform.Find("Buildings");
-        if (trans == null)
-        {
-            var go = new GameObject("Buildings");
-            trans = go.transform;
-            trans.SetParent(world.transform, worldPositionStays: false);
-            trans.localPosition = Vector3.zero;
-        }
-        return trans;
-    }
-
-    private static Component FindObjectOfTypeByName(string typeName)
-    {
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            var t = asm.GetType(typeName);
-            if (t == null) continue;
-#if UNITY_2023_1_OR_NEWER
-            var comp = UnityEngine.Object.FindAnyObjectByType(t) as Component;
-#else
-            var comp = UnityEngine.Object.FindObjectOfType(t) as Component;
-#endif
-            if (comp != null) return comp;
-        }
-        return null;
-    }
-
-    private static void TryGetField<T>(Component c, string field, ref T value)
-    {
-        if (c == null) return;
-        var f = c.GetType().GetField(field, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        if (f != null)
-        {
-            object v = f.GetValue(c);
-            if (v is T tv) value = tv;
-            else
-            {
-                try { value = (T)System.Convert.ChangeType(v, typeof(T)); } catch { }
-            }
-        }
-    }
-
-    private Camera GetCamera()
-    {
-        if (_cam != null) return _cam;
-        _cam = Camera.main;
-        if (_cam == null)
-        {
-            if (Camera.allCamerasCount > 0)
-            {
-                var arr = Camera.allCameras;
-                if (arr != null && arr.Length > 0) _cam = arr[0];
-            }
-        }
-        return _cam;
-    }
-
-    private Vector3 GuessCenteredAnchor()
-    {
-        if (_plane == GridPlane.XZ)
-            return new Vector3(-_w * _tile * 0.5f, _groundConst, -_h * _tile * 0.5f);
-        else
-            return new Vector3(-_w * _tile * 0.5f, -_h * _tile * 0.5f, _groundConst);
-    }
-
-    private Vector2Int GetFootprint()
-    {
-        switch (_tool)
-        {
-            case BuildTool.PlaceConstructionBoard: return new Vector2Int(3, 1);
-            default: return Vector2Int.one;
-        }
-    }
-
-    // Optional tiny debug overlay to help diagnose placement in the wild
-    private void OnGUI()
-    {
-        SyncToolFromController();
-        GUI.depth = -32767; // draw on top of windows
-        if (_tool == BuildTool.None) return; // only when a build tool is active
-        var style = new UnityEngine.GUIStyle(UnityEngine.GUI.skin.box);
-        style.alignment = TextAnchor.UpperLeft;
-        style.fontSize = 14;
-        string plane = _plane.ToString();
-        string reason = _canPlace ? "" : InvalidReason();
-        string worldStr = _plane == GridPlane.XZ ? $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}" : $"{_snapWorldPos.x:F2},{_snapWorldPos.y:F2},{_snapWorldPos.z:F2}";
-        string anchorStr = _plane == GridPlane.XZ ? $"{_anchor.x:F2},{_groundConst:F2},{_anchor.z:F2}" : $"{_anchor.x:F2},{_anchor.y:F2},{_groundConst:F2}";
-        Vector2 mpLegacy = Input.mousePosition;
-        Vector2 mpNIS = Vector2.zero;
-#if ENABLE_INPUT_SYSTEM
-        if (UnityEngine.InputSystem.Mouse.current != null)
-        {
-            mpNIS = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
-        }
-#endif
-        string text = $"Plane: {plane}\nTool: {_tool}\nDef: {_activeBuildingDefId} -> GhostVisual: {(_ghostVDef!=null ? _ghostVDef.id : "(default)")}\nGrid: {_snapGridPos.x},{_snapGridPos.y}\nWorld: {worldStr}\nMouse Legacy: {mpLegacy.x:F0},{mpLegacy.y:F0}  NIS: {mpNIS.x:F0},{mpNIS.y:F0}\nAnchor: {anchorStr}\nHaveBounds: {_haveBounds}  Tile: {_tile:F2}\nSorting: {SpriteVisualFactory2D.SortingLayerName} / base {SpriteVisualFactory2D.GroundOrder}\nFoot: {_footSize.x}x{_footSize.y}\nValid: {_canPlace} {reason}\nPlaced Last: {_lastPlaceStatus}";
-        UnityEngine.GUI.Label(new UnityEngine.Rect(8, 8, 760, 240), text, style);
-    }
-
-    private bool CameraHasLayer(int layer)
-    {
-        var cam = GetCamera(); if (cam == null) return true;
-        return (cam.cullingMask & (1 << layer)) != 0;
-    }
-
-    private bool TryGetMouseOnGround(Camera cam, out Vector3 world)
-    {
-        // 1) Try raycast to plane (works in both perspective and ortho)
-        Vector2 mp = GetMousePosition();
-        Ray ray = cam.ScreenPointToRay(new Vector3(mp.x, mp.y, 0f));
-        Plane ground = _plane == GridPlane.XZ
-            ? new Plane(Vector3.up, new Vector3(0f, _groundConst, 0f))
-            : new Plane(Vector3.forward, new Vector3(0f, 0f, _groundConst));
-        if (ground.Raycast(ray, out float enter))
-        {
-            world = ray.GetPoint(enter);
-            return true;
-        }
-
-        // 2) Fallback via depth from ground reference (covers edge camera setups)
-        Vector3 groundRef = _plane == GridPlane.XZ ? new Vector3(0f, _groundConst, 0f) : new Vector3(0f, 0f, _groundConst);
-        float depth = cam.WorldToScreenPoint(groundRef).z;
-        world = cam.ScreenToWorldPoint(new Vector3(mp.x, mp.y, depth));
-        if (!float.IsNaN(world.x)) return true;
-
-        // 3) Final fallback: project using camera basis onto plane
-        Vector3 origin = cam.transform.position;
-        Vector3 dir = (cam.transform.forward.sqrMagnitude < 0.0001f) ? Vector3.forward : cam.transform.forward;
-        Ray ray2 = new Ray(origin, dir);
-        if (ground.Raycast(ray2, out float enter2)) { world = ray2.GetPoint(enter2); return true; }
-        return true;
-    }
-
-    private void ResolveActiveVisual()
-    {
-        // Ensure defs are loaded once
-        if (DefDatabase.Visuals.Count == 0) DefDatabase.LoadAll();
-
-        // For now, only Construction Board is placed by this tool
-        // This maps to core.Building.ConstructionBoard → core.Visual.Board_Default
-        BuildingDef bdef = null;
-        DefDatabase.Buildings.TryGetValue("core.Building.ConstructionBoard", out bdef);
-        if (bdef == null)
-        {
-            // synthesize a default
-            _ghostVDef = new VisualDef();
+            // silently ignore for now; could beep/flash UI
             return;
         }
-        VisualDef vdef = null;
-        if (!string.IsNullOrEmpty(bdef.visual_ref)) DefDatabase.Visuals.TryGetValue(bdef.visual_ref, out vdef);
-        _ghostVDef = vdef ?? new VisualDef();
+
+        // Instantiate placed object
+        GameObject go = new GameObject(def.label ?? def.defName ?? "Building");
+        go.transform.position = pos;
+
+        // Attach the specific behaviour for Construction Board MVP
+        var board = go.AddComponent<ConstructionBoard>();
+        // If your ConstructionBoard has an OnPlaced API, you can call it here:
+        // board.OnPlaced(new Vector2Int(def.width, def.height), tileSize);
+
+        // Make a very simple visual for MVP if no sprite system is wired yet
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = MakeUnitSprite();
+        go.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f);
+
+        ClearTool(); // place once for MVP
     }
 
-    private void SetGhostColor(Color c)
+    void ClearTool()
     {
-        if (_ghostMr != null)
-        {
-            // Ensure we're not editing a shared material instance in play mode
-            if (Application.isPlaying)
-            {
-                if (_ghostMr.material != null) _ghostMr.material.color = c;
-            }
-            else
-            {
-                if (_ghostMr.sharedMaterial != null) _ghostMr.sharedMaterial.color = c;
-            }
-        }
+        active = BuildTool.None;
+        EnsureGhostDestroyed();
     }
 
-    private void DestroyMarker()
+    Vector3 SnapToGrid(Vector3 world, BuildingDef def)
     {
-        if (_marker != null)
-        {
-            Destroy(_marker);
-            _marker = null;
-        }
+        float w = def.width * tileSize;
+        float h = def.height * tileSize;
+        // Snap to tile grid, keep pivot at center of the footprint
+        float x = Mathf.Floor(world.x / tileSize) * tileSize + (w * 0.5f) - (tileSize * 0.5f);
+        float y = Mathf.Floor(world.y / tileSize) * tileSize + (h * 0.5f) - (tileSize * 0.5f);
+        return new Vector3(x, y, 0f);
     }
 
-    private string InvalidReason()
+    void EnsureGhost(BuildingDef def)
     {
-        if (!IsInsideGrid(_snapGridPos, _footSize)) return "(out of bounds)";
-        if (_tool == BuildTool.PlaceConstructionBoard && BuildModeController.UniqueBuildingExists<ConstructionBoard>())
-            return "(unique-per-map already placed)";
-        var all = UnityEngine.Object.FindObjectsByType<Building>(FindObjectsSortMode.None);
-        foreach (var b in all)
-            if (RectOverlaps(b.GridPos, b.size, _snapGridPos, _footSize)) return $"(overlap with {b.displayName})";
-        return "";
+        EnsureGhostDestroyed();
+        ghostGO = new GameObject("Ghost_" + (def.label ?? def.defName));
+        ghostSr = ghostGO.AddComponent<SpriteRenderer>();
+        ghostSr.sprite = MakeUnitSprite();
+        var c = ghostSr.color;
+        c.a = ghostAlpha;
+        ghostSr.color = c;
+        ghostGO.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f);
     }
 
-    private void CancelPlacement()
+    void EnsureGhostDestroyed()
     {
-        var bm = BuildModeController.Instance;
-        if (bm != null)
-        {
-            bm.SetTool(BuildTool.None);
-        }
-        else
-        {
-            SetTool(BuildTool.None);
-        }
-        KillAllPreviews();
+        if (ghostGO != null) Destroy(ghostGO);
+        ghostGO = null;
+        ghostSr = null;
     }
 
-    private void CleanupAfterPlacement(bool exitTool)
+    // Generates/returns a 1x1 white sprite for simple visuals
+    static Sprite _unitSprite;
+    static Sprite MakeUnitSprite()
     {
-        KillAllPreviews();
-        if (exitTool)
-        {
-            var bm = BuildModeController.Instance;
-            if (bm != null) bm.SetTool(BuildTool.None);
-            else SetTool(BuildTool.None);
-        }
-    }
-
-    private void KillAllPreviews()
-    {
-        DestroyGhost();
-        DestroyMarker();
-        foreach (var sr in GetComponentsInChildren<SpriteRenderer>(true))
-        {
-            var n = sr.gameObject.name;
-            if (n.Contains("Build Ghost") || n.Contains("Build Marker"))
-            {
-                Destroy(sr.gameObject);
-            }
-        }
-    }
-
-    private Transform EnsurePlacedParent2D()
-    {
-        var t = GameObject.Find("World2D/Buildings")?.transform;
-        if (t != null) return t;
-        var root = GameObject.Find("World2D")?.transform;
-        if (root == null)
-        {
-            var go = new GameObject("World2D");
-            root = go.transform; root.position = Vector3.zero; root.localScale = Vector3.one;
-        }
-        var b = new GameObject("Buildings").transform; b.SetParent(root, false);
-        return b;
-    }
-
-    private void DestroyGhost()
-    {
-        if (_ghost != null)
-        {
-            UnityEngine.Object.Destroy(_ghost);
-            _ghost = null;
-            _ghostMr = null;
-        }
+        if (_unitSprite != null) return _unitSprite;
+        var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+        tex.SetPixel(0, 0, Color.white);
+        tex.Apply(false, false);
+        _unitSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        return _unitSprite;
     }
 }
 
