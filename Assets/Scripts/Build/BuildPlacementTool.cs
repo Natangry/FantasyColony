@@ -31,8 +31,8 @@ public class BuildPlacementTool : MonoBehaviour
     BuildTool active = BuildTool.None;
 
     Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0 (adjustable)
-    // Prevent click-through after arming tool from a UI button press
-    bool suppressClickUntilMouseUp = false;
+    // Prevent click-through after arming tool from a UI button press (time gate)
+    float blockClicksUntil = 0f;
     float armBlockUntilTime = 0f;
     static bool _warnedSpriteMissing = false;
     // cached cell size set when arming/first hit
@@ -77,10 +77,10 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureGhostDestroyed();
         if (active == BuildTool.PlaceConstructionBoard && ctrl.SelectedBuildingDef != null)
         {
-            suppressClickUntilMouseUp = true; // wait for left mouse to be released once
-            armBlockUntilTime = Time.realtimeSinceStartup + 0.12f;
+            // simple time gate: ignore clicks right after arming
+            armBlockUntilTime = Time.realtimeSinceStartup + 0.08f;
+            blockClicksUntil = armBlockUntilTime;
             EnsureGhost(ctrl.SelectedBuildingDef);
-            // Position ghost immediately under cursor (no first-frame origin flicker)
             cam = GetActiveCamera();
             if (_cachedCellSize <= 0f) _cachedCellSize = GetCellSize();
             groundPlane = new Plane(Vector3.up, GetGroundY());
@@ -127,37 +127,37 @@ public class BuildPlacementTool : MonoBehaviour
             ghostGO.transform.position = pos + new Vector3(0f, 0.02f, 0f);
         }
 
-        // Click to place
-        // Ignore the initial click that selected the tool (click-through from UI)
-        if (suppressClickUntilMouseUp)
-        {
-            bool released = false;
+        // Cancel with right-click or Esc (both input systems)
+        bool cancel = false;
 #if ENABLE_INPUT_SYSTEM
-            if (Mouse.current != null) released |= Mouse.current.leftButton.wasReleasedThisFrame;
+        if (Mouse.current != null) cancel |= Mouse.current.rightButton.wasPressedThisFrame;
+        if (Keyboard.current != null) cancel |= Keyboard.current.escapeKey.wasPressedThisFrame;
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
-            released |= Input.GetMouseButtonUp(0);
+        cancel |= Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape);
 #endif
-            if (released && Time.realtimeSinceStartup >= armBlockUntilTime)
-                suppressClickUntilMouseUp = false;
+        if (cancel)
+        {
+            ClearTool();
+            return;
         }
-        else
-        {
-            bool clickDown = false;
+
+        // Click to place (single click after time gate)
+        if (Time.realtimeSinceStartup < blockClicksUntil)
+            return;
+
+        bool clickDown = false;
 #if ENABLE_INPUT_SYSTEM
-            if (Mouse.current != null) clickDown |= Mouse.current.leftButton.wasPressedThisFrame;
+        if (Mouse.current != null) clickDown |= Mouse.current.leftButton.wasPressedThisFrame;
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
-            clickDown |= Input.GetMouseButtonDown(0);
+        clickDown |= Input.GetMouseButtonDown(0);
 #endif
-            // Avoid placing when pointer over UI
-            var mp = GetMouseScreenPos();
-            if (IsPointerOverUI(mp)) clickDown = false;
-
-            if (clickDown)
-            {
-                TryPlace(def, snapped);
-            }
+        var mp = GetMouseScreenPos();
+        if (IsPointerOverUI(mp)) clickDown = false;
+        if (clickDown)
+        {
+            TryPlace(def, snapped);
         }
     }
 
@@ -291,8 +291,15 @@ public class BuildPlacementTool : MonoBehaviour
     {
         if (_cachedCellSize <= 0f) _cachedCellSize = GetCellSize();
         // Force exact grid footprint in world space: width × height tiles
-        float targetW = Mathf.Max(1, def.width) * _cachedCellSize;
-        float targetH = Mathf.Max(1, def.height) * _cachedCellSize;
+        // Construction Board footprint is 3x1 tiles; others use their def dims
+        int w = Mathf.Max(1, def.width);
+        int h = Mathf.Max(1, def.height);
+        if (!string.IsNullOrEmpty(def.defName) && def.defName.Equals("ConstructionBoard", StringComparison.OrdinalIgnoreCase))
+        {
+            w = 3; h = 1;
+        }
+        float targetW = w * _cachedCellSize;
+        float targetH = h * _cachedCellSize;
         Vector2 visualSize;
         if (spriteOrNull != null)
         {
@@ -308,8 +315,11 @@ public class BuildPlacementTool : MonoBehaviour
         float sy = (visualSize.y == 0) ? 1f : (targetH / visualSize.y);
         var scale = new Vector3(sx, sy, 1f);
 
-        // Optional: double size (visual-only) → uncomment if desired
-        // if (def.defName.Contains("ConstructionBoard")) scale *= 2f;
+        // Double the visual size while keeping the cell footprint (requested)
+        if (!string.IsNullOrEmpty(def.defName) && def.defName.Equals("ConstructionBoard", StringComparison.OrdinalIgnoreCase))
+        {
+            scale *= 2f;
+        }
         go.transform.localScale = scale;
         // Lay the sprite flat on XZ ground (face camera looking down -Y)
         go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
@@ -363,7 +373,7 @@ public class BuildPlacementTool : MonoBehaviour
         var g = WorldToGrid(pos, cell);
         Debug.Log($"[Build] Placed {def.defName} at world {pos} -> grid {g} (cellSize={cell})");
 
-        ClearTool(); // place once for MVP
+        // Do NOT clear tool on place; allow repeat placement until user cancels with RMB/ESC
     }
 
     void ClearTool()
