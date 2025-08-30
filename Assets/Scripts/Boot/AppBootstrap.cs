@@ -11,7 +11,8 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class AppBootstrap
 {
-    static readonly string[] IntroTypeHints = { "intro", "title", "menu" };
+    // Only consider intro-like components when they implement IIntroOverlay or match these hints.
+    static readonly string[] IntroTypeHints = { "intro", "title" };
     static readonly string[] VisibleFieldNames = { "showMenu", "isVisible", "visible", "IsVisible" };
     static readonly string[] ShowMethodNames = { "Show", "Open", "Enable", "ShowMenu", "ShowIntro", "SetVisible", "SetActive" };
     static readonly string[] HideMethodNames = { "Hide", "Close", "Disable", "HideMenu", "HideIntro", "SetVisible", "SetActive" };
@@ -34,10 +35,12 @@ public static class AppBootstrap
     {
         if (IntroMenuOverlay.IsOpen) return true;
         var comp = FindIntroComponentInScene();
-        if (comp == null) return false;
-        // Heuristics: visible flag or active+enabled
-        if (TryGetVisibleFlag(comp, out bool vis)) return vis;
-        return comp.isActiveAndEnabled && comp.gameObject.activeInHierarchy;
+        if (comp is IIntroOverlay)
+        {
+            if (TryGetVisibleFlag(comp, out bool vis)) return vis;
+            return comp.isActiveAndEnabled && comp.gameObject.activeInHierarchy;
+        }
+        return false;
     }
 
     /// <summary>Shows the intro overlay (prefer the project's real one; otherwise spawn a fallback).</summary>
@@ -97,6 +100,15 @@ public static class AppBootstrap
     static MonoBehaviour FindIntroComponentInScene()
     {
         var all = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        // First, look for explicit intro overlays.
+        foreach (var mb in all)
+        {
+            if (mb is IntroScreen) continue;
+            if (mb is PauseMenuController) continue;
+            if (mb is IIntroOverlay) return mb;
+        }
+
+        // Fallback: heuristics based on type name hints (intro/title only).
         foreach (var mb in all)
         {
             if (mb is IntroScreen) continue;
@@ -116,6 +128,7 @@ public static class AppBootstrap
             foreach (var t in types)
             {
                 if (!typeof(MonoBehaviour).IsAssignableFrom(t)) continue;
+                if (typeof(IIntroOverlay).IsAssignableFrom(t)) return t;
                 var n = t.Name.ToLowerInvariant();
                 if (IntroTypeHints.Any(h => n.Contains(h))) return t;
             }

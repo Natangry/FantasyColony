@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 /// Scene-less Intro overlay (uGUI) with Map Size presets and Start/Quit.
 /// Large is default; Huge is available.
 /// </summary>
-public class IntroMenuOverlay : MonoBehaviour
+public class IntroMenuOverlay : MonoBehaviour, IIntroOverlay
 {
     public static bool IsOpen => _root != null && _root.activeSelf;
 
