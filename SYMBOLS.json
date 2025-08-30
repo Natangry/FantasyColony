@@ -541,6 +541,228 @@
   },
   {
     "kind": "namespace",
+    "name": "FantasyColony.Core.Lifecycle",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 2
+  },
+  {
+    "kind": "enum",
+    "name": "LifecycleStage",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 8
+  },
+  {
+    "kind": "enum",
+    "name": "StageMoment",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 25
+  },
+  {
+    "kind": "class",
+    "name": "StageContext",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 33
+  },
+  {
+    "kind": "property",
+    "name": "Previous",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 35
+  },
+  {
+    "kind": "property",
+    "name": "Current",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 36
+  },
+  {
+    "kind": "property",
+    "name": "Moment",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 37
+  },
+  {
+    "kind": "property",
+    "name": "UtcNow",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 38
+  },
+  {
+    "kind": "property",
+    "name": "Runner",
+    "file": "Assets/Scripts/Core/Lifecycle/LifecycleStage.cs",
+    "line": 39
+  },
+  {
+    "kind": "namespace",
+    "name": "FantasyColony.Core.Lifecycle",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 2
+  },
+  {
+    "kind": "class",
+    "name": "OnStageAttribute",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 9
+  },
+  {
+    "kind": "class",
+    "name": "OrderBeforeAttribute",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 22
+  },
+  {
+    "kind": "class",
+    "name": "OrderAfterAttribute",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 28
+  },
+  {
+    "kind": "property",
+    "name": "Stage",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 11
+  },
+  {
+    "kind": "property",
+    "name": "Moment",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 12
+  },
+  {
+    "kind": "property",
+    "name": "Order",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 13
+  },
+  {
+    "kind": "property",
+    "name": "RunOnce",
+    "file": "Assets/Scripts/Core/Lifecycle/StageAttributes.cs",
+    "line": 14
+  },
+  {
+    "kind": "namespace",
+    "name": "FantasyColony.Core.Lifecycle",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "HandlerMeta",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 20
+  },
+  {
+    "kind": "class",
+    "name": "StageRegistry",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 35
+  },
+  {
+    "kind": "method",
+    "name": "Equals",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 15
+  },
+  {
+    "kind": "method",
+    "name": "Equals",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 16
+  },
+  {
+    "kind": "method",
+    "name": "GetHashCode",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 17
+  },
+  {
+    "kind": "method",
+    "name": "ToString",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 18
+  },
+  {
+    "kind": "method",
+    "name": "ToString",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 30
+  },
+  {
+    "kind": "method",
+    "name": "Build",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 39
+  },
+  {
+    "kind": "method",
+    "name": "OrderHandlers",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 82
+  },
+  {
+    "kind": "method",
+    "name": "GetHandlers",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 112
+  },
+  {
+    "kind": "method",
+    "name": "PrintReport",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 114
+  },
+  {
+    "kind": "method",
+    "name": "MarkRun",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRegistry.cs",
+    "line": 121
+  },
+  {
+    "kind": "namespace",
+    "name": "FantasyColony.Core.Lifecycle",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 4
+  },
+  {
+    "kind": "class",
+    "name": "StageRunner",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 9
+  },
+  {
+    "kind": "method",
+    "name": "Bootstrap",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 18
+  },
+  {
+    "kind": "method",
+    "name": "AdvanceTo",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 27
+  },
+  {
+    "kind": "method",
+    "name": "InvokeHandlers",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 41
+  },
+  {
+    "kind": "property",
+    "name": "Current",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 13
+  },
+  {
+    "kind": "property",
+    "name": "Previous",
+    "file": "Assets/Scripts/Core/Lifecycle/StageRunner.cs",
+    "line": 14
+  },
+  {
+    "kind": "namespace",
     "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/BuildingDef.cs",
     "line": 3

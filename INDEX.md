@@ -125,6 +125,15 @@
 - **PixelCameraHelper.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
 - **PixelCameraHelper.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta)
 
+## Assets/Scripts/Core/Lifecycle
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core/Lifecycle)
+
+- **LifecycleStage.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/LifecycleStage.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/LifecycleStage.cs)
+- **README.txt** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/README.txt) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/README.txt)
+- **StageAttributes.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/StageAttributes.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/StageAttributes.cs)
+- **StageRegistry.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/StageRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/StageRegistry.cs)
+- **StageRunner.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/StageRunner.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/StageRunner.cs)
+
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
 

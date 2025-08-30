@@ -2532,6 +2532,268 @@ public static class PixelCameraHelper
 
 
 
+// ===== FILE: Assets/Scripts/Core/Lifecycle/LifecycleStage.cs =====
+using System;
+namespace FantasyColony.Core.Lifecycle
+{
+    /// <summary>
+    /// High-level, mutually exclusive app stages. Scene-free.
+    /// Keep this list small and stable; prefer domain events for frequent gameplay signals.
+    /// </summary>
+    public enum LifecycleStage
+    {
+        None = 0,
+        AppBoot,
+        Intro,
+        WorldSetup,
+        WorldSim,
+        EmbarkPrep,
+        MapGen,
+        Gameplay,
+        // Terminal control stages
+        RestartRequested,
+        Shutdown,
+    }
+    /// <summary>
+    /// Moments within a stage transition.
+    /// </summary>
+    public enum StageMoment
+    {
+        Enter = 0,
+        Exit = 1
+    }
+    /// <summary>
+    /// Context passed to lifecycle handlers (optional parameter).
+    /// </summary>
+    public sealed class StageContext
+    {
+        public LifecycleStage Previous { get; internal set; }
+        public LifecycleStage Current { get; internal set; }
+        public StageMoment Moment { get; internal set; }
+        public DateTime UtcNow { get; internal set; }
+        public StageRunner Runner { get; internal set; }
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Core/Lifecycle/StageAttributes.cs =====
+using System;
+namespace FantasyColony.Core.Lifecycle
+{
+    /// <summary>
+    /// Attach to a <c>static</c> method to run it at a specific lifecycle stage/moment.
+    /// Method signature may be <c>void M()</c> or <c>void M(StageContext ctx)</c>.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
+    public sealed class OnStageAttribute : Attribute
+    {
+        public LifecycleStage Stage { get; }
+        public StageMoment Moment { get; }
+        public int Order { get; }
+        public bool RunOnce { get; }
+        public OnStageAttribute(LifecycleStage stage, StageMoment moment = StageMoment.Enter, int order = 0, bool runOnce = false)
+        { Stage = stage; Moment = moment; Order = order; RunOnce = runOnce; }
+    }
+    /// <summary>
+    /// Declare that this handler should run before handlers declared on the given type.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
+    public sealed class OrderBeforeAttribute : Attribute
+    { public Type Type { get; } public OrderBeforeAttribute(Type type) => Type = type; }
+    /// <summary>
+    /// Declare that this handler should run after handlers declared on the given type.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
+    public sealed class OrderAfterAttribute : Attribute
+    { public Type Type { get; } public OrderAfterAttribute(Type type) => Type = type; }
+}
+
+
+// ===== FILE: Assets/Scripts/Core/Lifecycle/StageRegistry.cs =====
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using UnityEngine;
+namespace FantasyColony.Core.Lifecycle
+{
+    internal readonly struct StageKey : IEquatable<StageKey>
+    {
+        public readonly LifecycleStage Stage;
+        public readonly StageMoment Moment;
+        public StageKey(LifecycleStage stage, StageMoment moment) { Stage = stage; Moment = moment; }
+        public bool Equals(StageKey other) => Stage == other.Stage && Moment == other.Moment;
+        public override bool Equals(object obj) => obj is StageKey k && Equals(k);
+        public override int GetHashCode() => ((int)Stage * 397) ^ (int)Moment;
+        public override string ToString() => $"{Stage}/{Moment}";
+    }
+    internal sealed class HandlerMeta
+    {
+        public MethodInfo Method;
+        public Type DeclaringType;
+        public OnStageAttribute Attr;
+        public int Order;
+        public bool RunOnce;
+        public bool HasRun;
+        public List<Type> BeforeTypes = new();
+        public List<Type> AfterTypes = new();
+        public override string ToString() => $"{DeclaringType.FullName}.{Method.Name} [Order={Order}{(RunOnce?", RunOnce":"")}]";
+    }
+    /// <summary>
+    /// Discovers and orders lifecycle handlers. Scene-free and domain-reload safe.
+    /// </summary>
+    internal static class StageRegistry
+    {
+        private static bool _built;
+        private static readonly Dictionary<StageKey, List<HandlerMeta>> _handlers = new();
+        public static void Build()
+        {
+            if (_built) return;
+            var sw = Stopwatch.StartNew();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var metas = new List<(StageKey key, HandlerMeta meta)>();
+            foreach (var asm in assemblies)
+            {
+                Type[] types;
+                try { types = asm.GetTypes(); }
+                catch (ReflectionTypeLoadException e) { types = e.Types.Where(t => t != null).ToArray(); }
+                foreach (var type in types)
+                {
+                    var methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                    foreach (var m in methods)
+                    {
+                        var onStages = (OnStageAttribute[])m.GetCustomAttributes(typeof(OnStageAttribute), false);
+                        if (onStages == null || onStages.Length == 0) continue;
+                        if (m.ReturnType != typeof(void)) { Debug.LogError($"[Lifecycle] {type.FullName}.{m.Name} must return void."); continue; }
+                        var ps = m.GetParameters();
+                        if (ps.Length > 1 || (ps.Length == 1 && ps[0].ParameterType != typeof(StageContext)))
+                        { Debug.LogError($"[Lifecycle] {type.FullName}.{m.Name} has invalid parameters. Use () or (StageContext)."); continue; }
+                        var before = ((OrderBeforeAttribute[])m.GetCustomAttributes(typeof(OrderBeforeAttribute), false)).Select(a => a.Type).Where(t => t != null).Distinct().ToList();
+                        var after  = ((OrderAfterAttribute[]) m.GetCustomAttributes(typeof(OrderAfterAttribute),  false)).Select(a => a.Type).Where(t => t != null).Distinct().ToList();
+                        foreach (var attr in onStages)
+                        {
+                            var meta = new HandlerMeta
+                            { Method = m, DeclaringType = type, Attr = attr, Order = attr.Order, RunOnce = attr.RunOnce, BeforeTypes = new List<Type>(before), AfterTypes = new List<Type>(after) };
+                            metas.Add((new StageKey(attr.Stage, attr.Moment), meta));
+                        }
+                    }
+                }
+            }
+            foreach (var group in metas.GroupBy(x => x.key))
+            {
+                var ordered = OrderHandlers(group.Select(x => x.meta).ToList());
+                _handlers[group.Key] = ordered;
+            }
+            _built = true;
+            sw.Stop();
+            Debug.Log($"[Lifecycle] Registry built in {sw.ElapsedMilliseconds} ms");
+            PrintReport();
+        }
+        private static List<HandlerMeta> OrderHandlers(List<HandlerMeta> list)
+        {
+            var nodes = new HashSet<Type>(list.Select(m => m.DeclaringType));
+            foreach (var m in list) { foreach (var t in m.BeforeTypes) nodes.Add(t); foreach (var t in m.AfterTypes) nodes.Add(t); }
+            var edges = new Dictionary<Type, HashSet<Type>>();
+            foreach (var n in nodes) edges[n] = new HashSet<Type>();
+            foreach (var m in list)
+            { foreach (var b in m.BeforeTypes) edges[m.DeclaringType].Add(b); foreach (var a in m.AfterTypes) edges[a].Add(m.DeclaringType); }
+            var indeg = nodes.ToDictionary(n => n, n => 0);
+            foreach (var kv in edges) foreach (var v in kv.Value) indeg[v] = indeg.TryGetValue(v, out var d) ? d + 1 : 1;
+            var q = new Queue<Type>(indeg.Where(kv => kv.Value == 0).Select(kv => kv.Key));
+            var topo = new List<Type>();
+            while (q.Count > 0)
+            {
+                var u = q.Dequeue(); topo.Add(u);
+                foreach (var v in edges[u]) { indeg[v]--; if (indeg[v] == 0) q.Enqueue(v); }
+            }
+            if (topo.Count != nodes.Count)
+            {
+                Debug.LogError("[Lifecycle] Ordering cycle detected among lifecycle handlers. Check OrderBefore/OrderAfter usage.");
+                return list.OrderBy(m => m.Order).ThenBy(m => m.DeclaringType.FullName).ThenBy(m => m.Method.Name).ToList();
+            }
+            var rank = topo.Select((t, i) => (t, i)).ToDictionary(x => x.t, x => x.i);
+            return list
+                .OrderBy(m => rank.TryGetValue(m.DeclaringType, out var r) ? r : int.MaxValue)
+                .ThenBy(m => m.Order)
+                .ThenBy(m => m.DeclaringType.FullName)
+                .ThenBy(m => m.Method.Name)
+                .ToList();
+        }
+        public static IReadOnlyList<HandlerMeta> GetHandlers(LifecycleStage stage, StageMoment moment)
+        { var key = new StageKey(stage, moment); return _handlers.TryGetValue(key, out var list) ? list : Array.Empty<HandlerMeta>(); }
+        public static void PrintReport()
+        {
+            var sb = new StringBuilder(); sb.AppendLine("[Lifecycle] Registry Report →");
+            foreach (var kv in _handlers.OrderBy(k => (int)k.Key.Stage).ThenBy(k => (int)k.Key.Moment))
+            { sb.AppendLine($"  {kv.Key}:"); var i = 0; foreach (var m in kv.Value) sb.AppendLine($"    {++i,2}. {m}"); }
+            Debug.Log(sb.ToString());
+        }
+        public static void MarkRun(HandlerMeta meta) => meta.HasRun = true;
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/Core/Lifecycle/StageRunner.cs =====
+using System;
+using System.Diagnostics;
+using UnityEngine;
+namespace FantasyColony.Core.Lifecycle
+{
+    /// <summary>
+    /// Drives stage transitions and invokes ordered handlers. Scene-free.
+    /// </summary>
+    public sealed class StageRunner
+    {
+        private static StageRunner _instance;
+        public static StageRunner Instance => _instance ??= new StageRunner();
+        public LifecycleStage Current { get; private set; } = LifecycleStage.None;
+        public LifecycleStage Previous { get; private set; } = LifecycleStage.None;
+        private bool _advancing;
+        private StageRunner() { }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Bootstrap()
+        {
+            try { StageRegistry.Build(); Instance.AdvanceTo(LifecycleStage.AppBoot); }
+            catch (Exception ex) { Debug.LogException(ex); }
+        }
+        /// <summary>
+        /// Transition to the next stage. Safe to call from UI (e.g., Intro Start → WorldSetup).
+        /// Ensures Exit(prev) handlers run before Enter(next) handlers.
+        /// </summary>
+        public void AdvanceTo(LifecycleStage next)
+        {
+            if (_advancing) { Debug.LogWarning($"[Lifecycle] Re-entrant AdvanceTo({next}) ignored while transitioning."); return; }
+            if (next == Current) { Debug.LogWarning($"[Lifecycle] AdvanceTo({next}) ignored; already in this stage."); return; }
+            _advancing = true;
+            try
+            {
+                var prev = Current; InvokeHandlers(prev, StageMoment.Exit);
+                Previous = prev; Current = next; InvokeHandlers(Current, StageMoment.Enter);
+                Debug.Log($"[Lifecycle] Transition {prev} → {Current}");
+            }
+            catch (Exception ex) { Debug.LogException(ex); }
+            finally { _advancing = false; }
+        }
+        private void InvokeHandlers(LifecycleStage stage, StageMoment moment)
+        {
+            if (stage == LifecycleStage.None) return;
+            var handlers = StageRegistry.GetHandlers(stage, moment); if (handlers.Count == 0) return;
+            var ctx = new StageContext { Previous = Previous, Current = stage, Moment = moment, UtcNow = DateTime.UtcNow, Runner = this };
+            foreach (var meta in handlers)
+            {
+                if (meta.RunOnce && meta.HasRun) continue;
+                var sw = Stopwatch.StartNew();
+                try { var ps = meta.Method.GetParameters(); if (ps.Length == 0) meta.Method.Invoke(null, null); else meta.Method.Invoke(null, new object[] { ctx }); }
+                catch (Exception ex) { Debug.LogError($"[Lifecycle] Exception in {meta.DeclaringType.FullName}.{meta.Method.Name}: {ex.GetBaseException().Message}"); Debug.LogException(ex); }
+                finally { sw.Stop(); StageRegistry.MarkRun(meta); Debug.Log($"[Lifecycle] {stage}/{moment} → {meta.DeclaringType.Name}.{meta.Method.Name} ({sw.ElapsedMilliseconds} ms)"); }
+            }
+        }
+    }
+}
+
+
 // ===== FILE: Assets/Scripts/Defs/BuildingDef.cs =====
 using System;
 using System.Collections.Generic;
