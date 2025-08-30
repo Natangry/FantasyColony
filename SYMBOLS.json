@@ -33,7 +33,7 @@
     "kind": "class",
     "name": "AppBootstrapRunner",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 230
+    "line": 206
   },
   {
     "kind": "method",
@@ -45,13 +45,13 @@
     "kind": "method",
     "name": "ShowIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 47
+    "line": 41
   },
   {
     "kind": "method",
     "name": "HideIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 57
+    "line": 51
   },
   {
     "kind": "class",
@@ -99,7 +99,7 @@
     "kind": "method",
     "name": "EnsureForCurrentScene",
     "file": "Assets/Scripts/Boot/BuildUIBootstrap.cs",
-    "line": 75
+    "line": 74
   },
   {
     "kind": "class",
