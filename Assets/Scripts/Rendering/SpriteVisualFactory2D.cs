@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FantasyColony.Defs;
 using UnityEngine;
-using System.Linq;
+using System.Globalization;
 
 public static class SpriteVisualFactory2D
 {
@@ -24,28 +24,15 @@ public static class SpriteVisualFactory2D
         foreach (var v in DefDatabase.Visuals)
         {
             // DefDatabase.Visuals is a list; build prefabs keyed by defName
-            var vd = v as VisualDef ?? new VisualDef
-            {
-                defName = v.defName,
-                sortingLayer = v.sortingLayer,
-                sortingOrder = v.sortingOrder,
-                pivotX = v.pivotX,
-                pivotY = v.pivotY,
-                scale = v.scale,
-                plane = v.plane,
-                z_lift = v.z_lift,
-                shader_hint = v.shader_hint,
-                color_rgba = v.color_rgba
-            };
-            _ghostPrefabs[vd.id] = MakeSpritePrefab(vd, translucent: true);
-            _placedPrefabs[vd.id] = MakeSpritePrefab(vd, translucent: false);
+            _ghostPrefabs[v.defName] = MakeSpritePrefab(v, translucent: true);
+            _placedPrefabs[v.defName] = MakeSpritePrefab(v, translucent: false);
         }
         if (_ghostPrefabs.Count == 0)
         {
             // synthesize a default visual so we see something
-            var v = new VisualDef { defName = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
-            _ghostPrefabs[v.id] = MakeSpritePrefab(v, translucent:true);
-            _placedPrefabs[v.id] = MakeSpritePrefab(v, translucent:false);
+            var v = new Visual2DDef { defName = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
+            _ghostPrefabs[v.defName] = MakeSpritePrefab(v, translucent:true);
+            _placedPrefabs[v.defName] = MakeSpritePrefab(v, translucent:false);
         }
         Debug.Log($"[SpriteVisualFactory2D] Ready. SortingLayer='{_sortingLayer}', GroundOrder={_orderGround}");
     }
@@ -66,9 +53,9 @@ public static class SpriteVisualFactory2D
         return inst;
     }
 
-    private static GameObject MakeSpritePrefab(VisualDef vdef, bool translucent)
+    private static GameObject MakeSpritePrefab(Visual2DDef vdef, bool translucent)
     {
-        var go = new GameObject(vdef.id + (translucent?".Ghost":".Placed"));
+        var go = new GameObject((vdef.defName ?? "Unknown") + (translucent?".Ghost":".Placed"));
         var sr = go.AddComponent<SpriteRenderer>();
         Sprite sprite = _white;
         if (!string.IsNullOrEmpty(vdef.spritePath))
@@ -79,10 +66,32 @@ public static class SpriteVisualFactory2D
         sr.sprite = sprite;
         sr.sortingLayerName = _sortingLayer;
         sr.sortingOrder = _orderGround + (translucent?5:3);
-        var c = vdef.Color; if (translucent) c.a *= 0.4f; sr.color = c;
+        var c = ParseColor(vdef.color_rgba); if (translucent) c.a *= 0.4f; sr.color = c;
         go.transform.localPosition = Vector3.zero;
         go.transform.localRotation = Quaternion.identity; // XY plane
         return go;
+    }
+
+    private static Color ParseColor(string s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return Color.white;
+        s = s.Trim();
+        if (s.StartsWith("#") && ColorUtility.TryParseHtmlString(s, out var cHex)) return cHex;
+        var parts = s.Split(',');
+        if (parts.Length >= 3)
+        {
+            float r = ParseFloat(parts[0], 1f);
+            float g = ParseFloat(parts[1], 1f);
+            float b = ParseFloat(parts[2], 1f);
+            float a = parts.Length > 3 ? ParseFloat(parts[3], 1f) : 1f;
+            return new Color(r, g, b, a);
+        }
+        return Color.white;
+    }
+
+    private static float ParseFloat(string s, float d)
+    {
+        return float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : d;
     }
 
     private static void SizeAndPlace(Transform t, Vector2Int foot, float tile, bool ghost)

@@ -68,7 +68,7 @@ public class BuildPlacementTool : MonoBehaviour
         }
     }
 
-    VisualDef GetVisualDefFor(BuildingDef def)
+    Visual2DDef GetVisualDefFor(BuildingDef def)
     {
         if (def == null) return null;
         if (string.IsNullOrEmpty(def.visualRef)) return null;
