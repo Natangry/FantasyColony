@@ -24,6 +24,17 @@ public class IntroScreen : MonoBehaviour
         IsVisible = showMenu;
     }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    static void EnsureOnBoot()
+    {
+        if (Instance == null)
+        {
+            var go = new GameObject("IntroScreen (Auto)");
+            go.AddComponent<IntroScreen>();
+        }
+        Instance.SetVisible(true);
+    }
+
     public void SetVisible(bool show)
     {
         showMenu = show;
