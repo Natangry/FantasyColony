@@ -29,9 +29,10 @@ public static class BuildUIBootstrap
 
     static bool IsIntroLike(string sceneName)
     {
-        if (string.IsNullOrEmpty(sceneName)) return false;
-        var s = sceneName.ToLowerInvariant();
-        return s.Contains("intro") || s.Contains("menu") || s.Contains("title");
+#if UNITY_EDITOR
+        UnityEngine.Debug.Log("[BuildUI] IsIntroLike disabled; relying on overlay visibility only.");
+#endif
+        return false;
     }
 
     static void EnsureEventSystem()
