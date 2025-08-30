@@ -1785,7 +1785,7 @@
     "kind": "method",
     "name": "NormalizeOrder",
     "file": "Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs",
-    "line": 87
+    "line": 103
   },
   {
     "kind": "namespace",
@@ -1807,9 +1807,15 @@
   },
   {
     "kind": "method",
+    "name": "RepoMeta",
+    "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
+    "line": 111
+  },
+  {
+    "kind": "method",
     "name": "Rel",
     "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
-    "line": 92
+    "line": 122
   },
   {
     "kind": "namespace",

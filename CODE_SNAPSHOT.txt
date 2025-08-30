@@ -5291,13 +5291,28 @@ namespace XmlDefsTools.Emit
         public static void WriteTemplates(string outputDir, ScanResult scan, IReadOnlyDictionary<string, IList<string>> orderHints)
         {
             Directory.CreateDirectory(outputDir);
-            foreach (var schema in scan.Schemas.OrderBy(s => s))
+            // union of discovered schemas and configured schemas (ensures baseline output)
+            var configuredSchemas = orderHints.Keys
+                .Where(k => !string.Equals(k, "_common", StringComparison.OrdinalIgnoreCase) && !k.StartsWith("//"))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var allSchemas = new HashSet<string>(scan.Schemas, StringComparer.OrdinalIgnoreCase);
+            foreach (var s in configuredSchemas) allSchemas.Add(s);
+
+            foreach (var schema in allSchemas.OrderBy(s => s))
             {
-                var defs = scan.DefsBySchema[schema];
+                // if no defs discovered, synthesize from hints only
+                var defs = scan.DefsBySchema.ContainsKey(schema)
+                    ? scan.DefsBySchema[schema]
+                    : new List<DefInfo>();
 
                 // union of observed fields (attributes + elements)
                 var attrFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var elemFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                // include configured per-schema fields as elements to seed structure
+                if (orderHints.TryGetValue(schema, out var hinted))
+                {
+                    foreach (var h in hinted) elemFields.Add(h);
+                }
                 foreach (var d in defs)
                 {
                     foreach (var f in d.AttributeFields) attrFields.Add(f);
@@ -5311,8 +5326,9 @@ namespace XmlDefsTools.Emit
 
                 // Attributes to place on root element
                 var rootAttrs = NormalizeOrder(attrFields, precedence, keepOnly: new[] { "id","schema","name_key","tags","version","requires" });
-                // Remaining element fields
-                var elementNames = NormalizeOrder(elemFields, precedence);
+                // Remaining element fields (drop those already in attributes)
+                var elementNames = NormalizeOrder(elemFields.Except(rootAttrs, StringComparer.OrdinalIgnoreCase),
+                                                  precedence);
 
                 bool HasElem(string name) => elementNames.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase));
 
@@ -5338,7 +5354,7 @@ namespace XmlDefsTools.Emit
                     root.Add(new XElement("requires"));
 
                 // Components block if observed
-                if (HasElem("components"))
+                if (HasElem("components") || perSchema.Contains("components", StringComparer.OrdinalIgnoreCase))
                 {
                     root.Add(new XElement("components",
                         new XComment(" Add component entries like <Component type=\"...\"/> ")));
@@ -5397,7 +5413,7 @@ namespace XmlDefsTools.Emit
         public static void Write(string repoRoot, string outFile, ScanResult scan)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("# XML Index");
+            sb.AppendLine("# XML Index (.xml)");
             sb.AppendLine();
             sb.AppendLine($"_Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC_");
             sb.AppendLine();
@@ -5430,6 +5446,23 @@ namespace XmlDefsTools.Emit
                 sb.AppendLine();
             }
 
+            // Match Code Index style: bulleted list of files with View · Raw links
+            var (repo, branch) = RepoMeta();
+            var allXmlFiles = scan.FileDocs.Keys.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToList();
+            if (allXmlFiles.Count > 0)
+            {
+                foreach (var file in allXmlFiles)
+                {
+                    var rel = Rel(repoRoot, file);
+                    var webPath = rel.Replace('\\','/'); // ensure URL form
+                    var viewUrl = $"https://github.com/{repo}/blob/{branch}/{Uri.EscapeUriString(webPath)}";
+                    var rawUrl  = $"https://raw.githubusercontent.com/{repo}/{branch}/{Uri.EscapeUriString(webPath)}";
+                    sb.AppendLine($"- `{webPath}` — [View]({viewUrl}) · [Raw]({rawUrl})");
+                }
+                sb.AppendLine();
+            }
+
+            // Keep the schema summary (below the list) for quick counts
             sb.AppendLine("## Summary by Schema");
             sb.AppendLine();
             sb.AppendLine("| Schema | Def Count | Files |");
@@ -5441,6 +5474,8 @@ namespace XmlDefsTools.Emit
                 sb.AppendLine($"| {schema} | {defs.Count} | {string.Join("<br/>", files)} |");
             }
             sb.AppendLine();
+
+            // Per-schema sections unchanged below (list ids + rare fields)
 
             foreach (var schema in scan.Schemas.OrderBy(s => s))
             {
@@ -5473,6 +5508,17 @@ namespace XmlDefsTools.Emit
 
             Directory.CreateDirectory(Path.GetDirectoryName(outFile)!);
             File.WriteAllText(outFile, sb.ToString());
+        }
+
+        private static (string repo, string branch) RepoMeta()
+        {
+            var repo = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
+            if (string.IsNullOrWhiteSpace(repo)) repo = "Natangry/FantasyColony";
+            var branch = Environment.GetEnvironmentVariable("GITHUB_REF_NAME");
+            if (string.IsNullOrWhiteSpace(branch)) branch = "main";
+            // strip refs/heads/ if present
+            branch = branch.Replace("refs/heads/", "");
+            return (repo, branch);
         }
 
         private static string Rel(string root, string path)
