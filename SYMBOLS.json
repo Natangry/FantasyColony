@@ -33,7 +33,7 @@
     "kind": "class",
     "name": "BuildUIBootstrap",
     "file": "Assets/Scripts/Boot/BuildUIBootstrap.cs",
-    "line": 10
+    "line": 14
   },
   {
     "kind": "class",
@@ -129,61 +129,61 @@
     "kind": "class",
     "name": "BuildModeController",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 8
+    "line": 11
   },
   {
     "kind": "enum",
     "name": "BuildTool",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 106
+    "line": 117
   },
   {
     "kind": "method",
     "name": "Awake",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 19
+    "line": 22
   },
   {
     "kind": "method",
     "name": "ToggleBuildMode",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 38
+    "line": 41
   },
   {
     "kind": "method",
     "name": "SetBuildMode",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 43
+    "line": 46
   },
   {
     "kind": "method",
     "name": "SetPlacingBuilding",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 49
+    "line": 52
   },
   {
     "kind": "method",
     "name": "ClearTool",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 55
+    "line": 58
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 62
+    "line": 65
   },
   {
     "kind": "method",
     "name": "Update",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 83
+    "line": 86
   },
   {
     "kind": "property",
     "name": "Instance",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
-    "line": 11
+    "line": 14
   },
   {
     "kind": "class",
