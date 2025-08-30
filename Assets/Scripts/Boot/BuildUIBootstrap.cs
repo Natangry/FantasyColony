@@ -78,16 +78,7 @@ public static class BuildUIBootstrap
         var canvas = GameObject.Find(CanvasName);
 
         // Destroy/hide if on an intro/menu scene or the scene-less intro overlay is visible
-        bool introOverlayVisible = false;
-        var introType = System.Type.GetType("IntroScreen");
-        if (introType != null)
-        {
-            var prop = introType.GetProperty("IsVisible", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            if (prop != null)
-            {
-                introOverlayVisible = (bool)prop.GetValue(null);
-            }
-        }
+        bool introOverlayVisible = IntroScreen.Instance != null && IntroScreen.IsVisible;
 
         if (IsIntroLike(active) || introOverlayVisible)
         {
