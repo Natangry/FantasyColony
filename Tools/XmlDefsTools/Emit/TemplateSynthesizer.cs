@@ -37,6 +37,8 @@ namespace XmlDefsTools.Emit
                 // Remaining element fields
                 var elementNames = NormalizeOrder(elemFields, precedence);
 
+                bool HasElem(string name) => elementNames.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase));
+
                 var sb = new StringBuilder();
                 sb.AppendLine($"<!-- Auto-generated default template for {schema}. Edit your copies; this file is regenerated. -->");
 
@@ -53,13 +55,13 @@ namespace XmlDefsTools.Emit
                 }
 
                 // Insert version/requires as elements too if heavily used as elements
-                if (elementNames.Contains("version", StringComparer.OrdinalIgnoreCase) && root.Attribute("version") == null)
+                if (HasElem("version") && root.Attribute("version") == null)
                     root.Add(new XElement("version", "1"));
-                if (elementNames.Contains("requires", StringComparer.OrdinalIgnoreCase) && root.Attribute("requires") == null)
+                if (HasElem("requires") && root.Attribute("requires") == null)
                     root.Add(new XElement("requires"));
 
                 // Components block if observed
-                if (elementNames.Contains("components", StringComparer.OrdinalIgnoreCase))
+                if (HasElem("components"))
                 {
                     root.Add(new XElement("components",
                         new XComment(" Add component entries like <Component type=\"...\"/> ")));
