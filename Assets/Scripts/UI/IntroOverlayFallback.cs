@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// Minimal uGUI intro overlay used only if a real intro overlay cannot be found.
 /// Provides Start (hides overlay, tries to call common "start game" bootstraps via reflection) and Quit.
 /// </summary>
-public class IntroOverlayFallback : MonoBehaviour
+public class IntroOverlayFallback : MonoBehaviour, IIntroOverlay
 {
     static IntroOverlayFallback _instance;
 
