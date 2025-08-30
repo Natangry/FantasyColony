@@ -164,6 +164,29 @@ namespace FantasyColony.EditorTools
 #endif
 
 
+// ===== FILE: Assets/Scripts/Boot/BootSession.cs =====
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+/// <summary>
+/// Records the scene the app launched into so we can "full reboot" back to it.
+/// </summary>
+public static class BootSession
+{
+    public static int InitialSceneIndex { get; private set; } = -1;
+    public static string InitialScenePath { get; private set; } = null;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Capture()
+    {
+        var active = SceneManager.GetActiveScene();
+        InitialSceneIndex = active.buildIndex;
+        InitialScenePath = active.path;
+        Debug.Log($"[BootSession] Captured initial scene index={InitialSceneIndex} path={InitialScenePath}");
+    }
+}
+
+
 // ===== FILE: Assets/Scripts/Boot/BuildBootstrap.cs =====
 using UnityEngine;
 using FantasyColony.Defs;
@@ -453,6 +476,7 @@ public static class HardRestart
         DestroyIfExists("BuildPalette (Auto)");
         DestroyIfExists("BuildCanvas (Auto)");
         DestroyIfExists("PauseCanvas (Auto)");
+        DestroyIfExists("PauseMenuController");
 
         // Destroy any EventSystem we created
         var es = Object.FindFirstObjectByType<EventSystem>();
@@ -463,8 +487,15 @@ public static class HardRestart
         var flag = bb.GetField("_defsLoadedOnce", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         if (flag != null) flag.SetValue(null, false);
 
-        // Choose intro-like scene by name/path; fallback to index 0
-        int target = FindIntroSceneIndex();
+        // Choose intro scene:
+        // 1) The scene we launched into (BootSession)
+        // 2) intro/title/menu heuristic
+        // 3) index 0 fallback
+        int target = -1;
+        if (BootSession.InitialSceneIndex >= 0)
+            target = BootSession.InitialSceneIndex;
+        else
+            target = FindIntroSceneIndex();
         Debug.Log("[HardRestart] Rebooting to scene index " + target + " (" + SceneUtility.GetScenePathByBuildIndex(target) + ")");
         SceneManager.LoadScene(target);
     }
@@ -4161,6 +4192,7 @@ public class PauseMenuController : MonoBehaviour
         _root.SetActive(true);
         Time.timeScale = 0f;
         IsPaused = true;
+        Debug.Log("[Pause] Shown");
     }
 
     public void Hide()
@@ -4168,6 +4200,7 @@ public class PauseMenuController : MonoBehaviour
         if (_root != null) _root.SetActive(false);
         Time.timeScale = 1f;
         IsPaused = false;
+        Debug.Log("[Pause] Hidden");
     }
 
     void EnsureUI()

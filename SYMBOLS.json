@@ -13,6 +13,24 @@
   },
   {
     "kind": "class",
+    "name": "BootSession",
+    "file": "Assets/Scripts/Boot/BootSession.cs",
+    "line": 7
+  },
+  {
+    "kind": "property",
+    "name": "InitialSceneIndex",
+    "file": "Assets/Scripts/Boot/BootSession.cs",
+    "line": 9
+  },
+  {
+    "kind": "property",
+    "name": "InitialScenePath",
+    "file": "Assets/Scripts/Boot/BootSession.cs",
+    "line": 10
+  },
+  {
+    "kind": "class",
     "name": "BuildBootstrap",
     "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
     "line": 9
@@ -1269,7 +1287,7 @@
     "kind": "method",
     "name": "Hide",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 64
+    "line": 65
   },
   {
     "kind": "property",
