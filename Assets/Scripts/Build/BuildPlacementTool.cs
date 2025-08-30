@@ -7,6 +7,7 @@ using UnityObject = UnityEngine.Object;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Minimal placement tool for the Construction Board bring-up:
@@ -33,11 +34,35 @@ public class BuildPlacementTool : MonoBehaviour
     bool suppressClickUntilMouseUp = false;
     float armBlockUntilTime = 0f;
     static bool _warnedSpriteMissing = false;
+    // cached cell size set when arming/first hit
+    float _cachedCellSize = -1f;
 
     void Start()
     {
         ctrl = GetComponent<BuildModeController>();
         cam  = GetActiveCamera();
+    }
+
+    float GetCellSize()
+    {
+        // Try to find a grid/map object with a cell size property/field.
+        // This is tolerant: it will use reflection to read common names.
+        float cell = 1f;
+        try
+        {
+            var any = FindAnyObjectByType<MonoBehaviour>();
+            if (any != null)
+            {
+                var type = any.GetType();
+                var csField = type.GetField("CellSize") ?? type.GetField("cellSize");
+                var csProp  = type.GetProperty("CellSize") ?? type.GetProperty("cellSize");
+                if (csField != null && csField.FieldType == typeof(float)) cell = (float)csField.GetValue(any);
+                else if (csProp != null && csProp.PropertyType == typeof(float)) cell = (float)csProp.GetValue(any);
+            }
+        }
+        catch { /* best-effort */ }
+        if (cell <= 0f || float.IsNaN(cell) || float.IsInfinity(cell)) cell = 1f;
+        return cell;
     }
 
     public void SetTool(BuildTool tool)
@@ -51,6 +76,7 @@ public class BuildPlacementTool : MonoBehaviour
             EnsureGhost(ctrl.SelectedBuildingDef);
             // Position ghost immediately under cursor (no first-frame origin flicker)
             cam = GetActiveCamera();
+            if (_cachedCellSize <= 0f) _cachedCellSize = GetCellSize();
             groundPlane = new Plane(Vector3.up, GetGroundY());
             var mp = GetMouseScreenPos();
             if (TryGetCursorHitRaw(mp, out var hit))
@@ -58,6 +84,7 @@ public class BuildPlacementTool : MonoBehaviour
                 var world = SnapToGridXZ(hit, ctrl.SelectedBuildingDef);
                 ghostGO.transform.position = world + new Vector3(0f, 0.02f, 0f);
                 Debug.Log($"[Build] Arm: mouse {mp} -> world {world}");
+                _cachedCellSize = GetCellSize();
             }
             else if (TryGetCenterHit(out var centerHit))
                 ghostGO.transform.position = SnapToGridXZ(centerHit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
@@ -71,7 +98,6 @@ public class BuildPlacementTool : MonoBehaviour
     {
         if (active == BuildTool.None) return;
         if (cam == null || !cam.isActiveAndEnabled) cam = GetActiveCamera();
-        groundPlane = new Plane(Vector3.up, GetGroundY());
 
         var def = ctrl.SelectedBuildingDef;
         if (def == null)
@@ -79,6 +105,8 @@ public class BuildPlacementTool : MonoBehaviour
             ClearTool();
             return;
         }
+        if (_cachedCellSize <= 0f) _cachedCellSize = GetCellSize();
+        groundPlane = new Plane(Vector3.up, GetGroundY());
 
         // Move ghost to snapped mouse position
         if (!TryGetCursorHit(out var hit))
@@ -100,9 +128,23 @@ public class BuildPlacementTool : MonoBehaviour
             if (Input.GetMouseButtonUp(0) && Time.realtimeSinceStartup >= armBlockUntilTime)
                 suppressClickUntilMouseUp = false;
         }
-        else if (Input.GetMouseButtonDown(0))
+        else
         {
-            TryPlace(def, snapped);
+            bool clickDown = false;
+#if ENABLE_INPUT_SYSTEM
+            if (Mouse.current != null) clickDown |= Mouse.current.leftButton.wasPressedThisFrame;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
+            clickDown |= Input.GetMouseButtonDown(0);
+#endif
+            // Avoid placing when pointer over UI
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                clickDown = false;
+
+            if (clickDown)
+            {
+                TryPlace(def, snapped);
+            }
         }
     }
 
@@ -234,7 +276,13 @@ public class BuildPlacementTool : MonoBehaviour
 
     void ApplyScaleForSpriteOrFallbackXZ(GameObject go, BuildingDef def, Sprite spriteOrNull)
     {
+        if (_cachedCellSize <= 0f) _cachedCellSize = GetCellSize();
         var scale = ComputeScaleForSprite(spriteOrNull, def);
+        // Ensure scale reflects grid squares instead of raw world units
+        scale.x *= _cachedCellSize;
+        scale.y *= _cachedCellSize;
+        // Optional visual-upsize: double the board if desired
+        // if (def.defName.Contains("ConstructionBoard")) { scale *= 2f; }
         go.transform.localScale = scale;
         // Lay the sprite flat on XZ ground (face camera looking down -Y)
         go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
@@ -284,6 +332,7 @@ public class BuildPlacementTool : MonoBehaviour
         sr.sortingOrder = 100;
         // Set final position on ground with slight epsilon to avoid z-fighting
         go.transform.position = new Vector3(pos.x, 0.03f, pos.z); // slight epsilon
+        Debug.Log($"[Build] Placed {def.defName} at world {pos} (cellSize={_cachedCellSize})");
 
         ClearTool(); // place once for MVP
     }
