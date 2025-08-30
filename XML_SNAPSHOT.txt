@@ -83,16 +83,118 @@
 </ItemDef>
 
 
-// ===== FILE: Docs/Templates/Defs/Visual2Def.xml =====
-<Visual2Def>
-  <version>1</version>
-  <requires />
-  <components />
-  <id />
-  <name_key />
-  <tags />
-  <sprite />
-  <palette />
-</Visual2Def>
+// ===== FILE: Docs/Templates/Defs/_AllSchemas.xml =====
+<DefSchemas generated="2025-08-30T02:10:25Z">
+  <Schema name="AbilityDef">
+    <Attributes />
+    <Elements>
+      <El name="id" />
+      <El name="name_key" />
+      <El name="tags" />
+      <El name="version" />
+      <El name="requires" />
+      <El name="icon" />
+      <El name="cooldown" />
+      <El name="cost" />
+      <El name="range" />
+      <El name="components" />
+    </Elements>
+    <Template>
+      <AbilityDef>
+        <version>1</version>
+        <requires />
+        <components />
+        <id />
+        <name_key />
+        <tags />
+        <icon />
+        <cooldown />
+        <cost />
+        <range />
+      </AbilityDef>
+    </Template>
+  </Schema>
+  <Schema name="BuildingDef">
+    <Attributes />
+    <Elements>
+      <El name="id" />
+      <El name="name_key" />
+      <El name="tags" />
+      <El name="version" />
+      <El name="requires" />
+      <El name="icon" />
+      <El name="size" />
+      <El name="cost" />
+      <El name="hitPoints" />
+      <El name="components" />
+    </Elements>
+    <Template>
+      <BuildingDef>
+        <version>1</version>
+        <requires />
+        <components />
+        <id />
+        <name_key />
+        <tags />
+        <icon />
+        <size />
+        <cost />
+        <hitPoints />
+      </BuildingDef>
+    </Template>
+  </Schema>
+  <Schema name="ItemDef">
+    <Attributes />
+    <Elements>
+      <El name="id" />
+      <El name="name_key" />
+      <El name="tags" />
+      <El name="version" />
+      <El name="requires" />
+      <El name="icon" />
+      <El name="stackSize" />
+      <El name="rarity" />
+      <El name="components" />
+    </Elements>
+    <Template>
+      <ItemDef>
+        <version>1</version>
+        <requires />
+        <components />
+        <id />
+        <name_key />
+        <tags />
+        <icon />
+        <stackSize />
+        <rarity />
+      </ItemDef>
+    </Template>
+  </Schema>
+  <Schema name="Visual2Def">
+    <Attributes />
+    <Elements>
+      <El name="id" />
+      <El name="name_key" />
+      <El name="tags" />
+      <El name="version" />
+      <El name="requires" />
+      <El name="sprite" />
+      <El name="palette" />
+      <El name="components" />
+    </Elements>
+    <Template>
+      <Visual2Def>
+        <version>1</version>
+        <requires />
+        <components />
+        <id />
+        <name_key />
+        <tags />
+        <sprite />
+        <palette />
+      </Visual2Def>
+    </Template>
+  </Schema>
+</DefSchemas>
 
 
