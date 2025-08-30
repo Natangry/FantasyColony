@@ -747,37 +747,49 @@
     "kind": "method",
     "name": "SpawnGhost",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 52
+    "line": 39
   },
   {
     "kind": "method",
     "name": "SpawnPlaced",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 60
+    "line": 47
   },
   {
     "kind": "method",
     "name": "MakeSpritePrefab",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 68
+    "line": 55
+  },
+  {
+    "kind": "method",
+    "name": "ParseColor",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 74
+  },
+  {
+    "kind": "method",
+    "name": "ParseFloat",
+    "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
+    "line": 91
   },
   {
     "kind": "method",
     "name": "SizeAndPlace",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 87
+    "line": 96
   },
   {
     "kind": "method",
     "name": "EnsureWhiteSprite",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 95
+    "line": 104
   },
   {
     "kind": "method",
     "name": "DetectSortingLayer",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 103
+    "line": 112
   },
   {
     "kind": "class",
