@@ -195,13 +195,13 @@
     "kind": "class",
     "name": "BuildPlacementTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 11
+    "line": 12
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 30
+    "line": 31
   },
   {
     "kind": "class",
@@ -735,49 +735,49 @@
     "kind": "class",
     "name": "SpriteVisualFactory2D",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 4
+    "line": 5
   },
   {
     "kind": "method",
     "name": "Build",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 15
+    "line": 16
   },
   {
     "kind": "method",
     "name": "SpawnGhost",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 51
+    "line": 52
   },
   {
     "kind": "method",
     "name": "SpawnPlaced",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 59
+    "line": 60
   },
   {
     "kind": "method",
     "name": "MakeSpritePrefab",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 67
+    "line": 68
   },
   {
     "kind": "method",
     "name": "SizeAndPlace",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 80
+    "line": 87
   },
   {
     "kind": "method",
     "name": "EnsureWhiteSprite",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 88
+    "line": 95
   },
   {
     "kind": "method",
     "name": "DetectSortingLayer",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 96
+    "line": 103
   },
   {
     "kind": "class",
