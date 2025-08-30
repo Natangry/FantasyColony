@@ -31,8 +31,10 @@ public static class HardRestart
         Resources.UnloadUnusedAssets();
         System.GC.Collect();
 
-        // Show the intro overlay (scene-less), real if present or fallback otherwise
-        AppBootstrap.ShowIntroOverlay();
+        // Show our intro overlay (Large default) regardless of scene usage
+        IntroMenuOverlay.Ensure();
+        IntroMenuOverlay.Show();
+        AppBootstrap.ShowIntroOverlay(); // also try project-specific intro if it exists
 
         Debug.Log("[HardRestart] Returned to Intro overlay (scene-less).");
     }

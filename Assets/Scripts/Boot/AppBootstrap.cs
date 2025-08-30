@@ -20,6 +20,9 @@ public static class AppBootstrap
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     static void EnsureIntroEarly()
     {
+        // Always ensure our own overlay exists and is shown (Large default)
+        IntroMenuOverlay.Ensure();
+        IntroMenuOverlay.Show();
         MakeRunner(); // ensures we also re-check shortly after boot
         TryShowIntroOverlay("AfterAssembliesLoaded");
         SceneManager.activeSceneChanged += (_, __) => TryShowIntroOverlay("activeSceneChanged");
@@ -28,6 +31,7 @@ public static class AppBootstrap
     /// <summary>Returns true if an intro-like overlay is visible.</summary>
     public static bool IsIntroVisible()
     {
+        if (IntroMenuOverlay.IsOpen) return true;
         var comp = FindIntroComponentInScene();
         if (comp == null) return false;
         // Heuristics: visible flag or active+enabled
@@ -38,6 +42,7 @@ public static class AppBootstrap
     /// <summary>Shows the intro overlay (prefer the project's real one; otherwise spawn a fallback).</summary>
     public static void ShowIntroOverlay()
     {
+        IntroMenuOverlay.Show();
         if (TryShowIntroOverlay("explicit call")) return;
         // If project has no intro overlay type, create a simple fallback UI.
         IntroOverlayFallback.SpawnIfNeeded();
@@ -47,6 +52,7 @@ public static class AppBootstrap
     /// <summary>Hides any intro overlay (real or fallback).</summary>
     public static void HideIntroOverlay()
     {
+        if (IntroMenuOverlay.IsOpen) { IntroMenuOverlay.Hide(); return; }
         var comp = FindIntroComponentInScene();
         if (comp != null)
         {

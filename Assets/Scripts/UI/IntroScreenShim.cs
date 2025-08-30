@@ -14,18 +14,18 @@ public class IntroScreen : MonoBehaviour
     /// </summary>
     public static bool IsVisible
     {
-        get => AppBootstrap.IsIntroVisible();
+        get => IntroMenuOverlay.IsOpen || AppBootstrap.IsIntroVisible();
         set
         {
-            if (value) AppBootstrap.ShowIntroOverlay();
-            else AppBootstrap.HideIntroOverlay();
+            if (value) IntroMenuOverlay.Show();
+            else IntroMenuOverlay.Hide();
         }
     }
 
     /// <summary>
     /// Legacy entry point to show the intro overlay.
     /// </summary>
-    public static void ShowIntro() => AppBootstrap.ShowIntroOverlay();
+    public static void ShowIntro() => IntroMenuOverlay.Show();
 
     /// <summary>
     /// If some legacy bootstrap does `new GameObject(...).AddComponent<IntroScreen>()`,
