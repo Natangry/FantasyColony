@@ -7,7 +7,7 @@
     <width>3</width>
     <height>1</height>
     <unique>true</unique>
-    <allowedRotations>N,E,S,W</allowedRotations>
+    <allowedRotations>N</allowedRotations>
     <workToBuild>2.0</workToBuild>
     <interactTags>
       <li>construction</li>
@@ -90,7 +90,7 @@
 
 
 // ===== FILE: Docs/Templates/Defs/_AllSchemas.xml =====
-<DefSchemas generated="2025-08-30T02:33:26Z">
+<DefSchemas generated="2025-08-30T02:50:02Z">
   <Schema name="AbilityDef">
     <Attributes />
     <Elements>
