@@ -518,16 +518,6 @@
 - **XRSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/XRSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/XRSettings.asset)
 - **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/README.md)
 
-## StreamingAssets/Defs/Buildings
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/StreamingAssets/Defs/Buildings)
-
-- **Core_Buildings.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/StreamingAssets/Defs/Buildings/Core_Buildings.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/StreamingAssets/Defs/Buildings/Core_Buildings.xml)
-
-## StreamingAssets/Defs/Visuals
-[Open folder](https://github.com/Natangry/FantasyColony/tree/main/StreamingAssets/Defs/Visuals)
-
-- **Core_Visuals.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/StreamingAssets/Defs/Visuals/Core_Visuals.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/StreamingAssets/Defs/Visuals/Core_Visuals.xml)
-
 ## Tools/XmlDefsTools/Config
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Config)
 
