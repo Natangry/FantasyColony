@@ -1845,6 +1845,16 @@ namespace FantasyColony.Defs
 
 
 
+// ===== FILE: Assets/Scripts/Defs/Defs.cs =====
+// Placeholder file to satisfy an existing .meta (Unity asset GUID).
+// Safe to remove later **from inside Unity** along with this file's .meta.
+namespace FantasyColony.Defs
+{
+    internal static class __DefsPlaceholder { }
+}
+
+
+
 // ===== FILE: Assets/Scripts/Defs/Visual2DDef.cs =====
 using System;
 
@@ -1871,6 +1881,23 @@ namespace FantasyColony.Defs
         public const string Root = "Visual2DDef";
     }
 }
+
+
+
+// ===== FILE: Assets/Scripts/Defs/VisualDef.cs =====
+using FantasyColony.Defs;
+
+/// <summary>
+/// Compatibility shim: legacy code references VisualDef. We now use Visual2DDef.
+/// This shim keeps existing code compiling while we migrate call sites.
+/// </summary>
+[System.Serializable]
+public class VisualDef : Visual2DDef
+{
+    // Intentionally empty. Inherits all fields from Visual2DDef.
+}
+
+
 
 
 
@@ -1910,6 +1937,12 @@ namespace FantasyColony.Defs.Xml
                                 var v = ParseVisual2D(root);
                                 v.modId = modId;
                                 visuals.Add(v);
+                                break;
+                            // Back-compat: allow <VisualDef> as an alias for <Visual2DDef>
+                            case "VisualDef":
+                                var v2 = ParseVisual2D(root);
+                                v2.modId = modId;
+                                visuals.Add(v2);
                                 break;
                             case BuildingDefKinds.Root:
                                 var b = ParseBuilding(root);

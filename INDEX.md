@@ -91,7 +91,9 @@
 - **BuildingDef.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/BuildingDef.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/BuildingDef.cs)
 - **Def.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Def.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Def.cs)
 - **DefDatabase.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/DefDatabase.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/DefDatabase.cs)
+- **Defs.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Defs.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Defs.cs)
 - **Visual2DDef.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Visual2DDef.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Visual2DDef.cs)
+- **VisualDef.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/VisualDef.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/VisualDef.cs)
 
 ## Assets/Scripts/Defs/Xml
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Defs/Xml)

@@ -650,6 +650,18 @@
   {
     "kind": "namespace",
     "name": "FantasyColony.Defs",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 3
+  },
+  {
+    "kind": "class",
+    "name": "__DefsPlaceholder",
+    "file": "Assets/Scripts/Defs/Defs.cs",
+    "line": 5
+  },
+  {
+    "kind": "namespace",
+    "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/Visual2DDef.cs",
     "line": 2
   },
@@ -670,6 +682,12 @@
     "name": "Visual2DDefKinds",
     "file": "Assets/Scripts/Defs/Visual2DDef.cs",
     "line": 21
+  },
+  {
+    "kind": "class",
+    "name": "VisualDef",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 8
   },
   {
     "kind": "namespace",
@@ -693,49 +711,49 @@
     "kind": "method",
     "name": "CreateSafeXmlReader",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 54
+    "line": 60
   },
   {
     "kind": "method",
     "name": "Short",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 66
+    "line": 72
   },
   {
     "kind": "method",
     "name": "ParseVisual2D",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 71
+    "line": 77
   },
   {
     "kind": "method",
     "name": "ParseBuilding",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 83
+    "line": 89
   },
   {
     "kind": "method",
     "name": "Value",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 95
+    "line": 101
   },
   {
     "kind": "method",
     "name": "Int",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 107
+    "line": 113
   },
   {
     "kind": "method",
     "name": "Float",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 113
+    "line": 119
   },
   {
     "kind": "method",
     "name": "Bool",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 119
+    "line": 125
   },
   {
     "kind": "class",
