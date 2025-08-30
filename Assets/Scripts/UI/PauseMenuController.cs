@@ -60,6 +60,7 @@ public class PauseMenuController : MonoBehaviour
         _root.SetActive(true);
         Time.timeScale = 0f;
         IsPaused = true;
+        Debug.Log("[Pause] Shown");
     }
 
     public void Hide()
@@ -67,6 +68,7 @@ public class PauseMenuController : MonoBehaviour
         if (_root != null) _root.SetActive(false);
         Time.timeScale = 1f;
         IsPaused = false;
+        Debug.Log("[Pause] Hidden");
     }
 
     void EnsureUI()

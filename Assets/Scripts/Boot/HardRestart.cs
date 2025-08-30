@@ -13,6 +13,7 @@ public static class HardRestart
         DestroyIfExists("BuildPalette (Auto)");
         DestroyIfExists("BuildCanvas (Auto)");
         DestroyIfExists("PauseCanvas (Auto)");
+        DestroyIfExists("PauseMenuController");
 
         // Destroy any EventSystem we created
         var es = Object.FindFirstObjectByType<EventSystem>();
@@ -23,8 +24,15 @@ public static class HardRestart
         var flag = bb.GetField("_defsLoadedOnce", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         if (flag != null) flag.SetValue(null, false);
 
-        // Choose intro-like scene by name/path; fallback to index 0
-        int target = FindIntroSceneIndex();
+        // Choose intro scene:
+        // 1) The scene we launched into (BootSession)
+        // 2) intro/title/menu heuristic
+        // 3) index 0 fallback
+        int target = -1;
+        if (BootSession.InitialSceneIndex >= 0)
+            target = BootSession.InitialSceneIndex;
+        else
+            target = FindIntroSceneIndex();
         Debug.Log("[HardRestart] Rebooting to scene index " + target + " (" + SceneUtility.GetScenePathByBuildIndex(target) + ")");
         SceneManager.LoadScene(target);
     }
