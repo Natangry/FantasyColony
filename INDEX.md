@@ -530,6 +530,7 @@
 ## Tools/XmlDefsTools/Emit
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Emit)
 
+- **SchemaCatalogWriter.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs)
 - **TemplateSynthesizer.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs)
 - **XmlIndexWriter.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/XmlIndexWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/XmlIndexWriter.cs)
 - **XmlSnapshotWriter.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs)

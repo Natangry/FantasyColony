@@ -1755,13 +1755,37 @@
     "kind": "method",
     "name": "GetRepoRoot",
     "file": "Tools/XmlDefsTools/Program.cs",
-    "line": 56
+    "line": 61
   },
   {
     "kind": "method",
     "name": "GetDefsDir",
     "file": "Tools/XmlDefsTools/Program.cs",
-    "line": 74
+    "line": 79
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools.Emit",
+    "file": "Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "SchemaCatalogWriter",
+    "file": "Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs",
+    "line": 16
+  },
+  {
+    "kind": "method",
+    "name": "Write",
+    "file": "Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs",
+    "line": 18
+  },
+  {
+    "kind": "method",
+    "name": "NormalizeOrder",
+    "file": "Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs",
+    "line": 120
   },
   {
     "kind": "namespace",
