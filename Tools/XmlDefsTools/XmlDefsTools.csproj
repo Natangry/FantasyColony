@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Scan\XmlDefScanner.cs" />
+    <Compile Include="Emit\XmlIndexWriter.cs" />
+    <Compile Include="Emit\XmlSnapshotWriter.cs" />
+    <Compile Include="Emit\TemplateSynthesizer.cs" />
+    <Compile Include="Util\CanonicalXml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Config\SchemaOrder.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+  </PropertyGroup>
+</Project>
