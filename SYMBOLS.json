@@ -1807,15 +1807,21 @@
   },
   {
     "kind": "method",
+    "name": "EncodePathSegments",
+    "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
+    "line": 114
+  },
+  {
+    "kind": "method",
     "name": "RepoMeta",
     "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
-    "line": 111
+    "line": 120
   },
   {
     "kind": "method",
     "name": "Rel",
     "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
-    "line": 122
+    "line": 131
   },
   {
     "kind": "namespace",

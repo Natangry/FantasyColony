@@ -5455,8 +5455,9 @@ namespace XmlDefsTools.Emit
                 {
                     var rel = Rel(repoRoot, file);
                     var webPath = rel.Replace('\\','/'); // ensure URL form
-                    var viewUrl = $"https://github.com/{repo}/blob/{branch}/{Uri.EscapeUriString(webPath)}";
-                    var rawUrl  = $"https://raw.githubusercontent.com/{repo}/{branch}/{Uri.EscapeUriString(webPath)}";
+                    var enc = EncodePathSegments(webPath);
+                    var viewUrl = $"https://github.com/{repo}/blob/{branch}/{enc}";
+                    var rawUrl  = $"https://raw.githubusercontent.com/{repo}/{branch}/{enc}";
                     sb.AppendLine($"- `{webPath}` — [View]({viewUrl}) · [Raw]({rawUrl})");
                 }
                 sb.AppendLine();
@@ -5508,6 +5509,14 @@ namespace XmlDefsTools.Emit
 
             Directory.CreateDirectory(Path.GetDirectoryName(outFile)!);
             File.WriteAllText(outFile, sb.ToString());
+        }
+
+        // Encode each path segment to avoid corrupting '/' and handle special characters safely.
+        private static string EncodePathSegments(string path)
+        {
+            var parts = path.Replace('\\','/').Split(new[]{'/'}, StringSplitOptions.RemoveEmptyEntries);
+            var encoded = parts.Select(Uri.EscapeDataString);
+            return string.Join("/", encoded);
         }
 
         private static (string repo, string branch) RepoMeta()
