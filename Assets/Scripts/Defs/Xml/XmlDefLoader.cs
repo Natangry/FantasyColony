@@ -34,6 +34,12 @@ namespace FantasyColony.Defs.Xml
                                 v.modId = modId;
                                 visuals.Add(v);
                                 break;
+                            // Back-compat: allow <VisualDef> as an alias for <Visual2DDef>
+                            case "VisualDef":
+                                var v2 = ParseVisual2D(root);
+                                v2.modId = modId;
+                                visuals.Add(v2);
+                                break;
                             case BuildingDefKinds.Root:
                                 var b = ParseBuilding(root);
                                 b.modId = modId;
