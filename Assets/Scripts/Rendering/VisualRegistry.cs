@@ -15,13 +15,26 @@ public static class VisualRegistry
         var cam = Camera.main ?? Object.FindAnyObjectByType<Camera>();
         _visibleLayer = PickVisibleLayer(0, cam);
 
-        foreach (var kv in DefDatabase.Visuals)
+        // Build from current defs
+        foreach (var v in DefDatabase.Visuals)
         {
-            var v = kv.Value;
-            var ghost = MakeQuadPrefab(v, translucent: true, cam);
-            var placed = MakeQuadPrefab(v, translucent: false, cam);
-            _ghostPrefabs[v.id] = ghost;
-            _placedPrefabs[v.id] = placed;
+            var vd = v as VisualDef ?? new VisualDef
+            {
+                defName = v.defName,
+                sortingLayer = v.sortingLayer,
+                sortingOrder = v.sortingOrder,
+                pivotX = v.pivotX,
+                pivotY = v.pivotY,
+                scale = v.scale,
+                plane = v.plane,
+                z_lift = v.z_lift,
+                shader_hint = v.shader_hint,
+                color_rgba = v.color_rgba
+            };
+            var ghost = MakeQuadPrefab(vd, translucent: true, cam);
+            var placed = MakeQuadPrefab(vd, translucent: false, cam);
+            _ghostPrefabs[vd.id] = ghost;
+            _placedPrefabs[vd.id] = placed;
         }
         Debug.Log($"[VisualRegistry] Built prefabs: Ghost={_ghostPrefabs.Count}, Placed={_placedPrefabs.Count}, Layer={_visibleLayer}");
     }
@@ -30,7 +43,23 @@ public static class VisualRegistry
     {
         if (!_ghostPrefabs.TryGetValue(visualId, out var pf)) return null;
         var inst = Object.Instantiate(pf, parent);
-        Orient(inst.transform, DefDatabase.Visuals[visualId], foot, tile, true);
+        if (DefDatabase.VisualsByName != null && DefDatabase.VisualsByName.TryGetValue(visualId, out var def))
+        {
+            var vd = def as VisualDef ?? new VisualDef
+            {
+                defName = def.defName,
+                sortingLayer = def.sortingLayer,
+                sortingOrder = def.sortingOrder,
+                pivotX = def.pivotX,
+                pivotY = def.pivotY,
+                scale = def.scale,
+                plane = def.plane,
+                z_lift = def.z_lift,
+                shader_hint = def.shader_hint,
+                color_rgba = def.color_rgba
+            };
+            Orient(inst.transform, vd, foot, tile, true);
+        }
         return inst;
     }
 
@@ -38,7 +67,23 @@ public static class VisualRegistry
     {
         if (!_placedPrefabs.TryGetValue(visualId, out var pf)) return null;
         var inst = Object.Instantiate(pf, parent);
-        Orient(inst.transform, DefDatabase.Visuals[visualId], foot, tile, false);
+        if (DefDatabase.VisualsByName != null && DefDatabase.VisualsByName.TryGetValue(visualId, out var def))
+        {
+            var vd = def as VisualDef ?? new VisualDef
+            {
+                defName = def.defName,
+                sortingLayer = def.sortingLayer,
+                sortingOrder = def.sortingOrder,
+                pivotX = def.pivotX,
+                pivotY = def.pivotY,
+                scale = def.scale,
+                plane = def.plane,
+                z_lift = def.z_lift,
+                shader_hint = def.shader_hint,
+                color_rgba = def.color_rgba
+            };
+            Orient(inst.transform, vd, foot, tile, false);
+        }
         return inst;
     }
 
@@ -59,8 +104,11 @@ public static class VisualRegistry
     private static Material MakeMaterial(VisualDef vdef, bool translucent)
     {
         Shader s = null;
-        if (vdef.shader_hint.Contains("URP")) s = Shader.Find("Universal Render Pipeline/Unlit");
-        if (s == null && vdef.shader_hint.Contains("Unlit")) s = Shader.Find("Unlit/Color");
+        if (!string.IsNullOrEmpty(vdef.shader_hint))
+        {
+            if (vdef.shader_hint.Contains("URP")) s = Shader.Find("Universal Render Pipeline/Unlit");
+            if (s == null && vdef.shader_hint.Contains("Unlit")) s = Shader.Find("Unlit/Color");
+        }
         if (s == null) s = Shader.Find("Standard");
         var m = new Material(s);
         if (s.name.Contains("Standard"))
