@@ -23,6 +23,7 @@ public static class AppBootstrap
         // Always ensure our own overlay exists and is shown (Large default)
         IntroMenuOverlay.Ensure();
         IntroMenuOverlay.Show();
+        PauseMenuController.HideIfPresent();
         MakeRunner(); // ensures we also re-check shortly after boot
         TryShowIntroOverlay("AfterAssembliesLoaded");
         SceneManager.activeSceneChanged += (_, __) => TryShowIntroOverlay("activeSceneChanged");

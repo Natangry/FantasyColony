@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 #endif
 
 /// <summary>
@@ -84,6 +85,16 @@ public class PauseMenuController : MonoBehaviour
             es.AddComponent<StandaloneInputModule>();
             DontDestroyOnLoad(es);
         }
+#if ENABLE_INPUT_SYSTEM
+        // Prefer the new Input System UI module when available
+        var esRef = FindFirstObjectByType<EventSystem>();
+        if (esRef != null)
+        {
+            var old = esRef.GetComponent<StandaloneInputModule>();
+            if (old != null) Destroy(old);
+            if (esRef.GetComponent<InputSystemUIInputModule>() == null) esRef.gameObject.AddComponent<InputSystemUIInputModule>();
+        }
+#endif
 
         _root = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         DontDestroyOnLoad(_root);
@@ -172,6 +183,12 @@ public class PauseMenuController : MonoBehaviour
         t.text = s;
         t.raycastTarget = false;
         return t;
+    }
+
+    public static void HideIfPresent()
+    {
+        var pm = FindFirstObjectByType<PauseMenuController>();
+        if (pm != null) pm.Hide();
     }
 }
 
