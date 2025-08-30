@@ -33,14 +33,8 @@ public static class AppBootstrap
     /// <summary>Returns true if an intro-like overlay is visible.</summary>
     public static bool IsIntroVisible()
     {
-        if (IntroMenuOverlay.IsOpen) return true;
-        var comp = FindIntroComponentInScene();
-        if (comp is IIntroOverlay)
-        {
-            if (TryGetVisibleFlag(comp, out bool vis)) return vis;
-            return comp.isActiveAndEnabled && comp.gameObject.activeInHierarchy;
-        }
-        return false;
+        var intro = UnityEngine.Object.FindObjectOfType<IntroMenuOverlay>(true);
+        return intro != null && intro.gameObject.activeInHierarchy;
     }
 
     /// <summary>Shows the intro overlay (prefer the project's real one; otherwise spawn a fallback).</summary>
@@ -56,26 +50,8 @@ public static class AppBootstrap
     /// <summary>Hides any intro overlay (real or fallback).</summary>
     public static void HideIntroOverlay()
     {
-        if (IntroMenuOverlay.IsOpen)
-        {
-            IntroMenuOverlay.Hide();
-            BuildUIBootstrap.EnsureForCurrentScene();
-            return;
-        }
-        var comp = FindIntroComponentInScene();
-        if (comp != null)
-        {
-            if (TryInvokeHide(comp))
-            {
-                BuildUIBootstrap.EnsureForCurrentScene();
-                return;
-            }
-            TrySetVisibleFlag(comp, false);
-            comp.gameObject.SetActive(false);
-            BuildUIBootstrap.EnsureForCurrentScene();
-            return;
-        }
-        IntroOverlayFallback.HideIfPresent();
+        var intro = UnityEngine.Object.FindObjectOfType<IntroMenuOverlay>(true);
+        if (intro != null) intro.gameObject.SetActive(false);
         BuildUIBootstrap.EnsureForCurrentScene();
     }
 
