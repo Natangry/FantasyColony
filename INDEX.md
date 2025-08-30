@@ -3,6 +3,261 @@
 - **.gitignore** — [View](https://github.com/Natangry/FantasyColony/blob/main/.gitignore) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/.gitignore)
 - **.vsconfig** — [View](https://github.com/Natangry/FantasyColony/blob/main/.vsconfig) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/.vsconfig)
 
+## Assets/Addressables
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Addressables)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Addressables/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Addressables/README.md)
+
+## Assets/Art/PixelArt/_Guidelines
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/_Guidelines)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/_Guidelines/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/_Guidelines/README.md)
+
+## Assets/Art/PixelArt/Atlases/Characters
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Atlases/Characters)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Atlases/Characters/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Atlases/Characters/README.md)
+
+## Assets/Art/PixelArt/Atlases/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Atlases/UI)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Atlases/UI/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Atlases/UI/README.md)
+
+## Assets/Art/PixelArt/Atlases/VFX
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Atlases/VFX)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Atlases/VFX/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Atlases/VFX/README.md)
+
+## Assets/Art/PixelArt/Atlases/World
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Atlases/World)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Atlases/World/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Atlases/World/README.md)
+
+## Assets/Art/PixelArt/Characters/Creatures
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Characters/Creatures)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Characters/Creatures/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Characters/Creatures/README.md)
+
+## Assets/Art/PixelArt/Characters/NPCs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Characters/NPCs)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Characters/NPCs/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Characters/NPCs/README.md)
+
+## Assets/Art/PixelArt/Characters/Player
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Characters/Player)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Characters/Player/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Characters/Player/README.md)
+
+## Assets/Art/PixelArt/Palettes
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Palettes)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Palettes/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Palettes/README.md)
+
+## Assets/Art/PixelArt/Sources/Characters
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Sources/Characters)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Sources/Characters/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Sources/Characters/README.md)
+
+## Assets/Art/PixelArt/Sources/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Sources/UI)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Sources/UI/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Sources/UI/README.md)
+
+## Assets/Art/PixelArt/Sources/VFX
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Sources/VFX)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Sources/VFX/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Sources/VFX/README.md)
+
+## Assets/Art/PixelArt/Sources/World
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/Sources/World)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/Sources/World/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/Sources/World/README.md)
+
+## Assets/Art/PixelArt/UI/Icons
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/UI/Icons)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/UI/Icons/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/UI/Icons/README.md)
+
+## Assets/Art/PixelArt/UI/Portraits
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/UI/Portraits)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/UI/Portraits/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/UI/Portraits/README.md)
+
+## Assets/Art/PixelArt/UI/Widgets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/UI/Widgets)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/UI/Widgets/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/UI/Widgets/README.md)
+
+## Assets/Art/PixelArt/VFX/Combat
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/VFX/Combat)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/VFX/Combat/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/VFX/Combat/README.md)
+
+## Assets/Art/PixelArt/VFX/Environment
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/VFX/Environment)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/VFX/Environment/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/VFX/Environment/README.md)
+
+## Assets/Art/PixelArt/VFX/Weather
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/VFX/Weather)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/VFX/Weather/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/VFX/Weather/README.md)
+
+## Assets/Art/PixelArt/World/Buildings
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/World/Buildings)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/World/Buildings/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/World/Buildings/README.md)
+
+## Assets/Art/PixelArt/World/Overworld
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/World/Overworld)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/World/Overworld/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/World/Overworld/README.md)
+
+## Assets/Art/PixelArt/World/Props
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/World/Props)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/World/Props/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/World/Props/README.md)
+
+## Assets/Art/PixelArt/World/Terrain
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/World/Terrain)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/World/Terrain/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/World/Terrain/README.md)
+
+## Assets/Art/PixelArt/World/Tilesets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Art/PixelArt/World/Tilesets)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Art/PixelArt/World/Tilesets/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Art/PixelArt/World/Tilesets/README.md)
+
+## Assets/Audio/Music
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Audio/Music)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Audio/Music/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Audio/Music/README.md)
+
+## Assets/Audio/SFX
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Audio/SFX)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Audio/SFX/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Audio/SFX/README.md)
+
+## Assets/Audio/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Audio/UI)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Audio/UI/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Audio/UI/README.md)
+
+## Assets/Defs/Buildings/Furniture
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Buildings/Furniture)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Buildings/Furniture/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Buildings/Furniture/README.md)
+
+## Assets/Defs/Buildings/Storage
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Buildings/Storage)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Buildings/Storage/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Buildings/Storage/README.md)
+
+## Assets/Defs/Buildings/Workbenches
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Buildings/Workbenches)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Buildings/Workbenches/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Buildings/Workbenches/README.md)
+
+## Assets/Defs/Core/GameRules
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Core/GameRules)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Core/GameRules/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Core/GameRules/README.md)
+
+## Assets/Defs/Core/Stats
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Core/Stats)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Core/Stats/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Core/Stats/README.md)
+
+## Assets/Defs/Core/Tags
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Core/Tags)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Core/Tags/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Core/Tags/README.md)
+
+## Assets/Defs/Incidents
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Incidents)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Incidents/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Incidents/README.md)
+
+## Assets/Defs/Items/Apparel
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Items/Apparel)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Items/Apparel/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Items/Apparel/README.md)
+
+## Assets/Defs/Items/Materials
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Items/Materials)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Items/Materials/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Items/Materials/README.md)
+
+## Assets/Defs/Items/Weapons
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Items/Weapons)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Items/Weapons/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Items/Weapons/README.md)
+
+## Assets/Defs/Pawns/Backstories
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Pawns/Backstories)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Pawns/Backstories/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Pawns/Backstories/README.md)
+
+## Assets/Defs/Pawns/Needs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Pawns/Needs)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Pawns/Needs/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Pawns/Needs/README.md)
+
+## Assets/Defs/Pawns/Races
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Pawns/Races)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Pawns/Races/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Pawns/Races/README.md)
+
+## Assets/Defs/Pawns/Traits
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Pawns/Traits)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Pawns/Traits/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Pawns/Traits/README.md)
+
+## Assets/Defs/Quests
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Quests)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Quests/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Quests/README.md)
+
+## Assets/Defs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/README.md)
+
+## Assets/Defs/Recipes
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Recipes)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Recipes/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Recipes/README.md)
+
+## Assets/Defs/Research
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/Research)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/Research/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/Research/README.md)
+
+## Assets/Defs/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/UI)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/UI/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/UI/README.md)
+
+## Assets/Defs/World/Biomes
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/World/Biomes)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/World/Biomes/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/World/Biomes/README.md)
+
+## Assets/Defs/World/Factions
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/World/Factions)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/World/Factions/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/World/Factions/README.md)
+
+## Assets/Defs/World/Sites
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/World/Sites)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/World/Sites/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/World/Sites/README.md)
+
+## Assets/Defs/World/WorldTags
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Defs/World/WorldTags)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Defs/World/WorldTags/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Defs/World/WorldTags/README.md)
+
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
 
@@ -12,14 +267,80 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Editor)
 
 - **CreateStartupConfigAsset.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/CreateStartupConfigAsset.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/CreateStartupConfigAsset.cs)
+- **FantasyColony.Editor.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/FantasyColony.Editor.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/FantasyColony.Editor.asmdef)
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/README.md)
 - **SpriteImportDefaults.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - **SpriteImportDefaults.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs.meta)
+
+## Assets/Fonts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Fonts)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Fonts/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Fonts/README.md)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
 
 - **InputSystem_Actions.inputactions** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions)
 - **InputSystem_Actions.inputactions.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions.meta)
+
+## Assets/Localization/Fonts
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Localization/Fonts)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Localization/Fonts/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Localization/Fonts/README.md)
+
+## Assets/Localization/StringTables
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Localization/StringTables)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Localization/StringTables/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Localization/StringTables/README.md)
+
+## Assets/Materials
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Materials)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Materials/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Materials/README.md)
+
+## Assets/Prefabs/Buildings
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/Buildings)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/Buildings/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/Buildings/README.md)
+
+## Assets/Prefabs/Camera
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/Camera)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/Camera/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/Camera/README.md)
+
+## Assets/Prefabs/Characters
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/Characters)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/Characters/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/Characters/README.md)
+
+## Assets/Prefabs/Items
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/Items)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/Items/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/Items/README.md)
+
+## Assets/Prefabs/Pawns
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/Pawns)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/Pawns/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/Pawns/README.md)
+
+## Assets/Prefabs/Props
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/Props)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/Props/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/Props/README.md)
+
+## Assets/Prefabs/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/UI)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/UI/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/UI/README.md)
+
+## Assets/Prefabs/VFX
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Prefabs/VFX)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Prefabs/VFX/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Prefabs/VFX/README.md)
+
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
 - **Readme.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset)
 - **Readme.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset.meta)
 - **Resources.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Resources.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Resources.meta)
@@ -125,6 +446,26 @@
 - **PixelCameraHelper.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs)
 - **PixelCameraHelper.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Camera/PixelCameraHelper.cs.meta)
 
+## Assets/Scripts/Core/Config
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core/Config)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Config/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Config/README.md)
+
+## Assets/Scripts/Core/Diagnostics
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core/Diagnostics)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Diagnostics/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Diagnostics/README.md)
+
+## Assets/Scripts/Core/Events
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core/Events)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Events/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Events/README.md)
+
+## Assets/Scripts/Core
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core)
+
+- **FantasyColony.Core.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/FantasyColony.Core.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/FantasyColony.Core.asmdef)
+
 ## Assets/Scripts/Core/Lifecycle
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core/Lifecycle)
 
@@ -133,6 +474,11 @@
 - **StageAttributes.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/StageAttributes.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/StageAttributes.cs)
 - **StageRegistry.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/StageRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/StageRegistry.cs)
 - **StageRunner.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Lifecycle/StageRunner.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Lifecycle/StageRunner.cs)
+
+## Assets/Scripts/Core/SaveLoad
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Core/SaveLoad)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/SaveLoad/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/SaveLoad/README.md)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -161,6 +507,71 @@
 
 - **XmlDefLoader.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs)
 - **XmlDefLoader.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Defs/Xml/XmlDefLoader.cs.meta)
+
+## Assets/Scripts/Dev/Cheats
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Dev/Cheats)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Dev/Cheats/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Dev/Cheats/README.md)
+
+## Assets/Scripts/Dev/Debug
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Dev/Debug)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Dev/Debug/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Dev/Debug/README.md)
+
+## Assets/Scripts/Dev
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Dev)
+
+- **FantasyColony.Dev.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Dev/FantasyColony.Dev.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Dev/FantasyColony.Dev.asmdef)
+
+## Assets/Scripts/Gameplay/Camera
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Camera)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Camera/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Camera/README.md)
+
+## Assets/Scripts/Gameplay
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay)
+
+- **FantasyColony.Gameplay.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/FantasyColony.Gameplay.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/FantasyColony.Gameplay.asmdef)
+
+## Assets/Scripts/Gameplay/Items
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Items)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Items/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Items/README.md)
+
+## Assets/Scripts/Gameplay/Pawns
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Pawns)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Pawns/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Pawns/README.md)
+
+## Assets/Scripts/Gameplay/Systems/AI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Systems/AI)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Systems/AI/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Systems/AI/README.md)
+
+## Assets/Scripts/Gameplay/Systems/Director
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Systems/Director)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Systems/Director/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Systems/Director/README.md)
+
+## Assets/Scripts/Gameplay/Systems/Economy
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Systems/Economy)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Systems/Economy/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Systems/Economy/README.md)
+
+## Assets/Scripts/Gameplay/Systems/Inventory
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Systems/Inventory)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Systems/Inventory/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Systems/Inventory/README.md)
+
+## Assets/Scripts/Gameplay/Systems/Jobs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Systems/Jobs)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Systems/Jobs/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Systems/Jobs/README.md)
+
+## Assets/Scripts/Gameplay/Systems/Needs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Gameplay/Systems/Needs)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Gameplay/Systems/Needs/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Gameplay/Systems/Needs/README.md)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -241,6 +652,35 @@
 
 - **ClockHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs)
 - **ClockHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs.meta)
+
+## Assets/Scripts/UI/Common
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI/Common)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Common/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Common/README.md)
+
+## Assets/Scripts/UI/EmbarkPrep
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI/EmbarkPrep)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/EmbarkPrep/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/EmbarkPrep/README.md)
+
+## Assets/Scripts/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI)
+
+- **FantasyColony.UI.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/FantasyColony.UI.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/FantasyColony.UI.asmdef)
+
+## Assets/Scripts/UI/HUD
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI/HUD)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/HUD/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/HUD/README.md)
+
+## Assets/Scripts/UI/Intro
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI/Intro)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Intro/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Intro/README.md)
+
+## Assets/Scripts/UI
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI)
+
 - **IntroMenuOverlay.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroMenuOverlay.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroMenuOverlay.cs)
 - **IntroOverlayFallback.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroOverlayFallback.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroOverlayFallback.cs)
 - **IntroOverlayFallback.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroOverlayFallback.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroOverlayFallback.cs.meta)
@@ -249,6 +689,11 @@
 - **PauseMenuController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/PauseMenuController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/PauseMenuController.cs)
 - **SelectionHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs)
 - **SelectionHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs.meta)
+
+## Assets/Scripts/UI/WorldSetup
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/UI/WorldSetup)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/WorldSetup/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/WorldSetup/README.md)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
@@ -282,8 +727,33 @@
 ## Assets/Scripts/World
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World)
 
+- **FantasyColony.World.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/FantasyColony.World.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/FantasyColony.World.asmdef)
+
+## Assets/Scripts/World/FogOfWar
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World/FogOfWar)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/FogOfWar/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/FogOfWar/README.md)
+
+## Assets/Scripts/World/MapGen
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World/MapGen)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/MapGen/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/MapGen/README.md)
+
+## Assets/Scripts/World/Regions
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World/Regions)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/Regions/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/Regions/README.md)
+
+## Assets/Scripts/World
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World)
+
 - **SimpleGridMap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/SimpleGridMap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/SimpleGridMap.cs)
 - **SimpleGridMap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/SimpleGridMap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/SimpleGridMap.cs.meta)
+
+## Assets/Scripts/World/WorldSim
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/World/WorldSim)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/World/WorldSim/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/World/WorldSim/README.md)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
@@ -307,6 +777,11 @@
 - **SampleSceneProfile.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/SampleSceneProfile.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/SampleSceneProfile.asset.meta)
 - **UniversalRenderPipelineGlobalSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset)
 - **UniversalRenderPipelineGlobalSettings.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset.meta)
+
+## Assets/Shaders
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Shaders)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Shaders/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Shaders/README.md)
 
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
@@ -599,6 +1074,27 @@
 - **XML_ARTIFACTS.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/XML_ARTIFACTS.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/XML_ARTIFACTS.md)
 - **LICENSE** — [View](https://github.com/Natangry/FantasyColony/blob/main/LICENSE) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/LICENSE)
 
+## Mods/_TemplateMod/Art/PixelArt/Atlases
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Mods/_TemplateMod/Art/PixelArt/Atlases)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Mods/_TemplateMod/Art/PixelArt/Atlases/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Mods/_TemplateMod/Art/PixelArt/Atlases/README.md)
+
+## Mods/_TemplateMod/Art/PixelArt/Sources
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Mods/_TemplateMod/Art/PixelArt/Sources)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Mods/_TemplateMod/Art/PixelArt/Sources/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Mods/_TemplateMod/Art/PixelArt/Sources/README.md)
+
+## Mods/_TemplateMod/Defs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Mods/_TemplateMod/Defs)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Mods/_TemplateMod/Defs/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Mods/_TemplateMod/Defs/README.md)
+
+## Mods/_TemplateMod
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Mods/_TemplateMod)
+
+- **modinfo.json** — [View](https://github.com/Natangry/FantasyColony/blob/main/Mods/_TemplateMod/modinfo.json) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Mods/_TemplateMod/modinfo.json)
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Mods/_TemplateMod/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Mods/_TemplateMod/README.md)
+
 ## Packages
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Packages)
 
@@ -635,6 +1131,33 @@
 - **VFXManager.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/VFXManager.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/VFXManager.asset)
 - **XRSettings.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/ProjectSettings/XRSettings.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/ProjectSettings/XRSettings.asset)
 - **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/README.md)
+
+## Tests/EditMode
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tests/EditMode)
+
+- **FantasyColony.Tests.EditMode.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tests/EditMode/FantasyColony.Tests.EditMode.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tests/EditMode/FantasyColony.Tests.EditMode.asmdef)
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tests/EditMode/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tests/EditMode/README.md)
+
+## Tests/PlayMode
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tests/PlayMode)
+
+- **FantasyColony.Tests.PlayMode.asmdef** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tests/PlayMode/FantasyColony.Tests.PlayMode.asmdef) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tests/PlayMode/FantasyColony.Tests.PlayMode.asmdef)
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tests/PlayMode/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tests/PlayMode/README.md)
+
+## Tools/Build
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/Build)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/Build/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/Build/README.md)
+
+## Tools/Importers
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/Importers)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/Importers/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/Importers/README.md)
+
+## Tools/Schema
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/Schema)
+
+- **README.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/Schema/README.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/Schema/README.md)
 
 ## Tools/XmlDefsTools/Config
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Config)
