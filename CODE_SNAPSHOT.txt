@@ -4336,7 +4336,7 @@ public class IntroMenuOverlay : MonoBehaviour
         {
             var dims = GetDims(_selected);
             if (_beh == null) _beh = _root.AddComponent<IntroMenuOverlay>();
-            _beh.StartCoroutine(StartWorldFlow(dims.x, dims.y, _selected));
+            _beh.StartCoroutine(_beh.StartWorldFlow(dims.x, dims.y, _selected));
         });
 
         var quit = BuildButton(panel.transform, "Quit", new Vector2(0, -150));
