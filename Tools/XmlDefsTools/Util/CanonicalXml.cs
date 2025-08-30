@@ -43,7 +43,7 @@ namespace XmlDefsTools.Util
         {
             var orderedAttrs = el.Attributes()
                 .Where(a => !a.IsNamespaceDeclaration)
-                .OrderBy(a => OrderKey(a.Name.LocalName), StringComparer.OrdinalIgnoreCase)
+                .OrderBy(a => OrderKey(a.Name.LocalName))
                 .ThenBy(a => a.Name.LocalName, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
