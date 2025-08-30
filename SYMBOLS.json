@@ -109,30 +109,6 @@
   },
   {
     "kind": "class",
-    "name": "BuildHotkeyListener",
-    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
-    "line": 7
-  },
-  {
-    "kind": "method",
-    "name": "Toggle",
-    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
-    "line": 9
-  },
-  {
-    "kind": "method",
-    "name": "Update",
-    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
-    "line": 24
-  },
-  {
-    "kind": "method",
-    "name": "OnGUI",
-    "file": "Assets/Scripts/Build/BuildHotkeyListener.cs",
-    "line": 34
-  },
-  {
-    "kind": "class",
     "name": "BuildModeController",
     "file": "Assets/Scripts/Build/BuildModeController.cs",
     "line": 8
@@ -195,7 +171,7 @@
     "kind": "class",
     "name": "BuildPaletteHUD",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 6
+    "line": 5
   },
   {
     "kind": "class",
@@ -832,60 +808,6 @@
     "name": "PickVisibleLayer",
     "file": "Assets/Scripts/Rendering/VisualFactory.cs",
     "line": 77
-  },
-  {
-    "kind": "class",
-    "name": "VisualRegistry",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 4
-  },
-  {
-    "kind": "method",
-    "name": "Build",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 10
-  },
-  {
-    "kind": "method",
-    "name": "SpawnGhost",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 41
-  },
-  {
-    "kind": "method",
-    "name": "SpawnPlaced",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 65
-  },
-  {
-    "kind": "method",
-    "name": "MakeQuadPrefab",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 89
-  },
-  {
-    "kind": "method",
-    "name": "MakeMaterial",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 103
-  },
-  {
-    "kind": "method",
-    "name": "Orient",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 129
-  },
-  {
-    "kind": "method",
-    "name": "LayerFromNameOrIndex",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 147
-  },
-  {
-    "kind": "method",
-    "name": "PickVisibleLayer",
-    "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 155
   },
   {
     "kind": "class",

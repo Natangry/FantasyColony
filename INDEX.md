@@ -67,8 +67,6 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Build)
 
 - **BuildBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildBootstrap.cs.meta)
-- **BuildHotkeyListener.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildHotkeyListener.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildHotkeyListener.cs)
-- **BuildHotkeyListener.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildHotkeyListener.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildHotkeyListener.cs.meta)
 - **BuildModeController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildModeController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildModeController.cs)
 - **BuildModeController.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildModeController.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildModeController.cs.meta)
 - **BuildPaletteHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Build/BuildPaletteHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Build/BuildPaletteHUD.cs)
@@ -170,8 +168,6 @@
 - **SpriteVisualFactory2D.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/SpriteVisualFactory2D.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/SpriteVisualFactory2D.cs.meta)
 - **VisualFactory.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualFactory.cs)
 - **VisualFactory.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualFactory.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualFactory.cs.meta)
-- **VisualRegistry.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualRegistry.cs)
-- **VisualRegistry.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Rendering/VisualRegistry.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Rendering/VisualRegistry.cs.meta)
 
 ## Assets/Scripts
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts)
