@@ -265,16 +265,27 @@ public static class AppBootstrap
     /// <summary>Hides any intro overlay (real or fallback).</summary>
     public static void HideIntroOverlay()
     {
-        if (IntroMenuOverlay.IsOpen) { IntroMenuOverlay.Hide(); return; }
+        if (IntroMenuOverlay.IsOpen)
+        {
+            IntroMenuOverlay.Hide();
+            BuildUIBootstrap.EnsureForCurrentScene();
+            return;
+        }
         var comp = FindIntroComponentInScene();
         if (comp != null)
         {
-            if (TryInvokeHide(comp)) return;
+            if (TryInvokeHide(comp))
+            {
+                BuildUIBootstrap.EnsureForCurrentScene();
+                return;
+            }
             TrySetVisibleFlag(comp, false);
             comp.gameObject.SetActive(false);
+            BuildUIBootstrap.EnsureForCurrentScene();
             return;
         }
         IntroOverlayFallback.HideIfPresent();
+        BuildUIBootstrap.EnsureForCurrentScene();
     }
 
     // --- internals ---
