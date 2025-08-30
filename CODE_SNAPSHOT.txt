@@ -426,6 +426,7 @@ using System.Linq;
 // Assumes BuildingDef exists in your Defs namespace
 // If your project uses a different namespace, adjust the using accordingly.
 using FantasyColony.Defs;
+using UnityObject = UnityEngine.Object;
 
 public class BuildModeController : MonoBehaviour
 {
@@ -444,6 +445,8 @@ public class BuildModeController : MonoBehaviour
     }
 
     public bool IsBuildModeEnabled => _buildModeEnabled;
+    // Back-compat for existing HUD scripts
+    public bool IsActive => _buildModeEnabled;
     public BuildTool ActiveTool => _activeTool;
     public BuildingDef SelectedBuildingDef => _selectedBuildingDef;
 
@@ -481,7 +484,15 @@ public class BuildModeController : MonoBehaviour
     // Utility used by placement tool to enforce uniqueness of special buildings
     public bool UniqueBuildingExists<T>() where T : Component
     {
-        return FindObjectsOfType<T>().Length > 0;
+#if UNITY_2023_1_OR_NEWER
+        return UnityObject.FindAnyObjectByType<T>() != null;
+#elif UNITY_2022_2_OR_NEWER
+        return UnityObject.FindFirstObjectByType<T>() != null;
+#else
+#pragma warning disable 618
+        return UnityObject.FindObjectOfType<T>() != null;
+#pragma warning restore 618
+#endif
     }
 
     private void Update()
@@ -511,6 +522,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using FantasyColony.Defs;
+using UnityEngine.UIElements;
 
 public class BuildPaletteHUD : MonoBehaviour
 {
@@ -519,7 +531,7 @@ public class BuildPaletteHUD : MonoBehaviour
 
     void OnGUI()
     {
-        if (BuildModeController.Instance == null || !BuildModeController.Instance.IsBuildModeEnabled) return;
+        if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
         GUILayout.BeginArea(_panelRect, GUI.skin.window);
         GUILayout.Label("Build Palette");
@@ -546,27 +558,22 @@ public class BuildPaletteHUD : MonoBehaviour
 
     static List<BuildingDef> GetPaletteDefs()
     {
-        // If a DefDatabase exists, use it. Otherwise return a local fallback.
+        // Use static DefDatabase (no singleton). Otherwise return a local fallback.
         var list = new List<BuildingDef>();
-        try
+        if (DefDatabase.Buildings != null && DefDatabase.Buildings.Count > 0)
         {
-            var db = DefDatabase.Instance; // adjust if your singleton accessor differs
-            if (db != null && db.Buildings != null && db.Buildings.Count > 0)
+            foreach (var b in DefDatabase.Buildings)
             {
-                foreach (var b in db.Buildings)
-                {
-                    if (b.showInPalette) list.Add(b);
-                }
-                // If nothing was explicitly marked for palette, surface Construction Board if present
-                if (list.Count == 0)
-                {
-                    var cb = db.Buildings.FirstOrDefault(x => x.defName == "ConstructionBoard");
-                    if (cb != null) list.Add(cb);
-                }
-                if (list.Count > 0) return list;
+                if (b.showInPalette) list.Add(b);
             }
+            // If nothing was explicitly marked for palette, surface Construction Board if present
+            if (list.Count == 0)
+            {
+                var cb = DefDatabase.Buildings.FirstOrDefault(x => x.defName == "ConstructionBoard");
+                if (cb != null) list.Add(cb);
+            }
+            if (list.Count > 0) return list;
         }
-        catch { /* fall through to fallback */ }
 
         // Fallback minimal def for bring-up
         list.Add(new BuildingDef
@@ -588,6 +595,7 @@ public class BuildPaletteHUD : MonoBehaviour
 // ===== FILE: Assets/Scripts/Build/BuildPlacementTool.cs =====
 using UnityEngine;
 using FantasyColony.Defs;
+using UnityObject = UnityEngine.Object;
 
 /// <summary>
 /// Minimal placement tool for the Construction Board bring-up:
@@ -657,7 +665,17 @@ public class BuildPlacementTool : MonoBehaviour
     void TryPlace(BuildingDef def, Vector3 pos)
     {
         // For MVP: explicitly handle uniqueness for ConstructionBoard
-        if (def.unique && FindObjectOfType<ConstructionBoard>() != null)
+        if (def.unique
+#if UNITY_2023_1_OR_NEWER
+            && UnityObject.FindAnyObjectByType<ConstructionBoard>() != null
+#elif UNITY_2022_2_OR_NEWER
+            && UnityObject.FindFirstObjectByType<ConstructionBoard>() != null
+#else
+#pragma warning disable 618
+            && FindObjectOfType<ConstructionBoard>() != null
+#pragma warning restore 618
+#endif
+            )
         {
             // silently ignore for now; could beep/flash UI
             return;
@@ -2032,7 +2050,7 @@ public static class SpriteVisualFactory2D
         if (_ghostPrefabs.Count == 0)
         {
             // synthesize a default visual so we see something
-            var v = new VisualDef { id = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
+            var v = new VisualDef { defName = "core.Visual.Board_Default", color_rgba = "#F3D95AFF", plane = "XY" };
             _ghostPrefabs[v.id] = MakeSpritePrefab(v, translucent:true);
             _placedPrefabs[v.id] = MakeSpritePrefab(v, translucent:false);
         }
