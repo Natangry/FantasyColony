@@ -569,6 +569,7 @@ public static class WorldBootstrap
 
 // ===== FILE: Assets/Scripts/Build/BuildHUD.cs =====
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Minimal header HUD that exposes a Build toggle and self-heals missing systems.
@@ -581,13 +582,31 @@ public class BuildHUD : MonoBehaviour
 
     void OnGUI()
     {
+        // Hide on intro/menu/title scenes
+        var sn = SceneManager.GetActiveScene().name;
+        if (!string.IsNullOrEmpty(sn))
+        {
+            var s = sn.ToLowerInvariant();
+            if (s.Contains("intro") || s.Contains("menu") || s.Contains("title")) return;
+        }
+
         var ctrl = Ctrl;
         if (ctrl == null)
         {
             BuildBootstrap.Ensure();
             ctrl = BuildModeController.Instance;
         }
-        GUILayout.BeginArea(HeaderRect, GUI.skin.window);
+
+        // Scale UI for high DPI
+        float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1920f, Screen.height / 1080f), 1.0f, 2.5f);
+        var prevMatrix = GUI.matrix;
+        GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), Vector2.zero);
+        var rect = new Rect(HeaderRect.x / scale, HeaderRect.y / scale, HeaderRect.width / scale, HeaderRect.height / scale);
+
+        var skin = GUI.skin;
+        int oldButton = skin.button.fontSize;
+        skin.button.fontSize = Mathf.RoundToInt(14 * scale);
+        GUILayout.BeginArea(rect, GUI.skin.window);
         GUILayout.BeginHorizontal();
         GUILayout.Label(ctrl != null && ctrl.IsActive ? "●" : "○", GUILayout.Width(20));
         if (GUILayout.Button("Build [B]", GUILayout.Height(20)))
@@ -596,9 +615,10 @@ public class BuildHUD : MonoBehaviour
         }
         GUILayout.EndHorizontal();
         GUILayout.EndArea();
+        skin.button.fontSize = oldButton;
+        GUI.matrix = prevMatrix;
     }
 }
-
 
 
 // ===== FILE: Assets/Scripts/Build/BuildModeController.cs =====
@@ -719,6 +739,7 @@ public enum BuildTool
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 using FantasyColony.Defs;
 
 public class BuildPaletteHUD : MonoBehaviour
@@ -735,8 +756,17 @@ public class BuildPaletteHUD : MonoBehaviour
         return new Rect(16, 64, w, h);
     }
 
+    static bool IsIntroScene()
+    {
+        var n = SceneManager.GetActiveScene().name;
+        if (string.IsNullOrEmpty(n)) return false;
+        n = n.ToLowerInvariant();
+        return n.Contains("intro") || n.Contains("menu") || n.Contains("title");
+    }
+
     void OnGUI()
     {
+        if (IsIntroScene()) return;
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
         // Self-heal to guarantee systems are present
@@ -744,7 +774,22 @@ public class BuildPaletteHUD : MonoBehaviour
 
         var _panelRect = GetPanelRect();
 
-        GUILayout.BeginArea(_panelRect, GUI.skin.window);
+        // --- DPI/UI scaling ---
+        float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1920f, Screen.height / 1080f), 1.0f, 2.5f);
+        var prevMatrix = GUI.matrix;
+        GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), Vector2.zero);
+        var drawRect = new Rect(_panelRect.x / scale, _panelRect.y / scale, _panelRect.width / scale, _panelRect.height / scale);
+
+        // Temporarily bump font sizes
+        var skin = GUI.skin;
+        int oldLabel = skin.label.fontSize;
+        int oldButton = skin.button.fontSize;
+        int oldWindow = skin.window.fontSize;
+        skin.label.fontSize = Mathf.RoundToInt(14 * scale);
+        skin.button.fontSize = Mathf.RoundToInt(14 * scale);
+        skin.window.fontSize = Mathf.RoundToInt(16 * scale);
+
+        GUILayout.BeginArea(drawRect, GUI.skin.window);
         var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
         GUILayout.Label("Build Palette" + activeName);
         GUILayout.Label("Click a def to arm the tool, then left-click ground to place. Esc cancels.");
@@ -755,8 +800,8 @@ public class BuildPaletteHUD : MonoBehaviour
         foreach (var def in defs)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(240));
-            if (GUILayout.Button("Select", GUILayout.Width(140)))
+            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(260));
+            if (GUILayout.Button("Select", GUILayout.Width(Mathf.RoundToInt(160 * scale))))
             {
                 // For now we only have a placement tool for Construction Board.
                 // Down the road this can dispatch different tools per def.category/type.
@@ -767,6 +812,12 @@ public class BuildPaletteHUD : MonoBehaviour
         GUILayout.EndScrollView();
 
         GUILayout.EndArea();
+
+        // Restore GUI state
+        skin.label.fontSize = oldLabel;
+        skin.button.fontSize = oldButton;
+        skin.window.fontSize = oldWindow;
+        GUI.matrix = prevMatrix;
     }
 
     static List<BuildingDef> GetPaletteDefs()
@@ -809,6 +860,7 @@ public class BuildPaletteHUD : MonoBehaviour
 using UnityEngine;
 using FantasyColony.Defs;
 using System.Linq;
+using UnityEngine.SceneManagement;
 using System;
 using UnityObject = UnityEngine.Object;
 
@@ -832,14 +884,15 @@ public class BuildPlacementTool : MonoBehaviour
     Camera cam;
     BuildTool active = BuildTool.None;
 
-    readonly Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0
+    Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0 (adjustable)
     // Prevent click-through after arming tool from a UI button press
     bool suppressClickUntilMouseUp = false;
+    float armBlockUntilTime = 0f;
 
     void Start()
     {
         ctrl = GetComponent<BuildModeController>();
-        cam  = Camera.main;
+        cam  = GetActiveCamera();
     }
 
     public void SetTool(BuildTool tool)
@@ -849,9 +902,11 @@ public class BuildPlacementTool : MonoBehaviour
         if (active == BuildTool.PlaceConstructionBoard && ctrl.SelectedBuildingDef != null)
         {
             suppressClickUntilMouseUp = true; // wait for left mouse to be released once
+            armBlockUntilTime = Time.realtimeSinceStartup + 0.12f;
             EnsureGhost(ctrl.SelectedBuildingDef);
             // Position ghost immediately under cursor (no first-frame origin flicker)
-            if (cam == null) cam = Camera.main;
+            cam = GetActiveCamera();
+            groundPlane = new Plane(Vector3.up, GetGroundY());
             if (TryGetCursorHit(out var hit))
                 ghostGO.transform.position = SnapToGridXZ(hit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
             Debug.Log("[Build] Tool armed for " + (ctrl.SelectedBuildingDef.defName ?? "Unknown"));
@@ -861,7 +916,8 @@ public class BuildPlacementTool : MonoBehaviour
     void Update()
     {
         if (active == BuildTool.None) return;
-        if (cam == null) cam = Camera.main;
+        if (cam == null || !cam.isActiveAndEnabled) cam = GetActiveCamera();
+        groundPlane = new Plane(Vector3.up, GetGroundY());
 
         var def = ctrl.SelectedBuildingDef;
         if (def == null)
@@ -883,7 +939,8 @@ public class BuildPlacementTool : MonoBehaviour
         // Ignore the initial click that selected the tool (click-through from UI)
         if (suppressClickUntilMouseUp)
         {
-            if (Input.GetMouseButtonUp(0)) suppressClickUntilMouseUp = false;
+            if (Input.GetMouseButtonUp(0) && Time.realtimeSinceStartup >= armBlockUntilTime)
+                suppressClickUntilMouseUp = false;
         }
         else if (Input.GetMouseButtonDown(0))
         {
@@ -900,6 +957,21 @@ public class BuildPlacementTool : MonoBehaviour
         float sx = (def.width  * tileSize) / Mathf.Max(0.0001f, spriteWorldWidth);
         float sy = (def.height * tileSize) / Mathf.Max(0.0001f, spriteWorldHeight);
         return new Vector3(sx, sy, 1f);
+    }
+
+    Camera GetActiveCamera()
+    {
+        var m = Camera.main;
+        if (m != null && m.isActiveAndEnabled) return m;
+        var any = FindAnyObjectByType<Camera>();
+        if (any != null && any.isActiveAndEnabled) return any;
+        return Camera.current;
+    }
+
+    float GetGroundY()
+    {
+        // If your world ground is not at y=0, put a better heuristic here.
+        return 0f;
     }
 
     Visual2DDef GetVisualDefFor(BuildingDef def)
@@ -995,11 +1067,11 @@ public class BuildPlacementTool : MonoBehaviour
     bool TryGetCursorHit(out Vector3 hit)
     {
         hit = default;
-        if (cam == null) cam = Camera.main;
+        if (cam == null) cam = GetActiveCamera();
         if (cam == null) return false;
         var ray = cam.ScreenPointToRay(Input.mousePosition);
         if (!groundPlane.Raycast(ray, out var enter)) return false;
-        hit = ray.GetPoint(enter); // y == 0 plane
+        hit = ray.GetPoint(enter); // y == plane height
         return true;
     }
 

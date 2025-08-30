@@ -123,7 +123,7 @@
     "kind": "class",
     "name": "BuildHUD",
     "file": "Assets/Scripts/Build/BuildHUD.cs",
-    "line": 6
+    "line": 7
   },
   {
     "kind": "class",
@@ -189,19 +189,19 @@
     "kind": "class",
     "name": "BuildPaletteHUD",
     "file": "Assets/Scripts/Build/BuildPaletteHUD.cs",
-    "line": 5
+    "line": 6
   },
   {
     "kind": "class",
     "name": "BuildPlacementTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 13
+    "line": 14
   },
   {
     "kind": "method",
     "name": "SetTool",
     "file": "Assets/Scripts/Build/BuildPlacementTool.cs",
-    "line": 36
+    "line": 38
   },
   {
     "kind": "class",
