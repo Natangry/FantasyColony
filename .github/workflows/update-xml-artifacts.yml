@@ -31,6 +31,9 @@ jobs:
       - name: Run XML tools
         run: dotnet run --project Tools/XmlDefsTools/XmlDefsTools.csproj -c Release --no-build
 
+      - name: Show generated templates
+        run: ls -la Docs/Templates/Defs || true
+
       - name: Commit changes (if any) with rebase retry
         run: |
           set -e

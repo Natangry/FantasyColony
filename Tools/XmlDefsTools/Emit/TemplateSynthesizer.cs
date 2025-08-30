@@ -14,13 +14,28 @@ namespace XmlDefsTools.Emit
         public static void WriteTemplates(string outputDir, ScanResult scan, IReadOnlyDictionary<string, IList<string>> orderHints)
         {
             Directory.CreateDirectory(outputDir);
-            foreach (var schema in scan.Schemas.OrderBy(s => s))
+            // union of discovered schemas and configured schemas (ensures baseline output)
+            var configuredSchemas = orderHints.Keys
+                .Where(k => !string.Equals(k, "_common", StringComparison.OrdinalIgnoreCase) && !k.StartsWith("//"))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var allSchemas = new HashSet<string>(scan.Schemas, StringComparer.OrdinalIgnoreCase);
+            foreach (var s in configuredSchemas) allSchemas.Add(s);
+
+            foreach (var schema in allSchemas.OrderBy(s => s))
             {
-                var defs = scan.DefsBySchema[schema];
+                // if no defs discovered, synthesize from hints only
+                var defs = scan.DefsBySchema.ContainsKey(schema)
+                    ? scan.DefsBySchema[schema]
+                    : new List<DefInfo>();
 
                 // union of observed fields (attributes + elements)
                 var attrFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var elemFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                // include configured per-schema fields as elements to seed structure
+                if (orderHints.TryGetValue(schema, out var hinted))
+                {
+                    foreach (var h in hinted) elemFields.Add(h);
+                }
                 foreach (var d in defs)
                 {
                     foreach (var f in d.AttributeFields) attrFields.Add(f);
@@ -34,8 +49,9 @@ namespace XmlDefsTools.Emit
 
                 // Attributes to place on root element
                 var rootAttrs = NormalizeOrder(attrFields, precedence, keepOnly: new[] { "id","schema","name_key","tags","version","requires" });
-                // Remaining element fields
-                var elementNames = NormalizeOrder(elemFields, precedence);
+                // Remaining element fields (drop those already in attributes)
+                var elementNames = NormalizeOrder(elemFields.Except(rootAttrs, StringComparer.OrdinalIgnoreCase),
+                                                  precedence);
 
                 bool HasElem(string name) => elementNames.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase));
 
@@ -61,7 +77,7 @@ namespace XmlDefsTools.Emit
                     root.Add(new XElement("requires"));
 
                 // Components block if observed
-                if (HasElem("components"))
+                if (HasElem("components") || perSchema.Contains("components", StringComparer.OrdinalIgnoreCase))
                 {
                     root.Add(new XElement("components",
                         new XComment(" Add component entries like <Component type=\"...\"/> ")));

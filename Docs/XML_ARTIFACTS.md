@@ -2,7 +2,7 @@
 
 This repository maintains **auto-generated** artifacts for Def XMLs:
 
-- `XML_INDEX.md` — inventory of schemas and defs with basic validation notes.
+- `XML_INDEX.md` — bulleted file list with `View · Raw` links (mirrors Code Index) and a schema summary.
 - `XML_SNAPSHOT.txt` — normalized, diffable snapshot of all XML Def files.
 - `Docs/Templates/Defs/*.xml` — default templates for each discovered schema.
 

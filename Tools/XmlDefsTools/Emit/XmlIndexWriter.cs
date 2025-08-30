@@ -12,7 +12,7 @@ namespace XmlDefsTools.Emit
         public static void Write(string repoRoot, string outFile, ScanResult scan)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("# XML Index");
+            sb.AppendLine("# XML Index (.xml)");
             sb.AppendLine();
             sb.AppendLine($"_Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC_");
             sb.AppendLine();
@@ -45,6 +45,23 @@ namespace XmlDefsTools.Emit
                 sb.AppendLine();
             }
 
+            // Match Code Index style: bulleted list of files with View · Raw links
+            var (repo, branch) = RepoMeta();
+            var allXmlFiles = scan.FileDocs.Keys.OrderBy(p => p, StringComparer.OrdinalIgnoreCase).ToList();
+            if (allXmlFiles.Count > 0)
+            {
+                foreach (var file in allXmlFiles)
+                {
+                    var rel = Rel(repoRoot, file);
+                    var webPath = rel.Replace('\\','/'); // ensure URL form
+                    var viewUrl = $"https://github.com/{repo}/blob/{branch}/{Uri.EscapeUriString(webPath)}";
+                    var rawUrl  = $"https://raw.githubusercontent.com/{repo}/{branch}/{Uri.EscapeUriString(webPath)}";
+                    sb.AppendLine($"- `{webPath}` — [View]({viewUrl}) · [Raw]({rawUrl})");
+                }
+                sb.AppendLine();
+            }
+
+            // Keep the schema summary (below the list) for quick counts
             sb.AppendLine("## Summary by Schema");
             sb.AppendLine();
             sb.AppendLine("| Schema | Def Count | Files |");
@@ -56,6 +73,8 @@ namespace XmlDefsTools.Emit
                 sb.AppendLine($"| {schema} | {defs.Count} | {string.Join("<br/>", files)} |");
             }
             sb.AppendLine();
+
+            // Per-schema sections unchanged below (list ids + rare fields)
 
             foreach (var schema in scan.Schemas.OrderBy(s => s))
             {
@@ -88,6 +107,17 @@ namespace XmlDefsTools.Emit
 
             Directory.CreateDirectory(Path.GetDirectoryName(outFile)!);
             File.WriteAllText(outFile, sb.ToString());
+        }
+
+        private static (string repo, string branch) RepoMeta()
+        {
+            var repo = Environment.GetEnvironmentVariable("GITHUB_REPOSITORY");
+            if (string.IsNullOrWhiteSpace(repo)) repo = "Natangry/FantasyColony";
+            var branch = Environment.GetEnvironmentVariable("GITHUB_REF_NAME");
+            if (string.IsNullOrWhiteSpace(branch)) branch = "main";
+            // strip refs/heads/ if present
+            branch = branch.Replace("refs/heads/", "");
+            return (repo, branch);
         }
 
         private static string Rel(string root, string path)
