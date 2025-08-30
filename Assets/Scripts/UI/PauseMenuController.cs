@@ -39,8 +39,8 @@ public class PauseMenuController : MonoBehaviour
     {
         // Esc toggles pause
         bool esc = false;
-        // Do not toggle pause when the Intro overlay is visible
-        if (IntroScreen.Instance != null && IntroScreen.IsVisible) return;
+        // Do not toggle pause when any Intro overlay is visible
+        if (AppBootstrap.IsIntroVisible()) return;
 #if ENABLE_INPUT_SYSTEM
         if (Keyboard.current != null) esc |= Keyboard.current.escapeKey.wasPressedThisFrame;
 #endif

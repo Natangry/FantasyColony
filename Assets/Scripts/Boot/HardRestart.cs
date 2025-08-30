@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Text;
@@ -32,8 +31,8 @@ public static class HardRestart
         Resources.UnloadUnusedAssets();
         System.GC.Collect();
 
-        // Show the intro overlay (scene-less)
-        IntroScreen.ShowIntro();
+        // Show the intro overlay (scene-less), real if present or fallback otherwise
+        AppBootstrap.ShowIntroOverlay();
 
         Debug.Log("[HardRestart] Returned to Intro overlay (scene-less).");
     }
