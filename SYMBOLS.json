@@ -33,25 +33,25 @@
     "kind": "class",
     "name": "AppBootstrapRunner",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 197
+    "line": 203
   },
   {
     "kind": "method",
     "name": "IsIntroVisible",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 29
+    "line": 32
   },
   {
     "kind": "method",
     "name": "ShowIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 39
+    "line": 43
   },
   {
     "kind": "method",
     "name": "HideIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 48
+    "line": 53
   },
   {
     "kind": "class",
@@ -1276,6 +1276,36 @@
     "name": "OnGUI",
     "file": "Assets/Scripts/UI/ClockHUD.cs",
     "line": 33
+  },
+  {
+    "kind": "class",
+    "name": "IntroMenuOverlay",
+    "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
+    "line": 11
+  },
+  {
+    "kind": "enum",
+    "name": "MapSize",
+    "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
+    "line": 14
+  },
+  {
+    "kind": "method",
+    "name": "Ensure",
+    "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
+    "line": 23
+  },
+  {
+    "kind": "method",
+    "name": "Show",
+    "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
+    "line": 29
+  },
+  {
+    "kind": "method",
+    "name": "Hide",
+    "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
+    "line": 35
   },
   {
     "kind": "class",
