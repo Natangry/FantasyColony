@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 using FantasyColony.Defs;
 
 public class BuildPaletteHUD : MonoBehaviour
@@ -17,8 +18,17 @@ public class BuildPaletteHUD : MonoBehaviour
         return new Rect(16, 64, w, h);
     }
 
+    static bool IsIntroScene()
+    {
+        var n = SceneManager.GetActiveScene().name;
+        if (string.IsNullOrEmpty(n)) return false;
+        n = n.ToLowerInvariant();
+        return n.Contains("intro") || n.Contains("menu") || n.Contains("title");
+    }
+
     void OnGUI()
     {
+        if (IsIntroScene()) return;
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
         // Self-heal to guarantee systems are present
@@ -26,7 +36,22 @@ public class BuildPaletteHUD : MonoBehaviour
 
         var _panelRect = GetPanelRect();
 
-        GUILayout.BeginArea(_panelRect, GUI.skin.window);
+        // --- DPI/UI scaling ---
+        float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1920f, Screen.height / 1080f), 1.0f, 2.5f);
+        var prevMatrix = GUI.matrix;
+        GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), Vector2.zero);
+        var drawRect = new Rect(_panelRect.x / scale, _panelRect.y / scale, _panelRect.width / scale, _panelRect.height / scale);
+
+        // Temporarily bump font sizes
+        var skin = GUI.skin;
+        int oldLabel = skin.label.fontSize;
+        int oldButton = skin.button.fontSize;
+        int oldWindow = skin.window.fontSize;
+        skin.label.fontSize = Mathf.RoundToInt(14 * scale);
+        skin.button.fontSize = Mathf.RoundToInt(14 * scale);
+        skin.window.fontSize = Mathf.RoundToInt(16 * scale);
+
+        GUILayout.BeginArea(drawRect, GUI.skin.window);
         var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
         GUILayout.Label("Build Palette" + activeName);
         GUILayout.Label("Click a def to arm the tool, then left-click ground to place. Esc cancels.");
@@ -37,8 +62,8 @@ public class BuildPaletteHUD : MonoBehaviour
         foreach (var def in defs)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(240));
-            if (GUILayout.Button("Select", GUILayout.Width(140)))
+            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(260));
+            if (GUILayout.Button("Select", GUILayout.Width(Mathf.RoundToInt(160 * scale))))
             {
                 // For now we only have a placement tool for Construction Board.
                 // Down the road this can dispatch different tools per def.category/type.
@@ -49,6 +74,12 @@ public class BuildPaletteHUD : MonoBehaviour
         GUILayout.EndScrollView();
 
         GUILayout.EndArea();
+
+        // Restore GUI state
+        skin.label.fontSize = oldLabel;
+        skin.button.fontSize = oldButton;
+        skin.window.fontSize = oldWindow;
+        GUI.matrix = prevMatrix;
     }
 
     static List<BuildingDef> GetPaletteDefs()
