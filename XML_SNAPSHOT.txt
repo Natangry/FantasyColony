@@ -39,6 +39,50 @@
 </Visual2DDef>
 
 
+// ===== FILE: Docs/Templates/Defs/AbilityDef.xml =====
+<AbilityDef>
+  <version>1</version>
+  <requires />
+  <components />
+  <id />
+  <name_key />
+  <tags />
+  <icon />
+  <cooldown />
+  <cost />
+  <range />
+</AbilityDef>
+
+
+// ===== FILE: Docs/Templates/Defs/BuildingDef.xml =====
+<BuildingDef>
+  <version>1</version>
+  <requires />
+  <components />
+  <id />
+  <name_key />
+  <tags />
+  <icon />
+  <size />
+  <cost />
+  <hitPoints />
+</BuildingDef>
+
+
+// ===== FILE: Docs/Templates/Defs/ItemDef.xml =====
+<ItemDef>
+  <version>1</version>
+  <requires />
+  <components />
+  <id />
+  <name_key />
+  <tags />
+  <icon />
+  <stackSize />
+  <rarity />
+</ItemDef>
+
+
 // ===== FILE: Docs/Templates/Defs/Visual2Def.xml =====
 <Visual2Def>
   <version>1</version>
@@ -53,7 +97,7 @@
 
 
 // ===== FILE: Docs/Templates/Defs/_AllSchemas.xml =====
-<DefSchemas generated="2025-08-30T02:11:44Z">
+<DefSchemas generated="2025-08-30T02:11:58Z">
   <Schema name="AbilityDef">
     <Attributes />
     <Elements>
