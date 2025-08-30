@@ -3,6 +3,7 @@
 ↩️ [Back to Repository Index](../INDEX.md)
 
 - **Glossary.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Glossary.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Glossary.md)
+- **XML_ARTIFACTS.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/XML_ARTIFACTS.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/XML_ARTIFACTS.md)
 
 ## Colony
 
@@ -138,6 +139,14 @@
 ## Runbooks
 
 - **Codex-Workflow.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Runbooks/Codex-Workflow.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Runbooks/Codex-Workflow.md)
+
+## Templates
+
+- **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/.gitkeep)
+
+## Templates/Defs
+
+- **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/.gitkeep)
 
 ## Tools
 

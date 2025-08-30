@@ -430,6 +430,16 @@
 
 - **Codex-Workflow.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Runbooks/Codex-Workflow.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Runbooks/Codex-Workflow.md)
 
+## Docs/Templates
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Templates)
+
+- **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/.gitkeep)
+
+## Docs/Templates/Defs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Templates/Defs)
+
+- **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/.gitkeep)
+
 ## Docs/Tools
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs/Tools)
 
@@ -465,6 +475,11 @@
 - **Settlement-Scenes-and-Services-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Settlement-Scenes-and-Services-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Settlement-Scenes-and-Services-v0.1.md)
 - **Storyteller-and-Pacing-Director-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md)
 - **World-Metrics-Conditions-and-Triggers-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md)
+
+## Docs
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Docs)
+
+- **XML_ARTIFACTS.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/XML_ARTIFACTS.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/XML_ARTIFACTS.md)
 - **LICENSE** — [View](https://github.com/Natangry/FantasyColony/blob/main/LICENSE) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/LICENSE)
 
 ## Packages
@@ -512,3 +527,37 @@
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/StreamingAssets/Defs/Visuals)
 
 - **Core_Visuals.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/StreamingAssets/Defs/Visuals/Core_Visuals.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/StreamingAssets/Defs/Visuals/Core_Visuals.xml)
+
+## Tools/XmlDefsTools/Config
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Config)
+
+- **SchemaOrder.json** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Config/SchemaOrder.json) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Config/SchemaOrder.json)
+
+## Tools/XmlDefsTools/Emit
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Emit)
+
+- **TemplateSynthesizer.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs)
+- **XmlIndexWriter.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/XmlIndexWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/XmlIndexWriter.cs)
+- **XmlSnapshotWriter.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs)
+
+## Tools/XmlDefsTools
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools)
+
+- **Program.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Program.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Program.cs)
+
+## Tools/XmlDefsTools/Scan
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Scan)
+
+- **XmlDefScanner.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Scan/XmlDefScanner.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Scan/XmlDefScanner.cs)
+
+## Tools/XmlDefsTools/Util
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools/Util)
+
+- **CanonicalXml.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Util/CanonicalXml.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Util/CanonicalXml.cs)
+
+## Tools/XmlDefsTools
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Tools/XmlDefsTools)
+
+- **XmlDefsTools.csproj** — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/XmlDefsTools.csproj) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/XmlDefsTools.csproj)
+- **XML_INDEX.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/XML_INDEX.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/XML_INDEX.md)
+- **XML_SNAPSHOT.txt** — [View](https://github.com/Natangry/FantasyColony/blob/main/XML_SNAPSHOT.txt) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/XML_SNAPSHOT.txt)

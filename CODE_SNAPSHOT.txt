@@ -5274,3 +5274,597 @@ public class Readme : ScriptableObject
 }
 
 
+// ===== FILE: Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs =====
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.Linq;
+using XmlDefsTools.Scan;
+using XmlDefsTools.Util;
+
+namespace XmlDefsTools.Emit
+{
+    public static class TemplateSynthesizer
+    {
+        public static void WriteTemplates(string outputDir, ScanResult scan, IReadOnlyDictionary<string, IList<string>> orderHints)
+        {
+            Directory.CreateDirectory(outputDir);
+            foreach (var schema in scan.Schemas.OrderBy(s => s))
+            {
+                var defs = scan.DefsBySchema[schema];
+
+                // union of observed fields (attributes + elements)
+                var attrFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var elemFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var d in defs)
+                {
+                    foreach (var f in d.AttributeFields) attrFields.Add(f);
+                    foreach (var f in d.ElementFields) elemFields.Add(f);
+                }
+
+                // known/common order
+                var common = orderHints.TryGetValue("_common", out var c) ? c : Array.Empty<string>();
+                var perSchema = orderHints.TryGetValue(schema, out var s) ? s : Array.Empty<string>();
+                var precedence = common.Concat(perSchema).ToList();
+
+                // Attributes to place on root element
+                var rootAttrs = NormalizeOrder(attrFields, precedence, keepOnly: new[] { "id","schema","name_key","tags","version","requires" });
+                // Remaining element fields
+                var elementNames = NormalizeOrder(elemFields, precedence);
+
+                var sb = new StringBuilder();
+                sb.AppendLine($"<!-- Auto-generated default template for {schema}. Edit your copies; this file is regenerated. -->");
+
+                var root = new XElement(schema);
+                // Put attributes with placeholders
+                foreach (var a in rootAttrs)
+                {
+                    var placeholder = a.Equals("id", StringComparison.OrdinalIgnoreCase) ? "your_id_here"
+                                   : a.Equals("name_key", StringComparison.OrdinalIgnoreCase) ? "ui.your.key.here"
+                                   : a.Equals("tags", StringComparison.OrdinalIgnoreCase) ? ""
+                                   : a.Equals("version", StringComparison.OrdinalIgnoreCase) ? "1"
+                                   : "";
+                    root.SetAttributeValue(a, placeholder);
+                }
+
+                // Insert version/requires as elements too if heavily used as elements
+                if (elementNames.Contains("version", StringComparer.OrdinalIgnoreCase) && root.Attribute("version") == null)
+                    root.Add(new XElement("version", "1"));
+                if (elementNames.Contains("requires", StringComparer.OrdinalIgnoreCase) && root.Attribute("requires") == null)
+                    root.Add(new XElement("requires"));
+
+                // Components block if observed
+                if (elementNames.Contains("components", StringComparer.OrdinalIgnoreCase))
+                {
+                    root.Add(new XElement("components",
+                        new XComment(" Add component entries like <Component type=\"...\"/> ")));
+                }
+
+                // Other fields as empty elements
+                foreach (var el in elementNames)
+                {
+                    if (string.Equals(el, "components", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (string.Equals(el, "version", StringComparison.OrdinalIgnoreCase) && root.Elements("version").Any()) continue;
+                    if (string.Equals(el, "requires", StringComparison.OrdinalIgnoreCase) && root.Elements("requires").Any()) continue;
+                    root.Add(new XElement(el));
+                }
+
+                // Canonicalize attribute order
+                var canonical = CanonicalXml.CanonicalizeElement(root);
+                sb.AppendLine(canonical.ToString(SaveOptions.None));
+
+                var outPath = Path.Combine(outputDir, $"{schema}.xml");
+                File.WriteAllText(outPath, sb.ToString());
+            }
+        }
+
+        private static List<string> NormalizeOrder(IEnumerable<string> names, IList<string> precedence, IEnumerable<string>? keepOnly = null)
+        {
+            var all = new HashSet<string>(names, StringComparer.OrdinalIgnoreCase);
+            if (keepOnly != null)
+            {
+                var keep = new HashSet<string>(keepOnly, StringComparer.OrdinalIgnoreCase);
+                all.RemoveWhere(n => !keep.Contains(n));
+            }
+            var ordered = new List<string>();
+            foreach (var p in precedence)
+            {
+                if (all.Remove(p)) ordered.Add(p);
+            }
+            ordered.AddRange(all.OrderBy(n => n, StringComparer.OrdinalIgnoreCase));
+            return ordered;
+        }
+    }
+}
+
+
+// ===== FILE: Tools/XmlDefsTools/Emit/XmlIndexWriter.cs =====
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using XmlDefsTools.Scan;
+
+namespace XmlDefsTools.Emit
+{
+    public static class XmlIndexWriter
+    {
+        public static void Write(string repoRoot, string outFile, ScanResult scan)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("# XML Index");
+            sb.AppendLine();
+            sb.AppendLine($"_Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC_");
+            sb.AppendLine();
+            sb.AppendLine($"**Total files scanned:** {scan.TotalFiles}  ");
+            sb.AppendLine($"**Valid XML files:** {scan.ValidFiles}  ");
+            sb.AppendLine($"**Defs discovered:** {scan.TotalDefs}  ");
+            sb.AppendLine();
+
+            if (scan.Errors.Any())
+            {
+                sb.AppendLine("## Parse Errors");
+                foreach (var err in scan.Errors)
+                {
+                    sb.AppendLine($"- `{Rel(repoRoot, err.File)}` — {err.Message}");
+                }
+                sb.AppendLine();
+            }
+
+            if (scan.DuplicateIds.Any())
+            {
+                sb.AppendLine("## Duplicate IDs");
+                foreach (var kvp in scan.DuplicateIds.OrderBy(k => k.Key, StringComparer.OrdinalIgnoreCase))
+                {
+                    sb.AppendLine($"- **{kvp.Key}**");
+                    foreach (var item in kvp.Value)
+                    {
+                        sb.AppendLine($"  - `{item.Schema}` in `{Rel(repoRoot, item.SourceFile)}`");
+                    }
+                }
+                sb.AppendLine();
+            }
+
+            sb.AppendLine("## Summary by Schema");
+            sb.AppendLine();
+            sb.AppendLine("| Schema | Def Count | Files |");
+            sb.AppendLine("|---|---:|---|");
+            foreach (var schema in scan.Schemas.OrderBy(s => s))
+            {
+                var defs = scan.DefsBySchema[schema];
+                var files = defs.Select(d => Rel(repoRoot, d.SourceFile)).Distinct().OrderBy(s => s);
+                sb.AppendLine($"| {schema} | {defs.Count} | {string.Join("<br/>", files)} |");
+            }
+            sb.AppendLine();
+
+            foreach (var schema in scan.Schemas.OrderBy(s => s))
+            {
+                var defs = scan.DefsBySchema[schema];
+                sb.AppendLine($"### {schema}");
+                sb.AppendLine();
+                foreach (var d in defs.OrderBy(d => d.Id, StringComparer.OrdinalIgnoreCase))
+                {
+                    sb.AppendLine($"- `{d.Id}` — `{Rel(repoRoot, d.SourceFile)}`");
+                }
+                // Any newly observed/rare fields
+                var fieldCounts = new Dictionary<string,int>(StringComparer.OrdinalIgnoreCase);
+                foreach (var d in defs)
+                {
+                    foreach (var f in d.AttributeFields.Concat(d.ElementFields))
+                        fieldCounts[f] = fieldCounts.TryGetValue(f, out var c) ? c + 1 : 1;
+                }
+                var rare = fieldCounts.Where(kvp => kvp.Value <= Math.Max(1, defs.Count/5)).Select(kvp => kvp.Key).OrderBy(s=>s, StringComparer.OrdinalIgnoreCase).ToList();
+                if (rare.Count > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine("<details><summary>Less common fields</summary>");
+                    sb.AppendLine();
+                    foreach (var f in rare) sb.AppendLine($"- `{f}`");
+                    sb.AppendLine();
+                    sb.AppendLine("</details>");
+                }
+                sb.AppendLine();
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(outFile)!);
+            File.WriteAllText(outFile, sb.ToString());
+        }
+
+        private static string Rel(string root, string path)
+        {
+            try
+            {
+                var rp = Path.GetRelativePath(root, path).Replace('\\','/');
+                return rp;
+            }
+            catch
+            {
+                return path.Replace('\\','/');
+            }
+        }
+    }
+}
+
+
+// ===== FILE: Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs =====
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.Linq;
+using XmlDefsTools.Util;
+
+namespace XmlDefsTools.Emit
+{
+    public static class XmlSnapshotWriter
+    {
+        public static void Write(string repoRoot, string outFile, IEnumerable<(string path, XDocument? doc)> docs)
+        {
+            var sb = new StringBuilder();
+            foreach (var (path, doc) in docs.OrderBy(t => t.path, StringComparer.OrdinalIgnoreCase))
+            {
+                sb.AppendLine($"// ===== FILE: {Rel(repoRoot, path)} =====");
+                if (doc == null)
+                {
+                    sb.AppendLine("// (invalid XML)");
+                    sb.AppendLine();
+                    continue;
+                }
+                var normalized = CanonicalXml.Canonicalize(doc);
+                sb.AppendLine(normalized);
+                sb.AppendLine();
+            }
+            File.WriteAllText(outFile, sb.ToString());
+        }
+
+        private static string Rel(string root, string path)
+        {
+            try
+            {
+                var rp = Path.GetRelativePath(root, path).Replace('\\','/');
+                return rp;
+            }
+            catch
+            {
+                return path.Replace('\\','/');
+            }
+        }
+    }
+}
+
+
+// ===== FILE: Tools/XmlDefsTools/Program.cs =====
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using XmlDefsTools.Emit;
+using XmlDefsTools.Scan;
+
+namespace XmlDefsTools
+{
+    internal static class Program
+    {
+        private static int Main(string[] args)
+        {
+            try
+            {
+                var repoRoot = GetRepoRoot();
+                var defsDir = GetDefsDir(repoRoot);
+                Console.WriteLine($"[XmlDefsTools] Repo root: {repoRoot}");
+                Console.WriteLine($"[XmlDefsTools] Defs dir : {defsDir}");
+
+                var scanner = new XmlDefScanner();
+                var scan = scanner.Scan(defsDir);
+
+                // Load order hints
+                var hintsPath = Path.Combine(repoRoot, "Tools", "XmlDefsTools", "Config", "SchemaOrder.json");
+                var orderHints = File.Exists(hintsPath)
+                    ? JsonSerializer.Deserialize<Dictionary<string, IList<string>>>(File.ReadAllText(hintsPath))
+                    : new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+                orderHints ??= new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+
+                // Write index
+                var indexPath = Path.Combine(repoRoot, "XML_INDEX.md");
+                XmlIndexWriter.Write(repoRoot, indexPath, scan);
+                Console.WriteLine($"[XmlDefsTools] Wrote index: {indexPath}");
+
+                // Write snapshot
+                var snapshotPath = Path.Combine(repoRoot, "XML_SNAPSHOT.txt");
+                var docs = scan.FileDocs.Select(kvp => (kvp.Key, kvp.Value));
+                XmlSnapshotWriter.Write(repoRoot, snapshotPath, docs);
+                Console.WriteLine($"[XmlDefsTools] Wrote snapshot: {snapshotPath}");
+
+                // Write templates
+                var templatesDir = Path.Combine(repoRoot, "Docs", "Templates", "Defs");
+                TemplateSynthesizer.WriteTemplates(templatesDir, scan, orderHints);
+                Console.WriteLine($"[XmlDefsTools] Wrote templates to: {templatesDir}");
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.ToString());
+                return 1;
+            }
+        }
+
+        private static string GetRepoRoot()
+        {
+            var env = Environment.GetEnvironmentVariable("FC_REPO_ROOT");
+            if (!string.IsNullOrWhiteSpace(env))
+                return Path.GetFullPath(env);
+            // assume current working directory is repo root (CI) or a subfolder (local)
+            var cwd = Directory.GetCurrentDirectory();
+            // try to find .git upwards
+            var dir = new DirectoryInfo(cwd);
+            while (dir != null)
+            {
+                if (Directory.Exists(Path.Combine(dir.FullName, ".git")))
+                    return dir.FullName;
+                dir = dir.Parent;
+            }
+            return cwd;
+        }
+
+        private static string GetDefsDir(string repoRoot)
+        {
+            var env = Environment.GetEnvironmentVariable("FC_DEFS_DIR");
+            if (!string.IsNullOrWhiteSpace(env))
+            {
+                var p = Path.IsPathRooted(env) ? env : Path.Combine(repoRoot, env);
+                return Directory.Exists(p) ? p : repoRoot;
+            }
+            var candidates = new[]
+            {
+                Path.Combine(repoRoot, "StreamingAssets", "Defs"),
+                Path.Combine(repoRoot, "Assets", "StreamingAssets", "Defs"),
+                Path.Combine(repoRoot, "GameData", "Defs")
+            };
+            foreach (var c in candidates)
+                if (Directory.Exists(c)) return c;
+            // fallback: repo root (will scan, find no files, still emit artifacts)
+            return repoRoot;
+        }
+    }
+}
+
+
+// ===== FILE: Tools/XmlDefsTools/Scan/XmlDefScanner.cs =====
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+
+namespace XmlDefsTools.Scan
+{
+    public sealed class XmlDefScanner
+    {
+        public ScanResult Scan(string rootDir)
+        {
+            var res = new ScanResult();
+            if (!Directory.Exists(rootDir))
+                return res;
+
+            var files = Directory.EnumerateFiles(rootDir, "*.xml", SearchOption.AllDirectories).ToList();
+            res.TotalFiles = files.Count;
+            foreach (var file in files)
+            {
+                XDocument? doc = null;
+                try
+                {
+                    var text = File.ReadAllText(file);
+                    doc = XDocument.Parse(text, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+                    res.ValidFiles++;
+                    res.FileDocs[file] = doc;
+                }
+                catch (Exception ex)
+                {
+                    res.Errors.Add(new ScanError { File = file, Message = ex.GetBaseException().Message });
+                    res.FileDocs[file] = null;
+                    continue;
+                }
+
+                // Collect defs: any element with an 'id' attribute
+                var defs = doc.Descendants()
+                    .Where(e => e.NodeType == System.Xml.XmlNodeType.Element)
+                    .OfType<XElement>()
+                    .Where(e => e.Attribute("id") != null)
+                    .ToList();
+
+                foreach (var el in defs)
+                {
+                    var schema = el.Name.LocalName;
+                    var id = (string?)el.Attribute("id") ?? "(missing)";
+                    var info = new DefInfo
+                    {
+                        Schema = schema,
+                        Id = id,
+                        SourceFile = file
+                    };
+
+                    // Attribute fields (names only)
+                    foreach (var a in el.Attributes())
+                    {
+                        if (a.IsNamespaceDeclaration) continue;
+                        info.AttributeFields.Add(a.Name.LocalName);
+                    }
+
+                    // Element fields (direct child element names only)
+                    foreach (var child in el.Elements())
+                    {
+                        info.ElementFields.Add(child.Name.LocalName);
+                    }
+
+                    res.TotalDefs++;
+                    if (!res.DefsBySchema.TryGetValue(schema, out var list))
+                    {
+                        list = new List<DefInfo>();
+                        res.DefsBySchema[schema] = list;
+                        res.Schemas.Add(schema);
+                    }
+                    list.Add(info);
+
+                    // Track duplicates
+                    var dupKey = id;
+                    if (!res.DuplicateIds.TryGetValue(dupKey, out var dupList))
+                    {
+                        dupList = new List<DefInfo>();
+                        res.DuplicateIds[dupKey] = dupList;
+                    }
+                    dupList.Add(info);
+                }
+            }
+
+            // Remove entries that are not actually duplicates (only one occurrence)
+            var toPrune = res.DuplicateIds.Where(kvp => kvp.Value.Count <= 1)
+                                          .Select(kvp => kvp.Key).ToList();
+            foreach (var k in toPrune) res.DuplicateIds.Remove(k);
+
+            return res;
+        }
+    }
+
+    public sealed class ScanResult
+    {
+        public int TotalFiles { get; set; }
+        public int ValidFiles { get; set; }
+        public int TotalDefs { get; set; }
+        public HashSet<string> Schemas { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<DefInfo>> DefsBySchema { get; } = new Dictionary<string, List<DefInfo>>(StringComparer.OrdinalIgnoreCase);
+        public List<ScanError> Errors { get; } = new List<ScanError>();
+        public Dictionary<string, XDocument?> FileDocs { get; } = new Dictionary<string, XDocument?>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, List<DefInfo>> DuplicateIds { get; } = new Dictionary<string, List<DefInfo>>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    public sealed class DefInfo
+    {
+        public string Schema { get; set; } = "";
+        public string Id { get; set; } = "";
+        public string SourceFile { get; set; } = "";
+        public HashSet<string> AttributeFields { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> ElementFields { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    public sealed class ScanError
+    {
+        public string File { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+}
+
+
+// ===== FILE: Tools/XmlDefsTools/Util/CanonicalXml.cs =====
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+
+namespace XmlDefsTools.Util
+{
+    public static class CanonicalXml
+    {
+        private static readonly string[] AttributePrecedence =
+        {
+            "id","schema","name_key","tags","version","requires"
+        };
+
+        public static string Canonicalize(XDocument doc)
+        {
+            // Remove comments
+            foreach (var c in doc.DescendantNodes().OfType<XComment>().ToList())
+                c.Remove();
+
+            // Canonicalize elements & attributes
+            var root = CanonicalizeElement(doc.Root!);
+            var newDoc = new XDocument(root);
+
+            // Save with stable formatting
+            var settings = new XmlWriterSettings
+            {
+                OmitXmlDeclaration = true,
+                Indent = true,
+                NewLineOnAttributes = false
+            };
+            var sb = new StringBuilder();
+            using (var writer = XmlWriter.Create(sb, settings))
+            {
+                newDoc.Save(writer);
+            }
+            return sb.ToString().Trim() + Environment.NewLine;
+        }
+
+        public static XElement CanonicalizeElement(XElement el)
+        {
+            var orderedAttrs = el.Attributes()
+                .Where(a => !a.IsNamespaceDeclaration)
+                .OrderBy(a => OrderKey(a.Name.LocalName), StringComparer.OrdinalIgnoreCase)
+                .ThenBy(a => a.Name.LocalName, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var newEl = new XElement(el.Name);
+            foreach (var a in orderedAttrs)
+                newEl.SetAttributeValue(a.Name.LocalName, a.Value);
+
+            foreach (var node in el.Nodes())
+            {
+                if (node is XElement child)
+                {
+                    newEl.Add(CanonicalizeElement(child));
+                }
+                else if (node is XText t)
+                {
+                    var v = t.Value;
+                    if (!string.IsNullOrWhiteSpace(v))
+                        newEl.Add(new XText(NormalizeWhitespace(v)));
+                }
+                // other node types (comments, processing instructions) are skipped
+            }
+            return newEl;
+        }
+
+        private static int OrderKey(string name)
+        {
+            for (int i = 0; i < AttributePrecedence.Length; i++)
+                if (name.Equals(AttributePrecedence[i], StringComparison.OrdinalIgnoreCase))
+                    return i - 1000; // bubble to front
+            return 0;
+        }
+
+        private static string NormalizeWhitespace(string s)
+        {
+            // Collapse internal whitespace sequences
+            var arr = s.ToCharArray();
+            var sb = new StringBuilder(arr.Length);
+            bool inWs = false;
+            foreach (var ch in arr)
+            {
+                if (char.IsWhiteSpace(ch))
+                {
+                    if (!inWs)
+                    {
+                        sb.Append(' ');
+                        inWs = true;
+                    }
+                }
+                else
+                {
+                    sb.Append(ch);
+                    inWs = false;
+                }
+            }
+            return sb.ToString().Trim();
+        }
+    }
+}
+
+

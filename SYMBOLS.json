@@ -1732,5 +1732,269 @@
     "name": "OnInspectorGUI",
     "file": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
     "line": 122
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools",
+    "file": "Tools/XmlDefsTools/Program.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "Program",
+    "file": "Tools/XmlDefsTools/Program.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "Main",
+    "file": "Tools/XmlDefsTools/Program.cs",
+    "line": 13
+  },
+  {
+    "kind": "method",
+    "name": "GetRepoRoot",
+    "file": "Tools/XmlDefsTools/Program.cs",
+    "line": 56
+  },
+  {
+    "kind": "method",
+    "name": "GetDefsDir",
+    "file": "Tools/XmlDefsTools/Program.cs",
+    "line": 74
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools.Emit",
+    "file": "Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs",
+    "line": 9
+  },
+  {
+    "kind": "class",
+    "name": "TemplateSynthesizer",
+    "file": "Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs",
+    "line": 12
+  },
+  {
+    "kind": "method",
+    "name": "WriteTemplates",
+    "file": "Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs",
+    "line": 14
+  },
+  {
+    "kind": "method",
+    "name": "NormalizeOrder",
+    "file": "Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs",
+    "line": 85
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools.Emit",
+    "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
+    "line": 7
+  },
+  {
+    "kind": "class",
+    "name": "XmlIndexWriter",
+    "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
+    "line": 10
+  },
+  {
+    "kind": "method",
+    "name": "Write",
+    "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
+    "line": 12
+  },
+  {
+    "kind": "method",
+    "name": "Rel",
+    "file": "Tools/XmlDefsTools/Emit/XmlIndexWriter.cs",
+    "line": 92
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools.Emit",
+    "file": "Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs",
+    "line": 8
+  },
+  {
+    "kind": "class",
+    "name": "XmlSnapshotWriter",
+    "file": "Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs",
+    "line": 11
+  },
+  {
+    "kind": "method",
+    "name": "Write",
+    "file": "Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs",
+    "line": 13
+  },
+  {
+    "kind": "method",
+    "name": "Rel",
+    "file": "Tools/XmlDefsTools/Emit/XmlSnapshotWriter.cs",
+    "line": 31
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools.Scan",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 7
+  },
+  {
+    "kind": "class",
+    "name": "XmlDefScanner",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 10
+  },
+  {
+    "kind": "class",
+    "name": "ScanResult",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 96
+  },
+  {
+    "kind": "class",
+    "name": "DefInfo",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 108
+  },
+  {
+    "kind": "class",
+    "name": "ScanError",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 117
+  },
+  {
+    "kind": "method",
+    "name": "Scan",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 12
+  },
+  {
+    "kind": "property",
+    "name": "TotalFiles",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 99
+  },
+  {
+    "kind": "property",
+    "name": "ValidFiles",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 100
+  },
+  {
+    "kind": "property",
+    "name": "TotalDefs",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 101
+  },
+  {
+    "kind": "property",
+    "name": "Schemas",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 102
+  },
+  {
+    "kind": "property",
+    "name": "DefsBySchema",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 103
+  },
+  {
+    "kind": "property",
+    "name": "Errors",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 104
+  },
+  {
+    "kind": "property",
+    "name": "FileDocs",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 105
+  },
+  {
+    "kind": "property",
+    "name": "DuplicateIds",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 106
+  },
+  {
+    "kind": "property",
+    "name": "Schema",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 111
+  },
+  {
+    "kind": "property",
+    "name": "Id",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 112
+  },
+  {
+    "kind": "property",
+    "name": "SourceFile",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 113
+  },
+  {
+    "kind": "property",
+    "name": "AttributeFields",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 114
+  },
+  {
+    "kind": "property",
+    "name": "ElementFields",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 115
+  },
+  {
+    "kind": "property",
+    "name": "File",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 120
+  },
+  {
+    "kind": "property",
+    "name": "Message",
+    "file": "Tools/XmlDefsTools/Scan/XmlDefScanner.cs",
+    "line": 121
+  },
+  {
+    "kind": "namespace",
+    "name": "XmlDefsTools.Util",
+    "file": "Tools/XmlDefsTools/Util/CanonicalXml.cs",
+    "line": 7
+  },
+  {
+    "kind": "class",
+    "name": "CanonicalXml",
+    "file": "Tools/XmlDefsTools/Util/CanonicalXml.cs",
+    "line": 10
+  },
+  {
+    "kind": "method",
+    "name": "Canonicalize",
+    "file": "Tools/XmlDefsTools/Util/CanonicalXml.cs",
+    "line": 16
+  },
+  {
+    "kind": "method",
+    "name": "CanonicalizeElement",
+    "file": "Tools/XmlDefsTools/Util/CanonicalXml.cs",
+    "line": 41
+  },
+  {
+    "kind": "method",
+    "name": "OrderKey",
+    "file": "Tools/XmlDefsTools/Util/CanonicalXml.cs",
+    "line": 70
+  },
+  {
+    "kind": "method",
+    "name": "NormalizeWhitespace",
+    "file": "Tools/XmlDefsTools/Util/CanonicalXml.cs",
+    "line": 78
   }
 ]
