@@ -1,5 +1,17 @@
 [
   {
+    "kind": "class",
+    "name": "CreateStartupConfigAsset",
+    "file": "Assets/Editor/CreateStartupConfigAsset.cs",
+    "line": 6
+  },
+  {
+    "kind": "method",
+    "name": "Create",
+    "file": "Assets/Editor/CreateStartupConfigAsset.cs",
+    "line": 13
+  },
+  {
     "kind": "namespace",
     "name": "FantasyColony.EditorTools",
     "file": "Assets/Editor/SpriteImportDefaults.cs",
@@ -81,13 +93,13 @@
     "kind": "class",
     "name": "HardRestart",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 5
+    "line": 6
   },
   {
     "kind": "method",
     "name": "RebootToIntro",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 8
+    "line": 9
   },
   {
     "kind": "class",

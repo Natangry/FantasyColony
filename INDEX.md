@@ -11,6 +11,7 @@
 ## Assets/Editor
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Editor)
 
+- **CreateStartupConfigAsset.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/CreateStartupConfigAsset.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/CreateStartupConfigAsset.cs)
 - **SpriteImportDefaults.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - **SpriteImportDefaults.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs.meta)
 
@@ -26,7 +27,6 @@
 ## Assets/Resources
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Resources)
 
-- **GameStartupConfig.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Resources/GameStartupConfig.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Resources/GameStartupConfig.asset)
 - **GameStartupConfig.asset.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Resources/GameStartupConfig.asset.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Resources/GameStartupConfig.asset.meta)
 - **Sprites.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Resources/Sprites.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Resources/Sprites.meta)
 
