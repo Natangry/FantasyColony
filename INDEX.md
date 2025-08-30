@@ -6,6 +6,17 @@
 ## Assets
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
 
+- **Editor.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor.meta)
+
+## Assets/Editor
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Editor)
+
+- **SpriteImportDefaults.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
+- **SpriteImportDefaults.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs.meta)
+
+## Assets
+[Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets)
+
 - **InputSystem_Actions.inputactions** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions)
 - **InputSystem_Actions.inputactions.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/InputSystem_Actions.inputactions.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/InputSystem_Actions.inputactions.meta)
 - **Readme.asset** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Readme.asset) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Readme.asset)

@@ -1,5 +1,17 @@
 [
   {
+    "kind": "namespace",
+    "name": "FantasyColony.EditorTools",
+    "file": "Assets/Editor/SpriteImportDefaults.cs",
+    "line": 22
+  },
+  {
+    "kind": "class",
+    "name": "SpriteImportDefaults",
+    "file": "Assets/Editor/SpriteImportDefaults.cs",
+    "line": 25
+  },
+  {
     "kind": "class",
     "name": "BuildBootstrap",
     "file": "Assets/Scripts/Boot/BuildBootstrap.cs",
