@@ -55,7 +55,7 @@
   },
   {
     "kind": "method",
-    "name": "RebootToFirstScene",
+    "name": "RebootToIntro",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
     "line": 7
   },
@@ -1257,19 +1257,19 @@
     "kind": "method",
     "name": "Toggle",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 45
+    "line": 50
   },
   {
     "kind": "method",
     "name": "Show",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 51
+    "line": 56
   },
   {
     "kind": "method",
     "name": "Hide",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 59
+    "line": 64
   },
   {
     "kind": "property",
