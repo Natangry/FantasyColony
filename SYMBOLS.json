@@ -201,13 +201,67 @@
     "kind": "class",
     "name": "TestMapStarter",
     "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 11
+    "line": 13
   },
   {
     "kind": "method",
     "name": "StartTestMap",
     "file": "Assets/Scripts/Boot/TestMapStarter.cs",
-    "line": 16
+    "line": 15
+  },
+  {
+    "kind": "method",
+    "name": "TryStartWorld",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 39
+  },
+  {
+    "kind": "method",
+    "name": "InvokeStarter",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 109
+  },
+  {
+    "kind": "method",
+    "name": "FindMethod",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 123
+  },
+  {
+    "kind": "method",
+    "name": "MatchesSignature",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 126
+  },
+  {
+    "kind": "method",
+    "name": "FindTypeByPreferredNames",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 138
+  },
+  {
+    "kind": "method",
+    "name": "SafeGetTypes",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 151
+  },
+  {
+    "kind": "method",
+    "name": "EnsurePawnInteractionManager",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 159
+  },
+  {
+    "kind": "method",
+    "name": "SpawnTwoTestPawnsNearCenter",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 172
+  },
+  {
+    "kind": "method",
+    "name": "CreateSpritePawn",
+    "file": "Assets/Scripts/Boot/TestMapStarter.cs",
+    "line": 194
   },
   {
     "kind": "class",
