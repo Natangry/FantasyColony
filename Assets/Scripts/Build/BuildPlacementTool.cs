@@ -29,6 +29,7 @@ public class BuildPlacementTool : MonoBehaviour
     // Prevent click-through after arming tool from a UI button press
     bool suppressClickUntilMouseUp = false;
     float armBlockUntilTime = 0f;
+    static bool _warnedSpriteMissing = false;
 
     void Start()
     {
@@ -50,6 +51,10 @@ public class BuildPlacementTool : MonoBehaviour
             groundPlane = new Plane(Vector3.up, GetGroundY());
             if (TryGetCursorHit(out var hit))
                 ghostGO.transform.position = SnapToGridXZ(hit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
+            else if (TryGetCenterHit(out var centerHit))
+                ghostGO.transform.position = SnapToGridXZ(centerHit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
+            else
+                ghostGO.transform.position = new Vector3(0f, 0.02f, 0f); // absolute worst-case fallback
             Debug.Log("[Build] Tool armed for " + (ctrl.SelectedBuildingDef.defName ?? "Unknown"));
         }
     }
@@ -73,7 +78,11 @@ public class BuildPlacementTool : MonoBehaviour
         var snapped = SnapToGridXZ(hit, def);
         if (ghostGO != null)
         {
-            ghostGO.transform.position = snapped + new Vector3(0f, 0.02f, 0f);
+            // Keep previous valid location if we cannot get a new hit (e.g., cursor off-screen)
+            Vector3 pos = snapped;
+            if (float.IsNaN(snapped.x) || float.IsNaN(snapped.z))
+                pos = lastValidWorld;
+            ghostGO.transform.position = pos + new Vector3(0f, 0.02f, 0f);
         }
 
         // Click to place
@@ -100,6 +109,8 @@ public class BuildPlacementTool : MonoBehaviour
         return new Vector3(sx, sy, 1f);
     }
 
+    Vector3 lastValidWorld;
+
     Camera GetActiveCamera()
     {
         var m = Camera.main;
@@ -117,6 +128,15 @@ public class BuildPlacementTool : MonoBehaviour
 
     Visual2DDef GetVisualDefFor(BuildingDef def)
     {
+        // Forgive missing visualRef for construction board in fallback scenarios
+        if (def != null && string.IsNullOrEmpty(def.visualRef) &&
+            !string.IsNullOrEmpty(def.defName) &&
+            def.defName.ToLowerInvariant().Contains("constructionboard"))
+        {
+            Debug.Log("[Build] Using fallback visualRef=ConstructionBoardVisual");
+            def.visualRef = "ConstructionBoardVisual";
+        }
+
         if (def == null) return null;
         if (string.IsNullOrEmpty(def.visualRef)) return null;
         if (DefDatabase.Visuals == null) return null;
@@ -130,6 +150,11 @@ public class BuildPlacementTool : MonoBehaviour
         {
             var s = Resources.Load<Sprite>(v.spritePath);
             if (s != null) return s;
+            if (!_warnedSpriteMissing)
+            {
+                Debug.LogWarning("[Build] Sprite NOT FOUND at Resources/" + v.spritePath + ".png – ensure it's Sprite(2D & UI), under Assets/Resources, no extension in path.");
+                _warnedSpriteMissing = true;
+            }
         }
         return null;
     }
@@ -214,7 +239,19 @@ public class BuildPlacementTool : MonoBehaviour
         var ray = cam.ScreenPointToRay(Input.mousePosition);
         if (!groundPlane.Raycast(ray, out var enter)) return false;
         hit = ray.GetPoint(enter); // y == plane height
+        lastValidWorld = hit;
         return true;
+    }
+
+    // If we fail to get a hit on arm, use the screen center as a reasonable default
+    bool TryGetCenterHit(out Vector3 hit)
+    {
+        hit = default;
+        var center = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
+        var ray = GetActiveCamera()?.ScreenPointToRay(center);
+        if (ray == null) return false;
+        if (!groundPlane.Raycast(ray.Value, out var enter)) return false;
+        hit = ray.Value.GetPoint(enter); lastValidWorld = hit; return true;
     }
 
     void EnsureGhost(BuildingDef def)
