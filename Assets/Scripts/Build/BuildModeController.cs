@@ -1,67 +1,84 @@
 using UnityEngine;
-
-public enum BuildTool
-{
-    None = 0,
-    PlaceConstructionBoard = 1,
-}
+using System;
+using System.Linq;
+// Assumes BuildingDef exists in your Defs namespace
+// If your project uses a different namespace, adjust the using accordingly.
+using FantasyColony.Defs;
 
 public class BuildModeController : MonoBehaviour
 {
     public static BuildModeController Instance { get; private set; }
 
-    [SerializeField] private bool isActive;
-    [SerializeField] private BuildTool currentTool = BuildTool.None;
+    [Header("State")]
+    [SerializeField] private bool _buildModeEnabled = false;
+    [SerializeField] private BuildTool _activeTool = BuildTool.None;
 
-    public bool IsActive => isActive;
-    public BuildTool CurrentTool => currentTool;
+    // Selected def for placement-oriented tools (e.g., PlaceConstructionBoard)
+    [SerializeField] private BuildingDef _selectedBuildingDef;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            ToggleBuildMode();
-        }
+    public bool IsBuildModeEnabled => _buildModeEnabled;
+    public BuildTool ActiveTool => _activeTool;
+    public BuildingDef SelectedBuildingDef => _selectedBuildingDef;
 
-        // ESC cancels tool or exits build mode
-        if (isActive && Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (currentTool != BuildTool.None)
-                SetTool(BuildTool.None);
-            else
-                SetActive(false);
-        }
+    public void ToggleBuildMode()
+    {
+        SetBuildMode(!_buildModeEnabled);
     }
 
-    public void ToggleBuildMode() => SetActive(!isActive);
-
-    public void SetActive(bool active)
+    public void SetBuildMode(bool on)
     {
-        isActive = active;
-        if (!isActive) SetTool(BuildTool.None);
+        _buildModeEnabled = on;
+        if (!on) ClearTool();
+    }
+
+    public void SetPlacingBuilding(BuildingDef def)
+    {
+        _selectedBuildingDef = def;
+        SetTool(BuildTool.PlaceConstructionBoard);
+    }
+
+    public void ClearTool()
+    {
+        _activeTool = BuildTool.None;
+        var tool = GetComponent<BuildPlacementTool>();
+        if (tool != null) tool.SetTool(BuildTool.None);
     }
 
     public void SetTool(BuildTool tool)
     {
-        currentTool = tool;
+        _activeTool = tool;
         var toolComp = GetComponent<BuildPlacementTool>();
-        if (toolComp == null) toolComp = gameObject.AddComponent<BuildPlacementTool>();
-        toolComp.SetTool(tool);
+        if (toolComp != null) toolComp.SetTool(tool);
     }
 
-    public static bool UniqueBuildingExists<T>() where T : Building
+    // Utility used by placement tool to enforce uniqueness of special buildings
+    public bool UniqueBuildingExists<T>() where T : Component
     {
-        // "Any" is acceptable and faster in 2023+; fallback for older Unity.
-#if UNITY_2023_1_OR_NEWER
-        return Object.FindAnyObjectByType<T>() != null;
-#else
-        return Object.FindObjectOfType<T>() != null;
-#endif
+        return FindObjectsOfType<T>().Length > 0;
     }
+
+    private void Update()
+    {
+        // Basic hotkey (B) to toggle build mode
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ToggleBuildMode();
+        }
+        // ESC cancels current tool
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ClearTool();
+        }
+    }
+}
+
+public enum BuildTool
+{
+    None,
+    PlaceConstructionBoard
 }

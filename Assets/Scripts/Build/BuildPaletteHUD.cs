@@ -1,119 +1,76 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using FantasyColony.Defs;
 
-/// <summary>
-/// Simple build palette shown only while Build Mode is active.
-/// </summary>
 public class BuildPaletteHUD : MonoBehaviour
 {
-    [SerializeField] private Vector2 offset = new Vector2(12f, 120f);
-    [SerializeField] private float widthPct = 0.28f;
-    [SerializeField] private float heightPct = 0.65f;
-    [SerializeField] private float fontPct = 0.03f; // scale with resolution
-    [SerializeField] private float buttonHPct = 0.05f;
+    Vector2 _scroll;
+    Rect _panelRect = new Rect(16, 64, 320, 420);
 
-    private GUIStyle _box;
-    private GUIStyle _button;
-    private GUIStyle _label;
-    private Vector2 _scroll;
-    private GUIStyle _itemLabel;
-    private GUIStyle _hint;
-
-    private void Ensure()
+    void OnGUI()
     {
-        if (_box == null)
+        if (BuildModeController.Instance == null || !BuildModeController.Instance.IsBuildModeEnabled) return;
+
+        GUILayout.BeginArea(_panelRect, GUI.skin.window);
+        GUILayout.Label("Build Palette");
+
+        // Try to enumerate building defs (fallback to a single Construction Board def if database not ready)
+        var defs = GetPaletteDefs();
+        _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.ExpandHeight(true));
+        foreach (var def in defs)
         {
-            _box = new GUIStyle(GUI.skin.box);
-        }
-        if (_button == null)
-        {
-            _button = new GUIStyle(GUI.skin.button)
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(200));
+            if (GUILayout.Button("Select", GUILayout.Width(80)))
             {
-                alignment = TextAnchor.MiddleCenter,
-                fontStyle = FontStyle.Bold
-            };
-        }
-        if (_label == null)
-        {
-            _label = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold };
-            _label.normal.textColor = Color.white;
-        }
-        if (_itemLabel == null)
-        {
-            _itemLabel = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft };
-            _itemLabel.normal.textColor = Color.white;
-        }
-        if (_hint == null)
-        {
-            _hint = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Italic };
-            _hint.normal.textColor = new Color(1f, 1f, 1f, 0.85f);
-        }
-    }
-
-    private void OnGUI()
-    {
-        var bm = BuildModeController.Instance;
-        if (IntroScreen.IsVisible) return; // never show on intro
-        if (bm == null || !bm.IsActive) return;
-
-        Ensure();
-
-        int fontSize = Mathf.RoundToInt(Mathf.Max(14f, Screen.height * fontPct));
-        _button.fontSize = fontSize;
-        _label.fontSize = fontSize;
-        _itemLabel.fontSize = Mathf.RoundToInt(fontSize * 0.9f);
-        _hint.fontSize = Mathf.RoundToInt(fontSize * 0.85f);
-        _hint.wordWrap = true;
-
-        float w = Mathf.Max(260f, Screen.width * widthPct);
-        float h = Mathf.Max(260f, Screen.height * heightPct);
-        Rect r = new Rect(offset.x, offset.y, w, h);
-        GUILayout.BeginArea(r, "Build Palette", _box);
-
-        GUILayout.Label("Stations", _label);
-        GUILayout.Space(6f);
-        // Data-driven defs: show loaded XML defs count as a simple sanity check during bring-up.
-        GUILayout.Label("Defs loaded: " + FantasyColony.Defs.DefDatabase.TotalCount, _hint);
-
-        _scroll = GUILayout.BeginScrollView(_scroll);
-
-        // Construction Board entry
-        bool exists = BuildModeController.UniqueBuildingExists<ConstructionBoard>();
-        using (new GUILayout.HorizontalScope())
-        {
-            GUILayout.Label("Construction Board (Free)", _itemLabel, GUILayout.ExpandWidth(true));
-            GUI.enabled = !exists;
-            float btnH = Mathf.Max(32f, Screen.height * buttonHPct);
-            float btnW = Mathf.Max(120f, _button.CalcSize(new GUIContent(exists ? "Placed" : "Place")).x + 24f);
-            btnW = Mathf.Max(btnW, fontSize * 6f);
-            if (GUILayout.Button(exists ? "Placed" : "Place", _button, GUILayout.Width(btnW), GUILayout.Height(btnH)))
-            {
-                bm.SetTool(BuildTool.PlaceConstructionBoard);
+                // For now we only have a placement tool for Construction Board.
+                // Down the road this can dispatch different tools per def.category/type.
+                BuildModeController.Instance.SetPlacingBuilding(def);
             }
-            GUI.enabled = true;
+            GUILayout.EndHorizontal();
         }
-
-        if (bm.CurrentTool == BuildTool.PlaceConstructionBoard)
-        {
-            GUILayout.Space(6f);
-            GUILayout.Label("Tip: Move the mouse to position the ghost.\nLeft-click to place, Right-click to cancel.", _hint);
-        }
-
         GUILayout.EndScrollView();
-
-        GUILayout.FlexibleSpace();
-        GUILayout.Space(8f);
-        if (GUILayout.Button("Exit Build Mode (B)", _button, GUILayout.Height(Mathf.Max(36f, Screen.height * (buttonHPct * 0.9f)))))
-        {
-            bm.SetActive(false);
-        }
 
         GUILayout.EndArea();
     }
-}
 
-internal struct GUIStateScope : System.IDisposable
-{
-    private readonly bool prev;
-    public GUIStateScope(bool enabled) { prev = GUI.enabled; GUI.enabled = enabled; }
-    public void Dispose() { GUI.enabled = prev; }
+    static List<BuildingDef> GetPaletteDefs()
+    {
+        // If a DefDatabase exists, use it. Otherwise return a local fallback.
+        var list = new List<BuildingDef>();
+        try
+        {
+            var db = DefDatabase.Instance; // adjust if your singleton accessor differs
+            if (db != null && db.Buildings != null && db.Buildings.Count > 0)
+            {
+                foreach (var b in db.Buildings)
+                {
+                    if (b.showInPalette) list.Add(b);
+                }
+                // If nothing was explicitly marked for palette, surface Construction Board if present
+                if (list.Count == 0)
+                {
+                    var cb = db.Buildings.FirstOrDefault(x => x.defName == "ConstructionBoard");
+                    if (cb != null) list.Add(cb);
+                }
+                if (list.Count > 0) return list;
+            }
+        }
+        catch { /* fall through to fallback */ }
+
+        // Fallback minimal def for bring-up
+        list.Add(new BuildingDef
+        {
+            defName = "ConstructionBoard",
+            label = "Construction Board",
+            width = 3,
+            height = 1,
+            unique = true,
+            showInPalette = true,
+            visualRef = "ConstructionBoardVisual",
+            category = "Stations"
+        });
+        return list;
+    }
 }

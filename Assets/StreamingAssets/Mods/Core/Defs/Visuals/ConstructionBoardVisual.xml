@@ -1,14 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Visual2DDef>
-  <defName>ConstructionBoardVisual</defName>
-  <spritePath>Sprites/Stations/ConstructionBoard</spritePath>
-  <sortingLayer>Default</sortingLayer>
-  <sortingOrder>0</sortingOrder>
-  <pivotX>0.5</pivotX>
-  <pivotY>0.0</pivotY>
-  <scale>1.0</scale>
-  <plane>XY</plane>
-  <z_lift>0</z_lift>
-  <shader_hint>Sprites/Default</shader_hint>
-  <color_rgba>1,1,1,1</color_rgba>
-</Visual2DDef>
+<Defs>
+  <Visual2DDef>
+    <defName>ConstructionBoardVisual</defName>
+    <spritePath>Sprites/ConstructionBoard</spritePath>
+    <plane>XY</plane>
+    <shader_hint>Sprites/Default</shader_hint>
+    <color>1,1,1,1</color>
+    <pivot>0.5,0.5</pivot>
+  </Visual2DDef>
+</Defs>
