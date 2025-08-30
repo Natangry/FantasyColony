@@ -7,14 +7,29 @@ using UnityEngine.UIElements;
 public class BuildPaletteHUD : MonoBehaviour
 {
     Vector2 _scroll;
-    Rect _panelRect = new Rect(16, 64, 480, 540);
+
+    BuildModeController Ctrl => BuildModeController.Instance;
+
+    Rect GetPanelRect()
+    {
+        // Responsive panel sizing for high-DPI / large resolutions
+        float w = Mathf.Clamp(Screen.width * 0.28f, 420f, 760f);
+        float h = Mathf.Clamp(Screen.height * 0.62f, 540f, 980f);
+        return new Rect(16, 64, w, h);
+    }
 
     void OnGUI()
     {
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
+        // Ensure systems exist (harmless if already present)
+        BuildBootstrap.Ensure();
+
+        var _panelRect = GetPanelRect();
+
         GUILayout.BeginArea(_panelRect, GUI.skin.window);
-        GUILayout.Label("Build Palette");
+        var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
+        GUILayout.Label("Build Palette" + activeName);
 
         // Try to enumerate building defs (fallback to a single Construction Board def if database not ready)
         var defs = GetPaletteDefs();

@@ -1,6 +1,7 @@
 using UnityEngine;
 using FantasyColony.Defs;
 using System.Linq;
+using System;
 using UnityObject = UnityEngine.Object;
 
 /// <summary>
@@ -22,6 +23,8 @@ public class BuildPlacementTool : MonoBehaviour
     BuildModeController ctrl;
     Camera cam;
     BuildTool active = BuildTool.None;
+
+    readonly Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0
 
     void Start()
     {
@@ -52,10 +55,12 @@ public class BuildPlacementTool : MonoBehaviour
         }
 
         // Move ghost to snapped mouse position
-        var mpos = Input.mousePosition;
-        var world = cam.ScreenToWorldPoint(new Vector3(mpos.x, mpos.y, -cam.transform.position.z));
-        world.z = 0f; // 2D XY plane
-        var snapped = SnapToGrid(world, def);
+        var ray = cam.ScreenPointToRay(Input.mousePosition);
+        Vector3 hit;
+        if (!groundPlane.Raycast(ray, out var enter))
+            return;
+        hit = ray.GetPoint(enter); // y == 0 plane
+        var snapped = SnapToGridXZ(hit, def);
         if (ghostGO != null)
         {
             ghostGO.transform.position = snapped;
@@ -66,6 +71,17 @@ public class BuildPlacementTool : MonoBehaviour
         {
             TryPlace(def, snapped);
         }
+    }
+
+    // Compute scale to ensure the sprite footprint matches def (in world units)
+    Vector3 ComputeScaleForSprite(Sprite sprite, BuildingDef def)
+    {
+        if (sprite == null) return new Vector3(def.width * tileSize, def.height * tileSize, 1f);
+        float spriteWorldWidth  = sprite.rect.width  / sprite.pixelsPerUnit;
+        float spriteWorldHeight = sprite.rect.height / sprite.pixelsPerUnit;
+        float sx = (def.width  * tileSize) / Mathf.Max(0.0001f, spriteWorldWidth);
+        float sy = (def.height * tileSize) / Mathf.Max(0.0001f, spriteWorldHeight);
+        return new Vector3(sx, sy, 1f);
     }
 
     Visual2DDef GetVisualDefFor(BuildingDef def)
@@ -87,12 +103,13 @@ public class BuildPlacementTool : MonoBehaviour
         return null;
     }
 
-    void ApplyScaleForSpriteOrFallback(GameObject go, BuildingDef def, Sprite spriteOrNull)
+    void ApplyScaleForSpriteOrFallbackXZ(GameObject go, BuildingDef def, Sprite spriteOrNull)
     {
-        if (spriteOrNull != null)
-            go.transform.localScale = Vector3.one; // rely on sprite PPU (hi-res 64 PPU)
-        else
-            go.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f); // fallback white unit sprite
+        var scale = ComputeScaleForSprite(spriteOrNull, def);
+        go.transform.localScale = scale;
+        // Lay the sprite flat on XZ ground (face +Y)
+        go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        // keep y slightly above ground to avoid z-fighting
     }
 
     void TryPlace(BuildingDef def, Vector3 pos)
@@ -116,8 +133,6 @@ public class BuildPlacementTool : MonoBehaviour
 
         // Instantiate placed object
         GameObject go = new GameObject(def.label ?? def.defName ?? "Building");
-        go.transform.position = pos;
-
         // Attach the specific behaviour for Construction Board MVP
         var board = go.AddComponent<ConstructionBoard>();
         // If your ConstructionBoard has an OnPlaced API, you can call it here:
@@ -127,7 +142,9 @@ public class BuildPlacementTool : MonoBehaviour
         var sr = go.AddComponent<SpriteRenderer>();
         var spr = LoadSpriteFor(def);
         if (spr != null) sr.sprite = spr; else sr.sprite = MakeUnitSprite();
-        ApplyScaleForSpriteOrFallback(go, def, spr);
+        ApplyScaleForSpriteOrFallbackXZ(go, def, spr);
+        // Set final position on ground with slight epsilon to avoid z-fighting
+        go.transform.position = new Vector3(pos.x, 0.01f, pos.z);
 
         ClearTool(); // place once for MVP
     }
@@ -138,14 +155,14 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureGhostDestroyed();
     }
 
-    Vector3 SnapToGrid(Vector3 world, BuildingDef def)
+    Vector3 SnapToGridXZ(Vector3 world, BuildingDef def)
     {
         float w = def.width * tileSize;
-        float h = def.height * tileSize;
-        // Snap to tile grid, keep pivot at center of the footprint
+        float d = def.height * tileSize;
+        // Snap to tile grid (XZ), keep pivot at center of the footprint
         float x = Mathf.Floor(world.x / tileSize) * tileSize + (w * 0.5f) - (tileSize * 0.5f);
-        float y = Mathf.Floor(world.y / tileSize) * tileSize + (h * 0.5f) - (tileSize * 0.5f);
-        return new Vector3(x, y, 0f);
+        float z = Mathf.Floor(world.z / tileSize) * tileSize + (d * 0.5f) - (tileSize * 0.5f);
+        return new Vector3(x, 0f, z);
     }
 
     void EnsureGhost(BuildingDef def)
@@ -165,7 +182,7 @@ public class BuildPlacementTool : MonoBehaviour
         var c = ghostSr.color;
         c.a = ghostAlpha;
         ghostSr.color = c;
-        ApplyScaleForSpriteOrFallback(ghostGO, def, spr);
+        ApplyScaleForSpriteOrFallbackXZ(ghostGO, def, spr);
     }
 
     void EnsureGhostDestroyed()
