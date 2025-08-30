@@ -83,6 +83,13 @@ public class BuildModeController : MonoBehaviour
 
     private void Update()
     {
+        // Self-heal: if Instance was lost (scene change), ensure systems exist
+        if (Instance == null)
+        {
+            BuildBootstrap.Ensure();
+            Instance = this;
+        }
+
         // Basic hotkey (B) to toggle build mode
         if (Input.GetKeyDown(KeyCode.B))
         {

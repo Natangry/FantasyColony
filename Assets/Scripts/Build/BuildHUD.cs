@@ -11,13 +11,6 @@ public class BuildHUD : MonoBehaviour
 
     void OnGUI()
     {
-        // Hide on intro/title screens if an IntroScreen surface exists and is visible.
-        try
-        {
-            var intro = FindAnyObjectByType<IntroScreen>();
-            if (intro != null && intro.isActiveAndEnabled) return;
-        } catch { /* safe if class not present */ }
-
         var ctrl = Ctrl;
         if (ctrl == null)
         {
