@@ -8,39 +8,49 @@ using UnityEngine;
 [System.Serializable]
 public class VisualDef : Visual2DDef
 {
-    // Intentionally mostly empty; below are legacy helper keys & parsers expected by old code.
-    // --- Legacy static keys (string) ---
-    public static readonly string id = nameof(defName);
-    public static readonly string render_layer = nameof(sortingLayer);
-    public static readonly string color_rgba_key = "color_rgba"; // avoid name clash
+    // --- Legacy static keys (string) for code that uses string keys ---
+    public static readonly string id_key = nameof(defName);
+    public static readonly string render_layer_key = nameof(sortingLayer);
+    public static readonly string color_rgba_key = "color_rgba";
     public static readonly string plane_key = "plane";
     public static readonly string shader_hint_key = "shader_hint";
     public static readonly string z_lift_key = "z_lift";
 
-    // Legacy helper methods (parsers)
-    public static Color Color(Visual2DDef def, string key, Color fallback)
+    // --- Instance properties expected by existing rendering code ---
+    public string id => defName;
+    public string render_layer => sortingLayer;
+    public Color Color => ParseColor(color_rgba);
+    public GridPlane Plane => ParsePlane(plane);
+
+    private static Color ParseColor(string s)
     {
-        var src = (def as VisualDef)?.color_rgba ?? def.color_rgba;
-        if (string.IsNullOrEmpty(src)) return fallback;
-        var parts = src.Split(',');
-        if (parts.Length < 3) return fallback;
-        float r = Parse(parts[0], 1f), g = Parse(parts[1], 1f), b = Parse(parts[2], 1f);
-        float a = parts.Length > 3 ? Parse(parts[3], 1f) : 1f;
-        return new Color(r, g, b, a);
+        if (string.IsNullOrWhiteSpace(s)) return Color.white;
+        s = s.Trim();
+        // Support hex like #RRGGBB or #RRGGBBAA
+        if (s[0] == '#')
+        {
+            if (ColorUtility.TryParseHtmlString(s, out var cHex)) return cHex;
+        }
+        // Support comma floats: r,g,b[,a]
+        var parts = s.Split(',');
+        if (parts.Length >= 3)
+        {
+            float r = ParseFloat(parts[0], 1f);
+            float g = ParseFloat(parts[1], 1f);
+            float b = ParseFloat(parts[2], 1f);
+            float a = parts.Length > 3 ? ParseFloat(parts[3], 1f) : 1f;
+            return new Color(r, g, b, a);
+        }
+        return Color.white;
     }
-    public static int Plane(Visual2DDef def, string key, int fallback)
-    {
-        var p = (def as VisualDef)?.plane ?? def.plane ?? "XY";
-        return p.Equals("XZ", System.StringComparison.OrdinalIgnoreCase) ? 1 : 0;
-    }
-    public static string Plane(Visual2DDef def, string key, string fallback)
-    {
-        var p = (def as VisualDef)?.plane ?? def.plane;
-        return string.IsNullOrEmpty(p) ? fallback : p;
-    }
-    private static float Parse(string s, float d)
+    private static float ParseFloat(string s, float d)
     {
         return float.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : d;
+    }
+    private static GridPlane ParsePlane(string p)
+    {
+        if (string.IsNullOrEmpty(p)) return GridPlane.XY;
+        return p.Equals("XZ", System.StringComparison.OrdinalIgnoreCase) ? GridPlane.XZ : GridPlane.XY;
     }
 }
 /// <summary>Legacy "Value" access pattern used by rendering code: allow key-based lookups from Visual2DDef.</summary>

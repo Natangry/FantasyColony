@@ -20,11 +20,24 @@ public static class SpriteVisualFactory2D
         EnsureWhiteSprite();
         DetectSortingLayer();
 
-        foreach (var kv in DefDatabase.Visuals)
+        foreach (var v in DefDatabase.Visuals)
         {
-            var v = kv.Value;
-            _ghostPrefabs[v.id] = MakeSpritePrefab(v, translucent:true);
-            _placedPrefabs[v.id] = MakeSpritePrefab(v, translucent:false);
+            // DefDatabase.Visuals is a list; build prefabs keyed by defName
+            var vd = v as VisualDef ?? new VisualDef
+            {
+                defName = v.defName,
+                sortingLayer = v.sortingLayer,
+                sortingOrder = v.sortingOrder,
+                pivotX = v.pivotX,
+                pivotY = v.pivotY,
+                scale = v.scale,
+                plane = v.plane,
+                z_lift = v.z_lift,
+                shader_hint = v.shader_hint,
+                color_rgba = v.color_rgba
+            };
+            _ghostPrefabs[vd.id] = MakeSpritePrefab(vd, translucent: true);
+            _placedPrefabs[vd.id] = MakeSpritePrefab(vd, translucent: false);
         }
         if (_ghostPrefabs.Count == 0)
         {
