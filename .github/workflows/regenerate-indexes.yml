@@ -1,8 +1,8 @@
-name: Regenerate & commit indexes/snapshots (on any push)
+name: Regenerate & commit indexes/snapshots (unified)
 
 on:
-  push:              # regenerate whenever code changes are pushed/merged
-  workflow_dispatch: # manual runs if needed
+  push:
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,7 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- XML: run your generator if present (keeps XML samples under Docs/Templates/Defs) ---
       - name: Setup .NET (for XML tools)
         if: ${{ hashFiles('Tools/**/*.csproj') != '' }}
         uses: actions/setup-dotnet@v4
@@ -27,29 +26,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # If your XML generator project exists, run it (writes into Docs/Templates/Defs/**)
           if [ -f Tools/XmlDefsTools/XmlDefsTools.csproj ]; then
             dotnet run --project Tools/XmlDefsTools/XmlDefsTools.csproj || true
           fi
 
-      # --- CODE: regenerate CODE_SNAPSHOT.txt, CODE_INDEX.md, SYMBOLS.json from tracked .cs files ---
       - name: Regenerate code snapshot, index, and symbols
         shell: bash
         run: |
           set -euo pipefail
-
           REPO="${GITHUB_REPOSITORY}"
-          # Try to resolve a friendly ref for "View/Raw" links
           REF_NAME="${GITHUB_REF_NAME:-${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}}"
           NOW="$(date -u +'%Y-%m-%d %H:%M:%S UTC')"
 
-          # Collect tracked C# files deterministically
-          mapfile -t CS_FILES < <(git ls-files \
-            | grep -E '\.cs$' \
-            | grep -Ev '^(Library|Temp|Build|obj|\.git)/' \
-            | sort)
+          mapfile -t CS_FILES < <(git ls-files | grep -E '\.cs$' | grep -Ev '^(Library|Temp|Build|obj|\.git)/' | sort)
 
-          #### CODE_SNAPSHOT.txt ####
           {
             echo "# Auto-generated code snapshot"
             echo "_Updated_: ${NOW}"
@@ -61,7 +51,6 @@ jobs:
             done
           } > CODE_SNAPSHOT.txt
 
-          #### CODE_INDEX.md ####
           {
             echo "# Code Index"
             echo
@@ -74,39 +63,36 @@ jobs:
             done
           } > CODE_INDEX.md
 
-          #### SYMBOLS.json (lightweight namespace/type/method map with 1-based line numbers) ####
           tmp_symbols="$(mktemp)"
           echo '{ "files": [' > "${tmp_symbols}"
           first_file=1
           for f in "${CS_FILES[@]}"; do
-            json="$(awk '
+            json="$(awk -v file="$f" '
               BEGIN {
+                q = sprintf("%c",34)
                 ns=""; type=""; firstSym=1
-                printf("{ \"file\": \"%s\", \"symbols\": [", FILENAME)
+                printf("{ " q "file" q ": " q file q ", " q "symbols" q ": [")
               }
               {
                 line=NR
-                # namespace
                 if ($0 ~ /^[ \t]*namespace[ \t]+[A-Za-z_][A-Za-z0-9_.]*/) {
                   match($0, /namespace[ \t]+([A-Za-z_][A-Za-z0-9_.]*)/, m)
                   ns=m[1]
-                  sym=sprintf("{\\"kind\\":\\"namespace\\",\\"name\\":\\"%s\\",\\"line\\":%d}", ns, line)
-                  printf(firstSym ? "%s" : ",%s", sym); firstSym=0
+                  obj="{" q "kind" q ":" q "namespace" q "," q "name" q ":" q ns q "," q "line" q ":" line "}"
+                  printf(firstSym ? obj : "," obj); firstSym=0
                 }
-                # type: class/struct/interface/enum
                 if ($0 ~ /^[ \t]*(public|internal|protected|private)?[ \t]*(sealed|abstract|static)?[ \t]*(class|struct|interface|enum)[ \t]+[A-Za-z_][A-Za-z0-9_]*/) {
                   match($0, /(class|struct|interface|enum)[ \t]+([A-Za-z_][A-Za-z0-9_]*)/, t)
                   kind=t[1]; type=t[2]
-                  sym=sprintf("{\\"kind\\":\\"%s\\",\\"name\\":\\"%s\\",\\"namespace\\":\\"%s\\",\\"line\\":%d}", kind, type, ns, line)
-                  printf(firstSym ? "%s" : ",%s", sym); firstSym=0
+                  obj="{" q "kind" q ":" q kind q "," q "name" q ":" q type q "," q "namespace" q ":" q ns q "," q "line" q ":" line "}"
+                  printf(firstSym ? obj : "," obj); firstSym=0
                 }
-                # methods (best-effort): access? static? return? Name( ... ) {
                 if ($0 ~ /^[ \t]*(public|private|protected|internal)[^;{=]*\([^\)]*\)[ \t]*\{/ ) {
                   match($0, /([A-Za-z_][A-Za-z0-9_]*)[ \t]*\(/, m)
                   if (m[1] != "") {
                     mname=m[1]
-                    sym=sprintf("{\\"kind\\":\\"method\\",\\"name\\":\\"%s\\",\\"type\\":\\"%s\\",\\"namespace\\":\\"%s\\",\\"line\\":%d}", mname, type, ns, line)
-                    printf(firstSym ? "%s" : ",%s", sym); firstSym=0
+                    obj="{" q "kind" q ":" q "method" q "," q "name" q ":" q mname q "," q "type" q ":" q type q "," q "namespace" q ":" q ns q "," q "line" q ":" line "}"
+                    printf(firstSym ? obj : "," obj); firstSym=0
                   }
                 }
               }
@@ -122,20 +108,17 @@ jobs:
           echo '] }' >> "${tmp_symbols}"
           mv "${tmp_symbols}" SYMBOLS.json
 
-      # --- COMMIT: stage known outputs and commit only if staged diff exists ---
       - name: Commit regenerated files if changed
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage code artifacts
           git add CODE_SNAPSHOT.txt CODE_INDEX.md SYMBOLS.json 2>/dev/null || true
-          # Stage docs indexes if you keep them current (optional but harmless)
-          git add INDEX.md Docs/INDEX.md 2>/dev/null || true
-          # Stage XML samples/schemas where live links point
+          git add XML_INDEX.md XML_SNAPSHOT.txt 2>/dev/null || true
           git add Docs/Templates/Defs/ 2>/dev/null || true
+          git add Docs/XML_ARTIFACTS.md 2>/dev/null || true
 
           if ! git diff --cached --quiet --exit-code; then
             git commit -m "ci: regenerate indexes & snapshots [skip ci]"
