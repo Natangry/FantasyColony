@@ -150,7 +150,7 @@
 - **AbilityDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/AbilityDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/AbilityDef.xml)
 - **BuildingDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/BuildingDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/BuildingDef.xml)
 - **ItemDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/ItemDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/ItemDef.xml)
-- **Visual2Def.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/Visual2Def.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/Visual2Def.xml)
+- **_AllSchemas.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/_AllSchemas.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/_AllSchemas.xml)
 
 ## Tools
 
