@@ -7,6 +7,15 @@
     "version",
     "requires"
   ],
+  "//": "Seed known schemas so we always emit a baseline template even before any defs exist.",
+  "BuildingDef": [
+    "id", "name_key", "tags", "version", "requires",
+    "icon", "size", "cost", "hitPoints", "components"
+  ],
+  "Visual2Def": [
+    "id", "name_key", "tags", "version", "requires",
+    "sprite", "palette", "components"
+  ],
   "AbilityDef": [
     "id", "name_key", "tags", "version", "requires",
     "icon", "cooldown", "cost", "range", "components"
