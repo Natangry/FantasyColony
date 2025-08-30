@@ -5,6 +5,7 @@ This repository maintains **auto-generated** artifacts for Def XMLs:
 - `XML_INDEX.md` — bulleted file list with `View · Raw` links (mirrors Code Index) and a schema summary.
 - `XML_SNAPSHOT.txt` — normalized, diffable snapshot of all XML Def files.
 - `Docs/Templates/Defs/*.xml` — default templates for each discovered schema.
+- `Docs/Templates/Defs/_AllSchemas.xml` — consolidated catalog of every schema with its attribute/element lists and an embedded canonical template sample.
 
 These files are regenerated on every push to `main` (and on manual dispatch) by
 the GitHub Actions workflow: `.github/workflows/update-xml-artifacts.yml`.

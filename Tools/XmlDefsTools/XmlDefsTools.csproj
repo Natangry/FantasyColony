@@ -11,6 +11,7 @@
     <None Include="Config\SchemaOrder.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="Emit\SchemaCatalogWriter.cs" />
   </ItemGroup>
   <PropertyGroup>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
