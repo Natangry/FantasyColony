@@ -19,6 +19,7 @@ using System;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 
 namespace FantasyColony.EditorTools
 {
@@ -64,9 +65,38 @@ namespace FantasyColony.EditorTools
             ti.alphaSource = TextureImporterAlphaSource.FromInput;
 #endif
 
-            // Pivot: Bottom-Center
-            ti.spriteAlignment = (int)SpriteAlignment.Custom;
+            // Pivot: Bottom-Center (Unity 6 removed 'spriteAlignment'; set via spritePivot and
+            // use reflection to set alignment to Custom when property exists on older versions)
+            SetPivotBottomCenter(ti);
+        }
+
+        static void SetPivotBottomCenter(TextureImporter ti)
+        {
+            // Always set explicit pivot
             ti.spritePivot = new Vector2(0.5f, 0f);
+
+            // Try to set alignment to Custom when the legacy property exists
+            try
+            {
+                var prop = typeof(TextureImporter).GetProperty("spriteAlignment",
+                    BindingFlags.Public | BindingFlags.Instance);
+                if (prop != null && prop.CanWrite)
+                {
+                    var enumType = prop.PropertyType;
+                    object customVal = null;
+                    // If type is an enum that defines "Custom", use it; otherwise fall back to 9
+                    if (enumType.IsEnum && Enum.GetNames(enumType).Contains("Custom"))
+                        customVal = Enum.Parse(enumType, "Custom");
+                    else
+                        customVal = Convert.ChangeType(9, enumType); // 9 == SpriteAlignment.Custom in legacy
+
+                    prop.SetValue(ti, customVal);
+                }
+            }
+            catch
+            {
+                // Safe no-op on newer Unity versions
+            }
         }
 
         // --- Context menus ---------------------------------------------------
