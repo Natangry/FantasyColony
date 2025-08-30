@@ -42,15 +42,14 @@ public static class BuildBootstrap
             // ignore – bring-up should still run with fallbacks
         }
 
-        // Ensure there is a HUD
-        var hud = GameObject.Find("BuildHUD (Auto)");
-        if (hud == null)
+        // Ensure there is a palette HUD
+        var pal = GameObject.Find("BuildPalette (Auto)");
+        if (pal == null)
         {
-            hud = new GameObject("BuildHUD (Auto)");
-            hud.AddComponent<BuildHUD>();
-            hud.AddComponent<BuildPaletteHUD>();
-            Object.DontDestroyOnLoad(hud);
-            Debug.Log("[BuildBootstrap] Spawned BuildHUD + Palette");
+            pal = new GameObject("BuildPalette (Auto)");
+            pal.AddComponent<BuildPaletteHUD>();
+            Object.DontDestroyOnLoad(pal);
+            Debug.Log("[BuildBootstrap] Spawned BuildPalette");
         }
 
         return go;

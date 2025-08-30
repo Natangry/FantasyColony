@@ -175,6 +175,7 @@ public class BuildPlacementTool : MonoBehaviour
         if (spr != null)
         {
             sr.sprite = spr;
+            Debug.Log("[Build] Loaded sprite: " + spr.name + " (PPU=" + spr.pixelsPerUnit + ")");
         }
         else
         {

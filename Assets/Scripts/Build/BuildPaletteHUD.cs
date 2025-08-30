@@ -39,6 +39,7 @@ public class BuildPaletteHUD : MonoBehaviour
         // --- DPI/UI scaling ---
         float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1920f, Screen.height / 1080f), 1.0f, 2.5f);
         var prevMatrix = GUI.matrix;
+        // Avoid empty tab look by drawing without window chrome at tiny scales
         GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), Vector2.zero);
         var drawRect = new Rect(_panelRect.x / scale, _panelRect.y / scale, _panelRect.width / scale, _panelRect.height / scale);
 
@@ -51,7 +52,7 @@ public class BuildPaletteHUD : MonoBehaviour
         skin.button.fontSize = Mathf.RoundToInt(14 * scale);
         skin.window.fontSize = Mathf.RoundToInt(16 * scale);
 
-        GUILayout.BeginArea(drawRect, GUI.skin.window);
+        GUILayout.BeginArea(drawRect); // no window chrome to prevent stray tab
         var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
         GUILayout.Label("Build Palette" + activeName);
         GUILayout.Label("Click a def to arm the tool, then left-click ground to place. Esc cancels.");
