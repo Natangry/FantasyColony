@@ -8,6 +8,9 @@ using System.Linq;
 /// </summary>
 public static class BuildBootstrap
 {
+    // Ensure we load defs once per run to avoid races where DB appears empty
+    static bool _defsLoadedOnce = false;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     public static void EnsureOnLoad()
     {
@@ -28,18 +31,31 @@ public static class BuildBootstrap
         if (go.GetComponent<BuildPlacementTool>() == null)
             go.AddComponent<BuildPlacementTool>();
 
-        // Make sure defs are available
-        try
+        // Make sure defs are available (force an eager first-load once per run)
+        if (!_defsLoadedOnce)
         {
-            if (DefDatabase.Buildings == null || DefDatabase.Visuals == null ||
-                DefDatabase.Buildings.Count == 0 || DefDatabase.Visuals.Count == 0)
+            try
             {
                 DefDatabase.LoadAll();
+                _defsLoadedOnce = true;
+            }
+            catch
+            {
+                // ignore – bring-up should still run with fallbacks
             }
         }
-        catch
+        else
         {
-            // ignore – bring-up should still run with fallbacks
+            try
+            {
+                if (DefDatabase.Buildings == null || DefDatabase.Visuals == null ||
+                    DefDatabase.Buildings.Count == 0 || DefDatabase.Visuals.Count == 0)
+                    DefDatabase.LoadAll();
+            }
+            catch
+            {
+                // ignore – bring-up should still run with fallbacks
+            }
         }
 
         // Ensure there is a palette HUD

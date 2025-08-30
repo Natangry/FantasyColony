@@ -145,16 +145,36 @@ public class BuildPlacementTool : MonoBehaviour
 
     Sprite LoadSpriteFor(BuildingDef def)
     {
+        // Primary path: via visual def
         var v = GetVisualDefFor(def);
         if (v != null && !string.IsNullOrEmpty(v.spritePath))
         {
-            var s = Resources.Load<Sprite>(v.spritePath);
-            if (s != null) return s;
+            var spr = Resources.Load<Sprite>(v.spritePath);
+            if (spr != null)
+            {
+                Debug.Log("[Build] Loaded sprite: " + spr.name + " (PPU=" + spr.pixelsPerUnit + ", path=" + v.spritePath + ")");
+                return spr;
+            }
             if (!_warnedSpriteMissing)
             {
                 Debug.LogWarning("[Build] Sprite NOT FOUND at Resources/" + v.spritePath + ".png – ensure it's Sprite(2D & UI), under Assets/Resources, no extension in path.");
                 _warnedSpriteMissing = true;
             }
+        }
+
+        // Direct fallback for Construction Board bring-up even when visual DB is missing
+        if (def != null && !string.IsNullOrEmpty(def.defName) &&
+            def.defName.ToLowerInvariant().Contains("constructionboard"))
+        {
+            const string directPath = "Sprites/ConstructionBoard";
+            var spr = Resources.Load<Sprite>(directPath);
+            if (spr != null)
+            {
+                Debug.Log("[Build] Loaded sprite via direct path fallback: " + spr.name + " (PPU=" + spr.pixelsPerUnit + ", path=" + directPath + ")");
+                return spr;
+            }
+            if (!_warnedSpriteMissing)
+                Debug.LogWarning("[Build] Sprite NOT FOUND at Resources/" + directPath + ".png – check asset path/type/import.");
         }
         return null;
     }
