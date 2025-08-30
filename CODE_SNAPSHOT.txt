@@ -1,6 +1,7 @@
 // ===== FILE: Assets/Scripts/Boot/BuildBootstrap.cs =====
 using UnityEngine;
 using FantasyColony.Defs;
+using System.Linq;
 
 /// <summary>
 /// Guarantees build systems exist at runtime and that defs are loaded.
@@ -14,7 +15,7 @@ public static class BuildBootstrap
         Ensure();
     }
 
-    public static void Ensure()
+    public static GameObject Ensure()
     {
         var go = GameObject.Find("BuildSystems (Auto)");
         if (go == null)
@@ -40,6 +41,18 @@ public static class BuildBootstrap
         {
             // ignore – bring-up should still run with fallbacks
         }
+
+        // Ensure there is a HUD
+        var hud = GameObject.Find("BuildHUD (Auto)");
+        if (hud == null)
+        {
+            hud = new GameObject("BuildHUD (Auto)");
+            hud.AddComponent<BuildHUD>();
+            hud.AddComponent<BuildPaletteHUD>();
+            Debug.Log("[BuildBootstrap] Spawned BuildHUD + Palette");
+        }
+
+        return go;
     }
 }
 
@@ -386,6 +399,40 @@ public static class WorldBootstrap
 
 
 
+// ===== FILE: Assets/Scripts/Build/BuildHUD.cs =====
+using UnityEngine;
+
+/// <summary>
+/// Minimal header HUD that exposes a Build toggle and self-heals missing systems.
+/// </summary>
+public class BuildHUD : MonoBehaviour
+{
+    BuildModeController Ctrl => BuildModeController.Instance;
+
+    Rect HeaderRect => new Rect(12, 12, 160, 32);
+
+    void OnGUI()
+    {
+        var ctrl = Ctrl;
+        if (ctrl == null)
+        {
+            BuildBootstrap.Ensure();
+            ctrl = BuildModeController.Instance;
+        }
+        GUILayout.BeginArea(HeaderRect, GUI.skin.window);
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(ctrl != null && ctrl.IsActive ? "●" : "○", GUILayout.Width(20));
+        if (GUILayout.Button("Build [B]", GUILayout.Height(20)))
+        {
+            if (ctrl != null) ctrl.ToggleBuildMode();
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.EndArea();
+    }
+}
+
+
+
 // ===== FILE: Assets/Scripts/Build/BuildModeController.cs =====
 using UnityEngine;
 using System;
@@ -408,7 +455,15 @@ public class BuildModeController : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
     public bool IsBuildModeEnabled => _buildModeEnabled;
@@ -468,6 +523,7 @@ public class BuildModeController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.B))
         {
             ToggleBuildMode();
+            Debug.Log("[Build] Toggled via B → " + (_buildModeEnabled ? "ON" : "OFF"));
         }
         // ESC cancels current tool
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -508,7 +564,7 @@ public class BuildPaletteHUD : MonoBehaviour
     {
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
-        // Ensure systems exist (harmless if already present)
+        // Self-heal to guarantee systems are present
         BuildBootstrap.Ensure();
 
         var _panelRect = GetPanelRect();
@@ -683,8 +739,8 @@ public class BuildPlacementTool : MonoBehaviour
     {
         var scale = ComputeScaleForSprite(spriteOrNull, def);
         go.transform.localScale = scale;
-        // Lay the sprite flat on XZ ground (face +Y)
-        go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        // Lay the sprite flat on XZ ground (face camera looking down -Y)
+        go.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
         // keep y slightly above ground to avoid z-fighting
     }
 
