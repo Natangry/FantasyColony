@@ -1,144 +1,57 @@
-name: Update Master Index & Code Snapshot
+name: Refresh repository indexes & snapshots
+
 on:
   push:
-    branches: [ main ]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-index:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Generate repo-wide INDEX.md, CODE_INDEX.md, CODE_SNAPSHOT.txt, SYMBOLS.json (and Docs/INDEX.md)
-        env:
-          REPO: ${{ github.repository }}
-        run: |
-          python3 - <<'PY'
-          import os, re, json, urllib.parse
+      - name: Setup .NET (if indexers exist)
+        if: ${{ hashFiles('Tools/**/*.csproj') != '' }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-          REPO = os.environ['REPO']
-          def view_url(p): return f'https://github.com/{REPO}/blob/main/{urllib.parse.quote(p)}'
-          def raw_url(p):  return f'https://raw.githubusercontent.com/{REPO}/main/{urllib.parse.quote(p)}'
-          def tree_url(p): return f'https://github.com/{REPO}/tree/main/{urllib.parse.quote(p)}'
-
-          EXCLUDE_DIRS = {'.git', '.github', '.idea', '.vscode'}
-
-          # Collect all tracked files
-          files_all = []
-          for base, dirs, files in os.walk('.'):
-            rel = os.path.relpath(base, '.')
-            parts = [] if rel == '.' else rel.split(os.sep)
-            if any(part in EXCLUDE_DIRS for part in parts):
-              dirs[:] = []
-              continue
-            dirs[:] = sorted(dirs)
-            for f in sorted(files):
-              if f == '.DS_Store':
-                continue
-              p = f if rel == '.' else f'{rel}/{f}'
-              files_all.append(p.replace('\\','/'))
-
-          # ---------- Repository Index ----------
-          lines = ['# Repository Index\n']
-          last_section = ''
-          for p in sorted(files_all, key=lambda s: s.lower()):
-            if p in ('INDEX.md', 'Docs/INDEX.md', 'CODE_INDEX.md', 'CODE_SNAPSHOT.txt', 'SYMBOLS.json'):
-              continue
-            section = os.path.dirname(p)
-            if section != last_section:
-              if section == '':
-                pass
-              else:
-                lines.append(f"\n## {section}\n[Open folder]({tree_url(section)})\n")
-              last_section = section
-            lines.append(f'- **{os.path.basename(p)}** — [View]({view_url(p)}) · [Raw]({raw_url(p)})')
-          open('INDEX.md','w',encoding='utf-8').write('\n'.join(lines)+'\n')
-
-          # ---------- Code Index (.cs only) ----------
-          cs_files = [p for p in files_all if p.lower().endswith('.cs')]
-          if cs_files:
-            out = ['# Code Index (.cs)\n']
-            for p in sorted(cs_files, key=lambda s: s.lower()):
-              out.append(f'- `{p}` — [View]({view_url(p)}) · [Raw]({raw_url(p)})')
-            open('CODE_INDEX.md','w',encoding='utf-8').write('\n'.join(out)+'\n')
-          else:
-            try: os.remove('CODE_INDEX.md')
-            except FileNotFoundError: pass
-
-          # ---------- Code Snapshot (.cs concatenated) ----------
-          if cs_files:
-            with open('CODE_SNAPSHOT.txt','w',encoding='utf-8',newline='\n') as w:
-              for p in sorted(cs_files, key=lambda s: s.lower()):
-                w.write(f"// ===== FILE: {p} =====\n")
-                try:
-                  with open(p,'r',encoding='utf-8',errors='replace') as r:
-                    w.write(r.read())
-                except Exception as e:
-                  w.write(f"// <error reading {p}: {e}>\n")
-                w.write("\n\n")
-          else:
-            try: os.remove('CODE_SNAPSHOT.txt')
-            except FileNotFoundError: pass
-
-          # ---------- Symbols (very simple regex pass) ----------
-          symbols = []
-          if cs_files:
-            cls_re = re.compile(r'^\s*(?:public|internal|protected|private)?\s*(?:abstract|static|sealed|partial\s+)*\s*(class|struct|interface|enum)\s+([A-Za-z_][A-Za-z0-9_]*)', re.MULTILINE)
-            ns_re  = re.compile(r'^\s*namespace\s+([A-Za-z0-9_.]+)', re.MULTILINE)
-            mth_re = re.compile(r'^\s*(?:public|internal|protected|private)\s+[A-Za-z0-9_<>,\[\]\?\(\)\s]+\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(', re.MULTILINE)
-            prop_re= re.compile(r'^\s*(?:public|internal|protected|private)\s+[A-Za-z0-9_<>,\[\]\?\(\)\s]+\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{\s*get;', re.MULTILINE)
-            for p in cs_files:
-              try:
-                with open(p,'r',encoding='utf-8',errors='replace') as r:
-                  txt = r.read()
-              except Exception:
-                continue
-              for m in ns_re.finditer(txt):
-                symbols.append({'kind':'namespace','name':m.group(1),'file':p,'line':txt[:m.start()].count('\n')+1})
-              for m in cls_re.finditer(txt):
-                symbols.append({'kind':m.group(1),'name':m.group(2),'file':p,'line':txt[:m.start()].count('\n')+1})
-              for m in mth_re.finditer(txt):
-                name=m.group(1)
-                if name in ('if','for','while','switch','return','try','catch','foreach','lock'): continue
-                symbols.append({'kind':'method','name':name,'file':p,'line':txt[:m.start()].count('\n')+1})
-              for m in prop_re.finditer(txt):
-                symbols.append({'kind':'property','name':m.group(1),'file':p,'line':txt[:m.start()].count('\n')+1})
-          if symbols:
-            open('SYMBOLS.json','w',encoding='utf-8').write(json.dumps(symbols, indent=2))
-          else:
-            try: os.remove('SYMBOLS.json')
-            except FileNotFoundError: pass
-
-          # ---------- Docs/INDEX.md convenience ----------
-          if os.path.isdir('Docs'):
-            dlines = ['# Docs Index (auto)\n', '↩️ [Back to Repository Index](../INDEX.md)\n']
-            for base, dirs, files in os.walk('Docs'):
-              dirs[:] = sorted(dirs)
-              files = sorted(f for f in files if f not in ('INDEX.md','README.md','.DS_Store'))
-              rel = os.path.relpath(base, 'Docs')
-              if rel != '.':
-                dlines.append(f"\n## {rel.replace(os.sep,'/')}\n")
-              for f in files:
-                p = os.path.join(base, f).replace(os.sep, '/')
-                dlines.append(f'- **{f}** — [View]({view_url(p)}) · [Raw]({raw_url(p)})')
-            open(os.path.join('Docs','INDEX.md'),'w',encoding='utf-8').write('\n'.join(dlines)+'\n')
-          PY
-
-      - name: Commit index if changed
+      - name: Run repository indexers (best-effort)
+        shell: bash
         run: |
           set -e
-          CHANGED="$(git status --porcelain INDEX.md Docs/INDEX.md CODE_INDEX.md CODE_SNAPSHOT.txt SYMBOLS.json 2>/dev/null || true)"
-          if [ -n "$CHANGED" ]; then
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
-            git add INDEX.md Docs/INDEX.md CODE_INDEX.md CODE_SNAPSHOT.txt SYMBOLS.json 2>/dev/null || true
-            git commit -m "ci: refresh repository index & code snapshot [skip ci]" || echo "Nothing to commit"
+          # If your repo has scripts or projects that generate indexes/snapshots, run them conditionally.
+          if [ -f Tools/Build/generate-index.sh ]; then
+            bash Tools/Build/generate-index.sh || true
+          fi
+          if [ -f Tools/DocsIndex/DocsIndex.csproj ]; then
+            dotnet run --project Tools/DocsIndex/DocsIndex.csproj || true
+          fi
+          if [ -f Tools/Indexing/Indexing.csproj ]; then
+            dotnet run --project Tools/Indexing/Indexing.csproj || true
+          fi
+
+      - name: Stage & commit index/snapshot files if changed (robust)
+        shell: bash
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Explicit, safe staging of the known outputs. Missing paths are ignored.
+          git add INDEX.md Docs/INDEX.md CODE_INDEX.md CODE_SNAPSHOT.txt SYMBOLS.json XML_INDEX.md XML_SNAPSHOT.txt 2>/dev/null || true
+          # Keep XML samples/schemas where your live links point.
+          git add Docs/Templates/Defs/ 2>/dev/null || true
+
+          # Commit only if something is staged
+          if ! git diff --cached --quiet --exit-code; then
+            git commit -m "ci: refresh repository index & XML samples"
             git push
           else
             echo "No index changes"
