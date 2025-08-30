@@ -579,25 +579,25 @@
     "kind": "namespace",
     "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/BuildingDef.cs",
-    "line": 2
+    "line": 3
   },
   {
     "kind": "namespace",
     "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/BuildingDef.cs",
-    "line": 18
+    "line": 54
   },
   {
     "kind": "class",
     "name": "BuildingDef",
     "file": "Assets/Scripts/Defs/BuildingDef.cs",
-    "line": 9
+    "line": 10
   },
   {
     "kind": "class",
     "name": "BuildingDefKinds",
     "file": "Assets/Scripts/Defs/BuildingDef.cs",
-    "line": 21
+    "line": 57
   },
   {
     "kind": "namespace",
@@ -642,10 +642,28 @@
     "line": 9
   },
   {
+    "kind": "class",
+    "name": "DefListExtensions",
+    "file": "Assets/Scripts/Defs/DefDatabase.cs",
+    "line": 66
+  },
+  {
     "kind": "method",
     "name": "LoadAll",
     "file": "Assets/Scripts/Defs/DefDatabase.cs",
-    "line": 22
+    "line": 30
+  },
+  {
+    "kind": "method",
+    "name": "TryGetValue",
+    "file": "Assets/Scripts/Defs/DefDatabase.cs",
+    "line": 68
+  },
+  {
+    "kind": "method",
+    "name": "TryGetValue",
+    "file": "Assets/Scripts/Defs/DefDatabase.cs",
+    "line": 78
   },
   {
     "kind": "namespace",
@@ -663,31 +681,85 @@
     "kind": "namespace",
     "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/Visual2DDef.cs",
-    "line": 2
+    "line": 3
   },
   {
     "kind": "namespace",
     "name": "FantasyColony.Defs",
     "file": "Assets/Scripts/Defs/Visual2DDef.cs",
-    "line": 18
+    "line": 39
   },
   {
     "kind": "class",
     "name": "Visual2DDef",
     "file": "Assets/Scripts/Defs/Visual2DDef.cs",
-    "line": 9
+    "line": 10
+  },
+  {
+    "kind": "class",
+    "name": "Variant",
+    "file": "Assets/Scripts/Defs/Visual2DDef.cs",
+    "line": 31
   },
   {
     "kind": "class",
     "name": "Visual2DDefKinds",
     "file": "Assets/Scripts/Defs/Visual2DDef.cs",
-    "line": 21
+    "line": 42
   },
   {
     "kind": "class",
     "name": "VisualDef",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 8
+    "line": 9
+  },
+  {
+    "kind": "class",
+    "name": "VisualDefExtensions",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 47
+  },
+  {
+    "kind": "method",
+    "name": "Color",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 21
+  },
+  {
+    "kind": "method",
+    "name": "Plane",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 31
+  },
+  {
+    "kind": "method",
+    "name": "Plane",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 36
+  },
+  {
+    "kind": "method",
+    "name": "Parse",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 41
+  },
+  {
+    "kind": "method",
+    "name": "Value",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 49
+  },
+  {
+    "kind": "method",
+    "name": "Value",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 61
+  },
+  {
+    "kind": "method",
+    "name": "Value",
+    "file": "Assets/Scripts/Defs/VisualDef.cs",
+    "line": 69
   },
   {
     "kind": "namespace",
@@ -729,31 +801,31 @@
     "kind": "method",
     "name": "ParseBuilding",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 89
+    "line": 118
   },
   {
     "kind": "method",
     "name": "Value",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 101
+    "line": 166
   },
   {
     "kind": "method",
     "name": "Int",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 113
+    "line": 178
   },
   {
     "kind": "method",
     "name": "Float",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 119
+    "line": 184
   },
   {
     "kind": "method",
     "name": "Bool",
     "file": "Assets/Scripts/Defs/Xml/XmlDefLoader.cs",
-    "line": 125
+    "line": 190
   },
   {
     "kind": "class",
