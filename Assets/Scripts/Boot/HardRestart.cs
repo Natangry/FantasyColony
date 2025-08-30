@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using System.Collections;
 using System.Text;
 
 public static class HardRestart
@@ -16,6 +17,9 @@ public static class HardRestart
         DestroyIfExists("PauseCanvas (Auto)");
         DestroyIfExists("PauseMenuController");
         DestroyAllOfType<EventSystem>();
+        DestroyAllOfType<BuildModeController>();
+        DestroyAllOfType<BuildPlacementTool>();
+        DestroyAllOfType<BuildPaletteHUD>();
 
         // Destroy any EventSystem we created
         var es = Object.FindFirstObjectByType<EventSystem>();
@@ -34,7 +38,7 @@ public static class HardRestart
         if (cfg != null && !string.IsNullOrEmpty(cfg.introScenePath))
         {
             Debug.Log("[HardRestart] Restart using configured intro scene path: " + cfg.introScenePath);
-            SceneManager.LoadScene(cfg.introScenePath);
+            LoadClean(cfg.introScenePath);
             return;
         }
 
@@ -45,7 +49,20 @@ public static class HardRestart
         int target = (BootSession.InitialSceneIndex >= 0) ? BootSession.InitialSceneIndex : FindIntroSceneIndex();
         var path = SceneUtility.GetScenePathByBuildIndex(target);
         Debug.Log("[HardRestart] Restart using scene index " + target + " (" + path + ")");
-        SceneManager.LoadScene(target);
+        LoadClean(target);
+    }
+
+    static void LoadClean(int buildIndex)
+    {
+        Resources.UnloadUnusedAssets();
+        System.GC.Collect();
+        SceneManager.LoadScene(buildIndex);
+    }
+    static void LoadClean(string scenePath)
+    {
+        Resources.UnloadUnusedAssets();
+        System.GC.Collect();
+        SceneManager.LoadScene(scenePath);
     }
 
     static string GetBuildScenesLog()
