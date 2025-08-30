@@ -67,15 +67,27 @@
   },
   {
     "kind": "class",
+    "name": "GameStartupConfig",
+    "file": "Assets/Scripts/Boot/GameStartupConfig.cs",
+    "line": 8
+  },
+  {
+    "kind": "method",
+    "name": "Load",
+    "file": "Assets/Scripts/Boot/GameStartupConfig.cs",
+    "line": 12
+  },
+  {
+    "kind": "class",
     "name": "HardRestart",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 4
+    "line": 5
   },
   {
     "kind": "method",
     "name": "RebootToIntro",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 7
+    "line": 8
   },
   {
     "kind": "class",
