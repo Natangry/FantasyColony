@@ -3,13 +3,13 @@
     "kind": "namespace",
     "name": "FantasyColony.EditorTools",
     "file": "Assets/Editor/SpriteImportDefaults.cs",
-    "line": 22
+    "line": 23
   },
   {
     "kind": "class",
     "name": "SpriteImportDefaults",
     "file": "Assets/Editor/SpriteImportDefaults.cs",
-    "line": 25
+    "line": 26
   },
   {
     "kind": "class",
