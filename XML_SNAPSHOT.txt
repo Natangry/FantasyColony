@@ -90,7 +90,7 @@
 
 
 // ===== FILE: Docs/Templates/Defs/_AllSchemas.xml =====
-<DefSchemas generated="2025-08-30T21:24:26Z">
+<DefSchemas generated="2025-08-30T22:05:26Z">
   <Schema name="AbilityDef">
     <Attributes />
     <Elements>
