@@ -29,6 +29,7 @@ public class BuildPaletteHUD : MonoBehaviour
     void OnGUI()
     {
         if (IsIntroScene()) return;
+        if (PauseMenuController.IsPaused) return;
         if (BuildModeController.Instance == null || !BuildModeController.Instance.IsActive) return;
 
         // Self-heal to guarantee systems are present
