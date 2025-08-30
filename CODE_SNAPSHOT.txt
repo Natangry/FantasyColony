@@ -563,6 +563,9 @@ public class BuildPaletteHUD : MonoBehaviour
 
         GUILayout.Label("Stations", _label);
         GUILayout.Space(6f);
+        // Data-driven defs: show loaded XML defs count as a simple sanity check during bring-up.
+        GUILayout.Label("Defs loaded: " + FantasyColony.Defs.DefDatabase.TotalCount, _hint);
+
         _scroll = GUILayout.BeginScrollView(_scroll);
 
         // Construction Board entry
@@ -584,7 +587,7 @@ public class BuildPaletteHUD : MonoBehaviour
         if (bm.CurrentTool == BuildTool.PlaceConstructionBoard)
         {
             GUILayout.Space(6f);
-            GUILayout.Label("Tip: Move the mouse to position the ghost. Left-click to place, Right-click to cancel.", _hint);
+            GUILayout.Label("Tip: Move the mouse to position the ghost.\nLeft-click to place, Right-click to cancel.", _hint);
         }
 
         GUILayout.EndScrollView();
@@ -1737,106 +1740,270 @@ public static class PixelCameraHelper
 
 
 
-// ===== FILE: Assets/Scripts/Defs/Defs.cs =====
+// ===== FILE: Assets/Scripts/Defs/BuildingDef.cs =====
 using System;
+
+namespace FantasyColony.Defs
+{
+    /// <summary>
+    /// Building metadata consumed by placement, UI, and visuals. All logic remains in C#.
+    /// </summary>
+    [Serializable]
+    public class BuildingDef : Def
+    {
+        public int width = 1;
+        public int height = 1;
+        public bool unique = false;
+        public bool showInPalette = true;
+        public string visualRef; // defName of a Visual2DDef
+    }
+}
+
+namespace FantasyColony.Defs
+{
+    public static class BuildingDefKinds
+    {
+        public const string Root = "BuildingDef";
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Defs/Def.cs =====
+using System;
+
+namespace FantasyColony.Defs
+{
+    /// <summary>
+    /// Base class for all data-driven defs. All content lives in XML; behaviors live in C#.
+    /// </summary>
+    [Serializable]
+    public abstract class Def
+    {
+        public string defName;
+        public string modId; // set by loader based on the mod directory
+        public string[] tags; // optional authoring tags
+
+        public virtual string GetKindName() => GetType().Name;
+    }
+}
+
+namespace FantasyColony.Defs
+{
+    /// <summary>
+    /// Simple type discriminator for debugging/logging.
+    /// </summary>
+    public enum DefType
+    {
+        Unknown = 0,
+        Visual2D = 1,
+        Building = 2,
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Defs/DefDatabase.cs =====
 using System.Collections.Generic;
-using System.Xml.Serialization;
 using UnityEngine;
 
 namespace FantasyColony.Defs
 {
-    [XmlRoot("Defs")] public class BuildingDefSet { [XmlElement("Building")] public List<BuildingDef> Items = new(); }
-    [XmlRoot("Defs")] public class VisualDefSet   { [XmlElement("Visual")]   public List<VisualDef>   Items = new(); }
-
-    [Serializable]
-    public class BuildingDef
-    {
-        [XmlAttribute("id")] public string id;
-        [XmlElement("display_name")] public string display_name;
-        [XmlElement("size_x")] public int size_x = 1;
-        [XmlElement("size_y")] public int size_y = 1;
-        [XmlElement("unique")] public bool unique;
-        [XmlElement("visual_ref")] public string visual_ref;
-        [XmlArray("job_slots"), XmlArrayItem("slot")] public List<JobSlot> job_slots = new();
-        [XmlArray("cost"), XmlArrayItem("entry")] public List<CostEntry> cost = new();
-
-        [Serializable] public class JobSlot { [XmlAttribute("job")] public string job; [XmlAttribute("count")] public int count = 1; }
-        [Serializable] public class CostEntry { [XmlAttribute("res")] public string resource; [XmlAttribute("amt")] public int amount; }
-
-        public Vector2Int Size => new Vector2Int(Mathf.Max(1,size_x), Mathf.Max(1,size_y));
-    }
-
-    [Serializable]
-    public class VisualDef
-    {
-        [XmlAttribute("id")] public string id;
-        [XmlElement("plane")] public string plane = "XZ"; // "XY" or "XZ"
-        [XmlElement("render_layer")] public string render_layer = "Default"; // name or index
-        [XmlElement("color_rgba")] public string color_rgba = "#F3D95AFF"; // 8-digit RGBA hex
-        [XmlElement("shader_hint")] public string shader_hint = "URP/Unlit"; // URP/Unlit | Unlit/Color | StandardTransparent
-        [XmlElement("z_lift")] public float z_lift = 0.05f;
-
-        public Color Color => ColorUtility.TryParseHtmlString(color_rgba, out var c) ? c : new Color(0.95f,0.85f,0.35f,1f);
-        public GridPlane Plane => string.Equals(plane, "XY", StringComparison.OrdinalIgnoreCase) ? GridPlane.XY : GridPlane.XZ;
-    }
-}
-
-namespace FantasyColony.Defs
-{
+    /// <summary>
+    /// In-memory store for all loaded defs. Single source of truth.
+    /// </summary>
     public static class DefDatabase
     {
-        public static readonly Dictionary<string, BuildingDef> Buildings = new();
-        public static readonly Dictionary<string, VisualDef> Visuals = new();
+        private static readonly List<Visual2DDef> _visuals = new List<Visual2DDef>();
+        private static readonly List<BuildingDef> _buildings = new List<BuildingDef>();
 
+        public static IReadOnlyList<Visual2DDef> Visuals => _visuals;
+        public static IReadOnlyList<BuildingDef> Buildings => _buildings;
+
+        public static int TotalCount => _visuals.Count + _buildings.Count;
+
+        /// <summary>
+        /// Called from BuildBootstrap.Ensure() during startup.
+        /// </summary>
         public static void LoadAll()
         {
-            Buildings.Clear();
-            Visuals.Clear();
-            XmlDefLoader.LoadSet("Buildings", System.IO.Path.Combine(Application.streamingAssetsPath, "Defs/Buildings"), (BuildingDefSet set) =>
+            _visuals.Clear();
+            _buildings.Clear();
+
+            try
             {
-                foreach (var b in set.Items) if (!string.IsNullOrEmpty(b.id)) Buildings[b.id] = b;
-            });
-            XmlDefLoader.LoadSet("Visuals", System.IO.Path.Combine(Application.streamingAssetsPath, "Defs/Visuals"), (VisualDefSet set) =>
+                Xml.XmlDefLoader.LoadAll(_visuals, _buildings);
+                Debug.Log($"[Defs] Loaded {TotalCount} defs (visuals: {_visuals.Count}, buildings: {_buildings.Count}).");
+            }
+            catch (System.Exception ex)
             {
-                foreach (var v in set.Items) if (!string.IsNullOrEmpty(v.id)) Visuals[v.id] = v;
-            });
-            Debug.Log($"[Defs] Loaded Buildings={Buildings.Count}, Visuals={Visuals.Count} from {Application.streamingAssetsPath}");
+                Debug.LogError($"[Defs] LoadAll failed: {ex.Message}\n{ex.StackTrace}");
+            }
         }
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Defs/Visual2DDef.cs =====
+using System;
+
+namespace FantasyColony.Defs
+{
+    /// <summary>
+    /// 2D sprite visual definition. References art by path; registry will resolve at runtime.
+    /// </summary>
+    [Serializable]
+    public class Visual2DDef : Def
+    {
+        public string spritePath;   // e.g., "Sprites/Stations/ConstructionBoard"
+        public string sortingLayer = "Default";
+        public int sortingOrder = 0;
+        public float pivotX = 0.5f;
+        public float pivotY = 0.0f;
     }
 }
 
 namespace FantasyColony.Defs
 {
+    public static class Visual2DDefKinds
+    {
+        public const string Root = "Visual2DDef";
+    }
+}
+
+
+
+// ===== FILE: Assets/Scripts/Defs/Xml/XmlDefLoader.cs =====
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Xml;
+using System.Xml.Linq;
+using UnityEngine;
+
+namespace FantasyColony.Defs.Xml
+{
+    /// <summary>
+    /// Minimal XML loader for v0 bring-up. One def per file, root element name is the type.
+    /// </summary>
     public static class XmlDefLoader
     {
-        public static void LoadSet<T>(string kind, string folderAbs, Action<T> onLoaded)
+        public static void LoadAll(List<Visual2DDef> visuals, List<BuildingDef> buildings)
         {
-            try
+            foreach (var file in Mods.ModDiscovery.EnumerateDefXmlFiles())
             {
-                var path = folderAbs;
-                if (!System.IO.Directory.Exists(path))
+                try
                 {
-                    Debug.LogWarning($"[Defs] {kind} folder missing: {path}");
-                    return;
+                    string modId = new DirectoryInfo(Directory.GetParent(Directory.GetParent(file).FullName).FullName).Name; // Mods/<modId>/Defs/<...>/<file>
+                    using (var reader = CreateSafeXmlReader(file))
+                    {
+                        var doc = XDocument.Load(reader, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+                        var root = doc.Root;
+                        if (root == null)
+                            continue;
+
+                        switch (root.Name.LocalName)
+                        {
+                            case Visual2DDefKinds.Root:
+                                var v = ParseVisual2D(root);
+                                v.modId = modId;
+                                visuals.Add(v);
+                                break;
+                            case BuildingDefKinds.Root:
+                                var b = ParseBuilding(root);
+                                b.modId = modId;
+                                buildings.Add(b);
+                                break;
+                            default:
+                                Debug.LogWarning($"[Defs] Unknown root '{root.Name.LocalName}' in {Short(file)} – skipping.");
+                                break;
+                        }
+                    }
                 }
-                var files = System.IO.Directory.GetFiles(path, "*.xml", System.IO.SearchOption.AllDirectories);
-                foreach (var file in files)
+                catch (Exception ex)
                 {
-                    var doc = System.IO.File.ReadAllText(file);
-                    var ser = new XmlSerializer(typeof(T));
-                    using var sr = new System.IO.StringReader(doc);
-                    var obj = (T)ser.Deserialize(sr);
-                    onLoaded?.Invoke(obj);
+                    Debug.LogWarning($"[Defs] Failed to parse '{Short(file)}': {ex.Message}");
                 }
-                Debug.Log($"[Defs] {kind} loaded: {files.Length} files");
             }
-            catch (Exception e)
+        }
+
+        private static XmlReader CreateSafeXmlReader(string path)
+        {
+            var settings = new XmlReaderSettings
             {
-                Debug.LogError($"[Defs] Failed to load {kind}: {e.Message}\n{e}");
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null,
+                IgnoreComments = true,
+                IgnoreProcessingInstructions = true
+            };
+            return XmlReader.Create(path, settings);
+        }
+
+        private static string Short(string path)
+        {
+            return path.Replace(Application.dataPath, "Assets");
+        }
+
+        private static Visual2DDef ParseVisual2D(XElement root)
+        {
+            var v = new Visual2DDef();
+            v.defName = Value(root, nameof(Visual2DDef.defName), required: true);
+            v.spritePath = Value(root, nameof(Visual2DDef.spritePath), required: true);
+            v.sortingLayer = Value(root, nameof(Visual2DDef.sortingLayer), defaultValue: "Default");
+            v.sortingOrder = Int(root, nameof(Visual2DDef.sortingOrder), 0);
+            v.pivotX = Float(root, nameof(Visual2DDef.pivotX), 0.5f);
+            v.pivotY = Float(root, nameof(Visual2DDef.pivotY), 0.0f);
+            return v;
+        }
+
+        private static BuildingDef ParseBuilding(XElement root)
+        {
+            var b = new BuildingDef();
+            b.defName = Value(root, nameof(BuildingDef.defName), required: true);
+            b.width = Int(root, nameof(BuildingDef.width), 1);
+            b.height = Int(root, nameof(BuildingDef.height), 1);
+            b.unique = Bool(root, nameof(BuildingDef.unique), false);
+            b.showInPalette = Bool(root, nameof(BuildingDef.showInPalette), true);
+            b.visualRef = Value(root, nameof(BuildingDef.visualRef), required: false);
+            return b;
+        }
+
+        private static string Value(XElement root, string name, string defaultValue = null, bool required = false)
+        {
+            var e = root.Element(name);
+            if (e == null)
+            {
+                if (required)
+                    throw new Exception($"Missing <{name}> element.");
+                return defaultValue;
             }
+            return e.Value?.Trim();
+        }
+
+        private static int Int(XElement root, string name, int defaultValue)
+        {
+            var s = Value(root, name, defaultValue.ToString(CultureInfo.InvariantCulture), required: false);
+            return int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var v) ? v : defaultValue;
+        }
+
+        private static float Float(XElement root, string name, float defaultValue)
+        {
+            var s = Value(root, name, defaultValue.ToString(CultureInfo.InvariantCulture), required: false);
+            return float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : defaultValue;
+        }
+
+        private static bool Bool(XElement root, string name, bool defaultValue)
+        {
+            var s = Value(root, name, defaultValue ? "true" : "false", required: false);
+            if (string.Equals(s, "true", StringComparison.OrdinalIgnoreCase)) return true;
+            if (string.Equals(s, "false", StringComparison.OrdinalIgnoreCase)) return false;
+            return defaultValue;
         }
     }
 }
+
 
 
 // ===== FILE: Assets/Scripts/Jobs/JobService.cs =====
@@ -1942,6 +2109,57 @@ public static class JobTypeExt
 {
     public static string Name(this JobType t) => t.ToString();
 }
+
+
+// ===== FILE: Assets/Scripts/Mods/ModDiscovery.cs =====
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+
+namespace FantasyColony.Mods
+{
+    /// <summary>
+    /// Finds Mods and their Defs directories under StreamingAssets.
+    /// Load order: Core -> (other mods alphabetically)
+    /// </summary>
+    public static class ModDiscovery
+    {
+        public static IEnumerable<string> EnumerateDefXmlFiles()
+        {
+            var modsRoot = Path.Combine(Application.streamingAssetsPath, "Mods");
+            if (!Directory.Exists(modsRoot))
+                yield break;
+
+            // Core first if present
+            var core = Path.Combine(modsRoot, "Core");
+            if (Directory.Exists(core))
+            {
+                foreach (var f in EnumerateDefFiles(core))
+                    yield return f;
+            }
+
+            // Then other mods alphabetically
+            foreach (var modDir in Directory.GetDirectories(modsRoot).OrderBy(p => p))
+            {
+                if (Path.GetFileName(modDir) == "Core")
+                    continue;
+                foreach (var f in EnumerateDefFiles(modDir))
+                    yield return f;
+            }
+        }
+
+        private static IEnumerable<string> EnumerateDefFiles(string modDir)
+        {
+            var defsDir = Path.Combine(modDir, "Defs");
+            if (!Directory.Exists(defsDir))
+                yield break;
+            foreach (var f in Directory.GetFiles(defsDir, "*.xml", SearchOption.AllDirectories))
+                yield return f;
+        }
+    }
+}
+
 
 
 // ===== FILE: Assets/Scripts/Pawns/PawnJob.cs =====
