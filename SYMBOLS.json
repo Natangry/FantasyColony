@@ -717,49 +717,43 @@
     "kind": "class",
     "name": "VisualDefExtensions",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 47
+    "line": 57
   },
   {
     "kind": "method",
-    "name": "Color",
+    "name": "ParseColor",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 21
+    "line": 24
   },
   {
     "kind": "method",
-    "name": "Plane",
+    "name": "ParseFloat",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 31
+    "line": 46
   },
   {
     "kind": "method",
-    "name": "Plane",
+    "name": "ParsePlane",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 36
-  },
-  {
-    "kind": "method",
-    "name": "Parse",
-    "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 41
+    "line": 50
   },
   {
     "kind": "method",
     "name": "Value",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 49
+    "line": 59
   },
   {
     "kind": "method",
     "name": "Value",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 61
+    "line": 71
   },
   {
     "kind": "method",
     "name": "Value",
     "file": "Assets/Scripts/Defs/VisualDef.cs",
-    "line": 69
+    "line": 79
   },
   {
     "kind": "namespace",
@@ -951,37 +945,37 @@
     "kind": "method",
     "name": "SpawnGhost",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 38
+    "line": 51
   },
   {
     "kind": "method",
     "name": "SpawnPlaced",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 46
+    "line": 59
   },
   {
     "kind": "method",
     "name": "MakeSpritePrefab",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 54
+    "line": 67
   },
   {
     "kind": "method",
     "name": "SizeAndPlace",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 67
+    "line": 80
   },
   {
     "kind": "method",
     "name": "EnsureWhiteSprite",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 75
+    "line": 88
   },
   {
     "kind": "method",
     "name": "DetectSortingLayer",
     "file": "Assets/Scripts/Rendering/SpriteVisualFactory2D.cs",
-    "line": 83
+    "line": 96
   },
   {
     "kind": "class",
@@ -1035,43 +1029,43 @@
     "kind": "method",
     "name": "SpawnGhost",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 28
+    "line": 41
   },
   {
     "kind": "method",
     "name": "SpawnPlaced",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 36
+    "line": 65
   },
   {
     "kind": "method",
     "name": "MakeQuadPrefab",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 44
+    "line": 89
   },
   {
     "kind": "method",
     "name": "MakeMaterial",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 58
+    "line": 103
   },
   {
     "kind": "method",
     "name": "Orient",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 81
+    "line": 129
   },
   {
     "kind": "method",
     "name": "LayerFromNameOrIndex",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 99
+    "line": 147
   },
   {
     "kind": "method",
     "name": "PickVisibleLayer",
     "file": "Assets/Scripts/Rendering/VisualRegistry.cs",
-    "line": 107
+    "line": 155
   },
   {
     "kind": "class",
