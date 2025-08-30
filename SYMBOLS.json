@@ -33,25 +33,25 @@
     "kind": "class",
     "name": "AppBootstrapRunner",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 217
+    "line": 230
   },
   {
     "kind": "method",
     "name": "IsIntroVisible",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 33
+    "line": 34
   },
   {
     "kind": "method",
     "name": "ShowIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 44
+    "line": 47
   },
   {
     "kind": "method",
     "name": "HideIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 54
+    "line": 57
   },
   {
     "kind": "class",
@@ -136,6 +136,12 @@
     "name": "RebootToIntro",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
     "line": 8
+  },
+  {
+    "kind": "interface",
+    "name": "IIntroOverlay",
+    "file": "Assets/Scripts/Boot/IIntroOverlay.cs",
+    "line": 1
   },
   {
     "kind": "class",
