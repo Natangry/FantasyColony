@@ -99,6 +99,7 @@ public static class AppBootstrap
         var all = UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var mb in all)
         {
+            if (mb is IntroScreen) continue;
             var n = mb.GetType().Name.ToLowerInvariant();
             if (IntroTypeHints.Any(h => n.Contains(h))) return mb;
         }
