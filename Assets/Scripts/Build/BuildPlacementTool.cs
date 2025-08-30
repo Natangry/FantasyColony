@@ -107,8 +107,8 @@ public class BuildPlacementTool : MonoBehaviour
     {
         var scale = ComputeScaleForSprite(spriteOrNull, def);
         go.transform.localScale = scale;
-        // Lay the sprite flat on XZ ground (face +Y)
-        go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        // Lay the sprite flat on XZ ground (face camera looking down -Y)
+        go.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
         // keep y slightly above ground to avoid z-fighting
     }
 
