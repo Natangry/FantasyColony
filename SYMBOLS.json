@@ -33,25 +33,25 @@
     "kind": "class",
     "name": "AppBootstrapRunner",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 203
+    "line": 204
   },
   {
     "kind": "method",
     "name": "IsIntroVisible",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 32
+    "line": 33
   },
   {
     "kind": "method",
     "name": "ShowIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 43
+    "line": 44
   },
   {
     "kind": "method",
     "name": "HideIntroOverlay",
     "file": "Assets/Scripts/Boot/AppBootstrap.cs",
-    "line": 53
+    "line": 54
   },
   {
     "kind": "class",
@@ -1281,31 +1281,31 @@
     "kind": "class",
     "name": "IntroMenuOverlay",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 11
+    "line": 15
   },
   {
     "kind": "enum",
     "name": "MapSize",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 14
+    "line": 18
   },
   {
     "kind": "method",
     "name": "Ensure",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 23
+    "line": 27
   },
   {
     "kind": "method",
     "name": "Show",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 29
+    "line": 34
   },
   {
     "kind": "method",
     "name": "Hide",
     "file": "Assets/Scripts/UI/IntroMenuOverlay.cs",
-    "line": 35
+    "line": 41
   },
   {
     "kind": "class",
@@ -1341,31 +1341,37 @@
     "kind": "class",
     "name": "PauseMenuController",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 12
+    "line": 13
   },
   {
     "kind": "method",
     "name": "Toggle",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 52
+    "line": 53
   },
   {
     "kind": "method",
     "name": "Show",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 58
+    "line": 59
   },
   {
     "kind": "method",
     "name": "Hide",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 67
+    "line": 68
+  },
+  {
+    "kind": "method",
+    "name": "HideIfPresent",
+    "file": "Assets/Scripts/UI/PauseMenuController.cs",
+    "line": 187
   },
   {
     "kind": "property",
     "name": "IsPaused",
     "file": "Assets/Scripts/UI/PauseMenuController.cs",
-    "line": 14
+    "line": 15
   },
   {
     "kind": "class",

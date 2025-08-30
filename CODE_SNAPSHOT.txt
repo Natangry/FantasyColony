@@ -235,6 +235,7 @@ public static class AppBootstrap
         // Always ensure our own overlay exists and is shown (Large default)
         IntroMenuOverlay.Ensure();
         IntroMenuOverlay.Show();
+        PauseMenuController.HideIfPresent();
         MakeRunner(); // ensures we also re-check shortly after boot
         TryShowIntroOverlay("AfterAssembliesLoaded");
         SceneManager.activeSceneChanged += (_, __) => TryShowIntroOverlay("activeSceneChanged");
@@ -4204,6 +4205,10 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem.UI;
+#endif
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Scene-less Intro overlay (uGUI) with Map Size presets and Start/Quit.
@@ -4225,11 +4230,13 @@ public class IntroMenuOverlay : MonoBehaviour
     public static void Ensure()
     {
         if (_root != null) return;
+        EnsureEventSystem();
         BuildUI();
     }
 
     public static void Show()
     {
+        HidePauseIfOpen();
         Ensure();
         _root.SetActive(true);
     }
@@ -4237,6 +4244,39 @@ public class IntroMenuOverlay : MonoBehaviour
     public static void Hide()
     {
         if (_root != null) _root.SetActive(false);
+    }
+
+    static void EnsureEventSystem()
+    {
+        var es = UnityEngine.Object.FindFirstObjectByType<EventSystem>();
+        if (es == null)
+        {
+            var go = new GameObject("EventSystem", typeof(EventSystem));
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            es = go.GetComponent<EventSystem>();
+        }
+        // Ensure appropriate input module
+#if ENABLE_INPUT_SYSTEM
+        var old = es.GetComponent<StandaloneInputModule>();
+        if (old != null) UnityEngine.Object.Destroy(old);
+        if (es.GetComponent<InputSystemUIInputModule>() == null)
+            es.gameObject.AddComponent<InputSystemUIInputModule>();
+#else
+        if (es.GetComponent<StandaloneInputModule>() == null)
+            es.gameObject.AddComponent<StandaloneInputModule>();
+#endif
+    }
+
+    static void HidePauseIfOpen()
+    {
+        var pm = UnityEngine.Object.FindFirstObjectByType<PauseMenuController>();
+        if (pm != null)
+        {
+            try { pm.Hide(); } catch { /* ignore */ }
+        }
+        // Ensure unpaused
+        if (Time.timeScale != 1f)
+            Time.timeScale = 1f;
     }
 
     static void BuildUI()
@@ -4649,6 +4689,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 #endif
 
 /// <summary>
@@ -4729,6 +4770,16 @@ public class PauseMenuController : MonoBehaviour
             es.AddComponent<StandaloneInputModule>();
             DontDestroyOnLoad(es);
         }
+#if ENABLE_INPUT_SYSTEM
+        // Prefer the new Input System UI module when available
+        var esRef = FindFirstObjectByType<EventSystem>();
+        if (esRef != null)
+        {
+            var old = esRef.GetComponent<StandaloneInputModule>();
+            if (old != null) Destroy(old);
+            if (esRef.GetComponent<InputSystemUIInputModule>() == null) esRef.gameObject.AddComponent<InputSystemUIInputModule>();
+        }
+#endif
 
         _root = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         DontDestroyOnLoad(_root);
@@ -4817,6 +4868,12 @@ public class PauseMenuController : MonoBehaviour
         t.text = s;
         t.raycastTarget = false;
         return t;
+    }
+
+    public static void HideIfPresent()
+    {
+        var pm = FindFirstObjectByType<PauseMenuController>();
+        if (pm != null) pm.Hide();
     }
 }
 
