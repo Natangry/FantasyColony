@@ -127,20 +127,23 @@ public class BuildPlacementTool : MonoBehaviour
             ghostGO.transform.position = pos + new Vector3(0f, 0.02f, 0f);
         }
 
-        // Cancel with right-click or Esc (both input systems)
+        // Cancel with right-click or X (both input systems)
         bool cancel = false;
 #if ENABLE_INPUT_SYSTEM
         if (Mouse.current != null) cancel |= Mouse.current.rightButton.wasPressedThisFrame;
-        if (Keyboard.current != null) cancel |= Keyboard.current.escapeKey.wasPressedThisFrame;
+        if (Keyboard.current != null) cancel |= Keyboard.current.xKey.wasPressedThisFrame; // X key for cancel ghost
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
-        cancel |= Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape);
+        cancel |= Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.X);
 #endif
         if (cancel)
         {
             ClearTool();
             return;
         }
+
+        // If paused, do nothing
+        if (PauseMenuController.IsPaused) return;
 
         // Click to place (single click after time gate)
         if (Time.realtimeSinceStartup < blockClicksUntil)
