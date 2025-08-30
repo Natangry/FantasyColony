@@ -40,6 +40,7 @@ public class IntroMenuOverlay : MonoBehaviour
     public static void Hide()
     {
         if (_root != null) _root.SetActive(false);
+        BuildUIBootstrap.EnsureForCurrentScene();
     }
 
     static void EnsureEventSystem()
