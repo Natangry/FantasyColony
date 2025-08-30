@@ -1,0 +1,13 @@
+{
+  "name": "FantasyColony.Tests.EditMode",
+  "references": [
+    "FantasyColony.Core",
+    "FantasyColony.World",
+    "FantasyColony.Gameplay",
+    "FantasyColony.UI"
+  ],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false,
+  "noEngineReferences": false
+}

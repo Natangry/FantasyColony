@@ -1,0 +1,10 @@
+{
+  "id": "example.mod.template",
+  "name": "Example Template Mod",
+  "version": "1.0.0",
+  "author": "YourName",
+  "description": "Template showing folder layout and defs grouping.",
+  "dependencies": [],
+  "loadBefore": [],
+  "loadAfter": []
+}
