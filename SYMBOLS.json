@@ -1251,43 +1251,31 @@
     "kind": "class",
     "name": "IntroScreen",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 2
+    "line": 7
   },
   {
     "kind": "method",
-    "name": "OnEnable",
+    "name": "SetVisible",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 32
+    "line": 26
   },
   {
     "kind": "method",
-    "name": "OnDisable",
+    "name": "ShowIntro",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 34
+    "line": 36
   },
   {
-    "kind": "method",
-    "name": "EnsureStyles",
+    "kind": "property",
+    "name": "Instance",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 35
-  },
-  {
-    "kind": "method",
-    "name": "OnGUI",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 106
-  },
-  {
-    "kind": "method",
-    "name": "OnStartGame",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 190
+    "line": 9
   },
   {
     "kind": "property",
     "name": "IsVisible",
     "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 6
+    "line": 10
   },
   {
     "kind": "class",
