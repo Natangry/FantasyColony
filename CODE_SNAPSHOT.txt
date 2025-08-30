@@ -1172,8 +1172,8 @@ public static class TestMapStarter
 
     private static void EnsurePawnInteractionManager()
     {
-        var existing = UnityEngine.Object.FindObjectOfType<MonoBehaviour>(true);
-        var pim = UnityEngine.Object.FindObjectOfType<PawnInteractionManager>(true);
+        _ = UnityEngine.Object.FindFirstObjectByType<MonoBehaviour>(UnityEngine.FindObjectsInactive.Include);
+        var pim = UnityEngine.Object.FindFirstObjectByType<PawnInteractionManager>(UnityEngine.FindObjectsInactive.Include);
         if (pim != null) return;
 
         var root = GameObject.Find("GameSystems (Auto)") ?? new GameObject("GameSystems (Auto)");
