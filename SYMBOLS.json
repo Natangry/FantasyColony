@@ -1785,7 +1785,7 @@
     "kind": "method",
     "name": "NormalizeOrder",
     "file": "Tools/XmlDefsTools/Emit/TemplateSynthesizer.cs",
-    "line": 85
+    "line": 87
   },
   {
     "kind": "namespace",
