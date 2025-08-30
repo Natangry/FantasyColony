@@ -4,6 +4,9 @@ using System.Linq;
 using UnityEngine.SceneManagement;
 using System;
 using UnityObject = UnityEngine.Object;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// Minimal placement tool for the Construction Board bring-up:
@@ -49,8 +52,13 @@ public class BuildPlacementTool : MonoBehaviour
             // Position ghost immediately under cursor (no first-frame origin flicker)
             cam = GetActiveCamera();
             groundPlane = new Plane(Vector3.up, GetGroundY());
-            if (TryGetCursorHit(out var hit))
-                ghostGO.transform.position = SnapToGridXZ(hit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
+            var mp = GetMouseScreenPos();
+            if (TryGetCursorHitRaw(mp, out var hit))
+            {
+                var world = SnapToGridXZ(hit, ctrl.SelectedBuildingDef);
+                ghostGO.transform.position = world + new Vector3(0f, 0.02f, 0f);
+                Debug.Log($"[Build] Arm: mouse {mp} -> world {world}");
+            }
             else if (TryGetCenterHit(out var centerHit))
                 ghostGO.transform.position = SnapToGridXZ(centerHit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
             else
@@ -110,6 +118,51 @@ public class BuildPlacementTool : MonoBehaviour
     }
 
     Vector3 lastValidWorld;
+
+    Vector3 GetMouseScreenPos()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null) return (Vector3)Mouse.current.position.ReadValue();
+#endif
+        return Input.mousePosition;
+    }
+
+    bool TryGetCursorHit(out Vector3 hit)
+    {
+        hit = default;
+        if (cam == null) cam = GetActiveCamera();
+        if (cam == null) return false;
+        var mp = GetMouseScreenPos();
+        var ray = cam.ScreenPointToRay(mp);
+        if (!groundPlane.Raycast(ray, out var enter)) return false;
+        hit = ray.GetPoint(enter); // y == plane height
+        lastValidWorld = hit;
+        return true;
+    }
+
+    bool TryGetCursorHitRaw(Vector3 screenPos, out Vector3 hit)
+    {
+        hit = default;
+        if (cam == null) cam = GetActiveCamera();
+        if (cam == null) return false;
+        var ray = cam.ScreenPointToRay(screenPos);
+        if (!groundPlane.Raycast(ray, out var enter)) return false;
+        hit = ray.GetPoint(enter); // y == plane height
+        lastValidWorld = hit;
+        return true;
+    }
+
+    bool TryGetCenterHit(out Vector3 hit)
+    {
+        hit = default;
+        var center = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
+        var camRef = GetActiveCamera();
+        if (camRef == null) return false;
+        var ray = camRef.ScreenPointToRay(center);
+        if (ray.direction == Vector3.zero) return false;
+        if (!groundPlane.Raycast(ray, out var enter)) return false;
+        hit = ray.GetPoint(enter); lastValidWorld = hit; return true;
+    }
 
     Camera GetActiveCamera()
     {
@@ -184,7 +237,7 @@ public class BuildPlacementTool : MonoBehaviour
         var scale = ComputeScaleForSprite(spriteOrNull, def);
         go.transform.localScale = scale;
         // Lay the sprite flat on XZ ground (face camera looking down -Y)
-        go.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+        go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         // keep y slightly above ground to avoid z-fighting
     }
 
@@ -249,29 +302,6 @@ public class BuildPlacementTool : MonoBehaviour
         float x = Mathf.Floor(world.x / tileSize) * tileSize + (w * 0.5f) - (tileSize * 0.5f);
         float z = Mathf.Floor(world.z / tileSize) * tileSize + (d * 0.5f) - (tileSize * 0.5f);
         return new Vector3(x, 0f, z);
-    }
-
-    bool TryGetCursorHit(out Vector3 hit)
-    {
-        hit = default;
-        if (cam == null) cam = GetActiveCamera();
-        if (cam == null) return false;
-        var ray = cam.ScreenPointToRay(Input.mousePosition);
-        if (!groundPlane.Raycast(ray, out var enter)) return false;
-        hit = ray.GetPoint(enter); // y == plane height
-        lastValidWorld = hit;
-        return true;
-    }
-
-    // If we fail to get a hit on arm, use the screen center as a reasonable default
-    bool TryGetCenterHit(out Vector3 hit)
-    {
-        hit = default;
-        var center = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
-        var ray = GetActiveCamera()?.ScreenPointToRay(center);
-        if (ray == null) return false;
-        if (!groundPlane.Raycast(ray.Value, out var enter)) return false;
-        hit = ray.Value.GetPoint(enter); lastValidWorld = hit; return true;
     }
 
     void EnsureGhost(BuildingDef def)
