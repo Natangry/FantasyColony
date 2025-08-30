@@ -8,14 +8,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Scan\XmlDefScanner.cs" />
-    <Compile Include="Emit\XmlIndexWriter.cs" />
-    <Compile Include="Emit\XmlSnapshotWriter.cs" />
-    <Compile Include="Emit\TemplateSynthesizer.cs" />
-    <Compile Include="Util\CanonicalXml.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Config\SchemaOrder.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
