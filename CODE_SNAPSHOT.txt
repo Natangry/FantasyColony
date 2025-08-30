@@ -187,6 +187,7 @@ public static class BuildBootstrap
         if (go == null)
         {
             go = new GameObject("BuildSystems (Auto)");
+            Object.DontDestroyOnLoad(go);
         }
 
         if (go.GetComponent<BuildModeController>() == null)
@@ -215,6 +216,7 @@ public static class BuildBootstrap
             hud = new GameObject("BuildHUD (Auto)");
             hud.AddComponent<BuildHUD>();
             hud.AddComponent<BuildPaletteHUD>();
+            Object.DontDestroyOnLoad(hud);
             Debug.Log("[BuildBootstrap] Spawned BuildHUD + Palette");
         }
 
@@ -579,6 +581,13 @@ public class BuildHUD : MonoBehaviour
 
     void OnGUI()
     {
+        // Hide on intro/title screens if an IntroScreen surface exists and is visible.
+        try
+        {
+            var intro = FindAnyObjectByType<IntroScreen>();
+            if (intro != null && intro.isActiveAndEnabled) return;
+        } catch { /* safe if class not present */ }
+
         var ctrl = Ctrl;
         if (ctrl == null)
         {
@@ -720,9 +729,9 @@ public class BuildPaletteHUD : MonoBehaviour
 
     Rect GetPanelRect()
     {
-        // Responsive panel sizing for high-DPI / large resolutions
-        float w = Mathf.Clamp(Screen.width * 0.28f, 420f, 760f);
-        float h = Mathf.Clamp(Screen.height * 0.62f, 540f, 980f);
+        // More aggressive sizing for high-DPI / large resolutions
+        float w = Mathf.Max(520f, Screen.width * 0.38f);
+        float h = Mathf.Max(600f, Screen.height * 0.72f);
         return new Rect(16, 64, w, h);
     }
 
@@ -738,6 +747,7 @@ public class BuildPaletteHUD : MonoBehaviour
         GUILayout.BeginArea(_panelRect, GUI.skin.window);
         var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
         GUILayout.Label("Build Palette" + activeName);
+        GUILayout.Label("Click a def to arm the tool, then left-click ground to place. Esc cancels.");
 
         // Try to enumerate building defs (fallback to a single Construction Board def if database not ready)
         var defs = GetPaletteDefs();
@@ -745,8 +755,8 @@ public class BuildPaletteHUD : MonoBehaviour
         foreach (var def in defs)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(200));
-            if (GUILayout.Button("Select", GUILayout.Width(80)))
+            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(240));
+            if (GUILayout.Button("Select", GUILayout.Width(140)))
             {
                 // For now we only have a placement tool for Construction Board.
                 // Down the road this can dispatch different tools per def.category/type.
@@ -823,6 +833,8 @@ public class BuildPlacementTool : MonoBehaviour
     BuildTool active = BuildTool.None;
 
     readonly Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0
+    // Prevent click-through after arming tool from a UI button press
+    bool suppressClickUntilMouseUp = false;
 
     void Start()
     {
@@ -836,7 +848,13 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureGhostDestroyed();
         if (active == BuildTool.PlaceConstructionBoard && ctrl.SelectedBuildingDef != null)
         {
+            suppressClickUntilMouseUp = true; // wait for left mouse to be released once
             EnsureGhost(ctrl.SelectedBuildingDef);
+            // Position ghost immediately under cursor (no first-frame origin flicker)
+            if (cam == null) cam = Camera.main;
+            if (TryGetCursorHit(out var hit))
+                ghostGO.transform.position = SnapToGridXZ(hit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
+            Debug.Log("[Build] Tool armed for " + (ctrl.SelectedBuildingDef.defName ?? "Unknown"));
         }
     }
 
@@ -853,19 +871,21 @@ public class BuildPlacementTool : MonoBehaviour
         }
 
         // Move ghost to snapped mouse position
-        var ray = cam.ScreenPointToRay(Input.mousePosition);
-        Vector3 hit;
-        if (!groundPlane.Raycast(ray, out var enter))
+        if (!TryGetCursorHit(out var hit))
             return;
-        hit = ray.GetPoint(enter); // y == 0 plane
         var snapped = SnapToGridXZ(hit, def);
         if (ghostGO != null)
         {
-            ghostGO.transform.position = snapped;
+            ghostGO.transform.position = snapped + new Vector3(0f, 0.02f, 0f);
         }
 
         // Click to place
-        if (Input.GetMouseButtonDown(0))
+        // Ignore the initial click that selected the tool (click-through from UI)
+        if (suppressClickUntilMouseUp)
+        {
+            if (Input.GetMouseButtonUp(0)) suppressClickUntilMouseUp = false;
+        }
+        else if (Input.GetMouseButtonDown(0))
         {
             TryPlace(def, snapped);
         }
@@ -939,10 +959,19 @@ public class BuildPlacementTool : MonoBehaviour
         // Visuals: prefer real sprite from VisualDef.spritePath; fall back to white unit
         var sr = go.AddComponent<SpriteRenderer>();
         var spr = LoadSpriteFor(def);
-        if (spr != null) sr.sprite = spr; else sr.sprite = MakeUnitSprite();
+        if (spr != null)
+        {
+            sr.sprite = spr;
+        }
+        else
+        {
+            Debug.LogWarning("[Build] Sprite not found at Resources/" + (GetVisualDefFor(def)?.spritePath ?? "(null)") + ".png — using white fallback.");
+            sr.sprite = MakeUnitSprite();
+        }
         ApplyScaleForSpriteOrFallbackXZ(go, def, spr);
+        sr.sortingOrder = 100;
         // Set final position on ground with slight epsilon to avoid z-fighting
-        go.transform.position = new Vector3(pos.x, 0.01f, pos.z);
+        go.transform.position = new Vector3(pos.x, 0.03f, pos.z); // slight epsilon
 
         ClearTool(); // place once for MVP
     }
@@ -963,6 +992,17 @@ public class BuildPlacementTool : MonoBehaviour
         return new Vector3(x, 0f, z);
     }
 
+    bool TryGetCursorHit(out Vector3 hit)
+    {
+        hit = default;
+        if (cam == null) cam = Camera.main;
+        if (cam == null) return false;
+        var ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (!groundPlane.Raycast(ray, out var enter)) return false;
+        hit = ray.GetPoint(enter); // y == 0 plane
+        return true;
+    }
+
     void EnsureGhost(BuildingDef def)
     {
         EnsureGhostDestroyed();
@@ -981,6 +1021,7 @@ public class BuildPlacementTool : MonoBehaviour
         c.a = ghostAlpha;
         ghostSr.color = c;
         ApplyScaleForSpriteOrFallbackXZ(ghostGO, def, spr);
+        ghostSr.sortingOrder = 200;
     }
 
     void EnsureGhostDestroyed()
