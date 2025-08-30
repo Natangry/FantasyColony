@@ -312,6 +312,7 @@ public static class AppBootstrap
         foreach (var mb in all)
         {
             if (mb is IntroScreen) continue;
+            if (mb is PauseMenuController) continue;
             var n = mb.GetType().Name.ToLowerInvariant();
             if (IntroTypeHints.Any(h => n.Contains(h))) return mb;
         }
