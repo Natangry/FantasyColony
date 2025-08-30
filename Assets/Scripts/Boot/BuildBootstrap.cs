@@ -20,6 +20,7 @@ public static class BuildBootstrap
         if (go == null)
         {
             go = new GameObject("BuildSystems (Auto)");
+            Object.DontDestroyOnLoad(go);
         }
 
         if (go.GetComponent<BuildModeController>() == null)
@@ -48,6 +49,7 @@ public static class BuildBootstrap
             hud = new GameObject("BuildHUD (Auto)");
             hud.AddComponent<BuildHUD>();
             hud.AddComponent<BuildPaletteHUD>();
+            Object.DontDestroyOnLoad(hud);
             Debug.Log("[BuildBootstrap] Spawned BuildHUD + Palette");
         }
 

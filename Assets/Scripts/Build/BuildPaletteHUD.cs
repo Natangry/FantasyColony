@@ -11,9 +11,9 @@ public class BuildPaletteHUD : MonoBehaviour
 
     Rect GetPanelRect()
     {
-        // Responsive panel sizing for high-DPI / large resolutions
-        float w = Mathf.Clamp(Screen.width * 0.28f, 420f, 760f);
-        float h = Mathf.Clamp(Screen.height * 0.62f, 540f, 980f);
+        // More aggressive sizing for high-DPI / large resolutions
+        float w = Mathf.Max(520f, Screen.width * 0.38f);
+        float h = Mathf.Max(600f, Screen.height * 0.72f);
         return new Rect(16, 64, w, h);
     }
 
@@ -29,6 +29,7 @@ public class BuildPaletteHUD : MonoBehaviour
         GUILayout.BeginArea(_panelRect, GUI.skin.window);
         var activeName = (Ctrl.SelectedBuildingDef != null) ? $" – Selected: {Ctrl.SelectedBuildingDef.label ?? Ctrl.SelectedBuildingDef.defName}" : "";
         GUILayout.Label("Build Palette" + activeName);
+        GUILayout.Label("Click a def to arm the tool, then left-click ground to place. Esc cancels.");
 
         // Try to enumerate building defs (fallback to a single Construction Board def if database not ready)
         var defs = GetPaletteDefs();
@@ -36,8 +37,8 @@ public class BuildPaletteHUD : MonoBehaviour
         foreach (var def in defs)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(200));
-            if (GUILayout.Button("Select", GUILayout.Width(80)))
+            GUILayout.Label(def.label ?? def.defName, GUILayout.Width(240));
+            if (GUILayout.Button("Select", GUILayout.Width(140)))
             {
                 // For now we only have a placement tool for Construction Board.
                 // Down the road this can dispatch different tools per def.category/type.
