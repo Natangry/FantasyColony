@@ -1,5 +1,6 @@
 using UnityEngine;
 using FantasyColony.Defs;
+using System.Linq;
 using UnityObject = UnityEngine.Object;
 
 /// <summary>
@@ -67,6 +68,33 @@ public class BuildPlacementTool : MonoBehaviour
         }
     }
 
+    VisualDef GetVisualDefFor(BuildingDef def)
+    {
+        if (def == null) return null;
+        if (string.IsNullOrEmpty(def.visualRef)) return null;
+        if (DefDatabase.Visuals == null) return null;
+        return DefDatabase.Visuals.FirstOrDefault(v => v.defName == def.visualRef);
+    }
+
+    Sprite LoadSpriteFor(BuildingDef def)
+    {
+        var v = GetVisualDefFor(def);
+        if (v != null && !string.IsNullOrEmpty(v.spritePath))
+        {
+            var s = Resources.Load<Sprite>(v.spritePath);
+            if (s != null) return s;
+        }
+        return null;
+    }
+
+    void ApplyScaleForSpriteOrFallback(GameObject go, BuildingDef def, Sprite spriteOrNull)
+    {
+        if (spriteOrNull != null)
+            go.transform.localScale = Vector3.one; // rely on sprite PPU (hi-res 64 PPU)
+        else
+            go.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f); // fallback white unit sprite
+    }
+
     void TryPlace(BuildingDef def, Vector3 pos)
     {
         // For MVP: explicitly handle uniqueness for ConstructionBoard
@@ -95,10 +123,11 @@ public class BuildPlacementTool : MonoBehaviour
         // If your ConstructionBoard has an OnPlaced API, you can call it here:
         // board.OnPlaced(new Vector2Int(def.width, def.height), tileSize);
 
-        // Make a very simple visual for MVP if no sprite system is wired yet
+        // Visuals: prefer real sprite from VisualDef.spritePath; fall back to white unit
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = MakeUnitSprite();
-        go.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f);
+        var spr = LoadSpriteFor(def);
+        if (spr != null) sr.sprite = spr; else sr.sprite = MakeUnitSprite();
+        ApplyScaleForSpriteOrFallback(go, def, spr);
 
         ClearTool(); // place once for MVP
     }
@@ -124,11 +153,19 @@ public class BuildPlacementTool : MonoBehaviour
         EnsureGhostDestroyed();
         ghostGO = new GameObject("Ghost_" + (def.label ?? def.defName));
         ghostSr = ghostGO.AddComponent<SpriteRenderer>();
-        ghostSr.sprite = MakeUnitSprite();
+        var spr = LoadSpriteFor(def);
+        if (spr != null)
+        {
+            ghostSr.sprite = spr;
+        }
+        else
+        {
+            ghostSr.sprite = MakeUnitSprite();
+        }
         var c = ghostSr.color;
         c.a = ghostAlpha;
         ghostSr.color = c;
-        ghostGO.transform.localScale = new Vector3(def.width * tileSize, def.height * tileSize, 1f);
+        ApplyScaleForSpriteOrFallback(ghostGO, def, spr);
     }
 
     void EnsureGhostDestroyed()

@@ -6,7 +6,7 @@
     <width>3</width>
     <height>1</height>
     <unique>true</unique>
-    <allowedRotations>N,E,S,W</allowedRotations>
+    <allowedRotations>N</allowedRotations>
     <workToBuild>2.0</workToBuild>
     <interactTags>
       <li>construction</li>
