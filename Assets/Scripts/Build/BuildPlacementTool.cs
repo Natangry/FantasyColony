@@ -1,6 +1,7 @@
 using UnityEngine;
 using FantasyColony.Defs;
 using System.Linq;
+using UnityEngine.SceneManagement;
 using System;
 using UnityObject = UnityEngine.Object;
 
@@ -24,14 +25,15 @@ public class BuildPlacementTool : MonoBehaviour
     Camera cam;
     BuildTool active = BuildTool.None;
 
-    readonly Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0
+    Plane groundPlane = new Plane(Vector3.up, 0f); // XZ ground at y=0 (adjustable)
     // Prevent click-through after arming tool from a UI button press
     bool suppressClickUntilMouseUp = false;
+    float armBlockUntilTime = 0f;
 
     void Start()
     {
         ctrl = GetComponent<BuildModeController>();
-        cam  = Camera.main;
+        cam  = GetActiveCamera();
     }
 
     public void SetTool(BuildTool tool)
@@ -41,9 +43,11 @@ public class BuildPlacementTool : MonoBehaviour
         if (active == BuildTool.PlaceConstructionBoard && ctrl.SelectedBuildingDef != null)
         {
             suppressClickUntilMouseUp = true; // wait for left mouse to be released once
+            armBlockUntilTime = Time.realtimeSinceStartup + 0.12f;
             EnsureGhost(ctrl.SelectedBuildingDef);
             // Position ghost immediately under cursor (no first-frame origin flicker)
-            if (cam == null) cam = Camera.main;
+            cam = GetActiveCamera();
+            groundPlane = new Plane(Vector3.up, GetGroundY());
             if (TryGetCursorHit(out var hit))
                 ghostGO.transform.position = SnapToGridXZ(hit, ctrl.SelectedBuildingDef) + new Vector3(0f, 0.02f, 0f);
             Debug.Log("[Build] Tool armed for " + (ctrl.SelectedBuildingDef.defName ?? "Unknown"));
@@ -53,7 +57,8 @@ public class BuildPlacementTool : MonoBehaviour
     void Update()
     {
         if (active == BuildTool.None) return;
-        if (cam == null) cam = Camera.main;
+        if (cam == null || !cam.isActiveAndEnabled) cam = GetActiveCamera();
+        groundPlane = new Plane(Vector3.up, GetGroundY());
 
         var def = ctrl.SelectedBuildingDef;
         if (def == null)
@@ -75,7 +80,8 @@ public class BuildPlacementTool : MonoBehaviour
         // Ignore the initial click that selected the tool (click-through from UI)
         if (suppressClickUntilMouseUp)
         {
-            if (Input.GetMouseButtonUp(0)) suppressClickUntilMouseUp = false;
+            if (Input.GetMouseButtonUp(0) && Time.realtimeSinceStartup >= armBlockUntilTime)
+                suppressClickUntilMouseUp = false;
         }
         else if (Input.GetMouseButtonDown(0))
         {
@@ -92,6 +98,21 @@ public class BuildPlacementTool : MonoBehaviour
         float sx = (def.width  * tileSize) / Mathf.Max(0.0001f, spriteWorldWidth);
         float sy = (def.height * tileSize) / Mathf.Max(0.0001f, spriteWorldHeight);
         return new Vector3(sx, sy, 1f);
+    }
+
+    Camera GetActiveCamera()
+    {
+        var m = Camera.main;
+        if (m != null && m.isActiveAndEnabled) return m;
+        var any = FindAnyObjectByType<Camera>();
+        if (any != null && any.isActiveAndEnabled) return any;
+        return Camera.current;
+    }
+
+    float GetGroundY()
+    {
+        // If your world ground is not at y=0, put a better heuristic here.
+        return 0f;
     }
 
     Visual2DDef GetVisualDefFor(BuildingDef def)
@@ -187,11 +208,11 @@ public class BuildPlacementTool : MonoBehaviour
     bool TryGetCursorHit(out Vector3 hit)
     {
         hit = default;
-        if (cam == null) cam = Camera.main;
+        if (cam == null) cam = GetActiveCamera();
         if (cam == null) return false;
         var ray = cam.ScreenPointToRay(Input.mousePosition);
         if (!groundPlane.Raycast(ray, out var enter)) return false;
-        hit = ray.GetPoint(enter); // y == 0 plane
+        hit = ray.GetPoint(enter); // y == plane height
         return true;
     }
 

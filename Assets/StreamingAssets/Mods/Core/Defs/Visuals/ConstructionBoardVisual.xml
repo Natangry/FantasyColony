@@ -5,6 +5,6 @@
     <plane>XZ</plane>
     <shader_hint>Sprites/Default</shader_hint>
     <color>1,1,1,1</color>
-    <pivot>0.5,0.5</pivot>
+    <pivot>0.5,0.0</pivot>
   </Visual2DDef>
 </Defs>
