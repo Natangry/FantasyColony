@@ -72,7 +72,7 @@ public static class BuildUIBootstrap
 #endif
     }
 
-    static void EnsureForCurrentScene()
+    public static void EnsureForCurrentScene()
     {
         var active = SceneManager.GetActiveScene().name;
         var canvas = GameObject.Find(CanvasName);
