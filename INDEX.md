@@ -62,6 +62,8 @@
 ## Assets/Scripts/Boot
 [Open folder](https://github.com/Natangry/FantasyColony/tree/main/Assets/Scripts/Boot)
 
+- **AppBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/AppBootstrap.cs)
+- **AppBootstrap.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/AppBootstrap.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/AppBootstrap.cs.meta)
 - **BootSession.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BootSession.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BootSession.cs)
 - **BootSession.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BootSession.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BootSession.cs.meta)
 - **BuildBootstrap.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BuildBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BuildBootstrap.cs)
@@ -227,8 +229,8 @@
 
 - **ClockHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs)
 - **ClockHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/ClockHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/ClockHUD.cs.meta)
-- **IntroScreen.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs)
-- **IntroScreen.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroScreen.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroScreen.cs.meta)
+- **IntroOverlayFallback.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroOverlayFallback.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroOverlayFallback.cs)
+- **IntroOverlayFallback.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/IntroOverlayFallback.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/IntroOverlayFallback.cs.meta)
 - **PauseMenuController.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/PauseMenuController.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/PauseMenuController.cs)
 - **SelectionHUD.cs** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs)
 - **SelectionHUD.cs.meta** — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/SelectionHUD.cs.meta) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/SelectionHUD.cs.meta)

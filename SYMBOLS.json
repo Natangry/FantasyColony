@@ -25,6 +25,36 @@
   },
   {
     "kind": "class",
+    "name": "AppBootstrap",
+    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
+    "line": 12
+  },
+  {
+    "kind": "class",
+    "name": "AppBootstrapRunner",
+    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
+    "line": 197
+  },
+  {
+    "kind": "method",
+    "name": "IsIntroVisible",
+    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
+    "line": 29
+  },
+  {
+    "kind": "method",
+    "name": "ShowIntroOverlay",
+    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
+    "line": 39
+  },
+  {
+    "kind": "method",
+    "name": "HideIntroOverlay",
+    "file": "Assets/Scripts/Boot/AppBootstrap.cs",
+    "line": 48
+  },
+  {
+    "kind": "class",
     "name": "BootSession",
     "file": "Assets/Scripts/Boot/BootSession.cs",
     "line": 7
@@ -93,13 +123,13 @@
     "kind": "class",
     "name": "HardRestart",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 6
+    "line": 5
   },
   {
     "kind": "method",
     "name": "RebootToIntro",
     "file": "Assets/Scripts/Boot/HardRestart.cs",
-    "line": 9
+    "line": 8
   },
   {
     "kind": "class",
@@ -1249,33 +1279,21 @@
   },
   {
     "kind": "class",
-    "name": "IntroScreen",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 7
+    "name": "IntroOverlayFallback",
+    "file": "Assets/Scripts/UI/IntroOverlayFallback.cs",
+    "line": 11
   },
   {
     "kind": "method",
-    "name": "SetVisible",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 37
+    "name": "SpawnIfNeeded",
+    "file": "Assets/Scripts/UI/IntroOverlayFallback.cs",
+    "line": 14
   },
   {
     "kind": "method",
-    "name": "ShowIntro",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 47
-  },
-  {
-    "kind": "property",
-    "name": "Instance",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 9
-  },
-  {
-    "kind": "property",
-    "name": "IsVisible",
-    "file": "Assets/Scripts/UI/IntroScreen.cs",
-    "line": 10
+    "name": "HideIfPresent",
+    "file": "Assets/Scripts/UI/IntroOverlayFallback.cs",
+    "line": 64
   },
   {
     "kind": "class",
