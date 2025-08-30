@@ -31,16 +31,48 @@ jobs:
       - name: Run XML tools
         run: dotnet run --project Tools/XmlDefsTools/XmlDefsTools.csproj -c Release --no-build
 
-      - name: Commit changes (if any)
+      - name: Commit changes (if any) with rebase retry
         run: |
           set -e
-          if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add XML_INDEX.md XML_SNAPSHOT.txt Docs/Templates/Defs || true
-            git add Docs/XML_ARTIFACTS.md || true
-            git commit -m "[CI] Update XML index, snapshot, and templates"
-            git push
-          else
-            echo "No XML artifact changes to commit."
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+          # function to detect staged or unstaged changes
+          has_changes () { test -n "$(git status --porcelain)"; }
+
+          # Up to 3 attempts to handle races on main
+          attempt=1
+          while [ $attempt -le 3 ]; do
+            echo "Attempt $attempt to commit & push XML artifacts..."
+
+            if has_changes; then
+              git add XML_INDEX.md XML_SNAPSHOT.txt Docs/Templates/Defs || true
+              git add Docs/XML_ARTIFACTS.md || true
+              if git diff --cached --quiet; then
+                echo "No staged changes to commit."
+              else
+                git commit -m "[CI] Update XML index, snapshot, and templates"
+              fi
+            else
+              echo "No XML artifact changes to commit."
+              exit 0
+            fi
+
+            # Rebase on latest main (someone else may have pushed meanwhile)
+            git fetch origin main
+            if ! git pull --rebase origin main; then
+              echo "Rebase conflict; regenerating artifacts on latest main..."
+              git rebase --abort || true
+              git reset --hard origin/main
+              dotnet run --project Tools/XmlDefsTools/XmlDefsTools.csproj -c Release --no-build
+              git add XML_INDEX.md XML_SNAPSHOT.txt Docs/Templates/Defs Docs/XML_ARTIFACTS.md || true
+              git commit -m "[CI] Update XML artifacts after rebase" || true
+            fi
+
+            if git push origin HEAD:main; then exit 0; fi
+            echo "Push failed; retrying..."
+            attempt=$((attempt+1))
+          done
+          echo "Failed to push after retries."
+          exit 1
