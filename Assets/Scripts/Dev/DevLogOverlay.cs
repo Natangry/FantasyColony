@@ -4,6 +4,10 @@ using System.Collections.Concurrent;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+//#if is allowed to safely reference the new Input System only when present
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// Lightweight, robust in-game developer log overlay.
@@ -175,15 +179,8 @@ public class DevLogOverlay : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.F9))
-        {
-            ToggleVisible();
-        }
-
-        if (Input.GetKeyDown(KeyCode.F10))
-        {
-            paused = !paused;
-        }
+        // Handle hotkeys without throwing when only the new Input System is active
+        HandleHotkeys();
     }
 
     private void OnGUI()
@@ -291,12 +288,31 @@ public class DevLogOverlay : MonoBehaviour
             _rowStyleWarn = new GUIStyle(_rowStyle);
             _rowStyleError = new GUIStyle(_rowStyle);
 
+            // Colorize severities for quick scanning
+            _rowStyleWarn.normal.textColor = Color.yellow; // Warnings
+            _rowStyleError.normal.textColor = Color.red;   // Errors/Exceptions/Asserts
+
             _tinyLabel = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 10,
                 alignment = TextAnchor.UpperLeft
             };
         }
+    }
+
+    private void HandleHotkeys()
+    {
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            if (kb.f9Key.wasPressedThisFrame) ToggleVisible();
+            if (kb.f10Key.wasPressedThisFrame) paused = !paused;
+        }
+#else
+        if (Input.GetKeyDown(KeyCode.F9)) ToggleVisible();
+        if (Input.GetKeyDown(KeyCode.F10)) paused = !paused;
+#endif
     }
 
     private void CycleDock()
