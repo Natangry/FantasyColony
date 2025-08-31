@@ -15,7 +15,7 @@ namespace FantasyColony.UI.Widgets
             go.transform.SetParent(parent, false);
 
             var rt = go.GetComponent<RectTransform>();
-            var img = go.GetComponent<Image>();
+            var rootImg = go.GetComponent<Image>();
 
             // Layout configuration (unchanged)
             var layout = go.GetComponent<VerticalLayoutGroup>();
@@ -43,10 +43,22 @@ namespace FantasyColony.UI.Widgets
             if (wood != null) { fillImg.sprite = wood; fillImg.type = Image.Type.Tiled; }
             else { fillImg.color = BaseUIStyle.SecondaryFill; }
 
-            // --- Border (9-slice) on root Image ---
+            // --- Border (9-slice) as sibling ABOVE fill ---
+            var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
+            borderGO.transform.SetParent(go.transform, false);
+            var borderRt = borderGO.GetComponent<RectTransform>();
+            borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
+            borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
+            var borderImg = borderGO.GetComponent<Image>();
+            borderImg.raycastTarget = false;
+            borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
-            if (border != null) { img.sprite = border; img.type = Image.Type.Sliced; img.color = Color.white; }
-            else { img.color = BaseUIStyle.PanelSurface; }
+            if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
+            else { borderImg.color = BaseUIStyle.PanelSurface; }
+
+            // Root image no longer draws visuals; keep it disabled but present for easy toggling
+            rootImg.enabled = false;
+            rootImg.raycastTarget = false;
 
             return rt;
         }
@@ -65,7 +77,9 @@ namespace FantasyColony.UI.Widgets
             var rt = go.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(380, BaseUIStyle.ButtonHeight);
 
-            var img = go.GetComponent<Image>();
+            // Root image handles raycasts, but does not draw visuals
+            var rootImg = go.GetComponent<Image>();
+            rootImg.sprite = null; rootImg.color = new Color(0,0,0,0); rootImg.raycastTarget = true;
             var btn = go.GetComponent<Button>();
 
             // --- Background fill (wood, tiled) ---
@@ -81,10 +95,18 @@ namespace FantasyColony.UI.Widgets
             if (wood != null) { fillImg.sprite = wood; fillImg.type = Image.Type.Tiled; }
             else { fillImg.color = fill; }
 
-            // --- Border (9-slice) on root image ---
+            // --- Border (9-slice) as child ABOVE fill ---
+            var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
+            borderGO.transform.SetParent(go.transform, false);
+            var borderRt = borderGO.GetComponent<RectTransform>();
+            borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
+            borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
+            var borderImg = borderGO.GetComponent<Image>();
+            borderImg.raycastTarget = false;
+            borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
-            if (border != null) { img.sprite = border; img.type = Image.Type.Sliced; img.color = Color.white; }
-            else { img.color = fill; }
+            if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
+            else { borderImg.color = fill; }
 
             // --- Overlay for state tints (Button.targetGraphic) ---
             var overlayGO = new GameObject("Overlay", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
@@ -132,6 +154,23 @@ namespace FantasyColony.UI.Widgets
             txt.fontSize = BaseUIStyle.ButtonFontSize;
             txt.color = textColor;
             return btn;
+        }
+
+        // Toggle panel chrome (fill + border) without affecting layout or children
+        public static void SetPanelDecorVisible(RectTransform panel, bool visible)
+        {
+            if (!panel) return;
+            // Root image (should be disabled by CreatePanelSurface, but handle both cases)
+            var rootImg = panel.GetComponent<Image>();
+            if (rootImg) { rootImg.enabled = false; rootImg.raycastTarget = false; }
+
+            // Child fill
+            var fill = panel.Find("BG_Fill");
+            if (fill) fill.gameObject.SetActive(visible);
+
+            // Child border
+            var border = panel.Find("BG_Border");
+            if (border) border.gameObject.SetActive(visible);
         }
 
         // STACK CONTAINER (Bottom-right MenuPanel)
