@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-08-31 13:11:56 UTC
+_Updated_: 2025-08-31 13:49:21 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/AppBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/AppBootstrap.cs)
@@ -8,6 +8,12 @@ _Updated_: 2025-08-31 13:11:56 UTC
 - `Assets/Scripts/Core/AppFlow.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppFlow.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppFlow.cs)
 - `Assets/Scripts/Core/AppHost.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppHost.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppHost.cs)
 - `Assets/Scripts/Core/BuildInfo.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/BuildInfo.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/BuildInfo.cs)
+- `Assets/Scripts/Core/Defs/DefId.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/DefId.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/DefId.cs)
+- `Assets/Scripts/Core/Defs/DefIndex.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/DefIndex.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/DefIndex.cs)
+- `Assets/Scripts/Core/Defs/DefMeta.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/DefMeta.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/DefMeta.cs)
+- `Assets/Scripts/Core/Defs/Migrations/MigrationEngine.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Migrations/MigrationEngine.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Migrations/MigrationEngine.cs)
+- `Assets/Scripts/Core/Defs/Migrations/SchemaRegistry.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Migrations/SchemaRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Migrations/SchemaRegistry.cs)
+- `Assets/Scripts/Core/Defs/Validation/DefValidator.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/DefValidator.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/DefValidator.cs)
 - `Assets/Scripts/Core/Input/InputRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Input/InputRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Input/InputRouter.cs)
 - `Assets/Scripts/Core/Mods/ModDiscovery.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/ModDiscovery.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/ModDiscovery.cs)
 - `Assets/Scripts/Core/Mods/XmlDefLoader.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs)
