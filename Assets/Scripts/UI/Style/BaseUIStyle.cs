@@ -24,6 +24,17 @@ namespace FantasyColony.UI.Style
         public static Color32 DangerHover     = Hex("#C8625E");
         public static Color32 DangerPressed   = Hex("#953A37");
 
+        // --- Textured UI assets ---
+        // Resource paths (under Assets/Resources)
+        public const string WoodTilePath = "ui/sprites/tile/wood_soft_tile";
+        public const string DarkBorder9SPath = "ui/sprites/9slice/border_dark_9s";
+
+        // Overlay tints for Button.state (applied to a transparent overlay Image)
+        // Keep subtle so textures are not washed out
+        public static readonly Color HoverOverlay   = new Color(1f, 1f, 1f, 0.06f);
+        public static readonly Color PressedOverlay = new Color(0f, 0f, 0f, 0.10f);
+        public static readonly Color DisabledOverlay= new Color(0f, 0f, 0f, 0.40f);
+
         // Sizes
         public const int ButtonHeight = 56;
         public const int ButtonFontSize = 24;
