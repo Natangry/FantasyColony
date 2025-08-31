@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-08-31 22:54:50 UTC
+_Updated_: 2025-08-31 23:04:45 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/AppBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/AppBootstrap.cs)
@@ -17,6 +17,7 @@ _Updated_: 2025-08-31 22:54:50 UTC
 - `Assets/Scripts/Core/Defs/Validation/SchemaCatalog.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/SchemaCatalog.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/SchemaCatalog.cs)
 - `Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs)
 - `Assets/Scripts/Core/Defs/Validation/TypeChecks.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/TypeChecks.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/TypeChecks.cs)
+- `Assets/Scripts/Core/Defs/Validation/ValidationMode.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/ValidationMode.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/ValidationMode.cs)
 - `Assets/Scripts/Core/Input/InputRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Input/InputRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Input/InputRouter.cs)
 - `Assets/Scripts/Core/Mods/ModDiscovery.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/ModDiscovery.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/ModDiscovery.cs)
 - `Assets/Scripts/Core/Mods/XmlDefLoader.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs)
@@ -36,6 +37,7 @@ _Updated_: 2025-08-31 22:54:50 UTC
 - `Assets/Scripts/UI/Root/UIRoot.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Root/UIRoot.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Root/UIRoot.cs)
 - `Assets/Scripts/UI/Router/IScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Router/IScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Router/IScreen.cs)
 - `Assets/Scripts/UI/Router/UIRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Router/UIRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Router/UIRouter.cs)
+- `Assets/Scripts/UI/Screens/BootReportScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/BootReportScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/BootReportScreen.cs)
 - `Assets/Scripts/UI/Screens/BootScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/BootScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/BootScreen.cs)
 - `Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs)
 - `Assets/Scripts/UI/Screens/MainMenuScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/MainMenuScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/MainMenuScreen.cs)
