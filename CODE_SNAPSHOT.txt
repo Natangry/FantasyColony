@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 23:26:28 UTC
+_Updated_: 2025-08-31 23:38:24 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -2452,6 +2452,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router;
+using FantasyColony.UI;
 
 namespace FantasyColony.UI.Screens {
     /// <summary>
