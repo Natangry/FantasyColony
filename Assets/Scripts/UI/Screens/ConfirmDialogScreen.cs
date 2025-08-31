@@ -87,13 +87,13 @@ namespace FantasyColony.UI.Screens
             rowLayout.padding = new RectOffset(0, 0, 8, 0);
 
             // Cancel / Confirm buttons using UIFactory
-            UIFactory.CreateButtonSecondary(row, string.IsNullOrEmpty(CancelLabel) ? "Cancel" : CancelLabel, () =>
+            UIFactory.CreateButtonSecondary(row.transform, string.IsNullOrEmpty(CancelLabel) ? "Cancel" : CancelLabel, () =>
             {
                 UIRouter.Current?.Pop();
                 OnCancel?.Invoke();
             });
 
-            UIFactory.CreateButtonDanger(row, string.IsNullOrEmpty(ConfirmLabel) ? "OK" : ConfirmLabel, () =>
+            UIFactory.CreateButtonDanger(row.transform, string.IsNullOrEmpty(ConfirmLabel) ? "OK" : ConfirmLabel, () =>
             {
                 var router = UIRouter.Current;
                 router?.Pop(); // close dialog first so new screens appear above
