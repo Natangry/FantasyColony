@@ -19,6 +19,11 @@ namespace FantasyColony.UI.Widgets
             var layout = go.GetComponent<VerticalLayoutGroup>();
             layout.spacing = BaseUIStyle.StackSpacing;
             layout.padding = new RectOffset(BaseUIStyle.PanelPadding, BaseUIStyle.PanelPadding, BaseUIStyle.PanelPadding, BaseUIStyle.PanelPadding);
+            // Ensure children (buttons) get proper space and panel wraps to content reliably
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
 
             var fitter = go.GetComponent<ContentSizeFitter>();
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -55,6 +60,12 @@ namespace FantasyColony.UI.Widgets
             colors.colorMultiplier = 1f;
             btn.colors = colors;
             btn.onClick.AddListener(() => onClick?.Invoke());
+
+            // Layout sizing so buttons are visible in the stack
+            var le = go.GetComponent<LayoutElement>();
+            le.preferredWidth = 420;
+            le.minHeight = BaseUIStyle.ButtonHeight;
+            le.flexibleWidth = 0; le.flexibleHeight = 0;
 
             // Label
             var textGO = new GameObject("Label", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
@@ -109,7 +120,7 @@ namespace FantasyColony.UI.Widgets
             if (sprite != null)
             {
                 img.sprite = sprite;
-                img.preserveAspect = true;
+                img.preserveAspect = true; // Placeholder background scaling; fills via CanvasScaler
                 img.color = Color.white;
             }
             else
