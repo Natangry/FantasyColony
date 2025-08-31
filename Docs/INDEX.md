@@ -54,6 +54,7 @@
 - ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Tools.md
 - ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-World-Metrics-Conditions-and-Counters.md
 - ``Docs/Design/Modding-Data-Schemas-v0.1.md
+- ``Docs/Design/Naming-and-Folders.md
 - ``Docs/Design/Needs-and-Fallbacks-v0.1.md
 - ``Docs/Design/New-Game-and-Starting-Scenarios-v0.1.md
 - ``Docs/Design/Numbers-Aftershocks-v0.1.md
