@@ -1,8 +1,21 @@
 # Code Index
 
-_Updated_: 2025-08-31 05:39:23 UTC
+_Updated_: 2025-08-31 06:19:56 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
+- `Assets/Scripts/Core/AppBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppBootstrap.cs)
+- `Assets/Scripts/Core/AppHost.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppHost.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppHost.cs)
+- `Assets/Scripts/Core/ServiceRegistry.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/ServiceRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/ServiceRegistry.cs)
+- `Assets/Scripts/Core/Services/IAssetProvider.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/IAssetProvider.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/IAssetProvider.cs)
+- `Assets/Scripts/Core/Services/IConfigService.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/IConfigService.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/IConfigService.cs)
+- `Assets/Scripts/Core/Services/IEventBus.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/IEventBus.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/IEventBus.cs)
+- `Assets/Scripts/Core/Services/ILogger.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/ILogger.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/ILogger.cs)
+- `Assets/Scripts/UI/Root/UIRoot.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Root/UIRoot.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Root/UIRoot.cs)
+- `Assets/Scripts/UI/Router/IScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Router/IScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Router/IScreen.cs)
+- `Assets/Scripts/UI/Router/UIRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Router/UIRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Router/UIRouter.cs)
+- `Assets/Scripts/UI/Screens/MainMenuScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/MainMenuScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/MainMenuScreen.cs)
+- `Assets/Scripts/UI/Style/BaseUIStyle.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Style/BaseUIStyle.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Style/BaseUIStyle.cs)
+- `Assets/Scripts/UI/Widgets/UIFactory.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Widgets/UIFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Widgets/UIFactory.cs)
 - `Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
 - `Assets/TutorialInfo/Scripts/Readme.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Readme.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Readme.cs)
 - `Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs)
