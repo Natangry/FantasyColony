@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 05:32:54 UTC
+_Updated_: 2025-08-31 05:33:40 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
