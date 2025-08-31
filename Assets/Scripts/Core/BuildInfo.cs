@@ -1,4 +1,4 @@
-namespace Core
+namespace FantasyColony.Core
 {
     /// <summary>
     /// Static build info for diagnostics; can be auto-generated later by an Editor script.
@@ -11,10 +11,10 @@ namespace Core
     }
 }
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     public static class BuildInfoRuntime
     {
-        public static string Describe() => $"v{Core.BuildInfo.Version} ({Core.BuildInfo.Commit}) | Unity {UnityEngine.Application.unityVersion}";
+        public static string Describe() => $"v{FantasyColony.Core.BuildInfo.Version} ({FantasyColony.Core.BuildInfo.Commit}) | Unity {UnityEngine.Application.unityVersion}";
     }
 }

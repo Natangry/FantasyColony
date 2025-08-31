@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Extremely simple definition registry keyed by type then id.

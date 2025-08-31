@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Minimal localization service. Loads Resources/Localization/{lang}/strings.json (TextAsset).

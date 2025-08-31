@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Input
+namespace FantasyColony.Core.Input
 {
     /// <summary>
     /// Placeholder router for the new Input System. No-ops if the package is missing.
