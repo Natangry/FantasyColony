@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using FantasyColony.Core.Mods;
 
 namespace FantasyColony.Core.Defs.Validation {
     /// <summary>
@@ -12,18 +11,22 @@ namespace FantasyColony.Core.Defs.Validation {
         private static readonly Dictionary<string, Dictionary<int, SchemaSpec>> _map = new(); // type -> version -> spec
         private static bool _loaded;
 
-        public static void EnsureLoaded(List<ModInfo> mods) {
+        public static void EnsureLoadedFromIndex(Defs.DefIndex index) {
             if (_loaded) return;
             try {
                 // Game-bundled schemas
                 var gameDir = Path.Combine(Application.streamingAssetsPath, "Defs", "Schemas");
                 LoadFromDir(gameDir);
 
-                // Mod-provided schemas
-                if (mods != null) {
-                    for (int i = 0; i < mods.Count; i++) {
-                        var dir = Path.Combine(mods[i].RootPath, "Defs", "Schemas");
-                        LoadFromDir(dir);
+                // Mod-provided schemas (infer mod root from def file paths in index)
+                if (index != null) {
+                    var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var m in index.Items) {
+                        var root = FindDefsRoot(Path.GetDirectoryName(m.Path));
+                        if (!string.IsNullOrEmpty(root) && roots.Add(root)) {
+                            var dir = Path.Combine(root, "Defs", "Schemas");
+                            LoadFromDir(dir);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -36,6 +39,18 @@ namespace FantasyColony.Core.Defs.Validation {
             if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir)) return;
             var files = Directory.GetFiles(dir, "*.schema.json", SearchOption.AllDirectories);
             for (int i = 0; i < files.Length; i++) LoadFile(files[i]);
+        }
+
+        private static string FindDefsRoot(string startDir) {
+            try {
+                var dir = startDir;
+                while (!string.IsNullOrEmpty(dir)) {
+                    var defsDir = Path.Combine(dir, "Defs");
+                    if (Directory.Exists(defsDir)) return dir;
+                    dir = Path.GetDirectoryName(dir);
+                }
+            } catch { }
+            return null;
         }
 
         private static void LoadFile(string path) {
