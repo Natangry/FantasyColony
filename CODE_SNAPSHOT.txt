@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 11:21:04 UTC
+_Updated_: 2025-08-31 11:31:49 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -1296,17 +1296,14 @@ namespace FantasyColony.UI.Screens
             dimImg.color = new Color(0f, 0f, 0f, 0.55f);
             dimImg.raycastTarget = true;
 
-            // Dialog panel
-            var panel = new GameObject("Panel");
-            var prt = panel.AddComponent<RectTransform>();
-            prt.SetParent(rt, false);
+            // Dialog panel (textured surface from UIFactory)
+            var prt = UIFactory.CreatePanelSurface(rt, "Panel");
             prt.sizeDelta = new Vector2(520, 280);
             prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
             prt.anchoredPosition = Vector2.zero;
-            var panelImg = panel.AddComponent<Image>();
-            panelImg.color = new Color(0.231f, 0.200f, 0.161f); // matches SecondaryFill-ish
+            UIFactory.SetPanelDecorVisible(prt, true);
 
-            var layout = panel.AddComponent<VerticalLayoutGroup>();
+            var layout = prt.GetComponent<VerticalLayoutGroup>();
             layout.childAlignment = TextAnchor.UpperCenter;
             layout.childControlHeight = true; layout.childControlWidth = true;
             layout.childForceExpandHeight = false; layout.childForceExpandWidth = false;
@@ -1315,7 +1312,7 @@ namespace FantasyColony.UI.Screens
 
             // Title
             var titleGO = new GameObject("Title");
-            titleGO.transform.SetParent(panel.transform, false);
+            titleGO.transform.SetParent(prt, false);
             var titleText = titleGO.AddComponent<Text>();
             titleText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             titleText.fontSize = 26; titleText.alignment = TextAnchor.MiddleCenter;
@@ -1326,7 +1323,7 @@ namespace FantasyColony.UI.Screens
 
             // Message
             var msgGO = new GameObject("Message");
-            msgGO.transform.SetParent(panel.transform, false);
+            msgGO.transform.SetParent(prt, false);
             var msgText = msgGO.AddComponent<Text>();
             msgText.font = titleText.font;
             msgText.fontSize = 16; msgText.alignment = TextAnchor.MiddleCenter;
@@ -1337,7 +1334,7 @@ namespace FantasyColony.UI.Screens
 
             // Buttons row
             var row = new GameObject("Buttons");
-            row.transform.SetParent(panel.transform, false);
+            row.transform.SetParent(prt, false);
             var rowLayout = row.AddComponent<HorizontalLayoutGroup>();
             rowLayout.childAlignment = TextAnchor.MiddleCenter;
             rowLayout.spacing = 16;
@@ -1595,6 +1592,7 @@ namespace FantasyColony.UI.Widgets
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
+            borderImg.preserveAspect = false;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -1603,6 +1601,12 @@ namespace FantasyColony.UI.Widgets
             // Root image no longer draws visuals; keep it disabled but present for easy toggling
             rootImg.enabled = false;
             rootImg.raycastTarget = false;
+
+            // Ensure BG_Fill under BG_Border
+            var fill = go.transform.Find("BG_Fill");
+            var borderT = go.transform.Find("BG_Border");
+            if (fill) fill.SetSiblingIndex(0);
+            if (borderT) borderT.SetSiblingIndex(1);
 
             return rt;
         }
@@ -1634,6 +1638,7 @@ namespace FantasyColony.UI.Widgets
             fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero;
             var fillImg = fillGO.GetComponent<Image>();
             fillImg.raycastTarget = false;
+            fillImg.preserveAspect = false;
             fillGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
             if (wood != null) { fillImg.sprite = wood; fillImg.type = Image.Type.Tiled; }
@@ -1647,6 +1652,7 @@ namespace FantasyColony.UI.Widgets
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
+            borderImg.preserveAspect = false;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -1697,6 +1703,16 @@ namespace FantasyColony.UI.Widgets
             txt.alignment = TextAnchor.MiddleLeft;
             txt.fontSize = BaseUIStyle.ButtonFontSize;
             txt.color = textColor;
+            txt.raycastTarget = false;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Truncate;
+
+            // Explicit layer order (back -> front)
+            fillGO.transform.SetSiblingIndex(0);
+            borderGO.transform.SetSiblingIndex(1);
+            overlayGO.transform.SetSiblingIndex(2);
+            textGO.transform.SetSiblingIndex(3);
+
             return btn;
         }
 
