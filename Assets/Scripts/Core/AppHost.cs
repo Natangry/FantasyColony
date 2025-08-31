@@ -17,16 +17,22 @@ using FCResourcesProvider = FantasyColony.Core.Services.ResourcesAssetProvider;
 namespace FantasyColony.Core
 {
     /// <summary>
-    /// Lifetime owner. Builds services, creates UIRoot and pushes Main Menu screen.
+    /// Lifetime owner.
+    /// Builds services, creates UIRoot and pushes Main Menu screen.
     /// </summary>
     public class AppHost : MonoBehaviour
     {
+        public static AppHost Instance { get; private set; }
+        public ServiceRegistry Services => _services;
+        public UIRouter Router => _router;
+
         private ServiceRegistry _services;
         private UIRoot _uiRoot;
         private UIRouter _router;
 
         private void Awake()
         {
+            Instance = this;
             Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 0;
 
@@ -41,6 +47,11 @@ namespace FantasyColony.Core
 
             // Router mounts screens under UIRoot
             _router = new UIRouter(_uiRoot.ScreenParent, _services);
+
+            // Attach AppFlow helper to manage restart/quit across the app
+            var flow = gameObject.GetComponent<AppFlow>();
+            if (flow == null) flow = gameObject.AddComponent<AppFlow>();
+            flow.Initialize(_router, _services);
 
             // Show Boot screen first so the UI covers while startup work initializes
             _router.Push<BootScreen>();

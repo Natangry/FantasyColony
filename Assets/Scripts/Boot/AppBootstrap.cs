@@ -5,109 +5,130 @@ using UnityEngine;
 using FantasyColony.Core.Services;
 using FantasyColony.Core.Mods;
 
-/// <summary>
-/// Real (yet lenient) boot pipeline that prepares core services without blocking Main Menu.
-/// Phases always succeed; errors are logged to help future hardening.
-/// Signature kept the same (Run(Action<string>)) to avoid UI changes in BootScreen.
-/// </summary>
-namespace FantasyColony.Boot
-{
-    public static class AppBootstrap
-    {
-        public static IEnumerator Run(Action<string> setPhase)
-        {
-            // Phase 0: Build info for diagnostics
-            setPhase?.Invoke("Reading build info...");
-            yield return null;
+namespace FantasyColony.Boot {
+    /// <summary>
+    /// Modular boot pipeline. Each step is an IBootTask for extensibility and robust error handling.
+    /// </summary>
+    public static class AppBootstrap {
+        public static IEnumerator Run(Action<string> setPhase) {
+            var report = new Boot.BootReport();
+            var ctx = new Boot.BootContext { Report = report };
 
-            // Phase 1: Config
-            setPhase?.Invoke("Loading configuration...");
-            try
-            {
-                JsonConfigService.Instance.Load();
+            foreach (var task in Boot.BootTaskRegistry.DefaultTasks()) {
+                setPhase?.Invoke(task.Title);
+                yield return task.Execute(ctx);
             }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Config load failed, using defaults. {e.Message}");
-            }
-            yield return null;
 
-            // Phase 2: Discover Mods
-            setPhase?.Invoke("Discovering mods...");
-            List<ModInfo> mods = null;
-            try
-            {
-                mods = ModDiscovery.Discover();
-                Debug.Log($"Mods discovered: {mods.Count}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Mod discovery failed: {e.Message}");
-                mods = new List<ModInfo>();
-            }
-            yield return null;
+            // Ready
+            setPhase?.Invoke("Ready");
+            Boot.BootReport.Last = report;
+        }
+    }
 
-            // Phase 3: Load Defs (lenient)
-            setPhase?.Invoke("Loading defs...");
-            try
-            {
-                var reg = DefRegistry.Instance;
+    // --- Boot framework ---------------------------------------------------
+    public interface IBootTask {
+        string Title { get; }
+        IEnumerator Execute(BootContext ctx);
+    }
+
+    public sealed class BootContext {
+        public List<ModInfo> Mods = new List<ModInfo>();
+        public DefRegistry Defs => DefRegistry.Instance;
+        public JsonConfigService Config => JsonConfigService.Instance;
+        public BootReport Report;
+    }
+
+    public sealed class BootReport {
+        public struct Step { public string title; public float seconds; public string warn; public string error; }
+        public readonly List<Step> steps = new();
+        public static BootReport Last { get; internal set; }
+        internal void Add(string title, float dt, string warn = null, string error = null) {
+            steps.Add(new Step { title = title, seconds = dt, warn = warn, error = error });
+        }
+    }
+
+    public static class BootTaskRegistry {
+        public static IEnumerable<IBootTask> DefaultTasks() {
+            yield return new ConfigTask();
+            yield return new DiscoverModsTask();
+            yield return new LoadDefsTask();
+            yield return new InitServicesTask();
+            yield return new WarmAssetsTask();
+        }
+    }
+
+    // --- Concrete tasks ---------------------------------------------------
+    sealed class ConfigTask : IBootTask {
+        public string Title => "Loading configuration...";
+        public IEnumerator Execute(BootContext ctx) {
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null, err = null;
+            try { ctx.Config.Load(); }
+            catch (Exception e) { warn = $"Config load failed, defaults used: {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, err);
+            yield return null;
+        }
+    }
+
+    sealed class DiscoverModsTask : IBootTask {
+        public string Title => "Discovering mods...";
+        public IEnumerator Execute(BootContext ctx) {
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            try { ctx.Mods = ModDiscovery.Discover(); Debug.Log($"Mods discovered: {ctx.Mods.Count}"); }
+            catch (Exception e) { warn = $"Mod discovery failed: {e.Message}"; Debug.LogWarning(warn); ctx.Mods = new List<ModInfo>(); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
+            yield return null;
+        }
+    }
+
+    sealed class LoadDefsTask : IBootTask {
+        public string Title => "Loading defs...";
+        public IEnumerator Execute(BootContext ctx) {
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            try {
                 var errors = new List<DefError>();
-                XmlDefLoader.Load(mods, reg, errors);
-                if (errors.Count > 0)
-                {
-                    Debug.LogWarning($"Defs loaded with {errors.Count} issues. See log for details.");
-                }
-                else
-                {
-                    Debug.Log($"Defs loaded. Count={reg.Count}");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Def loading failed (lenient): {e.Message}");
-            }
+                XmlDefLoader.Load(ctx.Mods, ctx.Defs, errors);
+                if (errors.Count > 0) warn = $"Defs loaded with {errors.Count} issues. See log.";
+                Debug.Log($"Defs loaded. Count={ctx.Defs.Count}");
+            } catch (Exception e) { warn = $"Def loading failed (lenient): {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
             yield return null;
+        }
+    }
 
-            // Phase 4: Core Services (Localization, Audio, Save)
-            setPhase?.Invoke("Initializing services...");
-            try
-            {
-                var cfg = JsonConfigService.Instance;
-
-                // Localization
+    sealed class InitServicesTask : IBootTask {
+        public string Title => "Initializing services...";
+        public IEnumerator Execute(BootContext ctx) {
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            try {
+                var cfg = ctx.Config;
                 var lang = cfg.Get("language", "en");
                 LocService.Instance.SetLanguage(lang);
-
-                // Audio (volumes default 1.0)
                 float vMaster = Parse01(cfg.Get("vol_master", "1"));
-                float vMusic = Parse01(cfg.Get("vol_music", "1"));
-                float vSfx = Parse01(cfg.Get("vol_sfx", "1"));
+                float vMusic  = Parse01(cfg.Get("vol_music", "1"));
+                float vSfx    = Parse01(cfg.Get("vol_sfx", "1"));
                 AudioService.Instance.SetVolume("master", vMaster);
                 AudioService.Instance.SetVolume("music", vMusic);
                 AudioService.Instance.SetVolume("sfx", vSfx);
-
-                // Save service touch (build slot cache)
                 JsonSaveService.Instance.RefreshCache();
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Service init had issues: {e.Message}");
-            }
+            } catch (Exception e) { warn = $"Service init had issues: {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
             yield return null;
-
-            // Phase 5: Warm minimal assets (non-blocking)
-            setPhase?.Invoke("Warming assets...");
-            yield return null;
-
-            // Phase 6: Finalize
-            setPhase?.Invoke("Ready");
         }
 
-        private static float Parse01(string s)
-        {
-            if (float.TryParse(s, out var f)) return Mathf.Clamp01(f);
-            return 1f;
+        private static float Parse01(string s) { if (float.TryParse(s, out var f)) return Mathf.Clamp01(f); return 1f; }
+    }
+
+    sealed class WarmAssetsTask : IBootTask {
+        public string Title => "Warming assets...";
+        public IEnumerator Execute(BootContext ctx) {
+            var t0 = Time.realtimeSinceStartup;
+            // Placeholder for future warmups
+            yield return null;
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, null, null);
         }
     }
 }
