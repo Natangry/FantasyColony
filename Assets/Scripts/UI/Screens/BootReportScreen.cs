@@ -2,21 +2,34 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router;
-using FantasyColony.UI;
 
 namespace FantasyColony.UI.Screens {
     /// <summary>
     /// Simple UI to present BootReport contents and first N validation messages.
     /// Dev-only utility; keep minimal.
     /// </summary>
-    public sealed class BootReportScreen : UIScreen {
+    public sealed class BootReportScreen : IScreen {
+        public GameObject Root { get; private set; }
+
+        public void Enter(Transform parent) {
+            CreateContent(parent);
+        }
+        public void Exit() { if (Root != null) GameObject.Destroy(Root); Root = null; }
+
         private Text _title;
         private Text _body;
         private Button _copy;
         private Button _close;
 
-        protected override void OnCreateContent(Transform parent) {
-            var panel = CreatePanel(parent, new Vector2(800, 600));
+        private void CreateContent(Transform parent) {
+            Root = new GameObject("BootReportScreen", typeof(RectTransform));
+            Root.transform.SetParent(parent, false);
+            var rootRT = (RectTransform)Root.transform;
+            rootRT.anchorMin = new Vector2(0.5f, 0.5f);
+            rootRT.anchorMax = new Vector2(0.5f, 0.5f);
+            rootRT.pivot = new Vector2(0.5f, 0.5f);
+
+            var panel = CreatePanel(Root.transform, new Vector2(800, 600));
             _title = CreateText(panel, "Boot Report", 24, TextAnchor.MiddleCenter);
             var titleRT = _title.rectTransform;
             titleRT.anchoredPosition = new Vector2(0, 250);
@@ -30,7 +43,7 @@ namespace FantasyColony.UI.Screens {
 
             _copy = CreateButton(panel, "Copy", OnCopyClicked);
             _copy.GetComponent<RectTransform>().anchoredPosition = new Vector2(-120, -250);
-            _close = CreateButton(panel, "Close", () => Router.Pop());
+            _close = CreateButton(panel, "Close", () => UIRouter.Current?.Pop());
             _close.GetComponent<RectTransform>().anchoredPosition = new Vector2(120, -250);
 
             Refresh();
