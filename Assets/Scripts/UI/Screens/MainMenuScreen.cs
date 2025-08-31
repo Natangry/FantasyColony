@@ -50,6 +50,11 @@ namespace FantasyColony.UI.Screens
             UIFactory.CreateButtonSecondary(panel, "Restart",    ShowRestartConfirm);
             UIFactory.CreateButtonDanger(panel,     "Quit",      ShowQuitConfirm);
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            UIFactory.CreateButtonSecondary(panel, "Boot Report", () => UIRouter.Current?.Push<BootReportScreen>());
+            UIFactory.CreateButtonSecondary(panel, "Validation: " + (JsonConfigService.Instance.GetValidationMode()==FantasyColony.Core.Defs.Validation.ValidationMode.Strict?"Strict":"Lenient"), ToggleValidationMode);
+#endif
+
             // Disabled rules for now (no save system yet)
             btnContinue.interactable = false;
             btnLoad.interactable = false;
@@ -108,5 +113,16 @@ namespace FantasyColony.UI.Screens
             Application.Quit();
         #endif
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private void ToggleValidationMode()
+        {
+            var cfg = JsonConfigService.Instance;
+            var cur = cfg.GetValidationMode();
+            var next = cur == FantasyColony.Core.Defs.Validation.ValidationMode.Strict ? "lenient" : "strict";
+            cfg.Set("validation_mode", next);
+            UIRouter.Current?.ResetTo<MainMenuScreen>();
+        }
+#endif
     }
 }

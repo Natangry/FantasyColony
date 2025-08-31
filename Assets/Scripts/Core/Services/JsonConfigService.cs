@@ -72,6 +72,12 @@ namespace FantasyColony.Core.Services
             return _map.TryGetValue(key, out var v) ? v : fallback;
         }
 
+        public FantasyColony.Core.Defs.Validation.ValidationMode GetValidationMode()
+        {
+            var s = Get("validation_mode", "lenient").ToLowerInvariant();
+            return (s == "strict") ? FantasyColony.Core.Defs.Validation.ValidationMode.Strict : FantasyColony.Core.Defs.Validation.ValidationMode.Lenient;
+        }
+
         public void Set(string key, string value)
         {
             if (string.IsNullOrEmpty(key)) return;
