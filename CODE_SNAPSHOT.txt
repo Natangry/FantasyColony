@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 06:54:31 UTC
+_Updated_: 2025-08-31 07:02:33 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -565,7 +565,11 @@ namespace FantasyColony.UI.Screens
             var panel = UIFactory.CreateBottomRightStack(Root, "MenuPanel");
             // Make panel background transparent (no shadow panel), keep layout behavior
             var panelImg = panel.GetComponent<Image>();
-            if (panelImg) panelImg.color = new Color(0,0,0,0);
+            if (panelImg)
+            {
+                panelImg.color = new Color(0,0,0,0);
+                panelImg.raycastTarget = false; // do not block button mouse events
+            }
             panel.SetAsLastSibling();
 
             // Buttons (log "Not implemented")
@@ -690,13 +694,18 @@ namespace FantasyColony.UI.Widgets
             img.color = fill;
 
             var btn = go.GetComponent<Button>();
+            btn.targetGraphic = img; // ensure transitions target our Image
+            btn.transition = Selectable.Transition.ColorTint;
             var colors = btn.colors;
             colors.normalColor = fill;
-            colors.highlightedColor = isDanger ? BaseUIStyle.DangerHover : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldHover : Multiply(fill, 1.06f));
-            colors.pressedColor = isDanger ? BaseUIStyle.DangerPressed : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldPressed : Multiply(fill, 0.90f));
-            colors.disabledColor = new Color(fill.r, fill.g, fill.b, 0.4f);
+            // Stronger deltas for clearer feedback
+            colors.highlightedColor = isDanger ? BaseUIStyle.DangerHover : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldHover : Multiply(fill, 1.15f));
+            colors.pressedColor    = isDanger ? BaseUIStyle.DangerPressed : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldPressed : Multiply(fill, 0.80f));
+            colors.selectedColor   = colors.highlightedColor;
+            colors.disabledColor   = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
             btn.colors = colors;
+            btn.fadeDuration = 0.08f;
             btn.onClick.AddListener(() => onClick?.Invoke());
 
             // Layout sizing so buttons are visible in the stack
@@ -758,13 +767,14 @@ namespace FantasyColony.UI.Widgets
             if (sprite != null)
             {
                 img.sprite = sprite;
-                img.preserveAspect = true; // Placeholder background scaling; fills via CanvasScaler
+                img.preserveAspect = true; // Background should not intercept clicks
                 img.color = Color.white;
             }
             else
             {
                 img.color = fallbackColor;
             }
+            img.raycastTarget = false; // never block UI
             return img;
         }
 
