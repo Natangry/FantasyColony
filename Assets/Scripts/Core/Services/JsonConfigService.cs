@@ -78,10 +78,9 @@ namespace FantasyColony.Core.Services
             return (s == "strict") ? FantasyColony.Core.Defs.Validation.ValidationMode.Strict : FantasyColony.Core.Defs.Validation.ValidationMode.Lenient;
         }
 
-        public void Set(string key, string value)
-        {
-            if (string.IsNullOrEmpty(key)) return;
+        public void Set(string key, string value) {
             _map[key] = value ?? string.Empty;
+            // Optional: persist to disk here if desired.
         }
 
         [Serializable]
