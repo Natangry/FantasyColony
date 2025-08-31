@@ -62,8 +62,8 @@ namespace FantasyColony.UI.Widgets
             colors.selectedColor   = colors.highlightedColor;
             colors.disabledColor   = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
+            colors.fadeDuration    = 0.08f;
             btn.colors = colors;
-            btn.fadeDuration = 0.08f;
             btn.onClick.AddListener(() => onClick?.Invoke());
 
             // Layout sizing so buttons are visible in the stack
