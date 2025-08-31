@@ -2,6 +2,7 @@ using UnityEngine;
 using FantasyColony.UI.Root;
 using FantasyColony.UI.Router;
 using FantasyColony.Core.Services;
+using FantasyColony.UI.Screens;
 
 // Disambiguate our service interfaces from Unity's similarly named types
 using FCLogger = FantasyColony.Core.Services.ILogger;
@@ -41,8 +42,8 @@ namespace FantasyColony.Core
             // Router mounts screens under UIRoot
             _router = new UIRouter(_uiRoot.ScreenParent, _services);
 
-            // Push Main Menu
-            _router.Push<FantasyColony.UI.Screens.MainMenuScreen>();
+            // Show Boot screen first so the UI covers while startup work initializes
+            _router.Push<BootScreen>();
         }
     }
 }
