@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+// using DevTools; // not required; DevLogOverlay is in the global namespace
 using System;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
@@ -45,7 +46,7 @@ namespace FantasyColony.UI.Screens
             // Buttons (log "Not implemented")
             void NotImpl(string name) => Debug.Log($"BUTTON: {name} (not implemented)");
 
-            UIFactory.CreateButtonSecondary(panel, "Log",        () => NotImpl("Log"));
+            UIFactory.CreateButtonSecondary(panel, "Log",        DevLogOverlay.Show);
             UIFactory.CreateButtonPrimary(panel,   "Start",      () => NotImpl("Start"));
             var btnContinue = UIFactory.CreateButtonSecondary(panel, "Continue", () => NotImpl("Continue"));
             var btnLoad     = UIFactory.CreateButtonSecondary(panel, "Load",     () => NotImpl("Load"));
