@@ -6,6 +6,7 @@ using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
 using FantasyColony.Core.Services;
 using UnityObject = UnityEngine.Object;
+using FantasyColony.Boot;
 
 namespace FantasyColony.UI.Screens
 {
@@ -78,7 +79,7 @@ namespace FantasyColony.UI.Screens
                 d.CancelLabel = "Cancel";
                 d.OnConfirm = () =>
                 {
-                    UIRouter.Current?.Push<LoadingScreen>(l => { l.Title = "Restarting…"; });
+                    UIRouter.Current?.Push<BootScreen>(b => { b.Title = "Loading"; });
                 };
             });
         }
