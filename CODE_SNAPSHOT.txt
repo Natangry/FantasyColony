@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 09:01:56 UTC
+_Updated_: 2025-08-31 09:21:41 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -518,7 +518,7 @@ namespace FantasyColony.UI.Router
         private readonly ServiceRegistry _services;
         private readonly Stack<IScreen> _stack = new();
 
-        // Global access to the active router (useful for simple buttons like Restart)
+        // Global access to the active router (set in ctor)
         public static UIRouter Current { get; private set; }
 
         public UIRouter(Transform parent, ServiceRegistry services)
@@ -531,6 +531,21 @@ namespace FantasyColony.UI.Router
         public void Push<T>() where T : IScreen, new()
         {
             var screen = new T();
+            screen.Enter(_parent);
+            _stack.Push(screen);
+        }
+
+        // Allow initializing a screen (e.g., dialogs) before entering
+        public void Push<T>(Action<T> init) where T : IScreen, new()
+        {
+            var screen = new T();
+            init?.Invoke(screen);
+            Push(screen);
+        }
+
+        // Push an existing instance
+        public void Push(IScreen screen)
+        {
             screen.Enter(_parent);
             _stack.Push(screen);
         }
@@ -552,6 +567,196 @@ namespace FantasyColony.UI.Router
         {
             PopAll();
             Push<T>();
+        }
+    }
+}
+
+// ===== FILE: Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs =====
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using FantasyColony.UI.Router;
+using FantasyColony.UI.Widgets;
+
+namespace FantasyColony.UI.Screens
+{
+    // Simple reusable confirmation dialog with a dimming overlay
+    public class ConfirmDialogScreen : IScreen
+    {
+        // Configure via UIRouter.Current.Push<ConfirmDialogScreen>(init => { ... })
+        public string Title;
+        public string Message;
+        public string ConfirmLabel = "OK";
+        public string CancelLabel = "Cancel";
+        public Action OnConfirm;
+        public Action OnCancel;
+
+        public GameObject Root { get; private set; }
+
+        public void Enter(Transform parent)
+        {
+            Root = new GameObject("ConfirmDialog");
+            var rt = Root.AddComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+
+            // Dimmer to block clicks and darken background
+            var dim = new GameObject("Dimmer");
+            var dimRt = dim.AddComponent<RectTransform>();
+            dimRt.SetParent(rt, false);
+            dimRt.anchorMin = Vector2.zero; dimRt.anchorMax = Vector2.one;
+            dimRt.offsetMin = Vector2.zero; dimRt.offsetMax = Vector2.zero;
+            var dimImg = dim.AddComponent<Image>();
+            dimImg.color = new Color(0f, 0f, 0f, 0.55f);
+            dimImg.raycastTarget = true;
+
+            // Dialog panel
+            var panel = new GameObject("Panel");
+            var prt = panel.AddComponent<RectTransform>();
+            prt.SetParent(rt, false);
+            prt.sizeDelta = new Vector2(520, 280);
+            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
+            prt.anchoredPosition = Vector2.zero;
+            var panelImg = panel.AddComponent<Image>();
+            panelImg.color = new Color(0.231f, 0.200f, 0.161f); // matches SecondaryFill-ish
+
+            var layout = panel.AddComponent<VerticalLayoutGroup>();
+            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.childControlHeight = true; layout.childControlWidth = true;
+            layout.childForceExpandHeight = false; layout.childForceExpandWidth = false;
+            layout.padding = new RectOffset(24, 24, 24, 24);
+            layout.spacing = 12;
+
+            // Title
+            var titleGO = new GameObject("Title");
+            titleGO.transform.SetParent(panel.transform, false);
+            var titleText = titleGO.AddComponent<Text>();
+            titleText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            titleText.fontSize = 26; titleText.alignment = TextAnchor.MiddleCenter;
+            titleText.color = Color.white;
+            titleText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            titleText.verticalOverflow = VerticalWrapMode.Truncate;
+            titleText.text = string.IsNullOrEmpty(Title) ? "Confirm" : Title;
+
+            // Message
+            var msgGO = new GameObject("Message");
+            msgGO.transform.SetParent(panel.transform, false);
+            var msgText = msgGO.AddComponent<Text>();
+            msgText.font = titleText.font;
+            msgText.fontSize = 16; msgText.alignment = TextAnchor.MiddleCenter;
+            msgText.color = new Color(0.9f, 0.9f, 0.9f, 0.95f);
+            msgText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            msgText.verticalOverflow = VerticalWrapMode.Overflow;
+            msgText.text = string.IsNullOrEmpty(Message) ? string.Empty : Message;
+
+            // Buttons row
+            var row = new GameObject("Buttons");
+            row.transform.SetParent(panel.transform, false);
+            var rowLayout = row.AddComponent<HorizontalLayoutGroup>();
+            rowLayout.childAlignment = TextAnchor.MiddleCenter;
+            rowLayout.spacing = 16;
+            rowLayout.childForceExpandWidth = false;
+            rowLayout.childForceExpandHeight = false;
+            rowLayout.padding = new RectOffset(0, 0, 8, 0);
+
+            // Cancel / Confirm buttons using UIFactory
+            UIFactory.CreateButtonSecondary(row, string.IsNullOrEmpty(CancelLabel) ? "Cancel" : CancelLabel, () =>
+            {
+                UIRouter.Current?.Pop();
+                OnCancel?.Invoke();
+            });
+
+            UIFactory.CreateButtonDanger(row, string.IsNullOrEmpty(ConfirmLabel) ? "OK" : ConfirmLabel, () =>
+            {
+                var router = UIRouter.Current;
+                router?.Pop(); // close dialog first so new screens appear above
+                OnConfirm?.Invoke();
+            });
+        }
+
+        public void Exit()
+        {
+            if (Root != null)
+            {
+                UnityEngine.Object.Destroy(Root);
+                Root = null;
+            }
+        }
+    }
+}
+
+// ===== FILE: Assets/Scripts/UI/Screens/LoadingScreen.cs =====
+using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using FantasyColony.UI.Router;
+
+namespace FantasyColony.UI.Screens
+{
+    // Minimal loading cover; reboots the app flow on the next frame (after a short delay)
+    public class LoadingScreen : IScreen
+    {
+        public string Title = "Restarting…";
+        public GameObject Root { get; private set; }
+
+        public void Enter(Transform parent)
+        {
+            Root = new GameObject("LoadingScreen");
+            var rt = Root.AddComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+
+            // Solid dark cover (prevents flash)
+            var bg = new GameObject("Background");
+            var bgrt = bg.AddComponent<RectTransform>();
+            bgrt.SetParent(rt, false);
+            bgrt.anchorMin = Vector2.zero; bgrt.anchorMax = Vector2.one;
+            bgrt.offsetMin = Vector2.zero; bgrt.offsetMax = Vector2.zero;
+            var bgImg = bg.AddComponent<Image>();
+            bgImg.color = new Color(0.10f, 0.09f, 0.08f, 1f);
+            bgImg.raycastTarget = true;
+
+            // Centered title
+            var titleGO = new GameObject("Title");
+            var tr = titleGO.AddComponent<RectTransform>();
+            tr.SetParent(rt, false);
+            tr.anchorMin = tr.anchorMax = new Vector2(0.5f, 0.5f);
+            tr.anchoredPosition = Vector2.zero;
+            var text = titleGO.AddComponent<Text>();
+            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.fontSize = 24; text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.text = string.IsNullOrEmpty(Title) ? "Loading…" : Title;
+
+            // Kick off the restart on the next frame (with a tiny delay to ensure display)
+            var runner = Root.AddComponent<Runner>();
+            runner.Begin(() => {
+                Time.timeScale = 1f;
+                UIRouter.Current?.ResetTo<MainMenuScreen>();
+            });
+        }
+
+        public void Exit()
+        {
+            if (Root != null)
+            {
+                UnityEngine.Object.Destroy(Root);
+                Root = null;
+            }
+        }
+
+        private class Runner : MonoBehaviour
+        {
+            public void Begin(Action onReady) { StartCoroutine(BeginCo(onReady)); }
+            private IEnumerator BeginCo(Action onReady)
+            {
+                yield return null; // render once
+                yield return new WaitForSeconds(0.15f); // anti-flicker; replace with real phases later
+                onReady?.Invoke();
+            }
         }
     }
 }
@@ -610,8 +815,8 @@ namespace FantasyColony.UI.Screens
             UIFactory.CreateButtonSecondary(panel, "Options",    () => NotImpl("Options"));
             UIFactory.CreateButtonSecondary(panel, "Mods",       () => NotImpl("Mods"));
             UIFactory.CreateButtonSecondary(panel, "Creator",    () => NotImpl("Creator"));
-            UIFactory.CreateButtonSecondary(panel, "Restart",    RestartGame);
-            UIFactory.CreateButtonDanger(panel,     "Quit",      QuitGame);
+            UIFactory.CreateButtonSecondary(panel, "Restart",    ShowRestartConfirm);
+            UIFactory.CreateButtonDanger(panel,     "Quit",      ShowQuitConfirm);
 
             // Disabled rules for now (no save system yet)
             btnContinue.interactable = false;
@@ -627,12 +832,38 @@ namespace FantasyColony.UI.Screens
             }
         }
 
+        private void ShowRestartConfirm()
+        {
+            UIRouter.Current?.Push<ConfirmDialogScreen>(d =>
+            {
+                d.Title = "Restart Game?";
+                d.Message = "This will restart the application flow.";
+                d.ConfirmLabel = "Restart";
+                d.CancelLabel = "Cancel";
+                d.OnConfirm = () =>
+                {
+                    UIRouter.Current?.Push<LoadingScreen>(l => { l.Title = "Restarting…"; });
+                };
+            });
+        }
+
+        private void ShowQuitConfirm()
+        {
+            UIRouter.Current?.Push<ConfirmDialogScreen>(d =>
+            {
+                d.Title = "Quit Game?";
+                d.Message = "Are you sure you want to exit?";
+                d.ConfirmLabel = "Quit";
+                d.CancelLabel = "Cancel";
+                d.OnConfirm = QuitGame;
+            });
+        }
+
         private void RestartGame()
         {
-            // Normalize timescale and reset the UI stack to simulate a fresh boot
+            // (Old direct restart path retained for reference; unused now)
             Time.timeScale = 1f;
             UIRouter.Current?.ResetTo<MainMenuScreen>();
-            // Optional hygiene to mirror a clean boot over time as content grows
             Resources.UnloadUnusedAssets();
             System.GC.Collect();
         }
