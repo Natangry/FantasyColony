@@ -50,7 +50,7 @@ namespace FantasyColony.UI.Screens
             UIFactory.CreateButtonSecondary(panel, "Mods",       () => NotImpl("Mods"));
             UIFactory.CreateButtonSecondary(panel, "Creator",    () => NotImpl("Creator"));
             UIFactory.CreateButtonSecondary(panel, "Restart",    () => NotImpl("Restart"));
-            UIFactory.CreateButtonDanger(panel,     "Quit",      () => NotImpl("Quit"));
+            UIFactory.CreateButtonDanger(panel,     "Quit",      QuitGame);
 
             // Disabled rules for now (no save system yet)
             btnContinue.interactable = false;
@@ -64,6 +64,15 @@ namespace FantasyColony.UI.Screens
                 Object.Destroy(Root.gameObject);
                 Root = null;
             }
+        }
+
+        private static void QuitGame()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.ExitPlaymode();
+#else
+            Application.Quit();
+#endif
         }
     }
 }
