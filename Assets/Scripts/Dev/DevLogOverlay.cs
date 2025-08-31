@@ -29,6 +29,7 @@ public class DevLogOverlay : MonoBehaviour
         public string message;
         public string stackTrace; // may be empty based on policy
         public string contextName; // optional
+        public int count; // number of additional consecutive occurrences collapsed into this entry
     }
 
     private struct QueuedLog
@@ -64,6 +65,7 @@ public class DevLogOverlay : MonoBehaviour
     public bool paused = false;
     public bool autoScroll = true;
     public bool showStackTraces = false; // toggles display; capture is controlled by Unity's stack trace policy
+    public bool collapseRepeats = true; // when true, consecutive identical messages are collapsed
 
     private Vector2 _scroll;
     private bool _visible = true;
@@ -170,7 +172,29 @@ public class DevLogOverlay : MonoBehaviour
 
             if (!paused)
             {
-                _entries.Add(e);
+                if (collapseRepeats && _entries.Count > 0)
+                {
+                    var lastIndex = _entries.Count - 1;
+                    var lastEntry = _entries[lastIndex];
+                    if (AreSameForCollapse(lastEntry, e))
+                    {
+                        lastEntry.count = lastEntry.count + 1;
+                        // keep the most recent time/frame/thread for the collapsed line
+                        lastEntry.time = e.time;
+                        lastEntry.frame = e.frame;
+                        lastEntry.threadId = e.threadId;
+                        _entries[lastIndex] = lastEntry;
+                    }
+                    else
+                    {
+                        _entries.Add(e);
+                    }
+                }
+                else
+                {
+                    _entries.Add(e);
+                }
+
                 if (_entries.Count > Mathf.Max(512, capacity))
                 {
                     var over = _entries.Count - capacity;
@@ -207,6 +231,7 @@ public class DevLogOverlay : MonoBehaviour
         GUILayout.FlexibleSpace();
         autoScroll = GUILayout.Toggle(autoScroll, "Auto-Scroll", GUILayout.Height(24));
         showStackTraces = GUILayout.Toggle(showStackTraces, "Stack Traces", GUILayout.Height(24));
+        collapseRepeats = GUILayout.Toggle(collapseRepeats, "Collapse Repeats", GUILayout.Height(24));
         GUILayout.EndHorizontal();
 
         GUILayout.Space(4);
@@ -258,7 +283,15 @@ public class DevLogOverlay : MonoBehaviour
             GUILayout.Label(e.frame.ToString(), _tinyLabel, GUILayout.Width(36));
             GUILayout.Label(e.threadId.ToString(), _tinyLabel, GUILayout.Width(28));
             GUILayout.Label(LevelLabel(e.type), _tinyLabel, GUILayout.Width(60));
-            GUILayout.Label(e.message, style);
+            if (e.count > 0)
+            {
+                // Show message with (xN) suffix for collapsed duplicates
+                GUILayout.Label(string.Concat(e.message, " (x", (e.count + 1).ToString(), ")"), style);
+            }
+            else
+            {
+                GUILayout.Label(e.message, style);
+            }
             GUILayout.EndHorizontal();
 
             if (showStackTraces && HasStack(e))
@@ -400,7 +433,14 @@ public class DevLogOverlay : MonoBehaviour
             {
                 sb.Append('{').Append(e.contextName).Append("} ");
             }
-            sb.AppendLine(e.message ?? string.Empty);
+            if (e.count > 0)
+            {
+                sb.Append(e.message ?? string.Empty).Append(" (x").Append((e.count + 1).ToString()).AppendLine(")");
+            }
+            else
+            {
+                sb.AppendLine(e.message ?? string.Empty);
+            }
 
             if (showStackTraces && HasStack(e))
             {
@@ -409,6 +449,15 @@ public class DevLogOverlay : MonoBehaviour
         }
 
         GUIUtility.systemCopyBuffer = sb.ToString();
+    }
+
+    private static bool AreSameForCollapse(in LogEntry a, in LogEntry b)
+    {
+        if (a.type != b.type) return false;
+        if (!string.Equals(a.message, b.message, StringComparison.Ordinal)) return false;
+        if (!string.Equals(a.stackTrace, b.stackTrace, StringComparison.Ordinal)) return false;
+        if (!string.Equals(a.contextName, b.contextName, StringComparison.Ordinal)) return false;
+        return true;
     }
 
     private void OnLogMessageReceivedThreaded(string condition, string stacktrace, LogType type)
