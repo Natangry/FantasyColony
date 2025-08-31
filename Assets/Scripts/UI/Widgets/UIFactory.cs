@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using FantasyColony.UI.Style;
 using System;
 
@@ -52,8 +53,8 @@ namespace FantasyColony.UI.Widgets
             img.color = fill;
 
             var btn = go.GetComponent<Button>();
-            btn.targetGraphic = img; // ensure transitions target our Image
             btn.transition = Selectable.Transition.ColorTint;
+            btn.targetGraphic = img;
             var colors = btn.colors;
             colors.normalColor = fill;
 
@@ -79,7 +80,8 @@ namespace FantasyColony.UI.Widgets
                 colors.pressedColor = Multiply(fill, 0.80f);
             }
 
-            colors.selectedColor = colors.highlightedColor;
+            // Ensure selected state does not appear "stuck pressed" after click
+            colors.selectedColor = colors.normalColor;
             colors.disabledColor = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
             colors.fadeDuration = 0.08f;
@@ -157,5 +159,14 @@ namespace FantasyColony.UI.Widgets
         }
 
         private static Color Multiply(Color c, float f) => new Color(c.r * f, c.g * f, c.b * f, c.a);
+
+        private static void ClearSelectionIfMouseClick()
+        {
+            var es = EventSystem.current;
+            if (es != null && Input.mousePresent)
+            {
+                es.SetSelectedGameObject(null);
+            }
+        }
     }
 }
