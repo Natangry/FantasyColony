@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
@@ -49,7 +50,7 @@ namespace FantasyColony.UI.Screens
             UIFactory.CreateButtonSecondary(panel, "Options",    () => NotImpl("Options"));
             UIFactory.CreateButtonSecondary(panel, "Mods",       () => NotImpl("Mods"));
             UIFactory.CreateButtonSecondary(panel, "Creator",    () => NotImpl("Creator"));
-            UIFactory.CreateButtonSecondary(panel, "Restart",    () => NotImpl("Restart"));
+            UIFactory.CreateButtonSecondary(panel, "Restart",    RestartGame);
             UIFactory.CreateButtonDanger(panel,     "Quit",      QuitGame);
 
             // Disabled rules for now (no save system yet)
@@ -64,6 +65,13 @@ namespace FantasyColony.UI.Screens
                 Object.Destroy(Root.gameObject);
                 Root = null;
             }
+        }
+
+        private static void RestartGame()
+        {
+            // Ensure normal time scale and reload the initial boot scene to mimic a fresh launch
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(0);
         }
 
         private static void QuitGame()
