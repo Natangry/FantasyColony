@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Lightweight audio bootstrap: one BGM source and one-shot SFX source.

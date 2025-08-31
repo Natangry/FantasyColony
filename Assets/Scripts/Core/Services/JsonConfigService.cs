@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Minimal JSON-backed config service with string Get/Set to avoid API churn.

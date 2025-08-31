@@ -4,7 +4,7 @@ using System.IO;
 using System.Xml.Linq;
 using UnityEngine;
 
-namespace Core.Mods
+namespace FantasyColony.Core.Mods
 {
     public class DefError
     {
@@ -18,7 +18,7 @@ namespace Core.Mods
     /// </summary>
     public static class XmlDefLoader
     {
-        public static void Load(List<ModInfo> mods, Core.Services.DefRegistry registry, List<DefError> errors)
+        public static void Load(List<ModInfo> mods, FantasyColony.Core.Services.DefRegistry registry, List<DefError> errors)
         {
             if (mods == null || registry == null) return;
             foreach (var mod in mods)
