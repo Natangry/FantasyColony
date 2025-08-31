@@ -1,0 +1,11 @@
+{
+  "type": "BiomeDef",
+  "version": 1,
+  "required": ["id", "label"],
+  "fields": [
+    {"name":"id","kind":"attr","type":"id"},
+    {"name":"label","kind":"elem","type":"string","minLength":1},
+    {"name":"temperature","kind":"elem","type":"float"},
+    {"name":"rainfall","kind":"elem","type":"float","min":0}
+  ]
+}
