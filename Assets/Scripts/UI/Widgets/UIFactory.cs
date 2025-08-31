@@ -51,6 +51,7 @@ namespace FantasyColony.UI.Widgets
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
+            borderImg.preserveAspect = false;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -59,6 +60,12 @@ namespace FantasyColony.UI.Widgets
             // Root image no longer draws visuals; keep it disabled but present for easy toggling
             rootImg.enabled = false;
             rootImg.raycastTarget = false;
+
+            // Ensure BG_Fill under BG_Border
+            var fill = go.transform.Find("BG_Fill");
+            var borderT = go.transform.Find("BG_Border");
+            if (fill) fill.SetSiblingIndex(0);
+            if (borderT) borderT.SetSiblingIndex(1);
 
             return rt;
         }
@@ -90,6 +97,7 @@ namespace FantasyColony.UI.Widgets
             fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero;
             var fillImg = fillGO.GetComponent<Image>();
             fillImg.raycastTarget = false;
+            fillImg.preserveAspect = false;
             fillGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
             if (wood != null) { fillImg.sprite = wood; fillImg.type = Image.Type.Tiled; }
@@ -103,6 +111,7 @@ namespace FantasyColony.UI.Widgets
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
+            borderImg.preserveAspect = false;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -153,6 +162,16 @@ namespace FantasyColony.UI.Widgets
             txt.alignment = TextAnchor.MiddleLeft;
             txt.fontSize = BaseUIStyle.ButtonFontSize;
             txt.color = textColor;
+            txt.raycastTarget = false;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Truncate;
+
+            // Explicit layer order (back -> front)
+            fillGO.transform.SetSiblingIndex(0);
+            borderGO.transform.SetSiblingIndex(1);
+            overlayGO.transform.SetSiblingIndex(2);
+            textGO.transform.SetSiblingIndex(3);
+
             return btn;
         }
 

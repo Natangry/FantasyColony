@@ -37,17 +37,14 @@ namespace FantasyColony.UI.Screens
             dimImg.color = new Color(0f, 0f, 0f, 0.55f);
             dimImg.raycastTarget = true;
 
-            // Dialog panel
-            var panel = new GameObject("Panel");
-            var prt = panel.AddComponent<RectTransform>();
-            prt.SetParent(rt, false);
+            // Dialog panel (textured surface from UIFactory)
+            var prt = UIFactory.CreatePanelSurface(rt, "Panel");
             prt.sizeDelta = new Vector2(520, 280);
             prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
             prt.anchoredPosition = Vector2.zero;
-            var panelImg = panel.AddComponent<Image>();
-            panelImg.color = new Color(0.231f, 0.200f, 0.161f); // matches SecondaryFill-ish
+            UIFactory.SetPanelDecorVisible(prt, true);
 
-            var layout = panel.AddComponent<VerticalLayoutGroup>();
+            var layout = prt.GetComponent<VerticalLayoutGroup>();
             layout.childAlignment = TextAnchor.UpperCenter;
             layout.childControlHeight = true; layout.childControlWidth = true;
             layout.childForceExpandHeight = false; layout.childForceExpandWidth = false;
@@ -56,7 +53,7 @@ namespace FantasyColony.UI.Screens
 
             // Title
             var titleGO = new GameObject("Title");
-            titleGO.transform.SetParent(panel.transform, false);
+            titleGO.transform.SetParent(prt, false);
             var titleText = titleGO.AddComponent<Text>();
             titleText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             titleText.fontSize = 26; titleText.alignment = TextAnchor.MiddleCenter;
@@ -67,7 +64,7 @@ namespace FantasyColony.UI.Screens
 
             // Message
             var msgGO = new GameObject("Message");
-            msgGO.transform.SetParent(panel.transform, false);
+            msgGO.transform.SetParent(prt, false);
             var msgText = msgGO.AddComponent<Text>();
             msgText.font = titleText.font;
             msgText.fontSize = 16; msgText.alignment = TextAnchor.MiddleCenter;
@@ -78,7 +75,7 @@ namespace FantasyColony.UI.Screens
 
             // Buttons row
             var row = new GameObject("Buttons");
-            row.transform.SetParent(panel.transform, false);
+            row.transform.SetParent(prt, false);
             var rowLayout = row.AddComponent<HorizontalLayoutGroup>();
             rowLayout.childAlignment = TextAnchor.MiddleCenter;
             rowLayout.spacing = 16;
