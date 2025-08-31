@@ -38,8 +38,8 @@ namespace FantasyColony.UI.Style
         // Encasing border thinness: higher = thinner (affects 9-slice edge width via Image.pixelsPerUnitMultiplier)
         // Effective border thickness in UI units ≈ slicePixels / (PPU * scale).
         // Tweak these two values to taste.
-        public const float ButtonBorderScale = 1.6f;
-        public const float PanelBorderScale  = 1.4f;
+        public const float ButtonBorderScale = 4.0f;
+        public const float PanelBorderScale  = 10.0f;
 
         // Sizes
         public const int ButtonHeight = 56;
