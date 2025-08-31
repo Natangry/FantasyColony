@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-08-31 05:33:40 UTC
+_Updated_: 2025-08-31 05:39:23 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
