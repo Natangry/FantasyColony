@@ -1,5 +1,6 @@
 using System;
 using FantasyColony.Core.Services;
+using UnityEngine;
 
 namespace FantasyColony.Core.Defs.Migrations {
     public static class MigrationEngine {
@@ -14,7 +15,7 @@ namespace FantasyColony.Core.Defs.Migrations {
                 if (m.SchemaVersion == 0) continue; // missing handled by validator; do not auto-set
                 if (m.SchemaVersion < current) {
                     migrated++;
-                    Logger.Log($"[Defs] Migrated {m.Type}.{m.Id} from v{m.SchemaVersion} to v{current}");
+                    Debug.Log($"[Defs] Migrated {m.Type}.{m.Id} from v{m.SchemaVersion} to v{current}");
                     // Future: data transforms on DOM; for now, we only log logical migration
                 }
             }
