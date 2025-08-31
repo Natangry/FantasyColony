@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 23:04:45 UTC
+_Updated_: 2025-08-31 23:26:28 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -1549,10 +1549,9 @@ namespace FantasyColony.Core.Services
             return (s == "strict") ? FantasyColony.Core.Defs.Validation.ValidationMode.Strict : FantasyColony.Core.Defs.Validation.ValidationMode.Lenient;
         }
 
-        public void Set(string key, string value)
-        {
-            if (string.IsNullOrEmpty(key)) return;
+        public void Set(string key, string value) {
             _map[key] = value ?? string.Empty;
+            // Optional: persist to disk here if desired.
         }
 
         [Serializable]
@@ -2459,48 +2458,44 @@ namespace FantasyColony.UI.Screens {
     /// Simple UI to present BootReport contents and first N validation messages.
     /// Dev-only utility; keep minimal.
     /// </summary>
-    public sealed class BootReportScreen : UIScreenBase {
+    public sealed class BootReportScreen : UIScreen {
         private Text _title;
         private Text _body;
         private Button _copy;
         private Button _close;
 
-        public override void Enter(Transform parent) {
-            Root = new GameObject("BootReport").AddComponent<RectTransform>();
-            Root.SetParent(parent, false);
-
-            var panel = CreatePanel(Root, new Vector2(800,600));
+        protected override void OnCreateContent(Transform parent) {
+            var panel = CreatePanel(parent, new Vector2(800, 600));
             _title = CreateText(panel, "Boot Report", 24, TextAnchor.MiddleCenter);
-            _title.rectTransform.anchoredPosition = new Vector2(0, 250);
+            var titleRT = _title.rectTransform;
+            titleRT.anchoredPosition = new Vector2(0, 250);
+
             _body = CreateText(panel, "", 14, TextAnchor.UpperLeft);
-            _body.rectTransform.sizeDelta = new Vector2(740, 430);
-            _body.rectTransform.anchoredPosition = new Vector2(0, 20);
+            var bodyRT = _body.rectTransform;
+            bodyRT.sizeDelta = new Vector2(740, 430);
+            bodyRT.anchoredPosition = new Vector2(0, 20);
             _body.horizontalOverflow = HorizontalWrapMode.Wrap;
             _body.verticalOverflow = VerticalWrapMode.Truncate;
 
             _copy = CreateButton(panel, "Copy", OnCopyClicked);
             _copy.GetComponent<RectTransform>().anchoredPosition = new Vector2(-120, -250);
-            _close = CreateButton(panel, "Close", () => UIRouter.Current?.Pop());
+            _close = CreateButton(panel, "Close", () => Router.Pop());
             _close.GetComponent<RectTransform>().anchoredPosition = new Vector2(120, -250);
 
             Refresh();
         }
 
-        public override void Exit() {
-            if (Root != null) {
-                UnityEngine.Object.Destroy(Root.gameObject);
-                Root = null;
-            }
-        }
-
         private void Refresh() {
             var report = FantasyColony.Boot.BootReport.Last;
-            if (report == null) { _body.text = "(no report)"; return; }
+            if (report == null) {
+                _body.text = "(no report)";
+                return;
+            }
             var sb = new StringBuilder();
             sb.AppendLine("Tasks:");
-            for (int i=0;i<report.steps.Count;i++) {
+            for (int i = 0; i < report.steps.Count; i++) {
                 var s = report.steps[i];
-                sb.AppendLine($" - {s.title}  ({s.seconds:0.000}s){(string.IsNullOrEmpty(s.warn)?"":"  ["+s.warn+"]")}");
+                sb.AppendLine($" - {s.title}  ({s.seconds:0.000}s){(string.IsNullOrEmpty(s.warn) ? "" : "  [" + s.warn + "]")}");
             }
             _body.text = sb.ToString();
         }
@@ -2509,9 +2504,9 @@ namespace FantasyColony.UI.Screens {
             var report = FantasyColony.Boot.BootReport.Last;
             if (report == null) return;
             var sb = new StringBuilder();
-            for (int i=0;i<report.steps.Count;i++) {
+            for (int i = 0; i < report.steps.Count; i++) {
                 var s = report.steps[i];
-                sb.AppendLine($"{s.title}\t{s.seconds:0.000}\t{(s.warn??"").Replace('\n',' ')}");
+                sb.AppendLine($"{s.title}\t{s.seconds:0.000}\t{(s.warn ?? "").Replace('\n', ' ')}");
             }
 #if UNITY_EDITOR
             UnityEditor.EditorGUIUtility.systemCopyBuffer = sb.ToString();
@@ -2528,29 +2523,40 @@ namespace FantasyColony.UI.Screens {
             rt.sizeDelta = size;
             rt.anchoredPosition = Vector2.zero;
             var img = go.GetComponent<Image>();
-            img.color = new Color(0,0,0,0.8f);
+            img.color = new Color(0, 0, 0, 0.8f);
             var outline = go.AddComponent<Outline>();
-            outline.effectColor = new Color(1,1,1,0.05f);
+            outline.effectColor = new Color(1, 1, 1, 0.05f);
             return rt;
         }
         private Text CreateText(RectTransform parent, string text, int size, TextAnchor anchor) {
             var go = new GameObject("Text", typeof(RectTransform), typeof(Text));
             go.transform.SetParent(parent, false);
             var t = go.GetComponent<Text>();
-            t.text = text; t.fontSize = size; t.alignment = anchor; t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            var rt = (RectTransform)go.transform; rt.sizeDelta = new Vector2(740,60); rt.anchoredPosition = Vector2.zero;
+            t.text = text;
+            t.fontSize = size;
+            t.alignment = anchor;
+            t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            var rt = (RectTransform)go.transform;
+            rt.sizeDelta = new Vector2(740, 60);
+            rt.anchoredPosition = Vector2.zero;
             return t;
         }
         private Button CreateButton(RectTransform parent, string text, System.Action onClick) {
             var go = new GameObject("Button", typeof(RectTransform), typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
-            var rt = (RectTransform)go.transform; rt.sizeDelta = new Vector2(160,40);
-            var img = go.GetComponent<Image>(); img.color = new Color(1,1,1,0.1f);
-            var btn = go.GetComponent<Button>(); btn.onClick.AddListener(() => onClick());
-            var label = CreateText(rt, text, 16, TextAnchor.MiddleCenter); label.rectTransform.sizeDelta = rt.sizeDelta;
+            var rt = (RectTransform)go.transform;
+            rt.sizeDelta = new Vector2(160, 40);
+            var img = go.GetComponent<Image>();
+            img.color = new Color(1, 1, 1, 0.1f);
+            var btn = go.GetComponent<Button>();
+            btn.onClick.AddListener(() => onClick());
+            var label = CreateText(rt, text, 16, TextAnchor.MiddleCenter);
+            label.rectTransform.sizeDelta = rt.sizeDelta;
             return btn;
         }
     }
+}
+
 
 // ===== FILE: Assets/Scripts/UI/Screens/BootScreen.cs =====
 using System;
