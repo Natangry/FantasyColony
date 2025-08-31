@@ -56,9 +56,21 @@ namespace FantasyColony.UI.Widgets
             btn.transition = Selectable.Transition.ColorTint;
             var colors = btn.colors;
             colors.normalColor = fill;
-            // Stronger deltas for clearer feedback
-            colors.highlightedColor = isDanger ? BaseUIStyle.DangerHover : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldHover : Multiply(fill, 1.15f));
-            colors.pressedColor    = isDanger ? BaseUIStyle.DangerPressed : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldPressed : Multiply(fill, 0.80f));
+            // Stronger deltas for clearer feedback. SecondaryFill uses explicit palette values
+            colors.highlightedColor = isDanger
+                ? BaseUIStyle.DangerHover
+                : (fill == BaseUIStyle.Gold
+                    ? BaseUIStyle.GoldHover
+                    : (fill == BaseUIStyle.SecondaryFill
+                        ? BaseUIStyle.SecondaryHover
+                        : Multiply(fill, 1.15f)));
+            colors.pressedColor = isDanger
+                ? BaseUIStyle.DangerPressed
+                : (fill == BaseUIStyle.Gold
+                    ? BaseUIStyle.GoldPressed
+                    : (fill == BaseUIStyle.SecondaryFill
+                        ? BaseUIStyle.SecondaryPressed
+                        : Multiply(fill, 0.80f)));
             colors.selectedColor   = colors.highlightedColor;
             colors.disabledColor   = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
