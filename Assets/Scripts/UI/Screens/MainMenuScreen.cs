@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using System;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
@@ -67,20 +67,23 @@ namespace FantasyColony.UI.Screens
             }
         }
 
-        private static void RestartGame()
+        private void RestartGame()
         {
-            // Ensure normal time scale and reload the initial boot scene to mimic a fresh launch
+            // Normalize timescale and reset the UI stack to simulate a fresh boot
             Time.timeScale = 1f;
-            SceneManager.LoadScene(0);
+            UIRouter.Current?.ResetTo<MainMenuScreen>();
+            // Optional hygiene to mirror a clean boot over time as content grows
+            Resources.UnloadUnusedAssets();
+            System.GC.Collect();
         }
 
-        private static void QuitGame()
+        private void QuitGame()
         {
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
             UnityEditor.EditorApplication.ExitPlaymode();
-#else
+        #else
             Application.Quit();
-#endif
+        #endif
         }
     }
 }
