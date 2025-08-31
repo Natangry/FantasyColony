@@ -1,187 +1,139 @@
-# Docs Index (auto)
-
-↩️ [Back to Repository Index](../INDEX.md)
-
-- **Glossary.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Glossary.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Glossary.md)
-- **XML_ARTIFACTS.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/XML_ARTIFACTS.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/XML_ARTIFACTS.md)
-
-## Colony
-
-- **Jobs-and-Assignment-Loop-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Jobs-and-Assignment-Loop-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Jobs-and-Assignment-Loop-v0.1.md)
-- **Personalities-Social-and-Relationships-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Personalities-Social-and-Relationships-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Personalities-Social-and-Relationships-v0.1.md)
-- **Sound-the-Alarm-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Sound-the-Alarm-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Sound-the-Alarm-v0.1.md)
-- **Threat-Director-Raids-and-Sieges-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Colony/Threat-Director-Raids-and-Sieges-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Colony/Threat-Director-Raids-and-Sieges-v0.1.md)
-
-## Combat
-
-- **Core-Stats-Damage-and-Math-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/Core-Stats-Damage-and-Math-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/Core-Stats-Damage-and-Math-v0.1.md)
-- **NonLethal-Capture-and-Custody-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/NonLethal-Capture-and-Custody-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/NonLethal-Capture-and-Custody-v0.1.md)
-- **RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md)
-- **Status-and-Dispels-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Combat/Status-and-Dispels-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Combat/Status-and-Dispels-v0.1.md)
-
-## Decisions
-
-- **ADR-0001-Combat-Model-RTwP.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0001-Combat-Model-RTwP.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0001-Combat-Model-RTwP.md)
-- **ADR-0002-Director-and-Quest-Dials.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0002-Director-and-Quest-Dials.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0002-Director-and-Quest-Dials.md)
-- **ADR-0003-Director-and-Mutation-Model.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0003-Director-and-Mutation-Model.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0003-Director-and-Mutation-Model.md)
-- **ADR-0004-Dynamic-Dialogue.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0004-Dynamic-Dialogue.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0004-Dynamic-Dialogue.md)
-- **ADR-0005-Major-Sagas-and-Boss-Arcs.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0005-Major-Sagas-and-Boss-Arcs.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0005-Major-Sagas-and-Boss-Arcs.md)
-- **ADR-0006-Faction-Mutators-and-Settlement-Scenes.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Decisions/ADR-0006-Faction-Mutators-and-Settlement-Scenes.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Decisions/ADR-0006-Faction-Mutators-and-Settlement-Scenes.md)
-
-## Design
-
-- **Building-Blueprints-and-Designations-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Building-Blueprints-and-Designations-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Building-Blueprints-and-Designations-v0.1.md)
-- **Colony-Loop-and-Pacing.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Colony-Loop-and-Pacing.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Colony-Loop-and-Pacing.md)
-- **Combat-RTwP-and-UI.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Combat-RTwP-and-UI.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Combat-RTwP-and-UI.md)
-- **Core-Stats-and-Combat-Math-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Core-Stats-and-Combat-Math-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Core-Stats-and-Combat-Math-v0.1.md)
-- **Gambit-Library-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Gambit-Library-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Gambit-Library-v0.1.md)
-- **Items-Inventory-and-Storage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Items-Inventory-and-Storage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Items-Inventory-and-Storage-v0.1.md)
-- **Jobs-Designation-Integration.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Jobs-Designation-Integration.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Jobs-Designation-Integration.md)
-- **Jobs-and-Workstation-Shifts.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Jobs-and-Workstation-Shifts.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Jobs-and-Workstation-Shifts.md)
-- **Mod-Packaging-and-Load-Order-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Mod-Packaging-and-Load-Order-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Mod-Packaging-and-Load-Order-v0.1.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Buildings.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Buildings.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Buildings.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Capture-Custody-and-Bounties.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Capture-Custody-and-Bounties.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Capture-Custody-and-Bounties.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Colony-Defense-and-Raids.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Colony-Defense-and-Raids.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Colony-Defense-and-Raids.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Combat-Stats-and-Formulas.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Combat-Stats-and-Formulas.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Combat-Stats-and-Formulas.md)
-- **Modding-Data-Schemas-v0.1-Addendum-CombatAI.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-CombatAI.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-CombatAI.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Dialogue.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Dialogue.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Dialogue.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Director-and-Quests.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Director-and-Quests.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Director-and-Quests.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Economy-Items-and-Trade.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Economy-Items-and-Trade.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Economy-Items-and-Trade.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Editor-Metadata.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Editor-Metadata.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Editor-Metadata.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Equipment-and-Inventory.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Equipment-and-Inventory.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Equipment-and-Inventory.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Ethos-Classes-and-QuestPaths.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Ethos-Classes-and-QuestPaths.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Ethos-Classes-and-QuestPaths.md)
-- **Modding-Data-Schemas-v0.1-Addendum-FactionMutators-and-Settlements.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-FactionMutators-and-Settlements.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-FactionMutators-and-Settlements.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Factions-and-Economy.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Factions-and-Economy.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Factions-and-Economy.md)
-- **Modding-Data-Schemas-v0.1-Addendum-FailForward-and-Rebuild.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-FailForward-and-Rebuild.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-FailForward-and-Rebuild.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Items-and-Storage.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Items-and-Storage.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Items-and-Storage.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Localization-and-Assets.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Localization-and-Assets.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Localization-and-Assets.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Logistics-and-Spoilage.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Logistics-and-Spoilage.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Logistics-and-Spoilage.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Needs.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Needs.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Needs.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Overworld-Gen-Travel-and-Camp.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Overworld-Gen-Travel-and-Camp.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Overworld-Gen-Travel-and-Camp.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Party-Quests-and-Dialogue-Mutators.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Party-Quests-and-Dialogue-Mutators.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Party-Quests-and-Dialogue-Mutators.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Progression-Classes-and-XP.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Progression-Classes-and-XP.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Progression-Classes-and-XP.md)
-- **Modding-Data-Schemas-v0.1-Addendum-RTwP-Controls-and-AI.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-RTwP-Controls-and-AI.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-RTwP-Controls-and-AI.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Sagas.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Sagas.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Sagas.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Settlements-and-Services.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Settlements-and-Services.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Settlements-and-Services.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Social-and-Relationships.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Social-and-Relationships.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Social-and-Relationships.md)
-- **Modding-Data-Schemas-v0.1-Addendum-StartScenario.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-StartScenario.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-StartScenario.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Stats-and-Damage.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Stats-and-Damage.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Stats-and-Damage.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Storyteller-and-Pacing.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Storyteller-and-Pacing.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Storyteller-and-Pacing.md)
-- **Modding-Data-Schemas-v0.1-Addendum-Tools.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Tools.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Tools.md)
-- **Modding-Data-Schemas-v0.1-Addendum-World-Metrics-Conditions-and-Counters.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-World-Metrics-Conditions-and-Counters.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1-Addendum-World-Metrics-Conditions-and-Counters.md)
-- **Modding-Data-Schemas-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Modding-Data-Schemas-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Modding-Data-Schemas-v0.1.md)
-- **Needs-and-Fallbacks-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Needs-and-Fallbacks-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Needs-and-Fallbacks-v0.1.md)
-- **New-Game-and-Starting-Scenarios-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/New-Game-and-Starting-Scenarios-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/New-Game-and-Starting-Scenarios-v0.1.md)
-- **Numbers-Aftershocks-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Aftershocks-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Aftershocks-v0.1.md)
-- **Numbers-Buildings-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Buildings-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Buildings-v0.1.md)
-- **Numbers-Capture-and-Custody-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Capture-and-Custody-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Capture-and-Custody-v0.1.md)
-- **Numbers-Colony-Defense-and-Breach-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Colony-Defense-and-Breach-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Colony-Defense-and-Breach-v0.1.md)
-- **Numbers-Combat-AI-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Combat-AI-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Combat-AI-v0.1.md)
-- **Numbers-Combat-and-Stats-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Combat-and-Stats-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Combat-and-Stats-v0.1.md)
-- **Numbers-Dialogue-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Dialogue-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Dialogue-v0.1.md)
-- **Numbers-Director-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Director-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Director-v0.1.md)
-- **Numbers-Economy-and-Prices-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Economy-and-Prices-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Economy-and-Prices-v0.1.md)
-- **Numbers-Equipment-Encumbrance-and-Repair-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Equipment-Encumbrance-and-Repair-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Equipment-Encumbrance-and-Repair-v0.1.md)
-- **Numbers-Ethos-and-Class-Aspects-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Ethos-and-Class-Aspects-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Ethos-and-Class-Aspects-v0.1.md)
-- **Numbers-Factions-Trade-and-Settlements-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Factions-Trade-and-Settlements-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Factions-Trade-and-Settlements-v0.1.md)
-- **Numbers-FailForward-and-Rebuild-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-FailForward-and-Rebuild-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-FailForward-and-Rebuild-v0.1.md)
-- **Numbers-Items-and-Storage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Items-and-Storage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Items-and-Storage-v0.1.md)
-- **Numbers-Logistics-Stockpiles-and-Spoilage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Logistics-Stockpiles-and-Spoilage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Logistics-Stockpiles-and-Spoilage-v0.1.md)
-- **Numbers-Needs-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Needs-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Needs-v0.1.md)
-- **Numbers-Overworld-Travel-and-Detection-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Overworld-Travel-and-Detection-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Overworld-Travel-and-Detection-v0.1.md)
-- **Numbers-Party-Loyalty-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Party-Loyalty-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Party-Loyalty-v0.1.md)
-- **Numbers-Progression-and-XP-v0.2.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Progression-and-XP-v0.2.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Progression-and-XP-v0.2.md)
-- **Numbers-RTwP-Controls-and-AI-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-RTwP-Controls-and-AI-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-RTwP-Controls-and-AI-v0.1.md)
-- **Numbers-Sagas-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Sagas-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Sagas-v0.1.md)
-- **Numbers-Settlements-Law-and-Festivals-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Settlements-Law-and-Festivals-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Settlements-Law-and-Festivals-v0.1.md)
-- **Numbers-Social-and-Relationships-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Social-and-Relationships-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Social-and-Relationships-v0.1.md)
-- **Numbers-Start-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Start-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Start-v0.1.md)
-- **Numbers-Stats-and-Damage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Stats-and-Damage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Stats-and-Damage-v0.1.md)
-- **Numbers-Storyteller-and-Pacing-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Storyteller-and-Pacing-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Storyteller-and-Pacing-v0.1.md)
-- **Numbers-Tools-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-Tools-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-Tools-v0.1.md)
-- **Numbers-World-Conditions-and-Thresholds-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-World-Conditions-and-Thresholds-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-World-Conditions-and-Thresholds-v0.1.md)
-- **Numbers-World-Director-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Numbers-World-Director-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Numbers-World-Director-v0.1.md)
-- **Tools-and-Equipment-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Tools-and-Equipment-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Tools-and-Equipment-v0.1.md)
-- **Validation-Severity-and-Lints-Addendum-Combat-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Validation-Severity-and-Lints-Addendum-Combat-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Validation-Severity-and-Lints-Addendum-Combat-v0.1.md)
-- **Validation-Severity-and-Lints-Addendum-Equipment-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Validation-Severity-and-Lints-Addendum-Equipment-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Validation-Severity-and-Lints-Addendum-Equipment-v0.1.md)
-- **Validation-Severity-and-Lints-Addendum-Logistics-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Validation-Severity-and-Lints-Addendum-Logistics-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Validation-Severity-and-Lints-Addendum-Logistics-v0.1.md)
-- **Validation-Severity-and-Lints.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Validation-Severity-and-Lints.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Validation-Severity-and-Lints.md)
-- **Workforce-Scheduling-and-Character-Info-UI.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Design/Workforce-Scheduling-and-Character-Info-UI.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Design/Workforce-Scheduling-and-Character-Info-UI.md)
-
-## Gear
-
-- **Equipment-Loadouts-Armory-and-Durability-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Gear/Equipment-Loadouts-Armory-and-Durability-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Gear/Equipment-Loadouts-Armory-and-Durability-v0.1.md)
-
-## Logistics
-
-- **Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Logistics/Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Logistics/Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md)
-
-## Overview
-
-- **Phase-0-Pre-Production.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Overview/Phase-0-Pre-Production.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Overview/Phase-0-Pre-Production.md)
-
-## Phases
-
-- **Phase-0-Pre-Production.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-0-Pre-Production.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-0-Pre-Production.md)
-- **Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md)
-- **Phase-1-Colony-Core-Slice.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-1-Colony-Core-Slice.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-1-Colony-Core-Slice.md)
-- **Phase-2-Battle-Core-RTwP.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-2-Battle-Core-RTwP.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-2-Battle-Core-RTwP.md)
-- **Phase-3-Loop-Integration-and-Overworld.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-3-Loop-Integration-and-Overworld.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-3-Loop-Integration-and-Overworld.md)
-- **Phase-4-Content-and-Systems-Expansion.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-4-Content-and-Systems-Expansion.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-4-Content-and-Systems-Expansion.md)
-- **Phase-5-Alpha-Polish-and-Mod-Hooks.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Phases/Phase-5-Alpha-Polish-and-Mod-Hooks.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Phases/Phase-5-Alpha-Polish-and-Mod-Hooks.md)
-
-## Progression
-
-- **Migration-Job-Combat-Unlocks-to-Classes.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Progression/Migration-Job-Combat-Unlocks-to-Classes.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Progression/Migration-Job-Combat-Unlocks-to-Classes.md)
-- **Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Progression/Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Progression/Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md)
-
-## Runbooks
-
-- **Codex-Workflow.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Runbooks/Codex-Workflow.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Runbooks/Codex-Workflow.md)
-
-## Templates
-
-- **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/.gitkeep)
-
-## Templates/Defs
-
-- **.gitkeep** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/.gitkeep) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/.gitkeep)
-- **AbilityDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/AbilityDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/AbilityDef.xml)
-- **BuildingDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/BuildingDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/BuildingDef.xml)
-- **ItemDef.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/ItemDef.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/ItemDef.xml)
-- **Visual2Def.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/Visual2Def.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/Visual2Def.xml)
-- **_AllSchemas.xml** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Templates/Defs/_AllSchemas.xml) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Templates/Defs/_AllSchemas.xml)
-
-## Tools
-
-- **Asset-Picker-and-Atlas-Builder-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Asset-Picker-and-Atlas-Builder-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Asset-Picker-and-Atlas-Builder-v0.1.md)
-- **Def-Editor-and-Dependency-Wizard-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Def-Editor-and-Dependency-Wizard-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Def-Editor-and-Dependency-Wizard-v0.1.md)
-- **Editor-UX-Guide-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Editor-UX-Guide-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Editor-UX-Guide-v0.1.md)
-- **Localization-Key-Editor-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/Tools/Localization-Key-Editor-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/Tools/Localization-Key-Editor-v0.1.md)
-
-## UI
-
-- **Character-Info-and-Compare-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/UI/Character-Info-and-Compare-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/UI/Character-Info-and-Compare-v0.1.md)
-- **Loadout-Manager-and-Armory-UI-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/UI/Loadout-Manager-and-Armory-UI-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/UI/Loadout-Manager-and-Armory-UI-v0.1.md)
-- **Logistics-Overlays-and-Alerts-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/UI/Logistics-Overlays-and-Alerts-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/UI/Logistics-Overlays-and-Alerts-v0.1.md)
-
-## World
-
-- **Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md)
-- **Catastrophic-FailForward-and-Rebuild-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Catastrophic-FailForward-and-Rebuild-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Catastrophic-FailForward-and-Rebuild-v0.1.md)
-- **Dialogue-and-Characters-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Dialogue-and-Characters-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Dialogue-and-Characters-v0.1.md)
-- **Director-Tags-and-Quests-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Director-Tags-and-Quests-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Director-Tags-and-Quests-v0.1.md)
-- **Economy-Itemization-and-Trade-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Economy-Itemization-and-Trade-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Economy-Itemization-and-Trade-v0.1.md)
-- **Economy-Trade-and-Markets-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Economy-Trade-and-Markets-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Economy-Trade-and-Markets-v0.1.md)
-- **Ethos-Good-Evil-and-Class-Aspects-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Ethos-Good-Evil-and-Class-Aspects-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Ethos-Good-Evil-and-Class-Aspects-v0.1.md)
-- **Faction-Mutators-and-Settlement-Scenes-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Faction-Mutators-and-Settlement-Scenes-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Faction-Mutators-and-Settlement-Scenes-v0.1.md)
-- **Factions-Reputation-and-Diplomacy-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Factions-Reputation-and-Diplomacy-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Factions-Reputation-and-Diplomacy-v0.1.md)
-- **Overworld-Free-Roam-and-Tags.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Overworld-Free-Roam-and-Tags.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Overworld-Free-Roam-and-Tags.md)
-- **Overworld-Generation-Travel-and-Camp-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Overworld-Generation-Travel-and-Camp-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Overworld-Generation-Travel-and-Camp-v0.1.md)
-- **Party-Loyalty-Temptation-and-Interjections-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Party-Loyalty-Temptation-and-Interjections-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Party-Loyalty-Temptation-and-Interjections-v0.1.md)
-- **Quest-Templates-and-Lifecycle-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Quest-Templates-and-Lifecycle-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Quest-Templates-and-Lifecycle-v0.1.md)
-- **Sagas-Major-Tags-and-Boss-Arcs-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Sagas-Major-Tags-and-Boss-Arcs-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Sagas-Major-Tags-and-Boss-Arcs-v0.1.md)
-- **Settlement-Scenes-and-Services-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Settlement-Scenes-and-Services-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Settlement-Scenes-and-Services-v0.1.md)
-- **Storyteller-and-Pacing-Director-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/Storyteller-and-Pacing-Director-v0.1.md)
-- **World-Metrics-Conditions-and-Triggers-v0.1.md** — [View](https://github.com/Natangry/FantasyColony/blob/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md)
+- ``Docs/Colony/Jobs-and-Assignment-Loop-v0.1.md
+- ``Docs/Colony/Personalities-Social-and-Relationships-v0.1.md
+- ``Docs/Colony/Sound-the-Alarm-v0.1.md
+- ``Docs/Colony/Threat-Director-Raids-and-Sieges-v0.1.md
+- ``Docs/Combat/Core-Stats-Damage-and-Math-v0.1.md
+- ``Docs/Combat/NonLethal-Capture-and-Custody-v0.1.md
+- ``Docs/Combat/RTwP-Stances-Formations-and-Gizmo-Bars-v0.1.md
+- ``Docs/Combat/Status-and-Dispels-v0.1.md
+- ``Docs/Decisions/ADR-0001-Combat-Model-RTwP.md
+- ``Docs/Decisions/ADR-0002-Director-and-Quest-Dials.md
+- ``Docs/Decisions/ADR-0003-Director-and-Mutation-Model.md
+- ``Docs/Decisions/ADR-0004-Dynamic-Dialogue.md
+- ``Docs/Decisions/ADR-0005-Major-Sagas-and-Boss-Arcs.md
+- ``Docs/Decisions/ADR-0006-Faction-Mutators-and-Settlement-Scenes.md
+- ``Docs/Design/Building-Blueprints-and-Designations-v0.1.md
+- ``Docs/Design/Colony-Loop-and-Pacing.md
+- ``Docs/Design/Combat-RTwP-and-UI.md
+- ``Docs/Design/Core-Stats-and-Combat-Math-v0.1.md
+- ``Docs/Design/Gambit-Library-v0.1.md
+- ``Docs/Design/Items-Inventory-and-Storage-v0.1.md
+- ``Docs/Design/Jobs-Designation-Integration.md
+- ``Docs/Design/Jobs-and-Workstation-Shifts.md
+- ``Docs/Design/Mod-Packaging-and-Load-Order-v0.1.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Aftershocks-and-SpinOffChains.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Buildings.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Capture-Custody-and-Bounties.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Colony-Defense-and-Raids.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Combat-Stats-and-Formulas.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-CombatAI.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Dialogue.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Director-and-Quests.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Economy-Items-and-Trade.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Editor-Metadata.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Equipment-and-Inventory.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Ethos-Classes-and-QuestPaths.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-FactionMutators-and-Settlements.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Factions-and-Economy.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-FailForward-and-Rebuild.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Items-and-Storage.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Localization-and-Assets.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Logistics-and-Spoilage.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Needs.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Overworld-Gen-Travel-and-Camp.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Party-Quests-and-Dialogue-Mutators.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Progression-Classes-and-XP.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-RTwP-Controls-and-AI.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Sagas.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Settlements-and-Services.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Social-and-Relationships.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-StartScenario.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Stats-and-Damage.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Storyteller-and-Pacing.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-Tools.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1-Addendum-World-Metrics-Conditions-and-Counters.md
+- ``Docs/Design/Modding-Data-Schemas-v0.1.md
+- ``Docs/Design/Needs-and-Fallbacks-v0.1.md
+- ``Docs/Design/New-Game-and-Starting-Scenarios-v0.1.md
+- ``Docs/Design/Numbers-Aftershocks-v0.1.md
+- ``Docs/Design/Numbers-Buildings-v0.1.md
+- ``Docs/Design/Numbers-Capture-and-Custody-v0.1.md
+- ``Docs/Design/Numbers-Colony-Defense-and-Breach-v0.1.md
+- ``Docs/Design/Numbers-Combat-AI-v0.1.md
+- ``Docs/Design/Numbers-Combat-and-Stats-v0.1.md
+- ``Docs/Design/Numbers-Dialogue-v0.1.md
+- ``Docs/Design/Numbers-Director-v0.1.md
+- ``Docs/Design/Numbers-Economy-and-Prices-v0.1.md
+- ``Docs/Design/Numbers-Equipment-Encumbrance-and-Repair-v0.1.md
+- ``Docs/Design/Numbers-Ethos-and-Class-Aspects-v0.1.md
+- ``Docs/Design/Numbers-Factions-Trade-and-Settlements-v0.1.md
+- ``Docs/Design/Numbers-FailForward-and-Rebuild-v0.1.md
+- ``Docs/Design/Numbers-Items-and-Storage-v0.1.md
+- ``Docs/Design/Numbers-Logistics-Stockpiles-and-Spoilage-v0.1.md
+- ``Docs/Design/Numbers-Needs-v0.1.md
+- ``Docs/Design/Numbers-Overworld-Travel-and-Detection-v0.1.md
+- ``Docs/Design/Numbers-Party-Loyalty-v0.1.md
+- ``Docs/Design/Numbers-Progression-and-XP-v0.2.md
+- ``Docs/Design/Numbers-RTwP-Controls-and-AI-v0.1.md
+- ``Docs/Design/Numbers-Sagas-v0.1.md
+- ``Docs/Design/Numbers-Settlements-Law-and-Festivals-v0.1.md
+- ``Docs/Design/Numbers-Social-and-Relationships-v0.1.md
+- ``Docs/Design/Numbers-Start-v0.1.md
+- ``Docs/Design/Numbers-Stats-and-Damage-v0.1.md
+- ``Docs/Design/Numbers-Storyteller-and-Pacing-v0.1.md
+- ``Docs/Design/Numbers-Tools-v0.1.md
+- ``Docs/Design/Numbers-World-Conditions-and-Thresholds-v0.1.md
+- ``Docs/Design/Numbers-World-Director-v0.1.md
+- ``Docs/Design/Tools-and-Equipment-v0.1.md
+- ``Docs/Design/Validation-Severity-and-Lints-Addendum-Combat-v0.1.md
+- ``Docs/Design/Validation-Severity-and-Lints-Addendum-Equipment-v0.1.md
+- ``Docs/Design/Validation-Severity-and-Lints-Addendum-Logistics-v0.1.md
+- ``Docs/Design/Validation-Severity-and-Lints.md
+- ``Docs/Design/Workforce-Scheduling-and-Character-Info-UI.md
+- ``Docs/Gear/Equipment-Loadouts-Armory-and-Durability-v0.1.md
+- ``Docs/Glossary.md
+- ``Docs/INDEX.md
+- ``Docs/Logistics/Logistics-Stockpiles-Hauling-and-Spoilage-v0.1.md
+- ``Docs/Overview/Phase-0-Pre-Production.md
+- ``Docs/Phases/Phase-0-Pre-Production.md
+- ``Docs/Phases/Phase-1-Addendum-Starter-Chains-and-Week1-Objectives.md
+- ``Docs/Phases/Phase-1-Colony-Core-Slice.md
+- ``Docs/Phases/Phase-2-Battle-Core-RTwP.md
+- ``Docs/Phases/Phase-3-Loop-Integration-and-Overworld.md
+- ``Docs/Phases/Phase-4-Content-and-Systems-Expansion.md
+- ``Docs/Phases/Phase-5-Alpha-Polish-and-Mod-Hooks.md
+- ``Docs/Progression/Migration-Job-Combat-Unlocks-to-Classes.md
+- ``Docs/Progression/Progression-Pawn-Class-Job-and-Combat-Skills-v0.2.md
+- ``Docs/Runbooks/Codex-Workflow.md
+- ``Docs/Templates/.gitkeep
+- ``Docs/Templates/Defs/.gitkeep
+- ``Docs/Templates/Defs/AbilityDef.xml
+- ``Docs/Templates/Defs/BuildingDef.xml
+- ``Docs/Templates/Defs/ItemDef.xml
+- ``Docs/Templates/Defs/Visual2Def.xml
+- ``Docs/Templates/Defs/_AllSchemas.xml
+- ``Docs/Tools/Asset-Picker-and-Atlas-Builder-v0.1.md
+- ``Docs/Tools/Def-Editor-and-Dependency-Wizard-v0.1.md
+- ``Docs/Tools/Editor-UX-Guide-v0.1.md
+- ``Docs/Tools/Localization-Key-Editor-v0.1.md
+- ``Docs/UI/Character-Info-and-Compare-v0.1.md
+- ``Docs/UI/Loadout-Manager-and-Armory-UI-v0.1.md
+- ``Docs/UI/Logistics-Overlays-and-Alerts-v0.1.md
+- ``Docs/World/Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md
+- ``Docs/World/Catastrophic-FailForward-and-Rebuild-v0.1.md
+- ``Docs/World/Dialogue-and-Characters-v0.1.md
+- ``Docs/World/Director-Tags-and-Quests-v0.1.md
+- ``Docs/World/Economy-Itemization-and-Trade-v0.1.md
+- ``Docs/World/Economy-Trade-and-Markets-v0.1.md
+- ``Docs/World/Ethos-Good-Evil-and-Class-Aspects-v0.1.md
+- ``Docs/World/Faction-Mutators-and-Settlement-Scenes-v0.1.md
+- ``Docs/World/Factions-Reputation-and-Diplomacy-v0.1.md
+- ``Docs/World/Overworld-Free-Roam-and-Tags.md
+- ``Docs/World/Overworld-Generation-Travel-and-Camp-v0.1.md
+- ``Docs/World/Party-Loyalty-Temptation-and-Interjections-v0.1.md
+- ``Docs/World/Quest-Templates-and-Lifecycle-v0.1.md
+- ``Docs/World/Sagas-Major-Tags-and-Boss-Arcs-v0.1.md
+- ``Docs/World/Settlement-Scenes-and-Services-v0.1.md
+- ``Docs/World/Storyteller-and-Pacing-Director-v0.1.md
+- ``Docs/World/World-Metrics-Conditions-and-Triggers-v0.1.md
+- ``Docs/XML_ARTIFACTS.md
