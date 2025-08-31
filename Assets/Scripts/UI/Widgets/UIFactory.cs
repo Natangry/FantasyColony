@@ -56,25 +56,33 @@ namespace FantasyColony.UI.Widgets
             btn.transition = Selectable.Transition.ColorTint;
             var colors = btn.colors;
             colors.normalColor = fill;
-            // Stronger deltas for clearer feedback. SecondaryFill uses explicit palette values
-            colors.highlightedColor = isDanger
-                ? BaseUIStyle.DangerHover
-                : (fill == BaseUIStyle.Gold
-                    ? BaseUIStyle.GoldHover
-                    : (fill == BaseUIStyle.SecondaryFill
-                        ? BaseUIStyle.SecondaryHover
-                        : Multiply(fill, 1.15f)));
-            colors.pressedColor = isDanger
-                ? BaseUIStyle.DangerPressed
-                : (fill == BaseUIStyle.Gold
-                    ? BaseUIStyle.GoldPressed
-                    : (fill == BaseUIStyle.SecondaryFill
-                        ? BaseUIStyle.SecondaryPressed
-                        : Multiply(fill, 0.80f)));
-            colors.selectedColor   = colors.highlightedColor;
-            colors.disabledColor   = new Color(fill.r, fill.g, fill.b, 0.35f);
+
+            // Use explicit palette values to guarantee visible state changes for known fills
+            if (isDanger)
+            {
+                colors.highlightedColor = BaseUIStyle.DangerHover;
+                colors.pressedColor = BaseUIStyle.DangerPressed;
+            }
+            else if (fill == BaseUIStyle.Gold)
+            {
+                colors.highlightedColor = BaseUIStyle.GoldHover;
+                colors.pressedColor = BaseUIStyle.GoldPressed;
+            }
+            else if (fill == BaseUIStyle.SecondaryFill)
+            {
+                colors.highlightedColor = BaseUIStyle.SecondaryHover;
+                colors.pressedColor = BaseUIStyle.SecondaryPressed;
+            }
+            else
+            {
+                colors.highlightedColor = Multiply(fill, 1.15f);
+                colors.pressedColor = Multiply(fill, 0.80f);
+            }
+
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
-            colors.fadeDuration    = 0.08f;
+            colors.fadeDuration = 0.08f;
             btn.colors = colors;
             btn.onClick.AddListener(() => onClick?.Invoke());
 
