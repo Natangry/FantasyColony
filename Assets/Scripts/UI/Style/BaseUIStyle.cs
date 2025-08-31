@@ -9,9 +9,10 @@ namespace FantasyColony.UI.Style
         public static Color32 GoldHover       = Hex("#E4C77D");
         public static Color32 GoldPressed     = Hex("#B99443");
         public static Color32 PanelSurface    = new Color32(0x1F,0x1A,0x14, (byte)(0.95f * 255));
-        public static Color32 SecondaryFill   = Hex("#2A231B");
-        public static Color32 SecondaryHover  = Hex("#383026");
-        public static Color32 SecondaryPressed= Hex("#241F17");
+        // Secondary palette tuned for clearer hover/click contrast
+        public static Color32 SecondaryFill   = Hex("#3B3329"); // Lightened from #2A231B
+        public static Color32 SecondaryHover  = Hex("#4A4033"); // Noticeably lighter than base
+        public static Color32 SecondaryPressed= Hex("#2A231B"); // Old base as pressed state
         public static Color32 Keyline         = new Color32(0x5A,0x4C,0x38, (byte)(0.60f * 255));
         public static Color32 TextPrimary     = Hex("#F1E9D2");
         public static Color32 TextSecondary   = Hex("#C9BDA2");
