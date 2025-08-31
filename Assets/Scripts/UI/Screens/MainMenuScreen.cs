@@ -34,7 +34,8 @@ namespace FantasyColony.UI.Screens
 
             // Panel stack (bottom-right)
             var panel = UIFactory.CreateBottomRightStack(Root, "MenuPanel");
-            panel.SetAsLastSibling();
+            // Hide panel chrome so buttons sit directly on the background art (previous behavior)
+            UIFactory.SetPanelDecorVisible(panel, false);
 
             // Buttons (log "Not implemented")
             void NotImpl(string name) => Debug.Log($"BUTTON: {name} (not implemented)");
