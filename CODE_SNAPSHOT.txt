@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 21:45:24 UTC
+_Updated_: 2025-08-31 22:48:32 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -275,6 +275,8 @@ namespace FantasyColony.Boot {
             string warn = null;
             int warnCount = 0, migCount = 0;
             try {
+                // Ensure per-type schema catalog is loaded from StreamingAssets and Mods
+                FantasyColony.Core.Defs.Validation.SchemaCatalog.EnsureLoaded(ctx.Mods);
                 var index = FantasyColony.Core.Defs.DefIndex.Build(ctx.Mods, ctx.Defs);
                 var results = FantasyColony.Core.Defs.Validation.DefValidator.Run(index);
                 foreach (var r in results) { Debug.LogWarning($"[Defs] {r}"); }
@@ -660,93 +662,282 @@ namespace FantasyColony.Core.Defs.Validation {
         public static List<Result> Run(Defs.DefIndex index) {
             var results = new List<Result>();
 
-            // R1: ID well-formed and present
-            foreach (var m in index.Items) {
-                if (string.IsNullOrEmpty(m.Id)) {
-                    results.Add(new Result { Path = m.Path, Message = $"Missing id for type {m.Type}" });
-                    continue;
-                }
-                if (!Defs.DefId.TryParse(m.Id.Contains('.') ? m.Id : $"{m.Type}.{m.Id}", out _)) {
-                    results.Add(new Result { Path = m.Path, Message = $"Id not well-formed: '{m.Id}' (expected modid.{m.Type}.Name or {m.Type}.Name)" });
-                }
-            }
-
-            // R2: Duplicates within (Type, Id) across all mods
+            // R0: Duplicates within (Type, Id) across all mods
             var seen = new HashSet<string>();
             foreach (var m in index.Items) {
                 var key = m.Type + "." + m.Id;
                 if (!seen.Add(key)) results.Add(new Result { Path = m.Path, Message = $"Duplicate id for {m.Type}: '{m.Id}'" });
             }
 
-            // R3: Cross-ref scan (heuristic) for common ref attributes
+            // Spec-driven validation
             foreach (var m in index.Items) {
+                // Basic ID shape
+                if (string.IsNullOrEmpty(m.Id) || !Defs.DefId.TryParse(m.Id.Contains('.') ? m.Id : $"{m.Type}.{m.Id}", out _)) {
+                    results.Add(new Result { Path = m.Path, Message = $"Id not well-formed: '{m.Id}' (expected modid.{m.Type}.Name or {m.Type}.Name)" });
+                    continue; // other checks will be noisy without an id
+                }
+
+                // Pick spec: declared version or current known
+                SchemaSpec spec = null;
+                if (m.SchemaVersion > 0) {
+                    SchemaCatalog.TryGet(m.Type, m.SchemaVersion, out spec);
+                } else {
+                    SchemaCatalog.TryGetCurrent(m.Type, out spec);
+                }
+
+                // Version sanity vs current
+                var (curOk, curVer) = Defs.Migrations.SchemaRegistry.TryGetCurrentVersion(m.Type);
+                if (m.SchemaVersion > 0 && curOk && m.SchemaVersion > curVer) {
+                    results.Add(new Result { Path = m.Path, Message = $"Schema version {m.SchemaVersion} ahead of supported {curVer} for {m.Type}" });
+                }
+
+                // Read minimal XML into attr/elem maps (root + first-level children)
+                var attrs = new Dictionary<string,string>();
+                var elems = new Dictionary<string,string>();
                 try {
                     using var xr = XmlReader.Create(m.Path, new XmlReaderSettings { IgnoreComments = true, IgnoreWhitespace = true, DtdProcessing = DtdProcessing.Ignore });
                     xr.MoveToContent();
-                    // Scan attributes on root and first level children for ref-like names
-                    ScanAttrs(xr, m, index, results);
+                    if (xr.HasAttributes) {
+                        while (xr.MoveToNextAttribute()) attrs[xr.Name] = xr.Value;
+                        xr.MoveToElement();
+                    }
                     if (!xr.IsEmptyElement) {
                         xr.ReadStartElement();
                         int depth0 = xr.Depth;
                         while (!xr.EOF && xr.Depth <= depth0 + 1) {
                             if (xr.NodeType == XmlNodeType.Element) {
-                                ScanAttrs(xr, m, index, results);
+                                var name = xr.Name;
+                                string val = string.Empty;
+                                if (!xr.IsEmptyElement) val = xr.ReadElementContentAsString(); else xr.Read();
+                                if (!elems.ContainsKey(name)) elems[name] = val;
+                                continue;
                             }
                             xr.Read();
                         }
                     }
-                } catch { /* per-file issues already handled elsewhere */ }
-            }
+                } catch { /* per-file parsing issues are tolerated in lenient mode */ }
 
-            // R4: Schema presence and version
-            foreach (var m in index.Items) {
-                var (curOk, curVer) = Defs.Migrations.SchemaRegistry.TryGetCurrentVersion(m.Type);
-                if (!string.IsNullOrEmpty(m.Schema) || m.SchemaVersion > 0) {
-                    if (curOk && m.SchemaVersion > curVer) {
-                        results.Add(new Result { Path = m.Path, Message = $"Schema version {m.SchemaVersion} ahead of game-supported {curVer} for {m.Type}" });
+                if (spec == null) {
+                    // No spec found; warn once for this file, but don't block
+                    results.Add(new Result { Path = m.Path, Message = $"No schema spec found for {m.Type}@{(m.SchemaVersion>0?m.SchemaVersion:0)}; skipping spec checks" });
+                    continue;
+                }
+
+                // Required fields present
+                if (spec.required != null && spec.required.Length > 0) {
+                    for (int i = 0; i < spec.required.Length; i++) {
+                        var reqName = spec.required[i];
+                        var fs = FindField(spec, reqName);
+                        bool present = false;
+                        if (fs != null && fs.kind == "attr") present = attrs.ContainsKey(reqName);
+                        else if (fs != null && fs.kind == "elem") present = elems.ContainsKey(reqName);
+                        else
+                            present = attrs.ContainsKey(reqName) || elems.ContainsKey(reqName);
+                        if (!present) results.Add(new Result { Path = m.Path, Message = $"Missing required field '{reqName}'" });
                     }
-                } else {
-                    results.Add(new Result { Path = m.Path, Message = $"Missing schema/schema_version on {m.Type}" });
+                }
+
+                // Field type checks where present
+                if (spec.fields != null) {
+                    for (int i = 0; i < spec.fields.Count; i++) {
+                        var fs = spec.fields[i];
+                        string v = null; bool has = false;
+                        if (fs.kind == "attr") { has = attrs.TryGetValue(fs.name, out v); }
+                        else { has = elems.TryGetValue(fs.name, out v); }
+                        if (!has) continue; // not present; required handling above
+                        var (ok, err) = TypeChecks.Check(fs, v, index);
+                        if (!ok) results.Add(new Result { Path = m.Path, Message = $"Field '{fs.name}': {err}" });
+                    }
                 }
             }
 
             return results;
         }
 
-        private static readonly string[] RefLike = new[] { "def", "defref", "target", "source", "*_def", "*_ref" };
-        private static void ScanAttrs(XmlReader xr, Defs.DefMeta m, Defs.DefIndex index, List<Result> results) {
-            if (!xr.HasAttributes) return;
-            while (xr.MoveToNextAttribute()) {
-                var an = xr.Name.ToLowerInvariant();
-                if (!LooksLikeRef(an)) continue;
-                var v = xr.Value;
-                if (string.IsNullOrEmpty(v)) continue;
-                if (!TryResolveRef(index, m, an, v)) {
-                    results.Add(new Result { Path = m.Path, Message = $"Missing reference '{an}={v}'" });
+        private static FieldSpec FindField(SchemaSpec spec, string name) {
+            if (spec.fields == null) return null;
+            for (int i=0;i<spec.fields.Count;i++) if (spec.fields[i].name == name) return spec.fields[i];
+            return null;
+        }
+    }
+}
+
+// ===== FILE: Assets/Scripts/Core/Defs/Validation/SchemaCatalog.cs =====
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using FantasyColony.Core.Mods;
+
+namespace FantasyColony.Core.Defs.Validation {
+    /// <summary>
+    /// Loads and caches per-type schema files located in StreamingAssets and Mods.
+    /// </summary>
+    public static class SchemaCatalog {
+        private static readonly Dictionary<string, Dictionary<int, SchemaSpec>> _map = new(); // type -> version -> spec
+        private static bool _loaded;
+
+        public static void EnsureLoaded(List<ModInfo> mods) {
+            if (_loaded) return;
+            try {
+                // Game-bundled schemas
+                var gameDir = Path.Combine(Application.streamingAssetsPath, "Defs", "Schemas");
+                LoadFromDir(gameDir);
+
+                // Mod-provided schemas
+                if (mods != null) {
+                    for (int i = 0; i < mods.Count; i++) {
+                        var dir = Path.Combine(mods[i].RootPath, "Defs", "Schemas");
+                        LoadFromDir(dir);
+                    }
                 }
+            } catch (Exception e) {
+                Debug.LogWarning($"SchemaCatalog load issue: {e.Message}");
             }
-            xr.MoveToElement();
+            _loaded = true;
         }
 
-        private static bool LooksLikeRef(string attrLower) {
-            if (attrLower.EndsWith("_def") || attrLower.EndsWith("_ref")) return true;
-            for (int i=0;i<RefLike.Length;i++) if (attrLower == RefLike[i]) return true;
+        private static void LoadFromDir(string dir) {
+            if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir)) return;
+            var files = Directory.GetFiles(dir, "*.schema.json", SearchOption.AllDirectories);
+            for (int i = 0; i < files.Length; i++) LoadFile(files[i]);
+        }
+
+        private static void LoadFile(string path) {
+            try {
+                var json = File.ReadAllText(path);
+                var spec = JsonUtility.FromJson<SchemaSpec>(json);
+                if (spec == null || string.IsNullOrEmpty(spec.type) || spec.version <= 0) return;
+                var tkey = spec.type;
+                if (!_map.TryGetValue(tkey, out var byVer)) _map[tkey] = byVer = new Dictionary<int, SchemaSpec>();
+                // First-in wins; later duplicates are ignored but warned
+                if (byVer.ContainsKey(spec.version)) {
+                    Debug.LogWarning($"Duplicate schema {spec.type}@{spec.version} at {path}; keeping first loaded.");
+                    return;
+                }
+                byVer[spec.version] = spec;
+            } catch (Exception e) {
+                Debug.LogWarning($"Failed to load schema '{path}': {e.Message}");
+            }
+        }
+
+        public static bool TryGet(string defType, int version, out SchemaSpec spec) {
+            spec = null;
+            if (string.IsNullOrEmpty(defType) || version <= 0) return false;
+            if (_map.TryGetValue(defType, out var byVer) && byVer.TryGetValue(version, out spec)) return true;
             return false;
         }
 
-        private static bool TryResolveRef(Defs.DefIndex index, Defs.DefMeta m, string attrName, string value) {
-            // Accept Type.Id or modid.Type.Name or just Id if Type can be inferred (not supported yet)
-            if (value.Contains('.')) {
-                // normalize to Type.Id without mod prefix if present
-                string type, id;
-                var parts = value.Split('.');
-                if (parts.Length == 2) { type = parts[0]; id = parts[1]; }
-                else if (parts.Length == 3) { type = parts[1]; id = parts[2]; }
-                else return false;
-                return index.Find(type, id) != null;
+        public static bool TryGetCurrent(string defType, out SchemaSpec spec) {
+            spec = null;
+            var (ok, v) = FantasyColony.Core.Defs.Migrations.SchemaRegistry.TryGetCurrentVersion(defType);
+            if (!ok) return false;
+            return TryGet(defType, v, out spec);
+        }
+    }
+}
+
+// ===== FILE: Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs =====
+using System;
+using System.Collections.Generic;
+
+namespace FantasyColony.Core.Defs.Validation {
+    /// <summary>
+    /// JSON-deserializable schema spec for a single Def type & version.
+    /// Stored as StreamingAssets/Defs/Schemas/<DefType>@<version>.schema.json
+    /// </summary>
+    [Serializable]
+    public sealed class SchemaSpec {
+        public string type;      // e.g., "FactionDef"
+        public int version;      // e.g., 1
+        public string[] required; // names of required fields
+        public List<FieldSpec> fields; // all declared fields
+    }
+
+    [Serializable]
+    public sealed class FieldSpec {
+        public string name;      // field name as it appears in XML
+        public string kind;      // "attr" or "elem"
+        public string type;      // string|int|float|bool|color|enum|defref|id|list
+        public string of;        // element type for lists (optional)
+        public string target;    // for defref: target DefType
+        public string[] values;  // for enum: allowed values
+        public int min;          // numeric bounds (optional)
+        public int max;
+        public int minLength;    // for string
+        public string @default;  // optional default as text
+    }
+}
+
+// ===== FILE: Assets/Scripts/Core/Defs/Validation/TypeChecks.cs =====
+using System;
+using System.Globalization;
+
+namespace FantasyColony.Core.Defs.Validation {
+    internal static class TypeChecks {
+        public static (bool ok, string err) Check(FieldSpec fs, string value, Defs.DefIndex index) {
+            var t = (fs.type ?? "string").ToLowerInvariant();
+            switch (t) {
+                case "string": return CheckString(value, fs);
+                case "id":     return CheckId(value);
+                case "int":    return CheckInt(value, fs);
+                case "float":  return CheckFloat(value, fs);
+                case "bool":   return CheckBool(value);
+                case "color":  return CheckColor(value);
+                case "enum":   return CheckEnum(value, fs);
+                case "defref": return CheckDefRef(value, fs, index);
+                case "list":   return (true, null); // future: validate list items
+                default:        return (true, null);
             }
-            // Could be plain Id; we don't infer yet → treat as unresolved
-            return false;
+        }
+
+        private static (bool,string) CheckString(string v, FieldSpec fs) {
+            if (v == null) return (false, "missing string");
+            if (fs.minLength > 0 && v.Length < fs.minLength) return (false, $"string too short (min {fs.minLength})");
+            return (true, null);
+        }
+        private static (bool,string) CheckId(string v) {
+            if (string.IsNullOrEmpty(v)) return (false, "missing id");
+            return (FantasyColony.Core.Defs.DefId.TryParse(v, out _)) ? (true, null) : (false, "id not well-formed");
+        }
+        private static (bool,string) CheckInt(string v, FieldSpec fs) {
+            if (!int.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)) return (false, "not an int");
+            if (fs.min != 0 && i < fs.min) return (false, $"int < min {fs.min}");
+            if (fs.max != 0 && i > fs.max) return (false, $"int > max {fs.max}");
+            return (true, null);
+        }
+        private static (bool,string) CheckFloat(string v, FieldSpec fs) {
+            if (!float.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out var f)) return (false, "not a float");
+            if (fs.min != 0 && f < fs.min) return (false, $"float < min {fs.min}");
+            if (fs.max != 0 && f > fs.max) return (false, $"float > max {fs.max}");
+            return (true, null);
+        }
+        private static (bool,string) CheckBool(string v) {
+            if (!bool.TryParse(v, out _)) return (false, "not a bool");
+            return (true, null);
+        }
+        private static (bool,string) CheckColor(string v) {
+            if (string.IsNullOrEmpty(v)) return (false, "missing color");
+            // Accept #RRGGBB or #RRGGBBAA
+            if (v.StartsWith("#") && (v.Length == 7 || v.Length == 9)) return (true, null);
+            return (false, "color must be #RRGGBB or #RRGGBBAA");
+        }
+        private static (bool,string) CheckEnum(string v, FieldSpec fs) {
+            if (fs.values == null || fs.values.Length == 0) return (true, null);
+            for (int i=0;i<fs.values.Length;i++) if (string.Equals(v, fs.values[i], StringComparison.Ordinal)) return (true, null);
+            return (false, $"enum value '{v}' not in [{string.Join(",", fs.values)}]");
+        }
+        private static (bool,string) CheckDefRef(string v, FieldSpec fs, Defs.DefIndex index) {
+            if (string.IsNullOrEmpty(v)) return (false, "missing defref");
+            string type, id;
+            var parts = v.Split('.');
+            if (parts.Length == 2) { type = parts[0]; id = parts[1]; }
+            else if (parts.Length == 3) { type = parts[1]; id = parts[2]; }
+            else return (false, "defref must be Type.Id or modid.Type.Name");
+            if (!string.IsNullOrEmpty(fs.target) && !string.Equals(type, fs.target, StringComparison.Ordinal))
+                return (false, $"defref type '{type}' expected '{fs.target}'");
+            var ok = index.Find(type, id) != null;
+            return ok ? (true, null) : (false, $"missing target {type}.{id}");
         }
     }
 }
