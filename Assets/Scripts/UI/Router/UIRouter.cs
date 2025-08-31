@@ -11,7 +11,7 @@ namespace FantasyColony.UI.Router
         private readonly ServiceRegistry _services;
         private readonly Stack<IScreen> _stack = new();
 
-        // Global access to the active router (useful for simple buttons like Restart)
+        // Global access to the active router (set in ctor)
         public static UIRouter Current { get; private set; }
 
         public UIRouter(Transform parent, ServiceRegistry services)
@@ -24,6 +24,21 @@ namespace FantasyColony.UI.Router
         public void Push<T>() where T : IScreen, new()
         {
             var screen = new T();
+            screen.Enter(_parent);
+            _stack.Push(screen);
+        }
+
+        // Allow initializing a screen (e.g., dialogs) before entering
+        public void Push<T>(Action<T> init) where T : IScreen, new()
+        {
+            var screen = new T();
+            init?.Invoke(screen);
+            Push(screen);
+        }
+
+        // Push an existing instance
+        public void Push(IScreen screen)
+        {
             screen.Enter(_parent);
             _stack.Push(screen);
         }
