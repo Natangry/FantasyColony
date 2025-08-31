@@ -11,10 +11,14 @@ namespace FantasyColony.UI.Router
         private readonly ServiceRegistry _services;
         private readonly Stack<IScreen> _stack = new();
 
+        // Global access to the active router (useful for simple buttons like Restart)
+        public static UIRouter Current { get; private set; }
+
         public UIRouter(Transform parent, ServiceRegistry services)
         {
             _parent = parent;
             _services = services;
+            Current = this;
         }
 
         public void Push<T>() where T : IScreen, new()
@@ -29,6 +33,18 @@ namespace FantasyColony.UI.Router
             if (_stack.Count == 0) return;
             var top = _stack.Pop();
             top.Exit();
+        }
+
+        // --- Restart helpers ---
+        public void PopAll()
+        {
+            while (_stack.Count > 0) Pop();
+        }
+
+        public void ResetTo<T>() where T : IScreen, new()
+        {
+            PopAll();
+            Push<T>();
         }
     }
 }
