@@ -3,6 +3,16 @@ using FantasyColony.UI.Root;
 using FantasyColony.UI.Router;
 using FantasyColony.Core.Services;
 
+// Disambiguate our service interfaces from Unity's similarly named types
+using FCLogger = FantasyColony.Core.Services.ILogger;
+using FCFileLogger = FantasyColony.Core.Services.FileLogger;
+using FCConfigService = FantasyColony.Core.Services.IConfigService;
+using FCDummyConfig = FantasyColony.Core.Services.DummyConfigService;
+using FCEventBus = FantasyColony.Core.Services.IEventBus;
+using FCSimpleEventBus = FantasyColony.Core.Services.SimpleEventBus;
+using FCAssetProvider = FantasyColony.Core.Services.IAssetProvider;
+using FCResourcesProvider = FantasyColony.Core.Services.ResourcesAssetProvider;
+
 namespace FantasyColony.Core
 {
     /// <summary>
@@ -20,10 +30,10 @@ namespace FantasyColony.Core
             QualitySettings.vSyncCount = 0;
 
             _services = new ServiceRegistry();
-            _services.Register<ILogger>(new FileLogger());
-            _services.Register<IConfigService>(new DummyConfigService());
-            _services.Register<IEventBus>(new SimpleEventBus());
-            _services.Register<IAssetProvider>(new ResourcesAssetProvider());
+            _services.Register<FCLogger>(new FCFileLogger());
+            _services.Register<FCConfigService>(new FCDummyConfig());
+            _services.Register<FCEventBus>(new FCSimpleEventBus());
+            _services.Register<FCAssetProvider>(new FCResourcesProvider());
 
             // Create UI root (Canvas + EventSystem)
             _uiRoot = UIRoot.Create(transform);

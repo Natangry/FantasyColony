@@ -32,7 +32,20 @@ namespace FantasyColony.UI.Root
             scaler.matchWidthOrHeight = 0.5f;
 
             // EventSystem if missing
-            if (FindObjectOfType<EventSystem>() == null)
+            bool hasEventSystem = EventSystem.current != null;
+#if UNITY_2023_1_OR_NEWER
+            if (!hasEventSystem)
+            {
+                hasEventSystem = (Object.FindFirstObjectByType<EventSystem>() != null);
+            }
+#else
+            if (!hasEventSystem)
+            {
+                hasEventSystem = (FindObjectOfType<EventSystem>() != null);
+            }
+#endif
+
+            if (!hasEventSystem)
             {
                 var es = new GameObject("EventSystem");
                 es.AddComponent<EventSystem>();
