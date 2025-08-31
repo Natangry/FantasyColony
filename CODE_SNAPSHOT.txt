@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 12:46:10 UTC
+_Updated_: 2025-08-31 12:47:45 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -354,7 +354,7 @@ namespace FantasyColony.Core
 }
 
 // ===== FILE: Assets/Scripts/Core/BuildInfo.cs =====
-namespace Core
+namespace FantasyColony.Core
 {
     /// <summary>
     /// Static build info for diagnostics; can be auto-generated later by an Editor script.
@@ -367,18 +367,18 @@ namespace Core
     }
 }
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     public static class BuildInfoRuntime
     {
-        public static string Describe() => $"v{Core.BuildInfo.Version} ({Core.BuildInfo.Commit}) | Unity {UnityEngine.Application.unityVersion}";
+        public static string Describe() => $"v{FantasyColony.Core.BuildInfo.Version} ({FantasyColony.Core.BuildInfo.Commit}) | Unity {UnityEngine.Application.unityVersion}";
     }
 }
 
 // ===== FILE: Assets/Scripts/Core/Input/InputRouter.cs =====
 using UnityEngine;
 
-namespace Core.Input
+namespace FantasyColony.Core.Input
 {
     /// <summary>
     /// Placeholder router for the new Input System. No-ops if the package is missing.
@@ -407,7 +407,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Core.Mods
+namespace FantasyColony.Core.Mods
 {
     public class ModInfo
     {
@@ -455,7 +455,7 @@ using System.IO;
 using System.Xml.Linq;
 using UnityEngine;
 
-namespace Core.Mods
+namespace FantasyColony.Core.Mods
 {
     public class DefError
     {
@@ -469,7 +469,7 @@ namespace Core.Mods
     /// </summary>
     public static class XmlDefLoader
     {
-        public static void Load(List<ModInfo> mods, Core.Services.DefRegistry registry, List<DefError> errors)
+        public static void Load(List<ModInfo> mods, FantasyColony.Core.Services.DefRegistry registry, List<DefError> errors)
         {
             if (mods == null || registry == null) return;
             foreach (var mod in mods)
@@ -525,7 +525,7 @@ namespace FantasyColony.Core
 using System;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Lightweight audio bootstrap: one BGM source and one-shot SFX source.
@@ -632,7 +632,7 @@ namespace Core.Services
 using System;
 using System.Collections.Generic;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Extremely simple definition registry keyed by type then id.
@@ -833,7 +833,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Minimal JSON-backed config service with string Get/Set to avoid API churn.
@@ -923,7 +923,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     public struct SaveSlotMeta
     {
@@ -1000,7 +1000,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.Services
+namespace FantasyColony.Core.Services
 {
     /// <summary>
     /// Minimal localization service. Loads Resources/Localization/{lang}/strings.json (TextAsset).
