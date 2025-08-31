@@ -2,6 +2,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router;
+using FantasyColony.UI;
 
 namespace FantasyColony.UI.Screens {
     /// <summary>
