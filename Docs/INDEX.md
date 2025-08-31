@@ -16,6 +16,7 @@
 - ``Docs/Design/Colony-Loop-and-Pacing.md
 - ``Docs/Design/Combat-RTwP-and-UI.md
 - ``Docs/Design/Core-Stats-and-Combat-Math-v0.1.md
+- ``Docs/Design/FantasyColony-Blueprint-Core-and-Authoring.md
 - ``Docs/Design/Gambit-Library-v0.1.md
 - ``Docs/Design/Items-Inventory-and-Storage-v0.1.md
 - ``Docs/Design/Jobs-Designation-Integration.md
