@@ -1,48 +1,57 @@
 using System;
 using System.Collections.Generic;
 
-namespace FantasyColony.Core.Services
-{
+namespace FantasyColony.Core.Services {
     /// <summary>
-    /// Extremely simple definition registry keyed by type then id.
-    /// Stores file paths for now; later this can hold parsed objects.
+    /// Definition registry keyed by type then id, storing file path and mod id.
     /// </summary>
-    public class DefRegistry
-    {
+    public class DefRegistry {
         private static DefRegistry _instance;
         public static DefRegistry Instance => _instance ?? (_instance = new DefRegistry());
 
-        private readonly Dictionary<string, Dictionary<string, string>> _map = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+        public struct Entry {
+            public string Type;
+            public string Id;
+            public string Path;
+            public string ModId;
+        }
+
+        private readonly Dictionary<string, Dictionary<string, Entry>> _map = new(StringComparer.OrdinalIgnoreCase);
 
         public int Count { get; private set; }
 
-        public void Add(string type, string id, string filePath)
-        {
+        public void Register(string type, string id, string filePath, string modId) {
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(id)) return;
-            if (!_map.TryGetValue(type, out var inner))
-            {
-                inner = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (!_map.TryGetValue(type, out var inner)) {
+                inner = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
                 _map[type] = inner;
             }
-            inner[id] = filePath ?? string.Empty;
+            inner[id] = new Entry { Type = type, Id = id, Path = filePath ?? string.Empty, ModId = modId };
             Count++;
         }
 
-        public bool TryGetPath(string type, string id, out string path)
-        {
+        // Legacy Add signature for backward compatibility
+        public void Add(string type, string id, string filePath) => Register(type, id, filePath, string.Empty);
+
+        public bool TryGetPath(string type, string id, out string path) {
             path = null;
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(id)) return false;
-            if (_map.TryGetValue(type, out var inner))
-            {
-                return inner.TryGetValue(id, out path);
+            if (_map.TryGetValue(type, out var inner) && inner.TryGetValue(id, out var e)) {
+                path = e.Path;
+                return true;
             }
             return false;
         }
 
+        public IEnumerable<Entry> All() {
+            foreach (var inner in _map.Values)
+                foreach (var e in inner.Values)
+                    yield return e;
+        }
+
         public IEnumerable<string> Types() => _map.Keys;
 
-        public IEnumerable<string> Ids(string type)
-        {
+        public IEnumerable<string> Ids(string type) {
             if (_map.TryGetValue(type, out var inner)) return inner.Keys;
             return Array.Empty<string>();
         }

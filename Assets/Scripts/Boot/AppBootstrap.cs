@@ -52,6 +52,7 @@ namespace FantasyColony.Boot {
             yield return new ConfigTask();
             yield return new DiscoverModsTask();
             yield return new LoadDefsTask();
+            yield return new ValidateAndMigrateDefsTask();
             yield return new InitServicesTask();
             yield return new WarmAssetsTask();
         }
@@ -93,6 +94,30 @@ namespace FantasyColony.Boot {
                 if (errors.Count > 0) warn = $"Defs loaded with {errors.Count} issues. See log.";
                 Debug.Log($"Defs loaded. Count={ctx.Defs.Count}");
             } catch (Exception e) { warn = $"Def loading failed (lenient): {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
+            yield return null;
+        }
+    }
+
+    sealed class ValidateAndMigrateDefsTask : IBootTask {
+        public string Title => "Validating & migrating defs...";
+        public IEnumerator Execute(BootContext ctx) {
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            int warnCount = 0, migCount = 0;
+            try {
+                var index = FantasyColony.Core.Defs.DefIndex.Build(ctx.Mods, ctx.Defs);
+                var results = FantasyColony.Core.Defs.Validation.DefValidator.Run(index);
+                foreach (var r in results) { Debug.LogWarning($"[Defs] {r}"); }
+                warnCount = results.Count;
+                migCount = FantasyColony.Core.Defs.Migrations.MigrationEngine.Run(index);
+                if (warnCount > 0 || migCount > 0) {
+                    warn = $"Validation warnings={warnCount}, migrations={migCount}";
+                }
+            } catch (System.Exception e) {
+                warn = $"Validation phase had issues: {e.Message}";
+                Debug.LogWarning(warn);
+            }
             ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
             yield return null;
         }

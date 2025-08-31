@@ -1,44 +1,39 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml.Linq;
 using UnityEngine;
+using FantasyColony.Core.Services;
 
-namespace FantasyColony.Core.Mods
-{
-    public class DefError
-    {
-        public string path;
-        public string message;
-        public override string ToString() => $"{path}: {message}";
+namespace FantasyColony.Core.Mods {
+    public class DefError {
+        public string Path;
+        public string Message;
+        public override string ToString() => $"{Path}: {Message}";
     }
 
     /// <summary>
     /// Lenient XML loader: scans *.xml under each mod and registers their root elements by name+id.
     /// </summary>
-    public static class XmlDefLoader
-    {
-        public static void Load(List<ModInfo> mods, FantasyColony.Core.Services.DefRegistry registry, List<DefError> errors)
-        {
-            if (mods == null || registry == null) return;
-            foreach (var mod in mods)
-            {
-                var defDir = Path.Combine(mod.path, "Defs");
-                if (!Directory.Exists(defDir)) continue;
-                foreach (var file in Directory.GetFiles(defDir, "*.xml", SearchOption.AllDirectories))
-                {
-                    try
-                    {
-                        var doc = XDocument.Load(file);
-                        var root = doc.Root;
-                        if (root == null) continue;
-                        var id = (string)root.Attribute("id") ?? Path.GetFileNameWithoutExtension(file);
-                        var type = root.Name.LocalName;
-                        registry.Add(type, id, file);
-                    }
-                    catch (Exception e)
-                    {
-                        errors?.Add(new DefError { path = file, message = e.Message });
+    public static class XmlDefLoader {
+        // Existing signature used by boot pipeline
+        public static void Load(List<ModInfo> mods, DefRegistry registry, List<DefError> errors) {
+            // current: iterate XML files under each mod's Defs folder, register Type/Id → path
+            // note: per-file schema metadata is now collected later by DefIndex for validation/migrations
+            foreach (var mod in mods) {
+                var dir = System.IO.Path.Combine(mod.path, "Defs");
+                if (!System.IO.Directory.Exists(dir)) continue;
+                foreach (var file in System.IO.Directory.EnumerateFiles(dir, "*.xml", System.IO.SearchOption.AllDirectories)) {
+                    try {
+                        using var xr = System.Xml.XmlReader.Create(file, new System.Xml.XmlReaderSettings { IgnoreComments = true, IgnoreWhitespace = true, DtdProcessing = System.Xml.DtdProcessing.Ignore });
+                        xr.MoveToContent();
+                        var type = xr.Name; // root element name is type
+                        var id = xr.GetAttribute("id") ?? string.Empty;
+                        if (string.IsNullOrEmpty(id)) {
+                            errors?.Add(new DefError { Path = file, Message = $"Missing id for type '{type}'" });
+                            continue;
+                        }
+                        registry.Register(type, id, file, mod.id);
+                    } catch (Exception e) {
+                        errors?.Add(new DefError { Path = file, Message = e.Message });
                     }
                 }
             }
