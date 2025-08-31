@@ -5,6 +5,7 @@ using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
 using FantasyColony.Core.Services;
+using UnityObject = UnityEngine.Object;
 
 namespace FantasyColony.UI.Screens
 {
@@ -62,7 +63,7 @@ namespace FantasyColony.UI.Screens
         {
             if (Root != null)
             {
-                Object.Destroy(Root.gameObject);
+                UnityObject.Destroy(Root.gameObject);
                 Root = null;
             }
         }
