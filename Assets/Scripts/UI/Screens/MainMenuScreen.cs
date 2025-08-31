@@ -32,7 +32,11 @@ namespace FantasyColony.UI.Screens
             var panel = UIFactory.CreateBottomRightStack(Root, "MenuPanel");
             // Make panel background transparent (no shadow panel), keep layout behavior
             var panelImg = panel.GetComponent<Image>();
-            if (panelImg) panelImg.color = new Color(0,0,0,0);
+            if (panelImg)
+            {
+                panelImg.color = new Color(0,0,0,0);
+                panelImg.raycastTarget = false; // do not block button mouse events
+            }
             panel.SetAsLastSibling();
 
             // Buttons (log "Not implemented")

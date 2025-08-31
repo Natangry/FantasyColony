@@ -52,13 +52,18 @@ namespace FantasyColony.UI.Widgets
             img.color = fill;
 
             var btn = go.GetComponent<Button>();
+            btn.targetGraphic = img; // ensure transitions target our Image
+            btn.transition = Selectable.Transition.ColorTint;
             var colors = btn.colors;
             colors.normalColor = fill;
-            colors.highlightedColor = isDanger ? BaseUIStyle.DangerHover : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldHover : Multiply(fill, 1.06f));
-            colors.pressedColor = isDanger ? BaseUIStyle.DangerPressed : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldPressed : Multiply(fill, 0.90f));
-            colors.disabledColor = new Color(fill.r, fill.g, fill.b, 0.4f);
+            // Stronger deltas for clearer feedback
+            colors.highlightedColor = isDanger ? BaseUIStyle.DangerHover : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldHover : Multiply(fill, 1.15f));
+            colors.pressedColor    = isDanger ? BaseUIStyle.DangerPressed : (fill == BaseUIStyle.Gold ? BaseUIStyle.GoldPressed : Multiply(fill, 0.80f));
+            colors.selectedColor   = colors.highlightedColor;
+            colors.disabledColor   = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
             btn.colors = colors;
+            btn.fadeDuration = 0.08f;
             btn.onClick.AddListener(() => onClick?.Invoke());
 
             // Layout sizing so buttons are visible in the stack
@@ -120,13 +125,14 @@ namespace FantasyColony.UI.Widgets
             if (sprite != null)
             {
                 img.sprite = sprite;
-                img.preserveAspect = true; // Placeholder background scaling; fills via CanvasScaler
+                img.preserveAspect = true; // Background should not intercept clicks
                 img.color = Color.white;
             }
             else
             {
                 img.color = fallbackColor;
             }
+            img.raycastTarget = false; // never block UI
             return img;
         }
 
