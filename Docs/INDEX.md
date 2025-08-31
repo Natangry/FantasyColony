@@ -87,6 +87,7 @@
 - ``Docs/Design/Numbers-World-Conditions-and-Thresholds-v0.1.md
 - ``Docs/Design/Numbers-World-Director-v0.1.md
 - ``Docs/Design/Tools-and-Equipment-v0.1.md
+- ``Docs/Design/UI-BaseStyle.md
 - ``Docs/Design/Validation-Severity-and-Lints-Addendum-Combat-v0.1.md
 - ``Docs/Design/Validation-Severity-and-Lints-Addendum-Equipment-v0.1.md
 - ``Docs/Design/Validation-Severity-and-Lints-Addendum-Logistics-v0.1.md
