@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-08-31 00:21:10 UTC
+_Updated_: 2025-08-31 02:40:17 UTC
 
 - `Assets/Editor/CreateStartupConfigAsset.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/CreateStartupConfigAsset.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/CreateStartupConfigAsset.cs)
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
