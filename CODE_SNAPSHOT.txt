@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 08:56:14 UTC
+_Updated_: 2025-08-31 09:01:56 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -564,6 +564,7 @@ using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
 using FantasyColony.Core.Services;
+using UnityObject = UnityEngine.Object;
 
 namespace FantasyColony.UI.Screens
 {
@@ -621,7 +622,7 @@ namespace FantasyColony.UI.Screens
         {
             if (Root != null)
             {
-                Object.Destroy(Root.gameObject);
+                UnityObject.Destroy(Root.gameObject);
                 Root = null;
             }
         }
