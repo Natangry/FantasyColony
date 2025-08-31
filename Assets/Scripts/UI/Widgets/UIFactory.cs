@@ -67,6 +67,14 @@ namespace FantasyColony.UI.Widgets
             if (fill) fill.SetSiblingIndex(0);
             if (borderT) borderT.SetSiblingIndex(1);
 
+            // Pixel-perfect inset of fill to the inner lip using sprite's slice widths
+            if (borderImg && borderImg.sprite != null) {
+                var b = borderImg.sprite.border; // left, bottom, right, top (pixels)
+                // Offsets are in pixels; anchors are stretch, so offsets apply directly
+                fillRt.offsetMin = new Vector2(b.x, b.y);
+                fillRt.offsetMax = new Vector2(-b.z, -b.w);
+            }
+
             return rt;
         }
 
@@ -162,15 +170,28 @@ namespace FantasyColony.UI.Widgets
             txt.alignment = TextAnchor.MiddleLeft;
             txt.fontSize = BaseUIStyle.ButtonFontSize;
             txt.color = textColor;
+            // Explicit font (avoid missing-font in builds)
+            try { txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); } catch {}
             txt.raycastTarget = false;
             txt.horizontalOverflow = HorizontalWrapMode.Overflow;
             txt.verticalOverflow = VerticalWrapMode.Truncate;
+            // Subtle outline for readability over busy backgrounds
+            var ol = textGO.AddComponent<Outline>();
+            ol.effectColor = new Color(0,0,0,0.5f);
+            ol.effectDistance = new Vector2(1f, -1f);
 
             // Explicit layer order (back -> front)
             fillGO.transform.SetSiblingIndex(0);
             borderGO.transform.SetSiblingIndex(1);
             overlayGO.transform.SetSiblingIndex(2);
             textGO.transform.SetSiblingIndex(3);
+
+            // Pixel-perfect inset of fill using border sprite slice widths
+            if (borderImg && borderImg.sprite != null) {
+                var b = borderImg.sprite.border; // left, bottom, right, top (pixels)
+                fillRt.offsetMin = new Vector2(b.x, b.y);
+                fillRt.offsetMax = new Vector2(-b.z, -b.w);
+            }
 
             return btn;
         }
