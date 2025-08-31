@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 08:41:20 UTC
+_Updated_: 2025-08-31 08:56:14 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -518,10 +518,14 @@ namespace FantasyColony.UI.Router
         private readonly ServiceRegistry _services;
         private readonly Stack<IScreen> _stack = new();
 
+        // Global access to the active router (useful for simple buttons like Restart)
+        public static UIRouter Current { get; private set; }
+
         public UIRouter(Transform parent, ServiceRegistry services)
         {
             _parent = parent;
             _services = services;
+            Current = this;
         }
 
         public void Push<T>() where T : IScreen, new()
@@ -537,13 +541,25 @@ namespace FantasyColony.UI.Router
             var top = _stack.Pop();
             top.Exit();
         }
+
+        // --- Restart helpers ---
+        public void PopAll()
+        {
+            while (_stack.Count > 0) Pop();
+        }
+
+        public void ResetTo<T>() where T : IScreen, new()
+        {
+            PopAll();
+            Push<T>();
+        }
     }
 }
 
 // ===== FILE: Assets/Scripts/UI/Screens/MainMenuScreen.cs =====
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using System;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
@@ -610,20 +626,23 @@ namespace FantasyColony.UI.Screens
             }
         }
 
-        private static void RestartGame()
+        private void RestartGame()
         {
-            // Ensure normal time scale and reload the initial boot scene to mimic a fresh launch
+            // Normalize timescale and reset the UI stack to simulate a fresh boot
             Time.timeScale = 1f;
-            SceneManager.LoadScene(0);
+            UIRouter.Current?.ResetTo<MainMenuScreen>();
+            // Optional hygiene to mirror a clean boot over time as content grows
+            Resources.UnloadUnusedAssets();
+            System.GC.Collect();
         }
 
-        private static void QuitGame()
+        private void QuitGame()
         {
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
             UnityEditor.EditorApplication.ExitPlaymode();
-#else
+        #else
             Application.Quit();
-#endif
+        #endif
         }
     }
 }
