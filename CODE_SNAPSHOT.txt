@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 07:50:49 UTC
+_Updated_: 2025-08-31 08:01:32 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -623,9 +623,10 @@ namespace FantasyColony.UI.Style
         public static Color32 GoldHover       = Hex("#E4C77D");
         public static Color32 GoldPressed     = Hex("#B99443");
         public static Color32 PanelSurface    = new Color32(0x1F,0x1A,0x14, (byte)(0.95f * 255));
-        public static Color32 SecondaryFill   = Hex("#2A231B");
-        public static Color32 SecondaryHover  = Hex("#383026");
-        public static Color32 SecondaryPressed= Hex("#241F17");
+        // Secondary palette tuned for clearer hover/click contrast
+        public static Color32 SecondaryFill   = Hex("#3B3329"); // Lightened from #2A231B
+        public static Color32 SecondaryHover  = Hex("#4A4033"); // Noticeably lighter than base
+        public static Color32 SecondaryPressed= Hex("#2A231B"); // Old base as pressed state
         public static Color32 Keyline         = new Color32(0x5A,0x4C,0x38, (byte)(0.60f * 255));
         public static Color32 TextPrimary     = Hex("#F1E9D2");
         public static Color32 TextSecondary   = Hex("#C9BDA2");
@@ -710,25 +711,33 @@ namespace FantasyColony.UI.Widgets
             btn.transition = Selectable.Transition.ColorTint;
             var colors = btn.colors;
             colors.normalColor = fill;
-            // Stronger deltas for clearer feedback. SecondaryFill uses explicit palette values
-            colors.highlightedColor = isDanger
-                ? BaseUIStyle.DangerHover
-                : (fill == BaseUIStyle.Gold
-                    ? BaseUIStyle.GoldHover
-                    : (fill == BaseUIStyle.SecondaryFill
-                        ? BaseUIStyle.SecondaryHover
-                        : Multiply(fill, 1.15f)));
-            colors.pressedColor = isDanger
-                ? BaseUIStyle.DangerPressed
-                : (fill == BaseUIStyle.Gold
-                    ? BaseUIStyle.GoldPressed
-                    : (fill == BaseUIStyle.SecondaryFill
-                        ? BaseUIStyle.SecondaryPressed
-                        : Multiply(fill, 0.80f)));
-            colors.selectedColor   = colors.highlightedColor;
-            colors.disabledColor   = new Color(fill.r, fill.g, fill.b, 0.35f);
+
+            // Use explicit palette values to guarantee visible state changes for known fills
+            if (isDanger)
+            {
+                colors.highlightedColor = BaseUIStyle.DangerHover;
+                colors.pressedColor = BaseUIStyle.DangerPressed;
+            }
+            else if (fill == BaseUIStyle.Gold)
+            {
+                colors.highlightedColor = BaseUIStyle.GoldHover;
+                colors.pressedColor = BaseUIStyle.GoldPressed;
+            }
+            else if (fill == BaseUIStyle.SecondaryFill)
+            {
+                colors.highlightedColor = BaseUIStyle.SecondaryHover;
+                colors.pressedColor = BaseUIStyle.SecondaryPressed;
+            }
+            else
+            {
+                colors.highlightedColor = Multiply(fill, 1.15f);
+                colors.pressedColor = Multiply(fill, 0.80f);
+            }
+
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = new Color(fill.r, fill.g, fill.b, 0.35f);
             colors.colorMultiplier = 1f;
-            colors.fadeDuration    = 0.08f;
+            colors.fadeDuration = 0.08f;
             btn.colors = colors;
             btn.onClick.AddListener(() => onClick?.Invoke());
 
