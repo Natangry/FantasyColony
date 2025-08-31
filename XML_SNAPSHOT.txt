@@ -1,37 +1,3 @@
-// ===== FILE: Assets/StreamingAssets/Mods/Core/Defs/Buildings/ConstructionBoard.xml =====
-<Defs>
-  <BuildingDef>
-    <defName>ConstructionBoard</defName>
-    <label>Construction Board</label>
-    <category>Stations</category>
-    <width>3</width>
-    <height>1</height>
-    <unique>true</unique>
-    <allowedRotations>N</allowedRotations>
-    <workToBuild>2.0</workToBuild>
-    <interactTags>
-      <li>construction</li>
-      <li>board</li>
-    </interactTags>
-    <visualRef>ConstructionBoardVisual</visualRef>
-    <showInPalette>true</showInPalette>
-  </BuildingDef>
-</Defs>
-
-
-// ===== FILE: Assets/StreamingAssets/Mods/Core/Defs/Visuals/ConstructionBoardVisual.xml =====
-<Defs>
-  <Visual2DDef>
-    <defName>ConstructionBoardVisual</defName>
-    <spritePath>Sprites/ConstructionBoard</spritePath>
-    <plane>XZ</plane>
-    <shader_hint>Sprites/Default</shader_hint>
-    <color>1,1,1,1</color>
-    <pivot>0.5,0.0</pivot>
-  </Visual2DDef>
-</Defs>
-
-
 // ===== FILE: Docs/Templates/Defs/AbilityDef.xml =====
 <AbilityDef>
   <version>1</version>
@@ -90,7 +56,7 @@
 
 
 // ===== FILE: Docs/Templates/Defs/_AllSchemas.xml =====
-<DefSchemas generated="2025-08-31T02:40:17Z">
+<DefSchemas generated="2025-08-31T02:54:35Z">
   <Schema name="AbilityDef">
     <Attributes />
     <Elements>
