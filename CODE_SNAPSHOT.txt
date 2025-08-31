@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 09:26:14 UTC
+_Updated_: 2025-08-31 09:44:38 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -166,6 +166,32 @@ namespace FantasyColony.EditorTools
 }
 #endif
 
+// ===== FILE: Assets/Scripts/Boot/AppBootstrap.cs =====
+using System;
+using System.Collections;
+
+namespace FantasyColony.Boot
+{
+    // Minimal bootstrap pipeline. Replace yields with real work as the project grows.
+    public static class AppBootstrap
+    {
+        // setPhase updates the BootScreen subtitle
+        public static IEnumerator Run(Action<string> setPhase)
+        {
+            setPhase?.Invoke("Loading defs…");
+            yield return null;
+
+            setPhase?.Invoke("Initializing…");
+            yield return null;
+
+            setPhase?.Invoke("Building assets…");
+            yield return null;
+
+            setPhase?.Invoke(string.Empty);
+        }
+    }
+}
+
 // ===== FILE: Assets/Scripts/Core/AppBootstrap.cs =====
 using UnityEngine;
 
@@ -192,6 +218,7 @@ using UnityEngine;
 using FantasyColony.UI.Root;
 using FantasyColony.UI.Router;
 using FantasyColony.Core.Services;
+using FantasyColony.UI.Screens;
 
 // Disambiguate our service interfaces from Unity's similarly named types
 using FCLogger = FantasyColony.Core.Services.ILogger;
@@ -231,8 +258,8 @@ namespace FantasyColony.Core
             // Router mounts screens under UIRoot
             _router = new UIRouter(_uiRoot.ScreenParent, _services);
 
-            // Push Main Menu
-            _router.Push<FantasyColony.UI.Screens.MainMenuScreen>();
+            // Show Boot screen first so the UI covers while startup work initializes
+            _router.Push<BootScreen>();
         }
     }
 }
@@ -571,6 +598,105 @@ namespace FantasyColony.UI.Router
     }
 }
 
+// ===== FILE: Assets/Scripts/UI/Screens/BootScreen.cs =====
+using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using FantasyColony.UI.Router;
+using FantasyColony.Boot;
+
+namespace FantasyColony.UI.Screens
+{
+    // Boot screen: shows a cover and phase text while the app boot pipeline runs
+    public class BootScreen : IScreen
+    {
+        public string Title = "Loading";
+        public GameObject Root { get; private set; }
+        private Text _phaseText;
+
+        public void Enter(Transform parent)
+        {
+            Root = new GameObject("BootScreen");
+            var rt = Root.AddComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+
+            // Solid dark cover (prevents flash)
+            var bg = new GameObject("Background");
+            var bgrt = bg.AddComponent<RectTransform>();
+            bgrt.SetParent(rt, false);
+            bgrt.anchorMin = Vector2.zero; bgrt.anchorMax = Vector2.one;
+            bgrt.offsetMin = Vector2.zero; bgrt.offsetMax = Vector2.zero;
+            var bgImg = bg.AddComponent<Image>();
+            bgImg.color = new Color(0.10f, 0.09f, 0.08f, 1f);
+            bgImg.raycastTarget = true;
+
+            // Centered title
+            var titleGO = new GameObject("Title");
+            var tr = titleGO.AddComponent<RectTransform>();
+            tr.SetParent(rt, false);
+            tr.anchorMin = tr.anchorMax = new Vector2(0.5f, 0.5f);
+            tr.anchoredPosition = new Vector2(0f, 24f);
+            tr.sizeDelta = new Vector2(640f, 80f);
+            var text = titleGO.AddComponent<Text>();
+            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.fontSize = 24; text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            text.text = string.IsNullOrEmpty(Title) ? "Loading" : Title;
+
+            // Phase text (small subtitle)
+            var phaseGO = new GameObject("Phase");
+            var pr = phaseGO.AddComponent<RectTransform>();
+            pr.SetParent(rt, false);
+            pr.anchorMin = pr.anchorMax = new Vector2(0.5f, 0.5f);
+            pr.anchoredPosition = new Vector2(0f, -16f);
+            pr.sizeDelta = new Vector2(720f, 40f);
+            _phaseText = phaseGO.AddComponent<Text>();
+            _phaseText.font = text.font;
+            _phaseText.fontSize = 18; _phaseText.alignment = TextAnchor.MiddleCenter;
+            _phaseText.color = new Color(0.92f, 0.92f, 0.92f, 0.95f);
+            _phaseText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            _phaseText.verticalOverflow = VerticalWrapMode.Truncate;
+            _phaseText.text = string.Empty;
+
+            // Kick off the boot pipeline on the next frame
+            var runner = Root.AddComponent<Runner>();
+            runner.Begin(() => runner.StartCoroutine(BootCo()));
+        }
+
+        public void Exit()
+        {
+            if (Root != null)
+            {
+                UnityEngine.Object.Destroy(Root);
+                Root = null;
+            }
+        }
+
+        private IEnumerator BootCo()
+        {
+            yield return null; // render once so the cover is visible
+            yield return AppBootstrap.Run(SetPhase);
+            Time.timeScale = 1f;
+            UIRouter.Current?.ResetTo<MainMenuScreen>();
+        }
+
+        private void SetPhase(string s)
+        {
+            if (_phaseText != null) _phaseText.text = s ?? string.Empty;
+        }
+
+        private class Runner : MonoBehaviour
+        {
+            public void Begin(Action onReady) { onReady?.Invoke(); }
+        }
+    }
+}
+
 // ===== FILE: Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs =====
 using System;
 using UnityEngine;
@@ -686,81 +812,6 @@ namespace FantasyColony.UI.Screens
     }
 }
 
-// ===== FILE: Assets/Scripts/UI/Screens/LoadingScreen.cs =====
-using System;
-using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using FantasyColony.UI.Router;
-
-namespace FantasyColony.UI.Screens
-{
-    // Minimal loading cover; reboots the app flow on the next frame (after a short delay)
-    public class LoadingScreen : IScreen
-    {
-        public string Title = "Restarting…";
-        public GameObject Root { get; private set; }
-
-        public void Enter(Transform parent)
-        {
-            Root = new GameObject("LoadingScreen");
-            var rt = Root.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
-
-            // Solid dark cover (prevents flash)
-            var bg = new GameObject("Background");
-            var bgrt = bg.AddComponent<RectTransform>();
-            bgrt.SetParent(rt, false);
-            bgrt.anchorMin = Vector2.zero; bgrt.anchorMax = Vector2.one;
-            bgrt.offsetMin = Vector2.zero; bgrt.offsetMax = Vector2.zero;
-            var bgImg = bg.AddComponent<Image>();
-            bgImg.color = new Color(0.10f, 0.09f, 0.08f, 1f);
-            bgImg.raycastTarget = true;
-
-            // Centered title
-            var titleGO = new GameObject("Title");
-            var tr = titleGO.AddComponent<RectTransform>();
-            tr.SetParent(rt, false);
-            tr.anchorMin = tr.anchorMax = new Vector2(0.5f, 0.5f);
-            tr.anchoredPosition = Vector2.zero;
-            var text = titleGO.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            text.fontSize = 24; text.alignment = TextAnchor.MiddleCenter;
-            text.color = Color.white;
-            text.text = string.IsNullOrEmpty(Title) ? "Loading…" : Title;
-
-            // Kick off the restart on the next frame (with a tiny delay to ensure display)
-            var runner = Root.AddComponent<Runner>();
-            runner.Begin(() => {
-                Time.timeScale = 1f;
-                UIRouter.Current?.ResetTo<MainMenuScreen>();
-            });
-        }
-
-        public void Exit()
-        {
-            if (Root != null)
-            {
-                UnityEngine.Object.Destroy(Root);
-                Root = null;
-            }
-        }
-
-        private class Runner : MonoBehaviour
-        {
-            public void Begin(Action onReady) { StartCoroutine(BeginCo(onReady)); }
-            private IEnumerator BeginCo(Action onReady)
-            {
-                yield return null; // render once
-                yield return new WaitForSeconds(0.15f); // anti-flicker; replace with real phases later
-                onReady?.Invoke();
-            }
-        }
-    }
-}
-
 // ===== FILE: Assets/Scripts/UI/Screens/MainMenuScreen.cs =====
 using UnityEngine;
 using UnityEngine.UI;
@@ -770,6 +821,7 @@ using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
 using FantasyColony.Core.Services;
 using UnityObject = UnityEngine.Object;
+using FantasyColony.Boot;
 
 namespace FantasyColony.UI.Screens
 {
@@ -842,7 +894,7 @@ namespace FantasyColony.UI.Screens
                 d.CancelLabel = "Cancel";
                 d.OnConfirm = () =>
                 {
-                    UIRouter.Current?.Push<LoadingScreen>(l => { l.Title = "Restarting…"; });
+                    UIRouter.Current?.Push<BootScreen>(b => { b.Title = "Loading"; });
                 };
             });
         }
