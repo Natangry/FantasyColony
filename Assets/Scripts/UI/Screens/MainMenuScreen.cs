@@ -28,19 +28,12 @@ namespace FantasyColony.UI.Screens
             var bgSprite = Resources.Load<Sprite>("ui/menu/main_menu_bg");
             UIFactory.CreateFullscreenBackground(Root, bgSprite, new Color32(18, 15, 12, 255));
 
-            // Optional scrim behind panel for readability
-            var scrimGO = new GameObject("RightScrim", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            scrimGO.transform.SetParent(Root, false);
-            var srt = scrimGO.GetComponent<RectTransform>();
-            srt.anchorMin = new Vector2(0.6f, 0);
-            srt.anchorMax = new Vector2(1f, 1f);
-            srt.offsetMin = Vector2.zero;
-            srt.offsetMax = Vector2.zero;
-            var sImg = scrimGO.GetComponent<Image>();
-            sImg.color = new Color(0, 0, 0, 0.55f);
-
             // Panel stack (bottom-right)
             var panel = UIFactory.CreateBottomRightStack(Root, "MenuPanel");
+            // Make panel background transparent (no shadow panel), keep layout behavior
+            var panelImg = panel.GetComponent<Image>();
+            if (panelImg) panelImg.color = new Color(0,0,0,0);
+            panel.SetAsLastSibling();
 
             // Buttons (log "Not implemented")
             void NotImpl(string name) => Debug.Log($"BUTTON: {name} (not implemented)");
