@@ -1,16 +1,18 @@
 # Code Index
 
-_Updated_: 2025-08-31 12:47:45 UTC
+_Updated_: 2025-08-31 13:11:56 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/AppBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/AppBootstrap.cs)
 - `Assets/Scripts/Core/AppBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppBootstrap.cs)
+- `Assets/Scripts/Core/AppFlow.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppFlow.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppFlow.cs)
 - `Assets/Scripts/Core/AppHost.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/AppHost.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/AppHost.cs)
 - `Assets/Scripts/Core/BuildInfo.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/BuildInfo.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/BuildInfo.cs)
 - `Assets/Scripts/Core/Input/InputRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Input/InputRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Input/InputRouter.cs)
 - `Assets/Scripts/Core/Mods/ModDiscovery.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/ModDiscovery.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/ModDiscovery.cs)
 - `Assets/Scripts/Core/Mods/XmlDefLoader.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs)
 - `Assets/Scripts/Core/ServiceRegistry.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/ServiceRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/ServiceRegistry.cs)
+- `Assets/Scripts/Core/Services/AddressablesAssetProvider.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/AddressablesAssetProvider.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/AddressablesAssetProvider.cs)
 - `Assets/Scripts/Core/Services/AudioService.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/AudioService.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/AudioService.cs)
 - `Assets/Scripts/Core/Services/DefRegistry.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/DefRegistry.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/DefRegistry.cs)
 - `Assets/Scripts/Core/Services/IAssetProvider.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/IAssetProvider.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/IAssetProvider.cs)
