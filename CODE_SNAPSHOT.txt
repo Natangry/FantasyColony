@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-08-31 03:24:03 UTC
+_Updated_: 2025-08-31 03:31:54 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -427,9 +427,6 @@ public class Readme : ScriptableObject
         public string heading, text, linkText, url;
     }
 }
-
-// ===== FILE: Assets/test.cs =====
-//test
 
 // ===== FILE: Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs =====
 using System;
