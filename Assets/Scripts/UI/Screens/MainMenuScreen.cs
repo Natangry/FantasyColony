@@ -51,8 +51,8 @@ namespace FantasyColony.UI.Screens
             UIFactory.CreateButtonSecondary(panel, "Options",    () => NotImpl("Options"));
             UIFactory.CreateButtonSecondary(panel, "Mods",       () => NotImpl("Mods"));
             UIFactory.CreateButtonSecondary(panel, "Creator",    () => NotImpl("Creator"));
-            UIFactory.CreateButtonSecondary(panel, "Restart",    RestartGame);
-            UIFactory.CreateButtonDanger(panel,     "Quit",      QuitGame);
+            UIFactory.CreateButtonSecondary(panel, "Restart",    ShowRestartConfirm);
+            UIFactory.CreateButtonDanger(panel,     "Quit",      ShowQuitConfirm);
 
             // Disabled rules for now (no save system yet)
             btnContinue.interactable = false;
@@ -68,12 +68,38 @@ namespace FantasyColony.UI.Screens
             }
         }
 
+        private void ShowRestartConfirm()
+        {
+            UIRouter.Current?.Push<ConfirmDialogScreen>(d =>
+            {
+                d.Title = "Restart Game?";
+                d.Message = "This will restart the application flow.";
+                d.ConfirmLabel = "Restart";
+                d.CancelLabel = "Cancel";
+                d.OnConfirm = () =>
+                {
+                    UIRouter.Current?.Push<LoadingScreen>(l => { l.Title = "Restarting…"; });
+                };
+            });
+        }
+
+        private void ShowQuitConfirm()
+        {
+            UIRouter.Current?.Push<ConfirmDialogScreen>(d =>
+            {
+                d.Title = "Quit Game?";
+                d.Message = "Are you sure you want to exit?";
+                d.ConfirmLabel = "Quit";
+                d.CancelLabel = "Cancel";
+                d.OnConfirm = QuitGame;
+            });
+        }
+
         private void RestartGame()
         {
-            // Normalize timescale and reset the UI stack to simulate a fresh boot
+            // (Old direct restart path retained for reference; unused now)
             Time.timeScale = 1f;
             UIRouter.Current?.ResetTo<MainMenuScreen>();
-            // Optional hygiene to mirror a clean boot over time as content grows
             Resources.UnloadUnusedAssets();
             System.GC.Collect();
         }
