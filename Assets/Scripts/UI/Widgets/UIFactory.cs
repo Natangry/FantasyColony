@@ -52,6 +52,7 @@ namespace FantasyColony.UI.Widgets
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
             borderImg.preserveAspect = false;
+            borderImg.pixelsPerUnitMultiplier = BaseUIStyle.PanelBorderScale; // thinner encasing frame
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -66,14 +67,6 @@ namespace FantasyColony.UI.Widgets
             var borderT = go.transform.Find("BG_Border");
             if (fill) fill.SetSiblingIndex(0);
             if (borderT) borderT.SetSiblingIndex(1);
-
-            // Pixel-perfect inset of fill to the inner lip using sprite's slice widths
-            if (borderImg && borderImg.sprite != null) {
-                var b = borderImg.sprite.border; // left, bottom, right, top (pixels)
-                // Offsets are in pixels; anchors are stretch, so offsets apply directly
-                fillRt.offsetMin = new Vector2(b.x, b.y);
-                fillRt.offsetMax = new Vector2(-b.z, -b.w);
-            }
 
             return rt;
         }
@@ -102,7 +95,7 @@ namespace FantasyColony.UI.Widgets
             fillGO.transform.SetParent(go.transform, false);
             var fillRt = fillGO.GetComponent<RectTransform>();
             fillRt.anchorMin = Vector2.zero; fillRt.anchorMax = Vector2.one;
-            fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero;
+            fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero; // full-bleed wood
             var fillImg = fillGO.GetComponent<Image>();
             fillImg.raycastTarget = false;
             fillImg.preserveAspect = false;
@@ -120,6 +113,7 @@ namespace FantasyColony.UI.Widgets
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
             borderImg.preserveAspect = false;
+            borderImg.pixelsPerUnitMultiplier = BaseUIStyle.ButtonBorderScale; // thinner encasing frame
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -163,11 +157,11 @@ namespace FantasyColony.UI.Widgets
             var trt = textGO.GetComponent<RectTransform>();
             trt.anchorMin = new Vector2(0, 0);
             trt.anchorMax = new Vector2(1, 1);
-            trt.offsetMin = new Vector2(16, 0);
-            trt.offsetMax = new Vector2(-16, 0);
+            trt.offsetMin = Vector2.zero; // true center
+            trt.offsetMax = Vector2.zero;
             var txt = textGO.GetComponent<Text>();
             txt.text = label;
-            txt.alignment = TextAnchor.MiddleLeft;
+            txt.alignment = TextAnchor.MiddleCenter; // center-aligned labels
             txt.fontSize = BaseUIStyle.ButtonFontSize;
             txt.color = textColor;
             // Explicit font (avoid missing-font in builds)
@@ -185,13 +179,6 @@ namespace FantasyColony.UI.Widgets
             borderGO.transform.SetSiblingIndex(1);
             overlayGO.transform.SetSiblingIndex(2);
             textGO.transform.SetSiblingIndex(3);
-
-            // Pixel-perfect inset of fill using border sprite slice widths
-            if (borderImg && borderImg.sprite != null) {
-                var b = borderImg.sprite.border; // left, bottom, right, top (pixels)
-                fillRt.offsetMin = new Vector2(b.x, b.y);
-                fillRt.offsetMax = new Vector2(-b.z, -b.w);
-            }
 
             return btn;
         }

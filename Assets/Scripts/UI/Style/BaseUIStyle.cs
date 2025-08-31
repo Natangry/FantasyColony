@@ -35,6 +35,12 @@ namespace FantasyColony.UI.Style
         public static readonly Color PressedOverlay = new Color(0f, 0f, 0f, 0.10f);
         public static readonly Color DisabledOverlay= new Color(0f, 0f, 0f, 0.40f);
 
+        // Encasing border thinness: higher = thinner (affects 9-slice edge width via Image.pixelsPerUnitMultiplier)
+        // Effective border thickness in UI units ≈ slicePixels / (PPU * scale).
+        // Tweak these two values to taste.
+        public const float ButtonBorderScale = 1.6f;
+        public const float PanelBorderScale  = 1.4f;
+
         // Sizes
         public const int ButtonHeight = 56;
         public const int ButtonFontSize = 24;
