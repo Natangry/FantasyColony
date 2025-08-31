@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+// Only available when the new Input System package/define is enabled
+using UnityEngine.InputSystem.UI;
+#endif
 
 namespace FantasyColony.UI.Root
 {
@@ -35,21 +39,27 @@ namespace FantasyColony.UI.Root
             bool hasEventSystem = EventSystem.current != null;
 #if UNITY_2023_1_OR_NEWER
             if (!hasEventSystem)
-            {
                 hasEventSystem = (Object.FindFirstObjectByType<EventSystem>() != null);
-            }
 #else
             if (!hasEventSystem)
-            {
                 hasEventSystem = (FindObjectOfType<EventSystem>() != null);
-            }
 #endif
-
             if (!hasEventSystem)
             {
+                // Create EventSystem and attach the correct UI input module
                 var es = new GameObject("EventSystem");
                 es.AddComponent<EventSystem>();
-                es.AddComponent<StandaloneInputModule>();
+#if ENABLE_INPUT_SYSTEM
+                if (es.GetComponent<InputSystemUIInputModule>() == null)
+                {
+                    es.AddComponent<InputSystemUIInputModule>();
+                }
+#else
+                if (es.GetComponent<StandaloneInputModule>() == null)
+                {
+                    es.AddComponent<StandaloneInputModule>();
+                }
+#endif
             }
 
             // Screen parent
