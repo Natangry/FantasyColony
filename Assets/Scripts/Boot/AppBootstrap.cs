@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FantasyColony.Core.Services;
+using FantasyColony.Core.Mods;
 
 /// <summary>
 /// Real (yet lenient) boot pipeline that prepares core services without blocking Main Menu.
@@ -22,7 +24,7 @@ namespace FantasyColony.Boot
             setPhase?.Invoke("Loading configuration...");
             try
             {
-                Core.Services.JsonConfigService.Instance.Load();
+                JsonConfigService.Instance.Load();
             }
             catch (Exception e)
             {
@@ -32,16 +34,16 @@ namespace FantasyColony.Boot
 
             // Phase 2: Discover Mods
             setPhase?.Invoke("Discovering mods...");
-            List<Core.Mods.ModInfo> mods = null;
+            List<ModInfo> mods = null;
             try
             {
-                mods = Core.Mods.ModDiscovery.Discover();
+                mods = ModDiscovery.Discover();
                 Debug.Log($"Mods discovered: {mods.Count}");
             }
             catch (Exception e)
             {
                 Debug.LogWarning($"Mod discovery failed: {e.Message}");
-                mods = new List<Core.Mods.ModInfo>();
+                mods = new List<ModInfo>();
             }
             yield return null;
 
@@ -49,9 +51,9 @@ namespace FantasyColony.Boot
             setPhase?.Invoke("Loading defs...");
             try
             {
-                var reg = Core.Services.DefRegistry.Instance;
-                var errors = new List<Core.Mods.DefError>();
-                Core.Mods.XmlDefLoader.Load(mods, reg, errors);
+                var reg = DefRegistry.Instance;
+                var errors = new List<DefError>();
+                XmlDefLoader.Load(mods, reg, errors);
                 if (errors.Count > 0)
                 {
                     Debug.LogWarning($"Defs loaded with {errors.Count} issues. See log for details.");
@@ -71,22 +73,22 @@ namespace FantasyColony.Boot
             setPhase?.Invoke("Initializing services...");
             try
             {
-                var cfg = Core.Services.JsonConfigService.Instance;
+                var cfg = JsonConfigService.Instance;
 
                 // Localization
                 var lang = cfg.Get("language", "en");
-                Core.Services.LocService.Instance.SetLanguage(lang);
+                LocService.Instance.SetLanguage(lang);
 
                 // Audio (volumes default 1.0)
                 float vMaster = Parse01(cfg.Get("vol_master", "1"));
                 float vMusic = Parse01(cfg.Get("vol_music", "1"));
                 float vSfx = Parse01(cfg.Get("vol_sfx", "1"));
-                Core.Services.AudioService.Instance.SetVolume("master", vMaster);
-                Core.Services.AudioService.Instance.SetVolume("music", vMusic);
-                Core.Services.AudioService.Instance.SetVolume("sfx", vSfx);
+                AudioService.Instance.SetVolume("master", vMaster);
+                AudioService.Instance.SetVolume("music", vMusic);
+                AudioService.Instance.SetVolume("sfx", vSfx);
 
                 // Save service touch (build slot cache)
-                Core.Services.JsonSaveService.Instance.RefreshCache();
+                JsonSaveService.Instance.RefreshCache();
             }
             catch (Exception e)
             {
