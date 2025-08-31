@@ -1,0 +1,12 @@
+{
+  "type": "ItemDef",
+  "version": 1,
+  "required": ["id", "label"],
+  "fields": [
+    {"name":"id","kind":"attr","type":"id"},
+    {"name":"label","kind":"elem","type":"string","minLength":1},
+    {"name":"stackLimit","kind":"elem","type":"int","min":1},
+    {"name":"value","kind":"elem","type":"float","min":0},
+    {"name":"category","kind":"elem","type":"enum","values":["Material","Food","Quest","Misc"]}
+  ]
+}

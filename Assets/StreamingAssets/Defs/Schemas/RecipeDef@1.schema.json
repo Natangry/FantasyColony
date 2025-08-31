@@ -1,0 +1,12 @@
+{
+  "type": "RecipeDef",
+  "version": 1,
+  "required": ["id", "label"],
+  "fields": [
+    {"name":"id","kind":"attr","type":"id"},
+    {"name":"label","kind":"elem","type":"string","minLength":1},
+    {"name":"workAmount","kind":"elem","type":"int","min":0},
+    {"name":"input","kind":"elem","type":"defref","target":"ItemDef"},
+    {"name":"output","kind":"elem","type":"defref","target":"ItemDef"}
+  ]
+}

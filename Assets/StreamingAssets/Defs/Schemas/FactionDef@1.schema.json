@@ -1,0 +1,12 @@
+{
+  "type": "FactionDef",
+  "version": 1,
+  "required": ["id", "label"],
+  "fields": [
+    {"name":"id","kind":"attr","type":"id"},
+    {"name":"label","kind":"elem","type":"string","minLength":1},
+    {"name":"color","kind":"elem","type":"color"},
+    {"name":"leader","kind":"elem","type":"defref","target":"PawnKindDef"},
+    {"name":"hostile","kind":"elem","type":"bool"}
+  ]
+}

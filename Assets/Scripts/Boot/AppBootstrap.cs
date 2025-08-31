@@ -106,6 +106,8 @@ namespace FantasyColony.Boot {
             string warn = null;
             int warnCount = 0, migCount = 0;
             try {
+                // Ensure per-type schema catalog is loaded from StreamingAssets and Mods
+                FantasyColony.Core.Defs.Validation.SchemaCatalog.EnsureLoaded(ctx.Mods);
                 var index = FantasyColony.Core.Defs.DefIndex.Build(ctx.Mods, ctx.Defs);
                 var results = FantasyColony.Core.Defs.Validation.DefValidator.Run(index);
                 foreach (var r in results) { Debug.LogWarning($"[Defs] {r}"); }
