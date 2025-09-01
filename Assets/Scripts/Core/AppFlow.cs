@@ -15,7 +15,7 @@ namespace FantasyColony.Core {
 
         private void Awake() {
             if (Instance != null && Instance != this) {
-                Destroy(this);
+                Destroy(gameObject);
                 return;
             }
             Instance = this;

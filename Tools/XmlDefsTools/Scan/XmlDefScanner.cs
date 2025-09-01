@@ -75,7 +75,7 @@ namespace XmlDefsTools.Scan
                     list.Add(info);
 
                     // Track duplicates
-                    var dupKey = id;
+                    var dupKey = $"{schema}:{id}";
                     if (!res.DuplicateIds.TryGetValue(dupKey, out var dupList))
                     {
                         dupList = new List<DefInfo>();

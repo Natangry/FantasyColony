@@ -29,7 +29,7 @@ namespace FantasyColony.Core.Services
                     for (int i = 0; i < data.keys.Length; i++)
                     {
                         var k = data.keys[i];
-                        var v = i < data.values.Length ? data.values[i] : string.Empty;
+                        var v = (data.values != null && i < data.values.Length) ? data.values[i] : string.Empty;
                         if (!string.IsNullOrEmpty(k)) _map[k] = v ?? string.Empty;
                     }
                 }

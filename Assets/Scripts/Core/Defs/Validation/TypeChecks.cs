@@ -30,14 +30,14 @@ namespace FantasyColony.Core.Defs.Validation {
         }
         private static (bool,string) CheckInt(string v, FieldSpec fs) {
             if (!int.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)) return (false, "not an int");
-            if (fs.min != 0 && i < fs.min) return (false, $"int < min {fs.min}");
-            if (fs.max != 0 && i > fs.max) return (false, $"int > max {fs.max}");
+            if (fs.hasMin && i < fs.min) return (false, $"int < min {fs.min}");
+            if (fs.hasMax && i > fs.max) return (false, $"int > max {fs.max}");
             return (true, null);
         }
         private static (bool,string) CheckFloat(string v, FieldSpec fs) {
             if (!float.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out var f)) return (false, "not a float");
-            if (fs.min != 0 && f < fs.min) return (false, $"float < min {fs.min}");
-            if (fs.max != 0 && f > fs.max) return (false, $"float > max {fs.max}");
+            if (fs.hasMin && f < fs.min) return (false, $"float < min {fs.min}");
+            if (fs.hasMax && f > fs.max) return (false, $"float > max {fs.max}");
             return (true, null);
         }
         private static (bool,string) CheckBool(string v) {

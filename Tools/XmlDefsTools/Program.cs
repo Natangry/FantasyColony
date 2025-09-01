@@ -46,9 +46,8 @@ namespace XmlDefsTools
                 Console.WriteLine($"[XmlDefsTools] Wrote templates to: {templatesDir}");
 
                 // Write consolidated schema catalog
-                var catalogPath = Path.Combine(templatesDir, "_AllSchemas.xml");
                 SchemaCatalogWriter.Write(templatesDir, scan, orderHints);
-                Console.WriteLine($"[XmlDefsTools] Wrote consolidated catalog: {catalogPath}");
+                Console.WriteLine($"[XmlDefsTools] Wrote consolidated catalog: {Path.Combine(templatesDir, "_AllSchemas.xml")}");
 
                 return 0;
             }
