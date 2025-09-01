@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 09:10:33 UTC
+_Updated_: 2025-09-01 09:22:24 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3100,27 +3100,12 @@ namespace FantasyColony.UI.Screens
             _root = CreateUIObject("ModsScreenRoot", parent).GetComponent<RectTransform>();
             Stretch(_root);
 
-            // Fullscreen wood background (tiled) so the whole screen is the Mods menu
-            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
-            var bg = UIFactory.CreateFullscreenBackground(_root, wood, new Color(0.05f, 0.04f, 0.03f, 1f));
-            bg.type = Image.Type.Tiled;      // tile the wood
-            bg.preserveAspect = false;       // fill entire screen
-            // Exclude from layout so the HorizontalLayoutGroup doesn't give it a column slot
-            var bgLE = bg.gameObject.AddComponent<LayoutElement>();
-            bgLE.ignoreLayout = true;
-            bg.rectTransform.SetAsFirstSibling();
-
-            // Three-column layout (Left: lists, Center: snapshot, Right: actions)
-            var row = _root.gameObject.AddComponent<HorizontalLayoutGroup>();
-            row.childForceExpandHeight = true;
-            row.childForceExpandWidth = true;
-            row.childAlignment = TextAnchor.UpperLeft;
-            row.spacing = 16f;
-            row.padding = new RectOffset(32, 32, 32, 32);
+            // Use new board helpers
+            var board = UIFactory.CreateBoardScreen(_root, padding:32, spacing:16);
+            var trio = UIFactory.CreateThreeColumnBoard(board.Content, leftWidth:380f, rightWidth:320f, joinDecor:true);
 
             // LEFT COLUMN
-            _leftColumn = UIFactory.CreatePanelSurface(_root, "LeftColumnPanel");
-            UIFactory.SetPanelDecorVisible(_leftColumn, true);
+            _leftColumn = trio.left;
             var leftLE = _leftColumn.GetComponent<LayoutElement>() ?? _leftColumn.gameObject.AddComponent<LayoutElement>();
             leftLE.preferredWidth = LeftWidth; // fixed width column
             leftLE.minWidth = LeftWidth - 60f;
@@ -3161,8 +3146,7 @@ namespace FantasyColony.UI.Screens
             CreateEmptyState(_activeListContent, "No active mods");
 
             // CENTER COLUMN (snapshot)
-            _centerColumn = UIFactory.CreatePanelSurface(_root, "CenterColumnPanel");
-            UIFactory.SetPanelDecorVisible(_centerColumn, true);
+            _centerColumn = trio.center;
             var centerLE = _centerColumn.GetComponent<LayoutElement>() ?? _centerColumn.gameObject.AddComponent<LayoutElement>();
             centerLE.preferredWidth = -1f; // let layout decide
             centerLE.flexibleWidth = 1f;  // flexible middle column
@@ -3213,8 +3197,7 @@ namespace FantasyColony.UI.Screens
             CreateDivider(_defsContent);
 
             // RIGHT COLUMN (actions)
-            _rightColumn = UIFactory.CreatePanelSurface(_root, "RightColumnPanel");
-            UIFactory.SetPanelDecorVisible(_rightColumn, true);
+            _rightColumn = trio.right;
             var rightLE = _rightColumn.GetComponent<LayoutElement>() ?? _rightColumn.gameObject.AddComponent<LayoutElement>();
             rightLE.preferredWidth = RightWidth;
             rightLE.minWidth = RightWidth - 60f;
@@ -3671,6 +3654,7 @@ namespace FantasyColony.UI.Util
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Linq;
 using FantasyColony; // for GetHierarchyPath()
 using FantasyColony.UI.Style;
 using FantasyColony.UI.Util;
@@ -3811,6 +3795,132 @@ namespace FantasyColony.UI.Widgets
             if (c == null) return;
             if (c.gameObject.GetComponent<UIPixelSnap>() == null)
                 c.gameObject.AddComponent<UIPixelSnap>();
+        }
+
+        private static RectTransform CreateUIObject(string name, Transform parent)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            var rt = go.GetComponent<RectTransform>();
+            go.transform.SetParent(parent, false);
+            return rt;
+        }
+
+        private static void Stretch(RectTransform rt)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        // ===== Board helpers (snap panels together) =====
+        public readonly struct Board
+        {
+            public readonly RectTransform Root;    // fullscreen container (HorizontalLayoutGroup lives elsewhere)
+            public readonly RectTransform Content; // padded inner area
+            public Board(RectTransform root, RectTransform content) { Root = root; Content = content; }
+        }
+
+        /// <summary>
+        /// Creates a full-screen tiled wood background and returns a padded content area for placing columns.
+        /// </summary>
+        public static Board CreateBoardScreen(Transform parent, float padding = 32f, float spacing = 16f)
+        {
+            var root = CreateUIObject("BoardRoot", parent);
+            Stretch(root);
+
+            // Background (tiled wood) that ignores layout
+            var bg = CreateFullscreenBackground(root, Resources.Load<Sprite>(BaseUIStyle.WoodTilePath), new Color(0.05f, 0.04f, 0.03f, 1f));
+            bg.type = Image.Type.Tiled;
+            var bgLE = bg.gameObject.AddComponent<LayoutElement>();
+            bgLE.ignoreLayout = true;
+            bg.rectTransform.SetAsFirstSibling();
+
+            // Padded content
+            var content = CreateUIObject("BoardContent", root);
+            var hl = content.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hl.childForceExpandWidth = true;
+            hl.childForceExpandHeight = true;
+            hl.spacing = spacing;
+            hl.padding = new RectOffset((int)padding, (int)padding, (int)padding, (int)padding);
+            return new Board(root, content);
+        }
+
+        /// <summary>
+        /// Creates three columns that snap decor together: left/right fixed widths, center flexible.
+        /// </summary>
+        public static (RectTransform left, RectTransform center, RectTransform right) CreateThreeColumnBoard(RectTransform parent, float leftWidth, float rightWidth, bool joinDecor = true)
+        {
+            var left = CreateColumn(parent, "LeftColumn", preferredWidth: leftWidth, flexibleWidth: 0);
+            var center = CreateColumn(parent, "CenterColumn", preferredWidth: -1, flexibleWidth: 1);
+            var right = CreateColumn(parent, "RightColumn", preferredWidth: rightWidth, flexibleWidth: 0);
+
+            if (joinDecor)
+            {
+                JoinHorizontal(left, center);
+                JoinHorizontal(center, right);
+            }
+            return (left, center, right);
+        }
+
+        /// <summary>
+        /// Creates a panel-surface column with width behavior already configured.
+        /// </summary>
+        public static RectTransform CreateColumn(Transform parent, string name, float preferredWidth, float flexibleWidth, bool showFrame = true)
+        {
+            var panel = CreatePanelSurface(parent, name);
+            SetPanelDecorVisible(panel, true);
+            if (!showFrame) SetPanelBorders(panel, false, false, false, false);
+
+            var le = panel.GetComponent<LayoutElement>() ?? panel.gameObject.AddComponent<LayoutElement>();
+            le.preferredWidth  = preferredWidth;
+            le.flexibleWidth   = flexibleWidth;
+            le.minWidth        = preferredWidth > 0 ? preferredWidth - 60f : 0f;
+            return panel;
+        }
+
+        /// <summary>
+        /// Hides/shows specific frame edges so adjacent panels "join" without double seams.
+        /// Assumes CreatePanelSurface creates children named: BG_Fill (Image), Frame (Image or container).
+        /// If Frame is a single 9-slice Image, we mask edges by overlaying thin images.
+        /// </summary>
+        public static void SetPanelBorders(RectTransform panel, bool left = true, bool right = true, bool top = true, bool bottom = true)
+        {
+            var frame = panel.Find("Frame");
+            if (frame == null) return;
+            var frameImg = frame.GetComponent<Image>();
+            if (frameImg != null)
+            {
+                // Simple approach: keep the 9-slice, but add masking quads on hidden edges
+                EnsureEdgeMask(panel, "Mask_L", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(4f, 0f)).gameObject.SetActive(!left);
+                EnsureEdgeMask(panel, "Mask_R", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(4f, 0f)).gameObject.SetActive(!right);
+                EnsureEdgeMask(panel, "Mask_T", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 4f)).gameObject.SetActive(!top);
+                EnsureEdgeMask(panel, "Mask_B", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 4f)).gameObject.SetActive(!bottom);
+                return;
+            }
+        }
+
+        private static RectTransform EnsureEdgeMask(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 size)
+        {
+            var t = parent.Find(name) as RectTransform;
+            if (t == null)
+            {
+                t = CreateUIObject(name, parent);
+                var img = t.gameObject.AddComponent<Image>();
+                img.color = new Color(0f, 0f, 0f, 1f); // matches border color
+            }
+            t.anchorMin = anchorMin;
+            t.anchorMax = anchorMax;
+            t.sizeDelta = size;
+            t.anchoredPosition = Vector2.zero;
+            t.SetAsLastSibling();
+            return t;
+        }
+
+        public static void JoinHorizontal(RectTransform left, RectTransform right)
+        {
+            SetPanelBorders(left,  left: true,  right: false, top: true, bottom: true);
+            SetPanelBorders(right, left: false, right: true,  top: true, bottom: true);
         }
 
         // PANEL (Textured wood fill + dark 9-slice border)
