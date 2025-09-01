@@ -9,6 +9,8 @@ using TintTheme = FantasyColony.UI.Style.BaseUIStyle.TintTheme;
 
 namespace FantasyColony.UI.Widgets
 {
+    public enum PanelSizing { Flexible, AutoHeight, AutoWidth, AutoBoth }
+
     public static class UIFactory
     {
         // Cache a symmetrized version of the dark 9-slice border so L/R and T/B are equal.
@@ -160,6 +162,62 @@ namespace FantasyColony.UI.Widgets
             rt.offsetMax = Vector2.zero;
         }
 
+        public static LayoutElement SetFlex(RectTransform rt, float flexW = 0f, float flexH = 0f, float prefW = -1f, float prefH = -1f)
+        {
+            var le = rt.GetComponent<LayoutElement>() ?? rt.gameObject.AddComponent<LayoutElement>();
+            le.flexibleWidth = flexW;
+            le.flexibleHeight = flexH;
+            le.preferredWidth = prefW;
+            le.preferredHeight = prefH;
+            return le;
+        }
+
+        public static (RectTransform root, RectTransform content) CreateScreenOverlay(Transform parent, string name = "ScreenOverlay", bool dim = false)
+        {
+            var root = CreateUIObject(name, parent);
+            Stretch(root);
+            var img = root.gameObject.AddComponent<Image>();
+            img.sprite = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
+            img.type = Image.Type.Tiled;
+            img.raycastTarget = true;
+            img.color = dim ? new Color(0f, 0f, 0f, 0.5f) : Color.white;
+            var content = CreateUIObject("Content", root);
+            Stretch(content);
+            return (root, content);
+        }
+
+        public static (RectTransform a, RectTransform b) SplitHorizontal(RectTransform parent, float leftPct, int gapPx = 0)
+        {
+            leftPct = Mathf.Clamp01(leftPct);
+            var a = CreateUIObject("Left", parent);
+            var b = CreateUIObject("Right", parent);
+            a.anchorMin = new Vector2(0,0); a.anchorMax = new Vector2(leftPct,1);
+            a.offsetMin = new Vector2(0,0); a.offsetMax = new Vector2(-gapPx/2f,0);
+            b.anchorMin = new Vector2(leftPct,0); b.anchorMax = new Vector2(1,1);
+            b.offsetMin = new Vector2(gapPx/2f,0); b.offsetMax = new Vector2(0,0);
+            return (a,b);
+        }
+
+        public static (RectTransform a, RectTransform b) SplitVertical(RectTransform parent, float topPct, int gapPx = 0)
+        {
+            topPct = Mathf.Clamp01(topPct);
+            var a = CreateUIObject("Top", parent);
+            var b = CreateUIObject("Bottom", parent);
+            a.anchorMin = new Vector2(0,1-topPct); a.anchorMax = new Vector2(1,1);
+            a.offsetMin = new Vector2(0,gapPx/2f); a.offsetMax = new Vector2(0,0);
+            b.anchorMin = new Vector2(0,0); b.anchorMax = new Vector2(1,1-topPct);
+            b.offsetMin = new Vector2(0,0); b.offsetMax = new Vector2(0,-gapPx/2f);
+            return (a,b);
+        }
+
+        public static RectTransform Inset(RectTransform parent, int l = 0, int r = 0, int t = 0, int b = 0)
+        {
+            var c = CreateUIObject("Inset", parent);
+            c.anchorMin = Vector2.zero; c.anchorMax = Vector2.one;
+            c.offsetMin = new Vector2(l, b); c.offsetMax = new Vector2(-r, -t);
+            return c;
+        }
+
         // ===== Board helpers (snap panels together) =====
         public readonly struct Board
         {
@@ -266,8 +324,56 @@ namespace FantasyColony.UI.Widgets
 
         public static void JoinHorizontal(RectTransform left, RectTransform right)
         {
-            SetPanelBorders(left,  left: true,  right: false, top: true, bottom: true);
-            SetPanelBorders(right, left: false, right: true,  top: true, bottom: true);
+            var lf = left.GetComponent<UIFrame>();
+            var rf = right.GetComponent<UIFrame>();
+            if (lf || rf)
+            {
+                if (lf) lf.SetEdges(true, false, true, true);
+                if (rf) rf.SetEdges(false, true, true, true);
+            }
+            else
+            {
+                SetPanelBorders(left,  left: true,  right: false, top: true, bottom: true);
+                SetPanelBorders(right, left: false, right: true,  top: true, bottom: true);
+            }
+        }
+
+        public static void JoinVertical(RectTransform top, RectTransform bottom)
+        {
+            var tf = top.GetComponent<UIFrame>();
+            var bf = bottom.GetComponent<UIFrame>();
+            if (tf || bf)
+            {
+                if (tf) tf.SetEdges(true, true, true, false);
+                if (bf) bf.SetEdges(true, true, false, true);
+            }
+            else
+            {
+                SetPanelBorders(top, left: true, right: true, top: true, bottom: false);
+                SetPanelBorders(bottom, left: true, right: true, top: false, bottom: true);
+            }
+        }
+
+        public static RectTransform CreateRow(Transform parent, float spacing = 8f, RectOffset padding = null)
+        {
+            var rt = CreateUIObject("Row", parent);
+            var lg = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
+            lg.spacing = spacing;
+            lg.childForceExpandWidth = true;
+            lg.childForceExpandHeight = true;
+            lg.padding = padding ?? new RectOffset();
+            return rt;
+        }
+
+        public static RectTransform CreateCol(Transform parent, float spacing = 8f, RectOffset padding = null)
+        {
+            var rt = CreateUIObject("Col", parent);
+            var lg = rt.gameObject.AddComponent<VerticalLayoutGroup>();
+            lg.spacing = spacing;
+            lg.childForceExpandWidth = true;
+            lg.childForceExpandHeight = true;
+            lg.padding = padding ?? new RectOffset();
+            return rt;
         }
 
         /// <summary>
@@ -291,9 +397,9 @@ namespace FantasyColony.UI.Widgets
         }
 
         // PANEL (Textured wood fill + dark 9-slice border)
-        public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel", TintTheme? theme = null)
+        public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel", TintTheme? theme = null, PanelSizing sizing = PanelSizing.AutoBoth)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(VerticalLayoutGroup));
             go.transform.SetParent(parent, false);
 
             var rt = go.GetComponent<RectTransform>();
@@ -308,8 +414,17 @@ namespace FantasyColony.UI.Widgets
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
             var fitter = go.GetComponent<ContentSizeFitter>();
-            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            if (sizing == PanelSizing.Flexible)
+            {
+                if (fitter) UnityEngine.Object.DestroyImmediate(fitter);
+                SetFlex(rt, flexW: 1f, flexH: 1f);
+            }
+            else
+            {
+                if (fitter == null) fitter = go.AddComponent<ContentSizeFitter>();
+                fitter.horizontalFit = (sizing == PanelSizing.AutoBoth || sizing == PanelSizing.AutoWidth) ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
+                fitter.verticalFit   = (sizing == PanelSizing.AutoBoth || sizing == PanelSizing.AutoHeight) ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
+            }
 
             // --- Fill (tiled wood) ---
             var fillGO = new GameObject("BG_Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
