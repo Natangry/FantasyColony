@@ -270,15 +270,38 @@ namespace FantasyColony.UI.Screens
         // Replaces flat Image panels with UIFactory wood/bordered panels
         private static RectTransform UIFactory_CreatePanelSurface(Transform parent, string name)
         {
-            // Try UIFactory.CreatePanelSurface(name,parent) → RectTransform
-            var m = typeof(UIFactory).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .FirstOrDefault(x => x.Name == "CreatePanelSurface");
-            if (m != null)
+            // Try all public static overloads of UIFactory.CreatePanelSurface and match supported signatures.
+            var overloads = typeof(UIFactory).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Where(x => x.Name == "CreatePanelSurface").ToArray();
+
+            foreach (var m in overloads)
             {
-                var rt = m.GetParameters().Length == 2
-                    ? (RectTransform)m.Invoke(null, new object[] { parent, name })
-                    : (RectTransform)m.Invoke(null, new object[] { parent });
-                if (rt != null) return rt;
+                var ps = m.GetParameters();
+                object[] args = null;
+
+                // Supported patterns:
+                // (Transform parent)
+                if (ps.Length == 1 && typeof(Transform).IsAssignableFrom(ps[0].ParameterType))
+                    args = new object[] { parent };
+
+                // (Transform parent, string name)
+                else if (ps.Length == 2 && typeof(Transform).IsAssignableFrom(ps[0].ParameterType) && ps[1].ParameterType == typeof(string))
+                    args = new object[] { parent, name };
+
+                // (Transform parent, string name, bool decorated)
+                else if (ps.Length == 3 && typeof(Transform).IsAssignableFrom(ps[0].ParameterType) && ps[1].ParameterType == typeof(string) && ps[2].ParameterType == typeof(bool))
+                    args = new object[] { parent, name, true };
+
+                // Skip unsupported shapes
+                if (args == null) continue;
+
+                try
+                {
+                    var result = m.Invoke(null, args) as RectTransform;
+                    if (result != null) return result;
+                }
+                catch (TargetParameterCountException) { /* try next overload */ }
+                catch (ArgumentException) { /* try next overload */ }
             }
             // Fallback: simple dark panel
             var panel = CreateUIObject(name, parent).GetComponent<RectTransform>();
@@ -458,8 +481,21 @@ namespace FantasyColony.UI.Screens
             var method = typeof(UIFactory).GetMethod("CreateFullscreenBackground", BindingFlags.Public | BindingFlags.Static);
             if (method != null)
             {
-                method.Invoke(null, new object[] { parent });
-                return;
+                try
+                {
+                    method.Invoke(null, new object[] { parent });
+                    return;
+                }
+                catch (TargetParameterCountException)
+                {
+                    // Try variant with (Transform parent, bool dim)
+                    try
+                    {
+                        method.Invoke(null, new object[] { parent, true });
+                        return;
+                    }
+                    catch { /* fall through to fallback */ }
+                }
             }
             // Fallback: opaque dark
             var bg = CreateUIObject("Background", parent).GetComponent<RectTransform>();
@@ -475,9 +511,19 @@ namespace FantasyColony.UI.Screens
             var method = typeof(UIFactory).GetMethod("CreateBottomRightStack", BindingFlags.Public | BindingFlags.Static);
             if (method != null)
             {
-                var stack = (RectTransform)method.Invoke(null, new object[] { screenRoot });
-                UIFactory_CreateButtonPrimary(stack, text, onClick);
-                return;
+                RectTransform stack = null;
+                try { stack = (RectTransform)method.Invoke(null, new object[] { screenRoot }); }
+                catch (TargetParameterCountException)
+                {
+                    // Try variant with an extra name parameter
+                    try { stack = (RectTransform)method.Invoke(null, new object[] { screenRoot, "BottomRight" }); }
+                    catch { /* ignore, will fallback */ }
+                }
+                if (stack != null)
+                {
+                    UIFactory_CreateButtonPrimary(stack, text, onClick);
+                    return;
+                }
             }
             // Fallback: absolute-anchored button in bottom-right
             var holder = CreateUIObject("BottomRightHolder", screenRoot).GetComponent<RectTransform>();
