@@ -133,7 +133,7 @@ namespace FantasyColony.UI.Widgets
                 fillImg.type = Image.Type.Tiled;
             }
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
-            fillImg.color = panelTheme.Value.Base;
+            fillImg.color = panelTheme.Base;
 
             // --- Border (9-slice) as sibling ABOVE fill ---
             var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
