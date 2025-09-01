@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 01:38:33 UTC
+_Updated_: 2025-09-01 01:51:20 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -261,6 +261,11 @@ namespace FantasyColony.Boot {
                 var errors = new List<DefError>();
                 XmlDefLoader.Load(ctx.Mods, ctx.Defs, errors);
                 if (errors.Count > 0) warn = $"Defs loaded with {errors.Count} issues. See log.";
+                // Surface mod override conflicts in the boot report
+                if (ctx.Defs.ConflictCount > 0) {
+                    var note = $"Conflicts={ctx.Defs.ConflictCount}";
+                    warn = string.IsNullOrEmpty(warn) ? note : ($"{warn} | {note}");
+                }
                 Debug.Log($"Defs loaded. Count={ctx.Defs.Count}");
             } catch (Exception e) { warn = $"Def loading failed (lenient): {e.Message}"; Debug.LogWarning(warn); }
             ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
@@ -323,7 +328,15 @@ namespace FantasyColony.Boot {
         public IEnumerator Execute(BootContext ctx) {
             var t0 = Time.realtimeSinceStartup;
             // Placeholder for future warmups
+            // If Addressables is enabled, initialize it early to avoid first-use hitching
+#if ADDRESSABLES
+            try {
+                var handle = UnityEngine.AddressableAssets.Addressables.InitializeAsync();
+                yield return handle;
+            } catch { /* swallow; fail-soft */ }
+#else
             yield return null;
+#endif
             ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, null, null);
         }
     }
@@ -457,8 +470,8 @@ namespace FantasyColony.Core
         private void Awake()
         {
             Instance = this;
+            // Frame pacing is controlled via vSync for desktop builds.
             QualitySettings.vSyncCount = 1;
-            // On desktop, let vSync drive frame pacing. Leave targetFrameRate unset (-1) unless vSync is disabled.
             Application.targetFrameRate = -1;
 
             _services = new ServiceRegistry();
@@ -466,6 +479,8 @@ namespace FantasyColony.Core
             _services.Register<FCConfigService>(new FCDummyConfig());
             _services.Register<FCEventBus>(new FCSimpleEventBus());
             _services.Register<FCAssetProvider>(new FCResourcesProvider());
+            // Make AudioService discoverable via the registry
+            _services.Register<AudioService>(AudioService.Instance);
 
             // Create UI root (Canvas + EventSystem)
             _uiRoot = UIRoot.Create(transform);
@@ -1180,6 +1195,30 @@ namespace FantasyColony.Core
                 return t;
             throw new InvalidOperationException($"Service not registered: {typeof(T).Name}");
         }
+
+        /// <summary>
+        /// Non-throwing lookup for fail-soft flows (player builds).
+        /// </summary>
+        public bool TryGet<T>(out T service) where T : class
+        {
+            if (_map.TryGetValue(typeof(T), out var o) && o is T t)
+            {
+                service = t;
+                return true;
+            }
+            service = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if a service of type T is registered.
+        /// </summary>
+        public bool Has<T>() where T : class => _map.ContainsKey(typeof(T));
+
+        /// <summary>
+        /// Optional unregistration helper. Returns true if removed.
+        /// </summary>
+        public bool Unregister<T>() where T : class => _map.Remove(typeof(T));
     }
 }
 
@@ -1201,9 +1240,8 @@ namespace FantasyColony.Core.Services {
             if (_initialized) return;
             try {
                 var h = Addressables.InitializeAsync();
-                h.WaitForCompletion();
-                _initialized = true;
-            } catch { /* swallow; fall back to on-demand */ }
+                h.Completed += _ => { _initialized = true; };
+            } catch { /* swallow; fail-soft */ }
         }
 
         public Sprite LoadSprite(string virtualPath) {
@@ -1260,6 +1298,14 @@ namespace FantasyColony.Core.Services
 
         private void Awake()
         {
+            // Duplicate guard: prefer the first instance
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            _instance = this;
+
             _bgm = gameObject.AddComponent<AudioSource>();
             _bgm.loop = true;
             _bgm.playOnAwake = false;
@@ -1336,6 +1382,7 @@ namespace FantasyColony.Core.Services
 // ===== FILE: Assets/Scripts/Core/Services/DefRegistry.cs =====
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace FantasyColony.Core.Services {
     /// <summary>
@@ -1355,6 +1402,7 @@ namespace FantasyColony.Core.Services {
         private readonly Dictionary<string, Dictionary<string, Entry>> _map = new(StringComparer.OrdinalIgnoreCase);
 
         public int Count { get; private set; }
+        public int ConflictCount { get; private set; }
 
         public void Register(string type, string id, string filePath, string modId) {
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(id)) return;
@@ -1362,9 +1410,12 @@ namespace FantasyColony.Core.Services {
                 inner = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
                 _map[type] = inner;
             }
-            var isNew = !inner.ContainsKey(id);
+            if (inner.TryGetValue(id, out var existing)) {
+                ConflictCount++;
+                Debug.LogWarning($"[Defs] Conflict for {type}/{id}: {existing.ModId} -> {modId} (file: {filePath})");
+            }
+            else { Count++; }
             inner[id] = new Entry { Type = type, Id = id, Path = filePath ?? string.Empty, ModId = modId };
-            if (isNew) Count++;
         }
 
         // Legacy Add signature for backward compatibility
