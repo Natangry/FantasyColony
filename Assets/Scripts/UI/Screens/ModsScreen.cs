@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router; // IScreen lives here
+using FantasyColony.UI.Widgets;
 using System.Reflection;
 using System.Linq;
 
