@@ -21,16 +21,16 @@ namespace FantasyColony.UI.Widgets
             if (src == null)
                 return null;
 
-            _darkBorderSymmetric = MakeSymmetricBorder(src);
+            _darkBorderSymmetric = MakeUniformBorderFromTopBottom(src);
             return _darkBorderSymmetric;
         }
 
-        private static Sprite MakeSymmetricBorder(Sprite src)
+        private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
         {
             // Unity's Sprite.border order: (left, right, top, bottom)
             var b = src.border;
-            float lr = Mathf.Min(b.x, b.y); // equalize L/R using the smaller to avoid cutting into artwork
-            float tb = Mathf.Min(b.z, b.w); // equalize T/B
+            // Force all four edges to match the thinner of Top/Bottom to keep corners safe
+            float tb = Mathf.Min(b.z, b.w);
 
             // Sprite.Create expects pivot relative to rect (0..1). Convert existing pixel pivot.
             var rect = src.rect;
@@ -46,7 +46,7 @@ namespace FantasyColony.UI.Widgets
                 src.pixelsPerUnit,
                 0,
                 SpriteMeshType.FullRect,
-                new Vector4(lr, lr, tb, tb)
+                new Vector4(tb, tb, tb, tb)
             );
             return sym;
         }
