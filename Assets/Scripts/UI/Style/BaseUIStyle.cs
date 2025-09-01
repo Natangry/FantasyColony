@@ -29,6 +29,9 @@ namespace FantasyColony.UI.Style
         public const string WoodTilePath = "ui/sprites/tile/wood_soft_tile";
         public const string DarkBorder9SPath = "ui/sprites/9slice/border_dark_9s";
 
+        // Toggle: grayscale the wood tile before tinting (for faithful palette hues)
+        public const bool UseGrayscaleTint = true;
+
         // Desired on-screen border thickness in device pixels for sliced borders
         // This single value controls both panels and buttons.
         public const float TargetBorderPx = 10f; // default visual = 10px borders
