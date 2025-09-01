@@ -1,14 +1,14 @@
 # Repository Index
 
-_Updated_: 2025-09-01 00:03:01 UTC
+_Updated_: 2025-09-01 00:05:35 UTC
 
 ## Summary
-- Tracked files: 398
+- Tracked files: 407
 - C# files: 51
 
 ## Top-level
 - `.github` (1 files)
-- `Assets` (195 files)
+- `Assets` (204 files)
 - `Docs` (142 files)
 - `Mods` (5 files)
 - `Packages` (2 files)
