@@ -8,11 +8,11 @@ using FantasyColony.UI.Screens;
 using FCLogger = FantasyColony.Core.Services.ILogger;
 using FCFileLogger = FantasyColony.Core.Services.FileLogger;
 using FCConfigService = FantasyColony.Core.Services.IConfigService;
-using FCDummyConfig = FantasyColony.Core.Services.DummyConfigService;
 using FCEventBus = FantasyColony.Core.Services.IEventBus;
 using FCSimpleEventBus = FantasyColony.Core.Services.SimpleEventBus;
 using FCAssetProvider = FantasyColony.Core.Services.IAssetProvider;
 using FCResourcesProvider = FantasyColony.Core.Services.ResourcesAssetProvider;
+using FCJsonConfig = FantasyColony.Core.Services.JsonConfigService;
 
 namespace FantasyColony.Core
 {
@@ -32,18 +32,27 @@ namespace FantasyColony.Core
 
         private void Awake()
         {
+            // Duplicate guard: prefer the first instance
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
-            // Frame pacing is controlled via vSync for desktop builds.
-            QualitySettings.vSyncCount = 1;
-            Application.targetFrameRate = -1;
 
             _services = new ServiceRegistry();
             _services.Register<FCLogger>(new FCFileLogger());
-            _services.Register<FCConfigService>(new FCDummyConfig());
+            // Use JSON-backed config as the single source of truth
+            var cfg = FCJsonConfig.Instance;
+            cfg.Load();
+            _services.Register<FCConfigService>(cfg);
             _services.Register<FCEventBus>(new FCSimpleEventBus());
             _services.Register<FCAssetProvider>(new FCResourcesProvider());
             // Make AudioService discoverable via the registry
             _services.Register<AudioService>(AudioService.Instance);
+
+            // Apply desktop frame pacing from config (defaults: vsync=1, target_fps=-1)
+            int vsync = 1; int targetFps = -1;
+            System.Int32.TryParse(cfg.Get("video.vsync", "1"), out vsync);
+            System.Int32.TryParse(cfg.Get("video.target_fps", "-1"), out targetFps);
+            QualitySettings.vSyncCount = Mathf.Max(0, vsync);
+            Application.targetFrameRate = targetFps;
 
             // Create UI root (Canvas + EventSystem)
             _uiRoot = UIRoot.Create(transform);
@@ -62,6 +71,11 @@ namespace FantasyColony.Core
 
             // Show Boot screen first so the UI covers while startup work initializes
             _router.Push<BootScreen>();
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
     }
 }

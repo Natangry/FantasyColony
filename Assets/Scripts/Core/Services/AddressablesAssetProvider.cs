@@ -29,6 +29,11 @@ namespace FantasyColony.Core.Services {
             return LoadSync<AudioClip>(virtualPath);
         }
 
+        public TextAsset LoadText(string virtualPath) {
+            EnsureInitialized();
+            return LoadSync<TextAsset>(virtualPath);
+        }
+
         private static T LoadSync<T>(string key) where T : UnityEngine.Object {
             try {
                 AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
