@@ -53,8 +53,8 @@ namespace FantasyColony.UI.Widgets
 
         // Compute a pixelsPerUnitMultiplier that yields a precise on-screen thickness in pixels for the 9-slice edges.
         // Assumes the Sprite has equal borders on all sides (enforced by GetSymmetricDarkBorder).
-        // Formula: displayed_px ≈ slice_px / (spritePPU * multiplier) * (canvasRefPPU / 100) * canvasScaleFactor
-        // We solve for multiplier so displayed_px == targetPixels. Unity's default referencePixelsPerUnit is 100.
+        // Formula: displayed_px ≈ slice_px / (spritePPU * multiplier) * canvasRefPPU * canvasScaleFactor
+        // We solve for multiplier so displayed_px == targetPixels.
         private static float ComputeBorderScale(Sprite s, float targetPixels, float canvasRefPPU, float canvasScaleFactor)
         {
             if (s == null) return 1f;
@@ -63,8 +63,8 @@ namespace FantasyColony.UI.Widgets
             float spritePPU = Mathf.Max(0.0001f, s.pixelsPerUnit);
             float refPPU = Mathf.Max(0.0001f, canvasRefPPU);
             float scale = Mathf.Max(0.0001f, canvasScaleFactor);
-            // Combine terms so multiplier scales down to meet the target pixel thickness
-            float m = (borderPx * (refPPU / 100f) * scale) / (spritePPU * tpx);
+            // Solve: targetPixels = borderPx / (spritePPU * m) * refPPU * scale
+            float m = (borderPx * refPPU * scale) / (spritePPU * tpx);
             return Mathf.Max(0.0001f, m);
         }
 
