@@ -400,6 +400,7 @@ namespace FantasyColony.UI.Screens
 
             // Content
             content = CreatePanelSurface(parent, title + "_Content");
+            var localContent = content;
             var vl = content.gameObject.AddComponent<VerticalLayoutGroup>();
             vl.childControlWidth = true;
             vl.childControlHeight = false;
@@ -415,7 +416,7 @@ namespace FantasyColony.UI.Screens
             btn.onClick.AddListener(() =>
             {
                 expanded = !expanded;
-                content.gameObject.SetActive(expanded);
+                localContent.gameObject.SetActive(expanded);
                 plusMinus.text = expanded ? "–" : "+";
             });
         }
