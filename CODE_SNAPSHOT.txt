@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 01:51:20 UTC
+_Updated_: 2025-09-01 02:08:19 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -445,11 +445,11 @@ using FantasyColony.UI.Screens;
 using FCLogger = FantasyColony.Core.Services.ILogger;
 using FCFileLogger = FantasyColony.Core.Services.FileLogger;
 using FCConfigService = FantasyColony.Core.Services.IConfigService;
-using FCDummyConfig = FantasyColony.Core.Services.DummyConfigService;
 using FCEventBus = FantasyColony.Core.Services.IEventBus;
 using FCSimpleEventBus = FantasyColony.Core.Services.SimpleEventBus;
 using FCAssetProvider = FantasyColony.Core.Services.IAssetProvider;
 using FCResourcesProvider = FantasyColony.Core.Services.ResourcesAssetProvider;
+using FCJsonConfig = FantasyColony.Core.Services.JsonConfigService;
 
 namespace FantasyColony.Core
 {
@@ -469,18 +469,27 @@ namespace FantasyColony.Core
 
         private void Awake()
         {
+            // Duplicate guard: prefer the first instance
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
-            // Frame pacing is controlled via vSync for desktop builds.
-            QualitySettings.vSyncCount = 1;
-            Application.targetFrameRate = -1;
 
             _services = new ServiceRegistry();
             _services.Register<FCLogger>(new FCFileLogger());
-            _services.Register<FCConfigService>(new FCDummyConfig());
+            // Use JSON-backed config as the single source of truth
+            var cfg = FCJsonConfig.Instance;
+            cfg.Load();
+            _services.Register<FCConfigService>(cfg);
             _services.Register<FCEventBus>(new FCSimpleEventBus());
             _services.Register<FCAssetProvider>(new FCResourcesProvider());
             // Make AudioService discoverable via the registry
             _services.Register<AudioService>(AudioService.Instance);
+
+            // Apply desktop frame pacing from config (defaults: vsync=1, target_fps=-1)
+            int vsync = 1; int targetFps = -1;
+            System.Int32.TryParse(cfg.Get("video.vsync", "1"), out vsync);
+            System.Int32.TryParse(cfg.Get("video.target_fps", "-1"), out targetFps);
+            QualitySettings.vSyncCount = Mathf.Max(0, vsync);
+            Application.targetFrameRate = targetFps;
 
             // Create UI root (Canvas + EventSystem)
             _uiRoot = UIRoot.Create(transform);
@@ -499,6 +508,11 @@ namespace FantasyColony.Core
 
             // Show Boot screen first so the UI covers while startup work initializes
             _router.Push<BootScreen>();
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
     }
 }
@@ -1254,6 +1268,11 @@ namespace FantasyColony.Core.Services {
             return LoadSync<AudioClip>(virtualPath);
         }
 
+        public TextAsset LoadText(string virtualPath) {
+            EnsureInitialized();
+            return LoadSync<TextAsset>(virtualPath);
+        }
+
         private static T LoadSync<T>(string key) where T : UnityEngine.Object {
             try {
                 AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
@@ -1455,6 +1474,7 @@ namespace FantasyColony.Core.Services
     {
         Sprite LoadSprite(string virtualPath);
         AudioClip LoadAudio(string virtualPath);
+        TextAsset LoadText(string virtualPath);
     }
 
     public sealed class ResourcesAssetProvider : IAssetProvider
@@ -1467,6 +1487,11 @@ namespace FantasyColony.Core.Services
         public AudioClip LoadAudio(string virtualPath)
         {
             return Resources.Load<AudioClip>(virtualPath);
+        }
+
+        public TextAsset LoadText(string virtualPath)
+        {
+            return Resources.Load<TextAsset>(virtualPath);
         }
     }
 }
@@ -1604,7 +1629,7 @@ namespace FantasyColony.Core.Services
     /// <summary>
     /// Minimal JSON-backed config service with string Get/Set to avoid API churn.
     /// </summary>
-    public class JsonConfigService
+    public class JsonConfigService : IConfigService
     {
         private static JsonConfigService _instance;
         public static JsonConfigService Instance => _instance ?? (_instance = new JsonConfigService());
@@ -1653,8 +1678,23 @@ namespace FantasyColony.Core.Services
                     idx++;
                 }
                 var json = JsonUtility.ToJson(bag, true);
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
-                File.WriteAllText(Path, json);
+                var dir = System.IO.Path.GetDirectoryName(Path);
+                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                var tmp = Path + ".tmp";
+                try
+                {
+                    File.WriteAllText(tmp, json);
+                    // Atomic replace when available (PC platforms)
+#if UNITY_2021_2_OR_NEWER
+                    var bak = Path + ".bak";
+                    File.Replace(tmp, Path, bak, true);
+#else
+                    // Fallback: best-effort replace
+                    if (File.Exists(Path)) File.Delete(Path);
+                    File.Move(tmp, Path);
+#endif
+                }
+                finally { if (File.Exists(tmp)) { try { File.Delete(tmp); } catch { } } }
             }
             catch (Exception e)
             {
@@ -1770,6 +1810,7 @@ namespace FantasyColony.Core.Services
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FantasyColony.Core;
 
 namespace FantasyColony.Core.Services
 {
@@ -1816,7 +1857,18 @@ namespace FantasyColony.Core.Services
             try
             {
                 var path = $"Localization/{lang}/strings";
-                var ta = Resources.Load<TextAsset>(path);
+                TextAsset ta = null;
+                // Prefer provider if available (mod- and backend-friendly)
+                var host = AppHost.Instance;
+                if (host != null && host.Services != null && host.Services.TryGet<IAssetProvider>(out var provider))
+                {
+                    ta = provider.LoadText(path);
+                }
+                // Fallback to Resources for safety
+                if (ta == null)
+                {
+                    ta = Resources.Load<TextAsset>(path);
+                }
                 if (ta == null) return false;
                 var bag = JsonUtility.FromJson<LocBag>(ta.text);
                 if (bag?.entries != null)
