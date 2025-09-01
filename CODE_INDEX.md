@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-09-01 04:14:07 UTC
+_Updated_: 2025-09-01 04:32:38 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/BootPipeline.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BootPipeline.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BootPipeline.cs)
@@ -43,6 +43,7 @@ _Updated_: 2025-09-01 04:14:07 UTC
 - `Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/ConfirmDialogScreen.cs)
 - `Assets/Scripts/UI/Screens/MainMenuScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Screens/MainMenuScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Screens/MainMenuScreen.cs)
 - `Assets/Scripts/UI/Style/BaseUIStyle.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Style/BaseUIStyle.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Style/BaseUIStyle.cs)
+- `Assets/Scripts/UI/Util/UIPixelSnap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Util/UIPixelSnap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Util/UIPixelSnap.cs)
 - `Assets/Scripts/UI/Widgets/UIFactory.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Widgets/UIFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Widgets/UIFactory.cs)
 - `Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
 - `Assets/TutorialInfo/Scripts/Readme.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Readme.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Readme.cs)
