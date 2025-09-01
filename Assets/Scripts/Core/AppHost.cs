@@ -53,6 +53,10 @@ namespace FantasyColony.Core
             if (flow == null) flow = gameObject.AddComponent<AppFlow>();
             flow.Initialize(_router, _services);
 
+            // Global shortcuts (e.g., F9 to open Boot Report) available in all builds
+            var shortcuts = gameObject.GetComponent<GlobalShortcuts>();
+            if (shortcuts == null) shortcuts = gameObject.AddComponent<GlobalShortcuts>();
+
             // Show Boot screen first so the UI covers while startup work initializes
             _router.Push<BootScreen>();
         }
