@@ -29,6 +29,9 @@ namespace FantasyColony.UI.Style
         public const string WoodTilePath = "ui/sprites/tile/wood_soft_tile";
         public const string DarkBorder9SPath = "ui/sprites/9slice/border_dark_9s";
 
+        // Desired on-screen border thickness in device pixels for sliced borders
+        public const float TargetBorderPx = 1f; // set to 2f if you want a slightly stronger frame
+
         // Overlay tints for Button.state (applied to a transparent overlay Image)
         // Keep subtle so textures are not washed out
         public static readonly Color HoverOverlay   = new Color(1f, 1f, 1f, 0.06f);

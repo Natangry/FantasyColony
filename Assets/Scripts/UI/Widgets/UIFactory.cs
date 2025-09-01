@@ -51,6 +51,27 @@ namespace FantasyColony.UI.Widgets
             return sym;
         }
 
+        // Compute a pixelsPerUnitMultiplier that yields a precise on-screen thickness in pixels for the 9-slice edges.
+        // Assumes the Sprite has equal borders on all sides (enforced by GetSymmetricDarkBorder).
+        private static float ComputeBorderScale(Sprite s, float targetPixels, float canvasScaleFactor)
+        {
+            if (s == null) return 1f;
+            // Unity: displayedThicknessInPixels ≈ borderPixels / (pixelsPerUnit * multiplier) * canvasScale
+            // Solve for multiplier to hit targetPixels exactly.
+            float borderPx = s.border.w; // any side; they're equal
+            float denom = s.pixelsPerUnit * Mathf.Max(0.0001f, targetPixels);
+            float m = (borderPx / denom) * Mathf.Max(0.0001f, canvasScaleFactor);
+            return Mathf.Max(0.0001f, m);
+        }
+
+        // Find nearest parent Canvas to get the current Canvas.scaleFactor (for pixel-accurate computation)
+        private static float GetCanvasScaleFactor(Transform t)
+        {
+            var canvas = t.GetComponentInParent<Canvas>();
+            if (canvas != null) return canvas.scaleFactor <= 0f ? 1f : canvas.scaleFactor;
+            return 1f;
+        }
+
         // PANEL (Textured wood fill + dark 9-slice border)
         public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel")
         {
@@ -95,9 +116,11 @@ namespace FantasyColony.UI.Widgets
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
             borderImg.preserveAspect = false;
-            borderImg.pixelsPerUnitMultiplier = BaseUIStyle.PanelBorderScale; // thinner encasing frame
-            borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = GetSymmetricDarkBorder();
+            // Compute precise pixel thickness so all four edges quantize identically
+            var panelScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasScaleFactor(go.transform));
+            borderImg.pixelsPerUnitMultiplier = panelScale;
+            borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
             else { borderImg.color = BaseUIStyle.PanelSurface; }
 
@@ -156,9 +179,11 @@ namespace FantasyColony.UI.Widgets
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.raycastTarget = false;
             borderImg.preserveAspect = false;
-            borderImg.pixelsPerUnitMultiplier = BaseUIStyle.ButtonBorderScale; // thinner encasing frame
-            borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var border = GetSymmetricDarkBorder();
+            // Compute precise pixel thickness so all four edges quantize identically
+            var buttonScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasScaleFactor(go.transform));
+            borderImg.pixelsPerUnitMultiplier = buttonScale;
+            borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
             else { borderImg.color = fill; }
 
