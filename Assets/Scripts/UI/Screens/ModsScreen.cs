@@ -31,6 +31,8 @@ namespace FantasyColony.UI.Screens
         private RectTransform _scriptContent;
         private RectTransform _defsContent;
 
+        private const float LeftWidth = 380f;
+        private const float RightWidth = 320f;
         // Selection state
         private string _selectedModName = null; // null => aggregated view of all active mods
 
@@ -57,12 +59,15 @@ namespace FantasyColony.UI.Screens
             row.childForceExpandWidth = true;
             row.childAlignment = TextAnchor.UpperLeft;
             row.spacing = 16f;
+            row.padding = new RectOffset(32, 32, 32, 32);
 
             // LEFT COLUMN
             _leftColumn = UIFactory.CreatePanelSurface(_root, "LeftColumnPanel");
-            var leftLE = _leftColumn.gameObject.AddComponent<LayoutElement>();
-            leftLE.preferredWidth = 380f; // ~360–400 px
-            leftLE.minWidth = 320f;
+            UIFactory.SetPanelDecorVisible(_leftColumn, true);
+            var leftLE = _leftColumn.GetComponent<LayoutElement>() ?? _leftColumn.gameObject.AddComponent<LayoutElement>();
+            leftLE.preferredWidth = LeftWidth; // fixed width column
+            leftLE.minWidth = LeftWidth - 60f;
+            leftLE.flexibleWidth = 0f; // fixed width column
             // Panel already has a VerticalLayoutGroup from UIFactory; adjust its spacing/padding if needed
             var leftVL = _leftColumn.GetComponent<VerticalLayoutGroup>();
             if (leftVL != null)
@@ -100,8 +105,10 @@ namespace FantasyColony.UI.Screens
 
             // CENTER COLUMN (snapshot)
             _centerColumn = UIFactory.CreatePanelSurface(_root, "CenterColumnPanel");
-            var centerLE = _centerColumn.gameObject.AddComponent<LayoutElement>();
-            centerLE.flexibleWidth = 1f; // flexible middle column
+            UIFactory.SetPanelDecorVisible(_centerColumn, true);
+            var centerLE = _centerColumn.GetComponent<LayoutElement>() ?? _centerColumn.gameObject.AddComponent<LayoutElement>();
+            centerLE.preferredWidth = -1f; // let layout decide
+            centerLE.flexibleWidth = 1f;  // flexible middle column
             var centerVL = _centerColumn.GetComponent<VerticalLayoutGroup>();
             if (centerVL != null)
             {
@@ -150,9 +157,11 @@ namespace FantasyColony.UI.Screens
 
             // RIGHT COLUMN (actions)
             _rightColumn = UIFactory.CreatePanelSurface(_root, "RightColumnPanel");
-            var rightLE = _rightColumn.gameObject.AddComponent<LayoutElement>();
-            rightLE.preferredWidth = 300f;
-            rightLE.minWidth = 260f;
+            UIFactory.SetPanelDecorVisible(_rightColumn, true);
+            var rightLE = _rightColumn.GetComponent<LayoutElement>() ?? _rightColumn.gameObject.AddComponent<LayoutElement>();
+            rightLE.preferredWidth = RightWidth;
+            rightLE.minWidth = RightWidth - 60f;
+            rightLE.flexibleWidth = 0f; // fixed width column
             var rightVL = _rightColumn.GetComponent<VerticalLayoutGroup>();
             if (rightVL != null)
             {
@@ -164,7 +173,8 @@ namespace FantasyColony.UI.Screens
 
             UIFactory.CreateButtonSecondary(_rightColumn, "save mod list", () => { /* TODO */ });
             UIFactory.CreateButtonSecondary(_rightColumn, "load mod list", () => { /* TODO */ });
-            CreateFlexibleSpace(_rightColumn); // push primary button to bottom
+            // push primary button to bottom
+            CreateFlexibleSpace(_rightColumn);
             UIFactory.CreateButtonPrimary(_rightColumn, "apply/restart", () =>
             {
                 try { AppFlowCommands.Restart(); } catch { Debug.Log("Restart requested (AppFlowCommands.Restart missing in editor)"); }
