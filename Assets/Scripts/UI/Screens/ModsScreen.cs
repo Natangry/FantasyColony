@@ -46,6 +46,9 @@ namespace FantasyColony.UI.Screens
             var bg = UIFactory.CreateFullscreenBackground(_root, wood, new Color(0.05f, 0.04f, 0.03f, 1f));
             bg.type = Image.Type.Tiled;      // tile the wood
             bg.preserveAspect = false;       // fill entire screen
+            // Exclude from layout so the HorizontalLayoutGroup doesn't give it a column slot
+            var bgLE = bg.gameObject.AddComponent<LayoutElement>();
+            bgLE.ignoreLayout = true;
             bg.rectTransform.SetAsFirstSibling();
 
             // Three-column layout (Left: lists, Center: snapshot, Right: actions)
@@ -60,13 +63,15 @@ namespace FantasyColony.UI.Screens
             var leftLE = _leftColumn.gameObject.AddComponent<LayoutElement>();
             leftLE.preferredWidth = 380f; // ~360–400 px
             leftLE.minWidth = 320f;
-            var leftVL = _leftColumn.gameObject.AddComponent<VerticalLayoutGroup>();
-            leftVL.childControlWidth = true;
-            leftVL.childControlHeight = false;
-            leftVL.childForceExpandWidth = true;
-            leftVL.childForceExpandHeight = false;
-            leftVL.spacing = 12f;
-            leftVL.padding = new RectOffset(12, 12, 12, 12);
+            // Panel already has a VerticalLayoutGroup from UIFactory; adjust its spacing/padding if needed
+            var leftVL = _leftColumn.GetComponent<VerticalLayoutGroup>();
+            if (leftVL != null)
+            {
+                leftVL.spacing = 12f;
+                leftVL.padding = new RectOffset(12, 12, 12, 12);
+                leftVL.childControlHeight = false;
+                leftVL.childForceExpandHeight = false;
+            }
 
             // Left title: "Mods"
             CreateHeaderLabel(_leftColumn, "Mods");
@@ -97,13 +102,14 @@ namespace FantasyColony.UI.Screens
             _centerColumn = UIFactory.CreatePanelSurface(_root, "CenterColumnPanel");
             var centerLE = _centerColumn.gameObject.AddComponent<LayoutElement>();
             centerLE.flexibleWidth = 1f; // flexible middle column
-            var centerVL = _centerColumn.gameObject.AddComponent<VerticalLayoutGroup>();
-            centerVL.childControlWidth = true;
-            centerVL.childControlHeight = false;
-            centerVL.childForceExpandWidth = true;
-            centerVL.childForceExpandHeight = false;
-            centerVL.spacing = 12f;
-            centerVL.padding = new RectOffset(12, 12, 12, 12);
+            var centerVL = _centerColumn.GetComponent<VerticalLayoutGroup>();
+            if (centerVL != null)
+            {
+                centerVL.spacing = 12f;
+                centerVL.padding = new RectOffset(12, 12, 12, 12);
+                centerVL.childControlHeight = false;
+                centerVL.childForceExpandHeight = false;
+            }
 
             // Center header row (Dynamic title + snapshot search)
             var centerHeader = CreateUIObject("CenterHeader", _centerColumn).GetComponent<RectTransform>();
@@ -120,13 +126,14 @@ namespace FantasyColony.UI.Screens
 
             // Snapshot panel with foldouts
             var snapshotPanel = UIFactory.CreatePanelSurface(_centerColumn, "SnapshotPanel");
-            var spVL = snapshotPanel.gameObject.AddComponent<VerticalLayoutGroup>();
-            spVL.childControlWidth = true;
-            spVL.childControlHeight = false;
-            spVL.childForceExpandWidth = true;
-            spVL.childForceExpandHeight = false;
-            spVL.spacing = 8f;
-            spVL.padding = new RectOffset(12, 12, 12, 12);
+            var spVL = snapshotPanel.GetComponent<VerticalLayoutGroup>();
+            if (spVL != null)
+            {
+                spVL.spacing = 8f;
+                spVL.padding = new RectOffset(12, 12, 12, 12);
+                spVL.childControlHeight = false;
+                spVL.childForceExpandHeight = false;
+            }
 
             CreateLabel(snapshotPanel, "Snapshot (shows the contents of the mod in a user-friendly list)", 14, FontStyle.Italic, TextAnchor.MiddleLeft);
 
@@ -146,13 +153,14 @@ namespace FantasyColony.UI.Screens
             var rightLE = _rightColumn.gameObject.AddComponent<LayoutElement>();
             rightLE.preferredWidth = 300f;
             rightLE.minWidth = 260f;
-            var rightVL = _rightColumn.gameObject.AddComponent<VerticalLayoutGroup>();
-            rightVL.childControlWidth = true;
-            rightVL.childControlHeight = false;
-            rightVL.childForceExpandWidth = true;
-            rightVL.childForceExpandHeight = false;
-            rightVL.spacing = 12f;
-            rightVL.padding = new RectOffset(12, 12, 12, 12);
+            var rightVL = _rightColumn.GetComponent<VerticalLayoutGroup>();
+            if (rightVL != null)
+            {
+                rightVL.spacing = 12f;
+                rightVL.padding = new RectOffset(12, 12, 12, 12);
+                rightVL.childControlHeight = false;
+                rightVL.childForceExpandHeight = false;
+            }
 
             UIFactory.CreateButtonSecondary(_rightColumn, "save mod list", () => { /* TODO */ });
             UIFactory.CreateButtonSecondary(_rightColumn, "load mod list", () => { /* TODO */ });
@@ -289,13 +297,14 @@ namespace FantasyColony.UI.Screens
         private static RectTransform CreateTitledScrollPanel_Styled(Transform parent, string title)
         {
             var container = UIFactory.CreatePanelSurface(parent, title + "_Panel");
-            var vl = container.gameObject.AddComponent<VerticalLayoutGroup>();
-            vl.childControlWidth = true;
-            vl.childControlHeight = false;
-            vl.childForceExpandWidth = true;
-            vl.childForceExpandHeight = false;
-            vl.spacing = 6f;
-            vl.padding = new RectOffset(8, 8, 8, 8);
+            var vl = container.GetComponent<VerticalLayoutGroup>();
+            if (vl != null)
+            {
+                vl.childControlHeight = false;
+                vl.childForceExpandHeight = false;
+                vl.spacing = 6f;
+                vl.padding = new RectOffset(8, 8, 8, 8);
+            }
 
             CreateLabel(container, title, 14, FontStyle.Bold, TextAnchor.MiddleLeft);
 
