@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 10:05:50 UTC
+_Updated_: 2025-09-01 19:44:28 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3300,11 +3300,17 @@ namespace FantasyColony.UI.Screens
         }
 
         // --- UI building helpers (lean, rely on layout components) ---
-        private static GameObject CreateUIObject(string name, Transform parent)
+        private static RectTransform CreateUIObject(string name, Transform parent)
         {
             var go = new GameObject(name, typeof(RectTransform));
-            go.transform.SetParent(parent, false);
-            return go;
+            var rt = go.GetComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            return rt;
+        }
+
+        private static RectTransform AsRT(Component c)
+        {
+            return c is RectTransform r ? r : c.GetComponent<RectTransform>();
         }
 
         private static void Stretch(RectTransform rt)
@@ -3318,13 +3324,13 @@ namespace FantasyColony.UI.Screens
         private static Text CreateLabel(Transform parent, string text, int size, FontStyle style, TextAnchor anchor)
         {
             var go = CreateUIObject("Label", parent);
-            var t = go.AddComponent<Text>();
+            var t = go.gameObject.AddComponent<Text>();
             t.text = text;
             t.fontSize = size;
             t.alignment = anchor;
             t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             t.color = new Color(0.92f, 0.88f, 0.78f, 1f); // light text (fits base style)
-            var le = go.AddComponent<LayoutElement>();
+            var le = go.gameObject.AddComponent<LayoutElement>();
             le.minHeight = 24f;
             return t;
         }
@@ -3347,36 +3353,36 @@ namespace FantasyColony.UI.Screens
         private static InputField CreateSearchField(Transform parent, string placeholder)
         {
             var container = CreateUIObject("SearchField", parent);
-            var bg = container.AddComponent<Image>();
+            var bg = container.gameObject.AddComponent<Image>();
             bg.color = new Color(0.16f, 0.14f, 0.10f, 0.85f);
-            var le = container.AddComponent<LayoutElement>();
+            var le = container.gameObject.AddComponent<LayoutElement>();
             le.preferredHeight = 32f;
             le.flexibleWidth = 0f;
 
-            var textGO = CreateUIObject("Text", container.transform);
-            var text = textGO.AddComponent<Text>();
+            var textGO = CreateUIObject("Text", container);
+            var text = textGO.gameObject.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.color = new Color(0.92f, 0.88f, 0.78f, 1f);
             text.alignment = TextAnchor.MiddleLeft;
-            var textRT = textGO.GetComponent<RectTransform>();
+            var textRT = textGO;
             textRT.anchorMin = new Vector2(0, 0);
             textRT.anchorMax = new Vector2(1, 1);
             textRT.offsetMin = new Vector2(8, 6);
             textRT.offsetMax = new Vector2(-8, -6);
 
-            var phGO = CreateUIObject("Placeholder", container.transform);
-            var placeholderText = phGO.AddComponent<Text>();
+            var phGO = CreateUIObject("Placeholder", container);
+            var placeholderText = phGO.gameObject.AddComponent<Text>();
             placeholderText.text = placeholder;
             placeholderText.font = text.font;
             placeholderText.color = new Color(1f, 1f, 1f, 0.35f);
             placeholderText.alignment = TextAnchor.MiddleLeft;
-            var phRT = phGO.GetComponent<RectTransform>();
+            var phRT = phGO;
             phRT.anchorMin = new Vector2(0, 0);
             phRT.anchorMax = new Vector2(1, 1);
             phRT.offsetMin = new Vector2(8, 6);
             phRT.offsetMax = new Vector2(-8, -6);
 
-            var input = container.AddComponent<InputField>();
+            var input = container.gameObject.AddComponent<InputField>();
             input.textComponent = text;
             input.placeholder = placeholderText;
             return input;
@@ -3396,11 +3402,11 @@ namespace FantasyColony.UI.Screens
 
             CreateLabel(container, title, 14, FontStyle.Bold, TextAnchor.MiddleLeft);
 
-            var scrollRoot = CreateUIObject("Scroll", container).GetComponent<RectTransform>();
+            var scrollRoot = CreateUIObject("Scroll", container);
             var le = scrollRoot.gameObject.AddComponent<LayoutElement>();
             le.preferredHeight = 220f;
             var scroll = scrollRoot.gameObject.AddComponent<ScrollRect>();
-            var viewport = CreateUIObject("Viewport", scrollRoot).GetComponent<RectTransform>();
+            var viewport = CreateUIObject("Viewport", scrollRoot);
             var vpImg = viewport.gameObject.AddComponent<Image>();
             vpImg.color = new Color(0, 0, 0, 0.1f);
             viewport.anchorMin = new Vector2(0, 0);
@@ -3410,7 +3416,7 @@ namespace FantasyColony.UI.Screens
             var mask = viewport.gameObject.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            var content = CreateUIObject("Content", viewport).GetComponent<RectTransform>();
+            var content = CreateUIObject("Content", viewport);
             var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.childControlWidth = true;
             layout.childControlHeight = false;
@@ -3429,18 +3435,18 @@ namespace FantasyColony.UI.Screens
 
         private static RectTransform CreateFlexibleSpace(Transform parent)
         {
-            var go = CreateUIObject("FlexibleSpace", parent);
-            var le = go.AddComponent<LayoutElement>();
+            var rt = CreateUIObject("FlexibleSpace", parent);
+            var le = rt.gameObject.AddComponent<LayoutElement>();
             le.flexibleWidth = 1f;
-            return go.GetComponent<RectTransform>();
+            return rt;
         }
 
         private static void CreateDivider(Transform parent)
         {
             var go = CreateUIObject("Divider", parent);
-            var img = go.AddComponent<Image>();
+            var img = go.gameObject.AddComponent<Image>();
             img.color = new Color(1f, 1f, 1f, 0.25f);
-            var le = go.AddComponent<LayoutElement>();
+            var le = go.gameObject.AddComponent<LayoutElement>();
             le.minHeight = 2f;
         }
 
@@ -3453,7 +3459,7 @@ namespace FantasyColony.UI.Screens
         private static void CreateFoldout(Transform parent, string title, out RectTransform content)
         {
             // Header
-            var header = CreateUIObject(title + "_Header", parent).GetComponent<RectTransform>();
+            var header = CreateUIObject(title + "_Header", parent);
             var hl = header.gameObject.AddComponent<HorizontalLayoutGroup>();
             hl.childAlignment = TextAnchor.MiddleLeft;
             hl.spacing = 6f;
