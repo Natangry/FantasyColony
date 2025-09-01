@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 02:08:19 UTC
+_Updated_: 2025-09-01 02:32:13 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -166,7 +166,7 @@ namespace FantasyColony.EditorTools
 }
 #endif
 
-// ===== FILE: Assets/Scripts/Boot/AppBootstrap.cs =====
+// ===== FILE: Assets/Scripts/Boot/BootPipeline.cs =====
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -178,7 +178,7 @@ namespace FantasyColony.Boot {
     /// <summary>
     /// Modular boot pipeline. Each step is an IBootTask for extensibility and robust error handling.
     /// </summary>
-    public static class AppBootstrap {
+    public static class BootPipeline {
         public static IEnumerator Run(Action<string> setPhase) {
             var report = new Boot.BootReport();
             var ctx = new Boot.BootContext { Report = report };
@@ -208,12 +208,11 @@ namespace FantasyColony.Boot {
     }
 
     public sealed class BootReport {
-        public struct Step { public string title; public float seconds; public string warn; public string error; }
-        public readonly List<Step> steps = new();
         public static BootReport Last { get; internal set; }
-        internal void Add(string title, float dt, string warn = null, string error = null) {
-            steps.Add(new Step { title = title, seconds = dt, warn = warn, error = error });
-        }
+        public int ModsFound, ModsLoaded;
+        public int DefsFound;
+        public int DefsLoaded;
+        public int Errors, Warnings;
     }
 
     public static class BootTaskRegistry {
@@ -231,70 +230,44 @@ namespace FantasyColony.Boot {
     sealed class ConfigTask : IBootTask {
         public string Title => "Loading configuration...";
         public IEnumerator Execute(BootContext ctx) {
-            var t0 = Time.realtimeSinceStartup;
-            string warn = null, err = null;
-            try { ctx.Config.Load(); }
-            catch (Exception e) { warn = $"Config load failed, defaults used: {e.Message}"; Debug.LogWarning(warn); }
-            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, err);
-            yield return null;
+            // Read config file and set up crash logging etc
+            yield return JsonConfigService.Instance.RefreshAsync();
+#if UNITY_EDITOR
+            // reduce spam in console during editor play-mode starts
+            Debug.unityLogger.logEnabled = JsonConfigService.Instance.GetBool("debug.unityLogs", false);
+#endif
         }
     }
 
     sealed class DiscoverModsTask : IBootTask {
         public string Title => "Discovering mods...";
         public IEnumerator Execute(BootContext ctx) {
-            var t0 = Time.realtimeSinceStartup;
-            string warn = null;
-            try { ctx.Mods = ModDiscovery.Discover(); Debug.Log($"Mods discovered: {ctx.Mods.Count}"); }
-            catch (Exception e) { warn = $"Mod discovery failed: {e.Message}"; Debug.LogWarning(warn); ctx.Mods = new List<ModInfo>(); }
-            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
-            yield return null;
+            ctx.Mods.Clear();
+            foreach (var mod in ModManager.Instance.Discover()) {
+                ctx.Mods.Add(mod);
+                yield return null; // allow UI to tick while enumerating
+            }
+            ctx.Report.ModsFound = ctx.Mods.Count;
         }
     }
 
     sealed class LoadDefsTask : IBootTask {
         public string Title => "Loading defs...";
         public IEnumerator Execute(BootContext ctx) {
-            var t0 = Time.realtimeSinceStartup;
-            string warn = null;
-            try {
-                var errors = new List<DefError>();
-                XmlDefLoader.Load(ctx.Mods, ctx.Defs, errors);
-                if (errors.Count > 0) warn = $"Defs loaded with {errors.Count} issues. See log.";
-                // Surface mod override conflicts in the boot report
-                if (ctx.Defs.ConflictCount > 0) {
-                    var note = $"Conflicts={ctx.Defs.ConflictCount}";
-                    warn = string.IsNullOrEmpty(warn) ? note : ($"{warn} | {note}");
+            foreach (var mod in ctx.Mods) {
+                foreach (var doc in DefRegistry.Instance.LoadFromMod(mod)) {
+                    yield return null; // allow UI to tick while loading
                 }
-                Debug.Log($"Defs loaded. Count={ctx.Defs.Count}");
-            } catch (Exception e) { warn = $"Def loading failed (lenient): {e.Message}"; Debug.LogWarning(warn); }
-            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
-            yield return null;
+            }
+            ctx.Report.DefsFound = ctx.Defs.Count;
         }
     }
 
     sealed class ValidateAndMigrateDefsTask : IBootTask {
         public string Title => "Validating & migrating defs...";
         public IEnumerator Execute(BootContext ctx) {
-            var t0 = Time.realtimeSinceStartup;
-            string warn = null;
-            int warnCount = 0, migCount = 0;
-            try {
-                // Build index first, then load schemas from StreamingAssets and from each mod root inferred via index
-                var index = FantasyColony.Core.Defs.DefIndex.Build(ctx.Mods, ctx.Defs);
-                FantasyColony.Core.Defs.Validation.SchemaCatalog.EnsureLoadedFromIndex(index);
-                var results = FantasyColony.Core.Defs.Validation.DefValidator.Run(index);
-                foreach (var r in results) { Debug.LogWarning($"[Defs] {r}"); }
-                warnCount = results.Count;
-                migCount = FantasyColony.Core.Defs.Migrations.MigrationEngine.Run(index);
-                if (warnCount > 0 || migCount > 0) {
-                    warn = $"Validation warnings={warnCount}, migrations={migCount}";
-                }
-            } catch (System.Exception e) {
-                warn = $"Validation phase had issues: {e.Message}";
-                Debug.LogWarning(warn);
-            }
-            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
+            var results = DefValidator.RunAll(ctx.Defs);
+            ctx.Report.Errors = results.Errors; ctx.Report.Warnings = results.Warnings;
             yield return null;
         }
     }
@@ -302,42 +275,24 @@ namespace FantasyColony.Boot {
     sealed class InitServicesTask : IBootTask {
         public string Title => "Initializing services...";
         public IEnumerator Execute(BootContext ctx) {
-            var t0 = Time.realtimeSinceStartup;
-            string warn = null;
-            try {
-                var cfg = ctx.Config;
-                var lang = cfg.Get("language", "en");
-                LocService.Instance.SetLanguage(lang);
-                float vMaster = Parse01(cfg.Get("vol_master", "1"));
-                float vMusic  = Parse01(cfg.Get("vol_music", "1"));
-                float vSfx    = Parse01(cfg.Get("vol_sfx", "1"));
-                AudioService.Instance.SetVolume("master", vMaster);
-                AudioService.Instance.SetVolume("music", vMusic);
-                AudioService.Instance.SetVolume("sfx", vSfx);
-                JsonSaveService.Instance.RefreshCache();
-            } catch (Exception e) { warn = $"Service init had issues: {e.Message}"; Debug.LogWarning(warn); }
-            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
+            // Wire up core services
+            var services = new ServiceRegistry();
+            services.Register<ILogger>(new FileLogger());
+            services.Register<IEventBus>(new SimpleEventBus());
+            services.Register<IAssetProvider>(new ResourcesAssetProvider());
+            services.Register<IConfigService>(JsonConfigService.Instance);
+            // Save service remains optional at this stage
+            services.Register<JsonSaveService>(JsonSaveService.Instance);
+            AppHost.Instance.AttachServices(services);
             yield return null;
         }
-
-        private static float Parse01(string s) { if (float.TryParse(s, out var f)) return Mathf.Clamp01(f); return 1f; }
     }
 
     sealed class WarmAssetsTask : IBootTask {
         public string Title => "Warming assets...";
         public IEnumerator Execute(BootContext ctx) {
-            var t0 = Time.realtimeSinceStartup;
-            // Placeholder for future warmups
-            // If Addressables is enabled, initialize it early to avoid first-use hitching
-#if ADDRESSABLES
-            try {
-                var handle = UnityEngine.AddressableAssets.Addressables.InitializeAsync();
-                yield return handle;
-            } catch { /* swallow; fail-soft */ }
-#else
-            yield return null;
-#endif
-            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, null, null);
+            // Load commonly used fonts/icons/prefabs so first menus feel snappy
+            yield return ResourcesAssetProvider.WarmupAsync();
         }
     }
 }
@@ -381,7 +336,6 @@ namespace FantasyColony.Core {
     /// </summary>
     public class AppFlow : MonoBehaviour {
         private UIRouter _router;
-        private ServiceRegistry _services;
 
         public static AppFlow Instance { get; private set; }
 
@@ -394,9 +348,8 @@ namespace FantasyColony.Core {
             DontDestroyOnLoad(gameObject);
         }
 
-        internal void Initialize(UIRouter router, ServiceRegistry services) {
+        internal void Initialize(UIRouter router) {
             _router = router;
-            _services = services;
         }
 
         /// <summary>
@@ -500,7 +453,7 @@ namespace FantasyColony.Core
             // Attach AppFlow helper to manage restart/quit across the app
             var flow = gameObject.GetComponent<AppFlow>();
             if (flow == null) flow = gameObject.AddComponent<AppFlow>();
-            flow.Initialize(_router, _services);
+            flow.Initialize(_router);
 
             // Global shortcuts (e.g., F9 to open Boot Report) available in all builds
             var shortcuts = gameObject.GetComponent<GlobalShortcuts>();
@@ -692,7 +645,6 @@ namespace FantasyColony.Core.Defs.Migrations {
 
 // ===== FILE: Assets/Scripts/Core/Defs/Validation/DefValidator.cs =====
 using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 
 namespace FantasyColony.Core.Defs.Validation {
@@ -1732,6 +1684,7 @@ namespace FantasyColony.Core.Services
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Globalization;
 using UnityEngine;
 
 namespace FantasyColony.Core.Services
@@ -1772,7 +1725,8 @@ namespace FantasyColony.Core.Services
                     {
                         var json = File.ReadAllText(metaPath);
                         var meta = JsonUtility.FromJson<SlotBag>(json) ?? new SlotBag();
-                        var when = DateTime.TryParse(meta.lastPlayedUtc, out var dt) ? dt : DateTime.UtcNow;
+                        var when = DateTimeOffset.TryParseExact(meta.lastPlayedUtc, "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dto)
+                            ? dto.UtcDateTime : DateTime.UtcNow;
                         _cache.Add(new SaveSlotMeta
                         {
                             slotId = slotId,
@@ -2790,7 +2744,7 @@ namespace FantasyColony.UI.Screens
 
             // Kick off the boot pipeline on the next frame
             var runner = Root.AddComponent<Runner>();
-            runner.Begin(() => runner.StartCoroutine(BootCo()));
+            runner.StartCoroutine(BootCo());
         }
 
         public void Exit()
@@ -2805,7 +2759,7 @@ namespace FantasyColony.UI.Screens
         private IEnumerator BootCo()
         {
             yield return null; // render once so the cover is visible
-            yield return AppBootstrap.Run(SetPhase);
+            yield return BootPipeline.Run(SetPhase);
             Time.timeScale = 1f;
             UIRouter.Current?.ResetTo<MainMenuScreen>();
         }
@@ -2815,10 +2769,7 @@ namespace FantasyColony.UI.Screens
             if (_phaseText != null) _phaseText.text = s ?? string.Empty;
         }
 
-        private class Runner : MonoBehaviour
-        {
-            public void Begin(Action onReady) { onReady?.Invoke(); }
-        }
+        private class Runner : MonoBehaviour { }
     }
 }
 
