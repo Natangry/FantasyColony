@@ -4,6 +4,7 @@ Shader "UI/GrayscaleTint"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
+        [PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
         [HideInInspector] _StencilComp ("Stencil Comparison", Float) = 8
         [HideInInspector] _Stencil ("Stencil ID", Float) = 0
         [HideInInspector] _StencilOp ("Stencil Operation", Float) = 0
@@ -11,6 +12,7 @@ Shader "UI/GrayscaleTint"
         [HideInInspector] _StencilReadMask ("Stencil Read Mask", Float) = 255
         [HideInInspector] _ColorMask ("Color Mask", Float) = 15
         [Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
+        [PerRendererData] _TextureSampleAdd ("Texture Sample Add", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -68,6 +70,10 @@ Shader "UI/GrayscaleTint"
             fixed4 _Color;
             sampler2D _MainTex;
             float4 _ClipRect;
+            #ifdef UNITY_UI_ETC1_EXTERNAL_ALPHA
+            sampler2D _AlphaTex;
+            #endif
+            float4 _TextureSampleAdd;
 
             v2f vert (appdata_t IN)
             {
@@ -82,10 +88,12 @@ Shader "UI/GrayscaleTint"
             fixed4 SampleSpriteTexture(half2 uv)
             {
                 fixed4 color = tex2D(_MainTex, uv);
-                #ifdef UNITY_UI_ETC1_EXTERNAL_ALPHA
+            #ifdef UNITY_UI_ETC1_EXTERNAL_ALPHA
                 fixed4 alpha = tex2D(_AlphaTex, uv);
                 color.a = alpha.r;
-                #endif
+            #endif
+                // Unity UI atlas fixup (see Unity's default UI shader)
+                color.rgb = (color.rgb - _TextureSampleAdd.rgb) * color.a + _TextureSampleAdd.rgb;
                 return color;
             }
 
