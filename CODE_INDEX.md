@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-09-01 05:58:23 UTC
+_Updated_: 2025-09-01 06:11:49 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/BootPipeline.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BootPipeline.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BootPipeline.cs)
@@ -46,6 +46,7 @@ _Updated_: 2025-09-01 05:58:23 UTC
 - `Assets/Scripts/UI/Util/UIPixelSnap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Util/UIPixelSnap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Util/UIPixelSnap.cs)
 - `Assets/Scripts/UI/Widgets/UIFactory.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Widgets/UIFactory.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Widgets/UIFactory.cs)
 - `Assets/Scripts/UI/Widgets/UIFrame.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Widgets/UIFrame.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Widgets/UIFrame.cs)
+- `Assets/Scripts/Util/TransformPathExtensions.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Util/TransformPathExtensions.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Util/TransformPathExtensions.cs)
 - `Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
 - `Assets/TutorialInfo/Scripts/Readme.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/TutorialInfo/Scripts/Readme.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/TutorialInfo/Scripts/Readme.cs)
 - `Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Tools/XmlDefsTools/Emit/SchemaCatalogWriter.cs)

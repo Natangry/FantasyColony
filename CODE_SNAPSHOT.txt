@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 05:58:23 UTC
+_Updated_: 2025-09-01 06:11:49 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3086,6 +3086,9 @@ namespace FantasyColony.UI.Style
         public const string WoodTilePath = "ui/sprites/tile/wood_soft_tile";
         public const string DarkBorder9SPath = "ui/sprites/9slice/border_dark_9s";
 
+        // Toggle: grayscale the wood tile before tinting (for faithful palette hues)
+        public const bool UseGrayscaleTint = true;
+
         // Desired on-screen border thickness in device pixels for sliced borders
         // This single value controls both panels and buttons.
         public const float TargetBorderPx = 10f; // default visual = 10px borders
@@ -3197,6 +3200,7 @@ using UnityEngine.UI;
 using FantasyColony.UI.Style;
 using System;
 using FantasyColony.UI.Util;
+using FantasyColony; // for Transform.GetHierarchyPath extension
 using TintTheme = FantasyColony.UI.Style.BaseUIStyle.TintTheme;
 
 namespace FantasyColony.UI.Widgets
@@ -3226,12 +3230,37 @@ namespace FantasyColony.UI.Widgets
         {
             if (_grayscaleTintMat != null) return _grayscaleTintMat;
             var sh = Shader.Find("UI/GrayscaleTint");
-            if (sh != null)
+            if (sh == null)
             {
-                _grayscaleTintMat = new Material(sh);
-                _grayscaleTintMat.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+                Debug.LogWarning("UIFactory: Shader 'UI/GrayscaleTint' not found. Falling back to UI/Default for wood tinting.");
+                return null;
             }
+            _grayscaleTintMat = new Material(sh)
+            {
+                hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor
+            };
             return _grayscaleTintMat;
+        }
+
+        private static void ApplyTintMaterial(Image img)
+        {
+            if (img == null) return;
+            if (!BaseUIStyle.UseGrayscaleTint)
+                return; // use default
+            var mat = GetGrayscaleTintMaterial();
+            if (mat == null) return;
+            // assign both to avoid fallback in some batching paths
+            img.material = mat;
+            img.sharedMaterial = mat;
+            img.SetMaterialDirty();
+#if UNITY_EDITOR
+            // Verify what actually renders
+            var actual = img.materialForRendering != null ? img.materialForRendering.shader.name : "<null>";
+            if (actual != "UI/GrayscaleTint")
+                Debug.LogWarning($"UIFactory: Expected 'UI/GrayscaleTint' but got '{actual}' on {img.transform.GetHierarchyPath()}.");
+            else
+                Debug.Log($"UIFactory: GrayscaleTint OK on {img.transform.GetHierarchyPath()}.");
+#endif
         }
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
@@ -3339,8 +3368,7 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
-            var mat = GetGrayscaleTintMaterial();
-            if (mat != null) fillImg.material = mat;
+            ApplyTintMaterial(fillImg);
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
             // --- Pixel-precise frame instead of 9-slice Image ---
@@ -3406,8 +3434,7 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
-            var mat = GetGrayscaleTintMaterial();
-            if (mat != null) fillImg.material = mat;
+            ApplyTintMaterial(fillImg);
             fillImg.color = theme.Base; // tint the wood itself
             // --- Pixel-precise frame instead of 9-slice Image ---
             var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
@@ -3673,6 +3700,30 @@ namespace FantasyColony.UI.Widgets
             rrt.pivot = new Vector2(1f, 0.5f);
             rrt.anchoredPosition = Vector2.zero;
             rrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
+        }
+    }
+}
+
+// ===== FILE: Assets/Scripts/Util/TransformPathExtensions.cs =====
+using UnityEngine;
+
+namespace FantasyColony
+{
+    public static class TransformPathExtensions
+    {
+        // Helper for readable logs (Editor only usage).
+        public static string GetHierarchyPath(this Transform t)
+        {
+            if (t == null) return "<null>";
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(t.name);
+            var p = t.parent;
+            while (p != null)
+            {
+                sb.Insert(0, "/");
+                sb.Insert(0, p.name);
+                p = p.parent;
+            }
+            return sb.ToString();
         }
     }
 }
