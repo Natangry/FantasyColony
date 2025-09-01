@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 00:05:34 UTC
+_Updated_: 2025-09-01 00:12:31 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -977,6 +977,7 @@ namespace FantasyColony.Core.Defs.Validation {
 using UnityEngine;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Screens;
+using UInput = UnityEngine.Input;
 
 namespace FantasyColony.Core {
     /// <summary>
@@ -991,7 +992,7 @@ namespace FantasyColony.Core {
 
         private void Update() {
             // Open Boot Report
-            if (Input.GetKeyDown(KeyCode.F9)) {
+            if (UInput.GetKeyDown(KeyCode.F9)) {
                 var router = UIRouter.Current;
                 if (router == null) {
                     // Fallback if static Current isn't set yet
