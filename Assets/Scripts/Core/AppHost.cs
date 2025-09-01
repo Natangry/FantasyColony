@@ -33,8 +33,9 @@ namespace FantasyColony.Core
         private void Awake()
         {
             Instance = this;
-            Application.targetFrameRate = 60;
-            QualitySettings.vSyncCount = 0;
+            QualitySettings.vSyncCount = 1;
+            // On desktop, let vSync drive frame pacing. Leave targetFrameRate unset (-1) unless vSync is disabled.
+            Application.targetFrameRate = -1;
 
             _services = new ServiceRegistry();
             _services.Register<FCLogger>(new FCFileLogger());
