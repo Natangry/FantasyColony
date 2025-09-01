@@ -35,7 +35,7 @@ namespace FantasyColony.UI.Screens
         {
 
             // Root container (stretches to parent)
-            _root = CreateUIObject("ModsScreenRoot", parent).rectTransform;
+            _root = CreateUIObject("ModsScreenRoot", parent).GetComponent<RectTransform>();
             Stretch(_root);
 
             // Optional: fullscreen background (house style)
@@ -49,7 +49,7 @@ namespace FantasyColony.UI.Screens
             row.spacing = 16f;
 
             // LEFT COLUMN
-            _leftColumn = CreateUIObject("LeftColumn", _root).rectTransform;
+            _leftColumn = CreateUIObject("LeftColumn", _root).GetComponent<RectTransform>();
             var leftLE = _leftColumn.gameObject.AddComponent<LayoutElement>();
             leftLE.preferredWidth = 380f; // ~360–400 px
             leftLE.minWidth = 320f;
@@ -65,7 +65,7 @@ namespace FantasyColony.UI.Screens
             CreateHeaderLabel(_leftColumn, "Mods");
 
             // Search + Sort row
-            var leftControls = CreateUIObject("LeftControls", _leftColumn).rectTransform;
+            var leftControls = CreateUIObject("LeftControls", _leftColumn).GetComponent<RectTransform>();
             var lcHL = leftControls.gameObject.AddComponent<HorizontalLayoutGroup>();
             lcHL.childAlignment = TextAnchor.MiddleLeft;
             lcHL.spacing = 8f;
@@ -87,7 +87,7 @@ namespace FantasyColony.UI.Screens
             CreateEmptyState(_activeListContent, "No active mods");
 
             // RIGHT COLUMN
-            _rightColumn = CreateUIObject("RightColumn", _root).rectTransform;
+            _rightColumn = CreateUIObject("RightColumn", _root).GetComponent<RectTransform>();
             var rightVL = _rightColumn.gameObject.AddComponent<VerticalLayoutGroup>();
             rightVL.childControlWidth = true;
             rightVL.childControlHeight = false;
@@ -97,7 +97,7 @@ namespace FantasyColony.UI.Screens
             rightVL.padding = new RectOffset(12, 12, 12, 12);
 
             // Right column header row (Dynamic title + snapshot search + Save/Load)
-            var rightHeader = CreateUIObject("RightHeader", _rightColumn).rectTransform;
+            var rightHeader = CreateUIObject("RightHeader", _rightColumn).GetComponent<RectTransform>();
             var rhHL = rightHeader.gameObject.AddComponent<HorizontalLayoutGroup>();
             rhHL.childAlignment = TextAnchor.MiddleLeft;
             rhHL.spacing = 8f;
@@ -135,7 +135,7 @@ namespace FantasyColony.UI.Screens
             CreateDivider(_defsContent);
 
             // Bottom-right primary button: apply/restart
-            var bottomRight = CreateUIObject("BottomRight", _rightColumn).rectTransform;
+            var bottomRight = CreateUIObject("BottomRight", _rightColumn).GetComponent<RectTransform>();
             var brHL = bottomRight.gameObject.AddComponent<HorizontalLayoutGroup>();
             brHL.spacing = 8f;
             brHL.childAlignment = TextAnchor.MiddleRight;
@@ -272,7 +272,7 @@ namespace FantasyColony.UI.Screens
 
         private static RectTransform CreatePanelSurface(Transform parent, string name)
         {
-            var panel = CreateUIObject(name, parent).rectTransform;
+            var panel = CreateUIObject(name, parent).GetComponent<RectTransform>();
             var img = panel.gameObject.AddComponent<Image>();
             img.color = new Color(0.12f, 0.10f, 0.08f, 0.9f); // surface
             return panel;
@@ -291,11 +291,11 @@ namespace FantasyColony.UI.Screens
 
             CreateLabel(container, title, 14, FontStyle.Bold, TextAnchor.MiddleLeft);
 
-            var scrollRoot = CreateUIObject("Scroll", container).rectTransform;
+            var scrollRoot = CreateUIObject("Scroll", container).GetComponent<RectTransform>();
             var le = scrollRoot.gameObject.AddComponent<LayoutElement>();
             le.preferredHeight = 220f;
             var scroll = scrollRoot.gameObject.AddComponent<ScrollRect>();
-            var viewport = CreateUIObject("Viewport", scrollRoot).rectTransform;
+            var viewport = CreateUIObject("Viewport", scrollRoot).GetComponent<RectTransform>();
             var vpImg = viewport.gameObject.AddComponent<Image>();
             vpImg.color = new Color(0, 0, 0, 0.1f);
             viewport.anchorMin = new Vector2(0, 0);
@@ -305,7 +305,7 @@ namespace FantasyColony.UI.Screens
             var mask = viewport.gameObject.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            var content = CreateUIObject("Content", viewport).rectTransform;
+            var content = CreateUIObject("Content", viewport).GetComponent<RectTransform>();
             var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.childControlWidth = true;
             layout.childControlHeight = false;
@@ -327,7 +327,7 @@ namespace FantasyColony.UI.Screens
             var go = CreateUIObject("FlexibleSpace", parent);
             var le = go.AddComponent<LayoutElement>();
             le.flexibleWidth = 1f;
-            return go.rectTransform;
+            return go.GetComponent<RectTransform>();
         }
 
         private static void CreateDivider(Transform parent)
@@ -388,7 +388,7 @@ namespace FantasyColony.UI.Screens
         private static void CreateFoldout(Transform parent, string title, out RectTransform content)
         {
             // Header
-            var header = CreateUIObject(title + "_Header", parent).rectTransform;
+            var header = CreateUIObject(title + "_Header", parent).GetComponent<RectTransform>();
             var hl = header.gameObject.AddComponent<HorizontalLayoutGroup>();
             hl.childAlignment = TextAnchor.MiddleLeft;
             hl.spacing = 6f;
@@ -448,7 +448,7 @@ namespace FantasyColony.UI.Screens
             catch { /* ignore and fallback */ }
 
             // Fallback simple background
-            var bg = CreateUIObject("Background", parent).rectTransform;
+            var bg = CreateUIObject("Background", parent).GetComponent<RectTransform>();
             Stretch(bg);
             var img = bg.gameObject.AddComponent<Image>();
             img.color = new Color(0.06f, 0.05f, 0.04f, 1f);
