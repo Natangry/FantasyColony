@@ -64,7 +64,7 @@ namespace FantasyColony.UI.Screens
 
             // Kick off the boot pipeline on the next frame
             var runner = Root.AddComponent<Runner>();
-            runner.Begin(() => runner.StartCoroutine(BootCo()));
+            runner.StartCoroutine(BootCo());
         }
 
         public void Exit()
@@ -79,7 +79,7 @@ namespace FantasyColony.UI.Screens
         private IEnumerator BootCo()
         {
             yield return null; // render once so the cover is visible
-            yield return AppBootstrap.Run(SetPhase);
+            yield return BootPipeline.Run(SetPhase);
             Time.timeScale = 1f;
             UIRouter.Current?.ResetTo<MainMenuScreen>();
         }
@@ -89,9 +89,6 @@ namespace FantasyColony.UI.Screens
             if (_phaseText != null) _phaseText.text = s ?? string.Empty;
         }
 
-        private class Runner : MonoBehaviour
-        {
-            public void Begin(Action onReady) { onReady?.Invoke(); }
-        }
+        private class Runner : MonoBehaviour { }
     }
 }

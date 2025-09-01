@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Globalization;
 using UnityEngine;
 
 namespace FantasyColony.Core.Services
@@ -41,7 +42,8 @@ namespace FantasyColony.Core.Services
                     {
                         var json = File.ReadAllText(metaPath);
                         var meta = JsonUtility.FromJson<SlotBag>(json) ?? new SlotBag();
-                        var when = DateTime.TryParse(meta.lastPlayedUtc, out var dt) ? dt : DateTime.UtcNow;
+                        var when = DateTimeOffset.TryParseExact(meta.lastPlayedUtc, "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var dto)
+                            ? dto.UtcDateTime : DateTime.UtcNow;
                         _cache.Add(new SaveSlotMeta
                         {
                             slotId = slotId,
