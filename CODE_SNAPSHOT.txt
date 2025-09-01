@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 00:43:35 UTC
+_Updated_: 2025-09-01 01:38:33 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -339,9 +339,15 @@ namespace FantasyColony.Core
     /// </summary>
     public static class AppBootstrap
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Boot()
         {
+            // Guard against duplicates (domain reloads, additive loads)
+#if UNITY_2023_1_OR_NEWER
+            if (Object.FindFirstObjectByType<AppHost>() != null) return;
+#else
+            if (Object.FindObjectOfType<AppHost>() != null) return;
+#endif
             // Root host object that survives for the whole app lifetime.
             var root = new GameObject("AppRoot");
             Object.DontDestroyOnLoad(root);
@@ -451,8 +457,9 @@ namespace FantasyColony.Core
         private void Awake()
         {
             Instance = this;
-            Application.targetFrameRate = 60;
-            QualitySettings.vSyncCount = 0;
+            QualitySettings.vSyncCount = 1;
+            // On desktop, let vSync drive frame pacing. Leave targetFrameRate unset (-1) unless vSync is disabled.
+            Application.targetFrameRate = -1;
 
             _services = new ServiceRegistry();
             _services.Register<FCLogger>(new FCFileLogger());
