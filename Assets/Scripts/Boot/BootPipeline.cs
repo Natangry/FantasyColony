@@ -39,11 +39,12 @@ namespace FantasyColony.Boot {
     }
 
     public sealed class BootReport {
+        public struct Step { public string title; public float seconds; public string warn; public string error; }
+        public readonly List<Step> steps = new();
         public static BootReport Last { get; internal set; }
-        public int ModsFound, ModsLoaded;
-        public int DefsFound;
-        public int DefsLoaded;
-        public int Errors, Warnings;
+        internal void Add(string title, float dt, string warn = null, string error = null) {
+            steps.Add(new Step { title = title, seconds = dt, warn = warn, error = error });
+        }
     }
 
     public static class BootTaskRegistry {
@@ -61,44 +62,69 @@ namespace FantasyColony.Boot {
     sealed class ConfigTask : IBootTask {
         public string Title => "Loading configuration...";
         public IEnumerator Execute(BootContext ctx) {
-            // Read config file and set up crash logging etc
-            yield return JsonConfigService.Instance.RefreshAsync();
-#if UNITY_EDITOR
-            // reduce spam in console during editor play-mode starts
-            Debug.unityLogger.logEnabled = JsonConfigService.Instance.GetBool("debug.unityLogs", false);
-#endif
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null, err = null;
+            try { ctx.Config.Load(); }
+            catch (Exception e) { warn = $"Config load failed, defaults used: {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, err);
+            yield return null;
         }
     }
 
     sealed class DiscoverModsTask : IBootTask {
         public string Title => "Discovering mods...";
         public IEnumerator Execute(BootContext ctx) {
-            ctx.Mods.Clear();
-            foreach (var mod in ModManager.Instance.Discover()) {
-                ctx.Mods.Add(mod);
-                yield return null; // allow UI to tick while enumerating
-            }
-            ctx.Report.ModsFound = ctx.Mods.Count;
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            try { ctx.Mods = ModDiscovery.Discover(); Debug.Log($"Mods discovered: {ctx.Mods.Count}"); }
+            catch (Exception e) { warn = $"Mod discovery failed: {e.Message}"; Debug.LogWarning(warn); ctx.Mods = new List<ModInfo>(); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
+            yield return null;
         }
     }
 
     sealed class LoadDefsTask : IBootTask {
         public string Title => "Loading defs...";
         public IEnumerator Execute(BootContext ctx) {
-            foreach (var mod in ctx.Mods) {
-                foreach (var doc in DefRegistry.Instance.LoadFromMod(mod)) {
-                    yield return null; // allow UI to tick while loading
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            try {
+                var errors = new List<DefError>();
+                XmlDefLoader.Load(ctx.Mods, ctx.Defs, errors);
+                if (errors.Count > 0) warn = $"Defs loaded with {errors.Count} issues. See log.";
+                if (ctx.Defs.ConflictCount > 0) {
+                    var note = $"Conflicts={ctx.Defs.ConflictCount}";
+                    warn = string.IsNullOrEmpty(warn) ? note : ($"{warn} | {note}");
                 }
-            }
-            ctx.Report.DefsFound = ctx.Defs.Count;
+                Debug.Log($"Defs loaded. Count={ctx.Defs.Count}");
+            } catch (Exception e) { warn = $"Def loading failed (lenient): {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
+            yield return null;
         }
     }
 
     sealed class ValidateAndMigrateDefsTask : IBootTask {
         public string Title => "Validating & migrating defs...";
         public IEnumerator Execute(BootContext ctx) {
-            var results = DefValidator.RunAll(ctx.Defs);
-            ctx.Report.Errors = results.Errors; ctx.Report.Warnings = results.Warnings;
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            int warnCount = 0, migCount = 0;
+            try {
+                // Build index first, then load schemas from StreamingAssets and from each mod root inferred via index
+                var index = FantasyColony.Core.Defs.DefIndex.Build(ctx.Mods, ctx.Defs);
+                FantasyColony.Core.Defs.Validation.SchemaCatalog.EnsureLoadedFromIndex(index);
+                var results = FantasyColony.Core.Defs.Validation.DefValidator.Run(index);
+                foreach (var r in results) { Debug.LogWarning($"[Defs] {r}"); }
+                warnCount = results.Count;
+                migCount = FantasyColony.Core.Defs.Migrations.MigrationEngine.Run(index);
+                if (warnCount > 0 || migCount > 0) {
+                    warn = $"Validation warnings={warnCount}, migrations={migCount}";
+                }
+            } catch (Exception e) {
+                warn = $"Validation phase had issues: {e.Message}";
+                Debug.LogWarning(warn);
+            }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
             yield return null;
         }
     }
@@ -106,24 +132,46 @@ namespace FantasyColony.Boot {
     sealed class InitServicesTask : IBootTask {
         public string Title => "Initializing services...";
         public IEnumerator Execute(BootContext ctx) {
-            // Wire up core services
-            var services = new ServiceRegistry();
-            services.Register<ILogger>(new FileLogger());
-            services.Register<IEventBus>(new SimpleEventBus());
-            services.Register<IAssetProvider>(new ResourcesAssetProvider());
-            services.Register<IConfigService>(JsonConfigService.Instance);
-            // Save service remains optional at this stage
-            services.Register<JsonSaveService>(JsonSaveService.Instance);
-            AppHost.Instance.AttachServices(services);
+            var t0 = Time.realtimeSinceStartup;
+            string warn = null;
+            try {
+                var cfg = ctx.Config;
+                var lang = cfg.Get("language", "en");
+                LocService.Instance.SetLanguage(lang);
+                float vMaster = Parse01(cfg.Get("vol_master", "1"));
+                float vMusic  = Parse01(cfg.Get("vol_music", "1"));
+                float vSfx    = Parse01(cfg.Get("vol_sfx", "1"));
+                AudioService.Instance.SetVolume("master", vMaster);
+                AudioService.Instance.SetVolume("music", vMusic);
+                AudioService.Instance.SetVolume("sfx", vSfx);
+                JsonSaveService.Instance.RefreshCache();
+            } catch (Exception e) { warn = $"Service init had issues: {e.Message}"; Debug.LogWarning(warn); }
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
             yield return null;
+        }
+        private static float Parse01(string s) {
+            if (float.TryParse(s, out var v)) {
+                if (float.IsNaN(v) || float.IsInfinity(v)) return 1f;
+                return Mathf.Clamp01(v);
+            }
+            return 1f;
         }
     }
 
     sealed class WarmAssetsTask : IBootTask {
         public string Title => "Warming assets...";
         public IEnumerator Execute(BootContext ctx) {
-            // Load commonly used fonts/icons/prefabs so first menus feel snappy
-            yield return ResourcesAssetProvider.WarmupAsync();
+            var t0 = Time.realtimeSinceStartup;
+#if ADDRESSABLES
+            try {
+                var handle = UnityEngine.AddressableAssets.Addressables.InitializeAsync();
+                yield return handle;
+            } catch { /* fail-soft */ }
+#else
+            yield return null;
+#endif
+            ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, null, null);
         }
     }
 }
+
