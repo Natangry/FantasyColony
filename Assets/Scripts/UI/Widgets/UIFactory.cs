@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Style;
 using System;
+using FantasyColony.UI.Util;
+using TintTheme = FantasyColony.UI.Style.BaseUIStyle.TintTheme;
 
 namespace FantasyColony.UI.Widgets
 {
@@ -86,8 +88,15 @@ namespace FantasyColony.UI.Widgets
             return 100f;
         }
 
+        private static void AttachPixelSnap(Component c)
+        {
+            if (c == null) return;
+            if (c.gameObject.GetComponent<UIPixelSnap>() == null)
+                c.gameObject.AddComponent<UIPixelSnap>();
+        }
+
         // PANEL (Textured wood fill + dark 9-slice border)
-        public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel")
+        public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel", TintTheme? theme = null)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             go.transform.SetParent(parent, false);
@@ -118,8 +127,13 @@ namespace FantasyColony.UI.Widgets
             var le = fillGO.GetComponent<LayoutElement>();
             le.ignoreLayout = true;
             var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
-            if (wood != null) { fillImg.sprite = wood; fillImg.type = Image.Type.Tiled; }
-            else { fillImg.color = BaseUIStyle.SecondaryFill; }
+            if (wood != null)
+            {
+                fillImg.sprite = wood;
+                fillImg.type = Image.Type.Tiled;
+            }
+            var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
+            fillImg.color = panelTheme.Value.Base;
 
             // --- Border (9-slice) as sibling ABOVE fill ---
             var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
@@ -142,6 +156,10 @@ namespace FantasyColony.UI.Widgets
             rootImg.enabled = false;
             rootImg.raycastTarget = false;
 
+            // Pixel snap to avoid uneven vertical vs horizontal edges
+            AttachPixelSnap(go.transform);
+            AttachPixelSnap(borderGO.transform);
+
             // Ensure BG_Fill under BG_Border
             var fill = go.transform.Find("BG_Fill");
             var borderT = go.transform.Find("BG_Border");
@@ -152,12 +170,12 @@ namespace FantasyColony.UI.Widgets
         }
 
         // BUTTONS
-        public static Button CreateButtonPrimary(Transform parent, string label, Action onClick) => CreateButton(parent, label, BaseUIStyle.Gold, BaseUIStyle.TextSecondary, onClick);
-        public static Button CreateButtonSecondary(Transform parent, string label, Action onClick) => CreateButton(parent, label, BaseUIStyle.SecondaryFill, BaseUIStyle.TextPrimary, onClick);
-        public static Button CreateButtonDanger(Transform parent, string label, Action onClick) => CreateButton(parent, label, BaseUIStyle.Danger, BaseUIStyle.TextSecondary, onClick, isDanger:true);
+        public static Button CreateButtonPrimary(Transform parent, string label, Action onClick) => CreateButton(parent, label, BaseUIStyle.TextSecondary, onClick, BaseUIStyle.GoldTheme);
+        public static Button CreateButtonSecondary(Transform parent, string label, Action onClick) => CreateButton(parent, label, BaseUIStyle.TextPrimary, onClick, BaseUIStyle.SecondaryTheme);
+        public static Button CreateButtonDanger(Transform parent, string label, Action onClick) => CreateButton(parent, label, BaseUIStyle.TextSecondary, onClick, BaseUIStyle.DangerTheme);
 
-        // Textured button: tiled wood fill + 9-slice dark border + overlay for state tints
-        private static Button CreateButton(Transform parent, string label, Color fill, Color textColor, Action onClick, bool isDanger = false)
+        // Textured button: tiled wood fill + 9-slice dark border; wood itself tints for state changes
+        private static Button CreateButton(Transform parent, string label, Color textColor, Action onClick, TintTheme theme)
         {
             var go = new GameObject($"Button_{label}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button), typeof(LayoutElement));
             go.transform.SetParent(parent, false);
@@ -181,8 +199,12 @@ namespace FantasyColony.UI.Widgets
             fillImg.preserveAspect = false;
             fillGO.GetComponent<LayoutElement>().ignoreLayout = true;
             var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
-            if (wood != null) { fillImg.sprite = wood; fillImg.type = Image.Type.Tiled; }
-            else { fillImg.color = fill; }
+            if (wood != null)
+            {
+                fillImg.sprite = wood;
+                fillImg.type = Image.Type.Tiled;
+            }
+            fillImg.color = theme.Base; // tint the wood itself
 
             // --- Border (9-slice) as child ABOVE fill ---
             var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
@@ -199,32 +221,28 @@ namespace FantasyColony.UI.Widgets
             borderImg.pixelsPerUnitMultiplier = buttonScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
-            else { borderImg.color = fill; }
-
-            // --- Overlay for state tints (Button.targetGraphic) ---
-            var overlayGO = new GameObject("Overlay", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
-            overlayGO.transform.SetParent(go.transform, false);
-            var overlayRt = overlayGO.GetComponent<RectTransform>();
-            overlayRt.anchorMin = Vector2.zero; overlayRt.anchorMax = Vector2.one;
-            overlayRt.offsetMin = Vector2.zero; overlayRt.offsetMax = Vector2.zero;
-            var overlayImg = overlayGO.GetComponent<Image>();
-            overlayImg.color = new Color(1,1,1,0f);
-            overlayImg.raycastTarget = false;
-            overlayGO.GetComponent<LayoutElement>().ignoreLayout = true;
+            else { borderImg.color = theme.Base; }
 
             // Button setup
             btn.transition = Selectable.Transition.ColorTint;
-            btn.targetGraphic = overlayImg; // only overlay is tinted by ColorBlock
-            var colors = btn.colors;
-            colors.normalColor = new Color(1,1,1,0f); // transparent overlay
-            colors.highlightedColor = BaseUIStyle.HoverOverlay;
-            colors.pressedColor = BaseUIStyle.PressedOverlay;
-            colors.selectedColor = colors.normalColor;
-            colors.disabledColor = BaseUIStyle.DisabledOverlay;
-            colors.colorMultiplier = 1f;
-            colors.fadeDuration = 0.08f;
-            btn.colors = colors;
+            // Make the wood fill the targetGraphic so the texture itself tints for state changes
+            btn.targetGraphic = fillImg;
+            var cb = btn.colors;
+            cb.colorMultiplier = 1f;
+            cb.fadeDuration = 0.08f;
+            cb.normalColor      = theme.Base;
+            cb.highlightedColor = theme.Hover;
+            cb.pressedColor     = theme.Pressed;
+            cb.selectedColor    = theme.Base;
+            var baseCol = (Color)theme.Base;
+            baseCol.a *= 0.6f;
+            cb.disabledColor    = baseCol;
+            btn.colors = cb;
             btn.onClick.AddListener(() => onClick?.Invoke());
+
+            // Pixel snapping on root & border to keep 1px borders even
+            AttachPixelSnap(go.transform);
+            AttachPixelSnap(borderGO.transform);
 
             // Layout sizing so buttons are visible in the stack
             var le = go.GetComponent<LayoutElement>();
@@ -259,8 +277,7 @@ namespace FantasyColony.UI.Widgets
             // Explicit layer order (back -> front)
             fillGO.transform.SetSiblingIndex(0);
             borderGO.transform.SetSiblingIndex(1);
-            overlayGO.transform.SetSiblingIndex(2);
-            textGO.transform.SetSiblingIndex(3);
+            textGO.transform.SetSiblingIndex(2);
 
             return btn;
         }

@@ -33,6 +33,33 @@ namespace FantasyColony.UI.Style
         // This single value controls both panels and buttons.
         public const float TargetBorderPx = 1f; // try 0.75f for subtler, 2f for thicker
 
+        // --- Tint themes for wood_soft_tile surfaces ---
+        public struct TintTheme { public Color32 Base, Hover, Pressed; }
+
+        // Secondary (dark) theme
+        public static readonly TintTheme SecondaryTheme = new TintTheme
+        {
+            Base    = SecondaryFill,
+            Hover   = SecondaryHover,
+            Pressed = SecondaryPressed
+        };
+
+        // Gold (primary/action) theme
+        public static readonly TintTheme GoldTheme = new TintTheme
+        {
+            Base    = Gold,
+            Hover   = GoldHover,
+            Pressed = GoldPressed
+        };
+
+        // Danger theme
+        public static readonly TintTheme DangerTheme = new TintTheme
+        {
+            Base    = Danger,
+            Hover   = DangerHover,
+            Pressed = DangerPressed
+        };
+
         // Overlay tints for Button.state (applied to a transparent overlay Image)
         // Keep subtle so textures are not washed out
         public static readonly Color HoverOverlay   = new Color(1f, 1f, 1f, 0.06f);

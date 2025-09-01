@@ -28,6 +28,8 @@ namespace FantasyColony.UI.Root
             canvasGO.transform.SetParent(transform, false);
             var canvas = canvasGO.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            // Ensure pixel-accurate rounding to avoid uneven 1px borders on sliced images
+            canvas.pixelPerfect = true; // ScreenSpaceOverlay only
             canvasGO.AddComponent<GraphicRaycaster>();
 
             var scaler = canvasGO.AddComponent<CanvasScaler>();
