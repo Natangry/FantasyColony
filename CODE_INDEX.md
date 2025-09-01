@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-08-31 23:47:07 UTC
+_Updated_: 2025-09-01 00:03:01 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/AppBootstrap.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/AppBootstrap.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/AppBootstrap.cs)
@@ -18,6 +18,7 @@ _Updated_: 2025-08-31 23:47:07 UTC
 - `Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/SchemaSpec.cs)
 - `Assets/Scripts/Core/Defs/Validation/TypeChecks.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/TypeChecks.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/TypeChecks.cs)
 - `Assets/Scripts/Core/Defs/Validation/ValidationMode.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Defs/Validation/ValidationMode.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Defs/Validation/ValidationMode.cs)
+- `Assets/Scripts/Core/GlobalShortcuts.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/GlobalShortcuts.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/GlobalShortcuts.cs)
 - `Assets/Scripts/Core/Input/InputRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Input/InputRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Input/InputRouter.cs)
 - `Assets/Scripts/Core/Mods/ModDiscovery.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/ModDiscovery.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/ModDiscovery.cs)
 - `Assets/Scripts/Core/Mods/XmlDefLoader.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Mods/XmlDefLoader.cs)
