@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using FantasyColony.UI; // IScreen
 
 namespace FantasyColony.UI.Screens
 {
@@ -10,7 +11,7 @@ namespace FantasyColony.UI.Screens
     /// Left column is labeled "Mods"; right column title reflects the selected mod's name.
     /// If no mod is selected, the snapshot shows aggregated view of all active mods (placeholder for now).
     /// </summary>
-    public class ModsScreen : UIScreenBase
+    public class ModsScreen : IScreen
     {
         private RectTransform _root;
 
@@ -30,9 +31,8 @@ namespace FantasyColony.UI.Screens
         // Selection state
         private string _selectedModName = null; // null => aggregated view of all active mods
 
-        public override void Enter(Transform parent)
+        public void Enter(Transform parent)
         {
-            base.Enter(parent);
 
             // Root container (stretches to parent)
             _root = CreateUIObject("ModsScreenRoot", parent).rectTransform;
@@ -150,14 +150,13 @@ namespace FantasyColony.UI.Screens
             RefreshSnapshot();
         }
 
-        public override void Exit()
+        public void Exit()
         {
             if (_root != null)
             {
                 GameObject.Destroy(_root.gameObject);
                 _root = null;
             }
-            base.Exit();
         }
 
         // --- Selection and snapshot ---
