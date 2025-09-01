@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 04:55:44 UTC
+_Updated_: 2025-09-01 05:20:07 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3205,6 +3205,7 @@ namespace FantasyColony.UI.Widgets
     {
         // Cache a symmetrized version of the dark 9-slice border so L/R and T/B are equal.
         private static Sprite _darkBorderSymmetric;
+        private static Material _grayscaleTintMat;
 
         // Ensure the 9-slice border has equal left/right and top/bottom edge sizes.
         // This avoids visual asymmetry when Unity stretches the sliced edges.
@@ -3219,6 +3220,17 @@ namespace FantasyColony.UI.Widgets
 
             _darkBorderSymmetric = MakeUniformBorderFromTopBottom(src);
             return _darkBorderSymmetric;
+        }
+
+        private static Material GetGrayscaleTintMaterial()
+        {
+            if (_grayscaleTintMat != null) return _grayscaleTintMat;
+            var sh = Shader.Find("UI/GrayscaleTint");
+            if (sh != null)
+            {
+                _grayscaleTintMat = new Material(sh);
+            }
+            return _grayscaleTintMat;
         }
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
@@ -3326,6 +3338,8 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
+            var mat = GetGrayscaleTintMaterial();
+            if (mat != null) fillImg.material = mat;
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
             // --- Pixel-precise frame instead of 9-slice Image ---
@@ -3391,6 +3405,8 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
+            var mat = GetGrayscaleTintMaterial();
+            if (mat != null) fillImg.material = mat;
             fillImg.color = theme.Base; // tint the wood itself
             // --- Pixel-precise frame instead of 9-slice Image ---
             var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
@@ -3540,7 +3556,7 @@ namespace FantasyColony.UI.Widgets
     public class UIFrame : MonoBehaviour
     {
         [SerializeField] private Sprite _sourceNineSlice; // your dark border 9-slice
-        [SerializeField] private float _targetBorderPx = 1f;
+        [SerializeField] private float _targetBorderPx = 1f; // in screen pixels
         [SerializeField] private Color _tint = Color.white;
 
         // child images
@@ -3618,21 +3634,12 @@ namespace FantasyColony.UI.Widgets
             _top.preserveAspect = _bottom.preserveAspect = _left.preserveAspect = _right.preserveAspect = false;
         }
 
-        float PixelsToUnits(float px)
-        {
-            if (_canvas == null) _canvas = GetComponentInParent<Canvas>();
-            float refPPU = (_canvas != null && _canvas.referencePixelsPerUnit > 0f) ? _canvas.referencePixelsPerUnit : 100f;
-            float scale = (_canvas != null && _canvas.scaleFactor > 0f) ? _canvas.scaleFactor : 1f;
-            return px / (refPPU * scale);
-        }
-
         void LayoutNow()
         {
             if (_rt == null) _rt = GetComponent<RectTransform>();
             if (_rt == null || _top == null) return;
 
-            float t = Mathf.Max(0.0f, _targetBorderPx);
-            float u = PixelsToUnits(t);
+            float px = Mathf.Max(0.0f, _targetBorderPx);
 
             // Top
             var trt = _top.rectTransform;
@@ -3640,7 +3647,7 @@ namespace FantasyColony.UI.Widgets
             trt.anchorMax = new Vector2(1f, 1f);
             trt.pivot = new Vector2(0.5f, 1f);
             trt.anchoredPosition = Vector2.zero;
-            trt.sizeDelta = new Vector2(0f, u);
+            trt.sizeDelta = new Vector2(0f, Mathf.Round(px));
 
             // Bottom
             var brt = _bottom.rectTransform;
@@ -3648,7 +3655,7 @@ namespace FantasyColony.UI.Widgets
             brt.anchorMax = new Vector2(1f, 0f);
             brt.pivot = new Vector2(0.5f, 0f);
             brt.anchoredPosition = Vector2.zero;
-            brt.sizeDelta = new Vector2(0f, u);
+            brt.sizeDelta = new Vector2(0f, Mathf.Round(px));
 
             // Left
             var lrt = _left.rectTransform;
@@ -3656,7 +3663,7 @@ namespace FantasyColony.UI.Widgets
             lrt.anchorMax = new Vector2(0f, 1f);
             lrt.pivot = new Vector2(0f, 0.5f);
             lrt.anchoredPosition = Vector2.zero;
-            lrt.sizeDelta = new Vector2(u, 0f);
+            lrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
 
             // Right
             var rrt = _right.rectTransform;
@@ -3664,7 +3671,7 @@ namespace FantasyColony.UI.Widgets
             rrt.anchorMax = new Vector2(1f, 1f);
             rrt.pivot = new Vector2(1f, 0.5f);
             rrt.anchoredPosition = Vector2.zero;
-            rrt.sizeDelta = new Vector2(u, 0f);
+            rrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
         }
     }
 }
