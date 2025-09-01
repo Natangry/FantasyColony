@@ -43,27 +43,12 @@ namespace FantasyColony.UI.Screens
             _root = CreateUIObject("ModsScreenRoot", parent).GetComponent<RectTransform>();
             Stretch(_root);
 
-            // Fullscreen wood background (tiled) so the whole screen is the Mods menu
-            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
-            var bg = UIFactory.CreateFullscreenBackground(_root, wood, new Color(0.05f, 0.04f, 0.03f, 1f));
-            bg.type = Image.Type.Tiled;      // tile the wood
-            bg.preserveAspect = false;       // fill entire screen
-            // Exclude from layout so the HorizontalLayoutGroup doesn't give it a column slot
-            var bgLE = bg.gameObject.AddComponent<LayoutElement>();
-            bgLE.ignoreLayout = true;
-            bg.rectTransform.SetAsFirstSibling();
-
-            // Three-column layout (Left: lists, Center: snapshot, Right: actions)
-            var row = _root.gameObject.AddComponent<HorizontalLayoutGroup>();
-            row.childForceExpandHeight = true;
-            row.childForceExpandWidth = true;
-            row.childAlignment = TextAnchor.UpperLeft;
-            row.spacing = 16f;
-            row.padding = new RectOffset(32, 32, 32, 32);
+            // Use new board helpers
+            var board = UIFactory.CreateBoardScreen(_root, padding:32, spacing:16);
+            var trio = UIFactory.CreateThreeColumnBoard(board.Content, leftWidth:380f, rightWidth:320f, joinDecor:true);
 
             // LEFT COLUMN
-            _leftColumn = UIFactory.CreatePanelSurface(_root, "LeftColumnPanel");
-            UIFactory.SetPanelDecorVisible(_leftColumn, true);
+            _leftColumn = trio.left;
             var leftLE = _leftColumn.GetComponent<LayoutElement>() ?? _leftColumn.gameObject.AddComponent<LayoutElement>();
             leftLE.preferredWidth = LeftWidth; // fixed width column
             leftLE.minWidth = LeftWidth - 60f;
@@ -104,8 +89,7 @@ namespace FantasyColony.UI.Screens
             CreateEmptyState(_activeListContent, "No active mods");
 
             // CENTER COLUMN (snapshot)
-            _centerColumn = UIFactory.CreatePanelSurface(_root, "CenterColumnPanel");
-            UIFactory.SetPanelDecorVisible(_centerColumn, true);
+            _centerColumn = trio.center;
             var centerLE = _centerColumn.GetComponent<LayoutElement>() ?? _centerColumn.gameObject.AddComponent<LayoutElement>();
             centerLE.preferredWidth = -1f; // let layout decide
             centerLE.flexibleWidth = 1f;  // flexible middle column
@@ -156,8 +140,7 @@ namespace FantasyColony.UI.Screens
             CreateDivider(_defsContent);
 
             // RIGHT COLUMN (actions)
-            _rightColumn = UIFactory.CreatePanelSurface(_root, "RightColumnPanel");
-            UIFactory.SetPanelDecorVisible(_rightColumn, true);
+            _rightColumn = trio.right;
             var rightLE = _rightColumn.GetComponent<LayoutElement>() ?? _rightColumn.gameObject.AddComponent<LayoutElement>();
             rightLE.preferredWidth = RightWidth;
             rightLE.minWidth = RightWidth - 60f;
