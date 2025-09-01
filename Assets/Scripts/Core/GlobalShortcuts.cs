@@ -1,7 +1,6 @@
 using UnityEngine;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Screens;
-using UInput = UnityEngine.Input;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -19,12 +18,13 @@ namespace FantasyColony.Core {
 
         private void Update() {
             // Open Boot Report
-            bool pressed = UInput.GetKeyDown(KeyCode.F9);
+            bool pressed = false;
 #if ENABLE_INPUT_SYSTEM
-            if (!pressed) {
-                var kb = Keyboard.current;
-                if (kb != null && kb.f9Key.wasPressedThisFrame) pressed = true;
-            }
+            var kb = Keyboard.current;
+            if (kb != null && kb.f9Key.wasPressedThisFrame) pressed = true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (!pressed && UnityEngine.Input.GetKeyDown(KeyCode.F9)) pressed = true;
 #endif
             if (pressed) {
                 var router = UIRouter.Current;
