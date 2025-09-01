@@ -11,7 +11,7 @@ namespace FantasyColony.UI.Widgets
     public class UIFrame : MonoBehaviour
     {
         [SerializeField] private Sprite _sourceNineSlice; // your dark border 9-slice
-        [SerializeField] private float _targetBorderPx = 1f;
+        [SerializeField] private float _targetBorderPx = 1f; // in screen pixels
         [SerializeField] private Color _tint = Color.white;
 
         // child images
@@ -89,21 +89,12 @@ namespace FantasyColony.UI.Widgets
             _top.preserveAspect = _bottom.preserveAspect = _left.preserveAspect = _right.preserveAspect = false;
         }
 
-        float PixelsToUnits(float px)
-        {
-            if (_canvas == null) _canvas = GetComponentInParent<Canvas>();
-            float refPPU = (_canvas != null && _canvas.referencePixelsPerUnit > 0f) ? _canvas.referencePixelsPerUnit : 100f;
-            float scale = (_canvas != null && _canvas.scaleFactor > 0f) ? _canvas.scaleFactor : 1f;
-            return px / (refPPU * scale);
-        }
-
         void LayoutNow()
         {
             if (_rt == null) _rt = GetComponent<RectTransform>();
             if (_rt == null || _top == null) return;
 
-            float t = Mathf.Max(0.0f, _targetBorderPx);
-            float u = PixelsToUnits(t);
+            float px = Mathf.Max(0.0f, _targetBorderPx);
 
             // Top
             var trt = _top.rectTransform;
@@ -111,7 +102,7 @@ namespace FantasyColony.UI.Widgets
             trt.anchorMax = new Vector2(1f, 1f);
             trt.pivot = new Vector2(0.5f, 1f);
             trt.anchoredPosition = Vector2.zero;
-            trt.sizeDelta = new Vector2(0f, u);
+            trt.sizeDelta = new Vector2(0f, Mathf.Round(px));
 
             // Bottom
             var brt = _bottom.rectTransform;
@@ -119,7 +110,7 @@ namespace FantasyColony.UI.Widgets
             brt.anchorMax = new Vector2(1f, 0f);
             brt.pivot = new Vector2(0.5f, 0f);
             brt.anchoredPosition = Vector2.zero;
-            brt.sizeDelta = new Vector2(0f, u);
+            brt.sizeDelta = new Vector2(0f, Mathf.Round(px));
 
             // Left
             var lrt = _left.rectTransform;
@@ -127,7 +118,7 @@ namespace FantasyColony.UI.Widgets
             lrt.anchorMax = new Vector2(0f, 1f);
             lrt.pivot = new Vector2(0f, 0.5f);
             lrt.anchoredPosition = Vector2.zero;
-            lrt.sizeDelta = new Vector2(u, 0f);
+            lrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
 
             // Right
             var rrt = _right.rectTransform;
@@ -135,7 +126,7 @@ namespace FantasyColony.UI.Widgets
             rrt.anchorMax = new Vector2(1f, 1f);
             rrt.pivot = new Vector2(1f, 0.5f);
             rrt.anchoredPosition = Vector2.zero;
-            rrt.sizeDelta = new Vector2(u, 0f);
+            rrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
         }
     }
 }

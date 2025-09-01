@@ -11,6 +11,7 @@ namespace FantasyColony.UI.Widgets
     {
         // Cache a symmetrized version of the dark 9-slice border so L/R and T/B are equal.
         private static Sprite _darkBorderSymmetric;
+        private static Material _grayscaleTintMat;
 
         // Ensure the 9-slice border has equal left/right and top/bottom edge sizes.
         // This avoids visual asymmetry when Unity stretches the sliced edges.
@@ -25,6 +26,17 @@ namespace FantasyColony.UI.Widgets
 
             _darkBorderSymmetric = MakeUniformBorderFromTopBottom(src);
             return _darkBorderSymmetric;
+        }
+
+        private static Material GetGrayscaleTintMaterial()
+        {
+            if (_grayscaleTintMat != null) return _grayscaleTintMat;
+            var sh = Shader.Find("UI/GrayscaleTint");
+            if (sh != null)
+            {
+                _grayscaleTintMat = new Material(sh);
+            }
+            return _grayscaleTintMat;
         }
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
@@ -132,6 +144,8 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
+            var mat = GetGrayscaleTintMaterial();
+            if (mat != null) fillImg.material = mat;
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
             // --- Pixel-precise frame instead of 9-slice Image ---
@@ -197,6 +211,8 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
+            var mat = GetGrayscaleTintMaterial();
+            if (mat != null) fillImg.material = mat;
             fillImg.color = theme.Base; // tint the wood itself
             // --- Pixel-precise frame instead of 9-slice Image ---
             var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
