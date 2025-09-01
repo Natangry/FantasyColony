@@ -13,6 +13,7 @@ namespace FantasyColony.UI.Widgets
         [SerializeField] private Sprite _sourceNineSlice; // your dark border 9-slice
         [SerializeField] private float _targetBorderPx = 1f; // in screen pixels
         [SerializeField] private Color _tint = Color.white;
+        public bool ShowLeft = true, ShowRight = true, ShowTop = true, ShowBottom = true;
 
         // child images
         Image _top, _bottom, _left, _right;
@@ -25,6 +26,7 @@ namespace FantasyColony.UI.Widgets
             _targetBorderPx = targetPx;
             _tint = tint;
             EnsureChildren();
+            SetEdges(ShowLeft, ShowRight, ShowTop, ShowBottom);
             ApplyLook();
             LayoutNow();
         }
@@ -34,6 +36,7 @@ namespace FantasyColony.UI.Widgets
             _rt = GetComponent<RectTransform>();
             _canvas = GetComponentInParent<Canvas>();
             EnsureChildren();
+            SetEdges(ShowLeft, ShowRight, ShowTop, ShowBottom);
             ApplyLook();
             LayoutNow();
         }
@@ -127,6 +130,15 @@ namespace FantasyColony.UI.Widgets
             rrt.pivot = new Vector2(1f, 0.5f);
             rrt.anchoredPosition = Vector2.zero;
             rrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
+        }
+
+        public void SetEdges(bool left, bool right, bool top, bool bottom)
+        {
+            ShowLeft = left; ShowRight = right; ShowTop = top; ShowBottom = bottom;
+            if (_left) _left.gameObject.SetActive(ShowLeft);
+            if (_right) _right.gameObject.SetActive(ShowRight);
+            if (_top) _top.gameObject.SetActive(ShowTop);
+            if (_bottom) _bottom.gameObject.SetActive(ShowBottom);
         }
     }
 }
