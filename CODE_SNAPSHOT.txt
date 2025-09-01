@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 00:36:36 UTC
+_Updated_: 2025-09-01 00:43:35 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -368,7 +368,7 @@ namespace FantasyColony.Core {
 
         private void Awake() {
             if (Instance != null && Instance != this) {
-                Destroy(this);
+                Destroy(gameObject);
                 return;
             }
             Instance = this;
@@ -827,6 +827,23 @@ namespace FantasyColony.Core.Defs.Validation {
                 var json = File.ReadAllText(path);
                 var spec = JsonUtility.FromJson<SchemaSpec>(json);
                 if (spec == null || string.IsNullOrEmpty(spec.type) || spec.version <= 0) return;
+
+                // Mark presence of numeric bounds so zero is enforceable
+                try {
+                    if (spec.fields != null) {
+                        foreach (var fs in spec.fields) {
+                            if (string.IsNullOrEmpty(fs.name)) continue;
+                            var nameEsc = System.Text.RegularExpressions.Regex.Escape(fs.name);
+                            var rx = new System.Text.RegularExpressions.Regex("{[^{}]*\\\"name\\\"\\s*:\\s*\\\"" + nameEsc + "\\\"[^{}]*}", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+                            var m = rx.Match(json);
+                            if (m.Success) {
+                                var slice = m.Value;
+                                fs.hasMin = slice.Contains("\\\"min\\\"");
+                                fs.hasMax = slice.Contains("\\\"max\\\"");
+                            }
+                        }
+                    }
+                } catch { /* best-effort; missing flags default to false */ }
                 var tkey = spec.type;
                 if (!_map.TryGetValue(tkey, out var byVer)) _map[tkey] = byVer = new Dictionary<int, SchemaSpec>();
                 // First-in wins; later duplicates are ignored but warned
@@ -884,6 +901,8 @@ namespace FantasyColony.Core.Defs.Validation {
         public int min;          // numeric bounds (optional)
         public int max;
         public int minLength;    // for string
+        [NonSerialized] public bool hasMin; // runtime: whether 'min' was present in JSON
+        [NonSerialized] public bool hasMax; // runtime: whether 'max' was present in JSON
         public string @default;  // optional default as text
     }
 }
@@ -921,14 +940,14 @@ namespace FantasyColony.Core.Defs.Validation {
         }
         private static (bool,string) CheckInt(string v, FieldSpec fs) {
             if (!int.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i)) return (false, "not an int");
-            if (fs.min != 0 && i < fs.min) return (false, $"int < min {fs.min}");
-            if (fs.max != 0 && i > fs.max) return (false, $"int > max {fs.max}");
+            if (fs.hasMin && i < fs.min) return (false, $"int < min {fs.min}");
+            if (fs.hasMax && i > fs.max) return (false, $"int > max {fs.max}");
             return (true, null);
         }
         private static (bool,string) CheckFloat(string v, FieldSpec fs) {
             if (!float.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out var f)) return (false, "not a float");
-            if (fs.min != 0 && f < fs.min) return (false, $"float < min {fs.min}");
-            if (fs.max != 0 && f > fs.max) return (false, $"float > max {fs.max}");
+            if (fs.hasMin && f < fs.min) return (false, $"float < min {fs.min}");
+            if (fs.hasMax && f > fs.max) return (false, $"float > max {fs.max}");
             return (true, null);
         }
         private static (bool,string) CheckBool(string v) {
@@ -1336,8 +1355,9 @@ namespace FantasyColony.Core.Services {
                 inner = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
                 _map[type] = inner;
             }
+            var isNew = !inner.ContainsKey(id);
             inner[id] = new Entry { Type = type, Id = id, Path = filePath ?? string.Empty, ModId = modId };
-            Count++;
+            if (isNew) Count++;
         }
 
         // Legacy Add signature for backward compatibility
@@ -1547,7 +1567,7 @@ namespace FantasyColony.Core.Services
                     for (int i = 0; i < data.keys.Length; i++)
                     {
                         var k = data.keys[i];
-                        var v = i < data.values.Length ? data.values[i] : string.Empty;
+                        var v = (data.values != null && i < data.values.Length) ? data.values[i] : string.Empty;
                         if (!string.IsNullOrEmpty(k)) _map[k] = v ?? string.Empty;
                     }
                 }
@@ -2250,32 +2270,6 @@ public class DevLogOverlay : MonoBehaviour
     }
 }
 
-// Helper component to make it trivial to wire a UI Button to the overlay
-// Attach to your "Log" Button (UnityEngine.UI.Button). It will toggle the Dev Log when clicked.
-namespace DevTools
-{
-    using UnityEngine.UI;
-    using UnityEngine;
-
-    [RequireComponent(typeof(Button))]
-    public class OpenDevLogButton : MonoBehaviour
-    {
-        public Button button;
-
-        private void Reset()
-        {
-            if (button == null) button = GetComponent<Button>();
-        }
-
-        private void Awake()
-        {
-            if (button == null) button = GetComponent<Button>();
-            if (button != null)
-                button.onClick.AddListener(DevLogOverlay.ToggleVisible);
-        }
-    }
-}
-
 // Optional convenience for code callers (e.g., MainMenuScreen) without adding compile-time dependency on UnityEngine.UI
 public static class DevLog
 {
@@ -2832,9 +2826,7 @@ namespace FantasyColony.UI.Screens
 
 // ===== FILE: Assets/Scripts/UI/Screens/MainMenuScreen.cs =====
 using UnityEngine;
-using UnityEngine.UI;
 // using DevTools; // not required; DevLogOverlay is in the global namespace
-using System;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
@@ -2929,22 +2921,13 @@ namespace FantasyColony.UI.Screens
             });
         }
 
-        private void RestartGame()
-        {
-            // (Old direct restart path retained for reference; unused now)
-            Time.timeScale = 1f;
-            UIRouter.Current?.ResetTo<MainMenuScreen>();
-            Resources.UnloadUnusedAssets();
-            System.GC.Collect();
-        }
-
         private void QuitGame()
         {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.ExitPlaymode();
-        #else
+#else
             Application.Quit();
-        #endif
+#endif
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -3025,7 +3008,6 @@ namespace FantasyColony.UI.Style
 // ===== FILE: Assets/Scripts/UI/Widgets/UIFactory.cs =====
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using FantasyColony.UI.Style;
 using System;
 
@@ -3269,16 +3251,6 @@ namespace FantasyColony.UI.Widgets
             return img;
         }
 
-        private static Color Multiply(Color c, float f) => new Color(c.r * f, c.g * f, c.b * f, c.a);
-
-        private static void ClearSelectionIfMouseClick()
-        {
-            var es = EventSystem.current;
-            if (es != null && Input.mousePresent)
-            {
-                es.SetSelectedGameObject(null);
-            }
-        }
     }
 }
 
@@ -4053,9 +4025,8 @@ namespace XmlDefsTools
                 Console.WriteLine($"[XmlDefsTools] Wrote templates to: {templatesDir}");
 
                 // Write consolidated schema catalog
-                var catalogPath = Path.Combine(templatesDir, "_AllSchemas.xml");
                 SchemaCatalogWriter.Write(templatesDir, scan, orderHints);
-                Console.WriteLine($"[XmlDefsTools] Wrote consolidated catalog: {catalogPath}");
+                Console.WriteLine($"[XmlDefsTools] Wrote consolidated catalog: {Path.Combine(templatesDir, "_AllSchemas.xml")}");
 
                 return 0;
             }
@@ -4184,7 +4155,7 @@ namespace XmlDefsTools.Scan
                     list.Add(info);
 
                     // Track duplicates
-                    var dupKey = id;
+                    var dupKey = $"{schema}:{id}";
                     if (!res.DuplicateIds.TryGetValue(dupKey, out var dupList))
                     {
                         dupList = new List<DefInfo>();
