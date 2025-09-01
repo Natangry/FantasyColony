@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 08:36:57 UTC
+_Updated_: 2025-09-01 08:48:36 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3060,10 +3060,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router; // IScreen lives here
-using FantasyColony.UI.Widgets;
-using System.Reflection;
-using System.Linq;
-using Object = UnityEngine.Object;
+using FantasyColony.UI.Widgets; // UIFactory
+using FantasyColony.UI.Style;   // BaseUIStyle paths & themes
 
 namespace FantasyColony.UI.Screens
 {
@@ -3100,9 +3098,12 @@ namespace FantasyColony.UI.Screens
             _root = CreateUIObject("ModsScreenRoot", parent).GetComponent<RectTransform>();
             Stretch(_root);
 
-            // Fullscreen background via UIFactory (then add opaque occluder so main menu never shows through)
-            UIFactory_CreateFullscreenBackground(parent);
-            AddOpaqueOccluder(parent); // ensure no bleed-through from previous screen
+            // Fullscreen wood background (tiled) so the whole screen is the Mods menu
+            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
+            var bg = UIFactory.CreateFullscreenBackground(_root, wood, new Color(0.05f, 0.04f, 0.03f, 1f));
+            bg.type = Image.Type.Tiled;      // tile the wood
+            bg.preserveAspect = false;       // fill entire screen
+            bg.rectTransform.SetAsFirstSibling();
 
             // Three-column layout (Left: lists, Center: snapshot, Right: actions)
             var row = _root.gameObject.AddComponent<HorizontalLayoutGroup>();
@@ -3112,7 +3113,7 @@ namespace FantasyColony.UI.Screens
             row.spacing = 16f;
 
             // LEFT COLUMN
-            _leftColumn = UIFactory_CreatePanelSurfaceDecorated(_root, "LeftColumnPanel");
+            _leftColumn = UIFactory.CreatePanelSurface(_root, "LeftColumnPanel");
             var leftLE = _leftColumn.gameObject.AddComponent<LayoutElement>();
             leftLE.preferredWidth = 380f; // ~360–400 px
             leftLE.minWidth = 320f;
@@ -3139,7 +3140,7 @@ namespace FantasyColony.UI.Screens
             if (searchLE == null) searchLE = _leftSearch.gameObject.AddComponent<LayoutElement>();
             searchLE.preferredWidth = 220f;
 
-            UIFactory_CreateButtonSecondary(leftControls, "Sort", () => { /* TODO: sort menu */ });
+            UIFactory.CreateButtonSecondary(leftControls, "Sort", () => { /* TODO: sort menu */ });
 
             // Inactive list panel
             _inactiveListContent = CreateTitledScrollPanel_Styled(_leftColumn, "inactive mod list");
@@ -3150,7 +3151,7 @@ namespace FantasyColony.UI.Screens
             CreateEmptyState(_activeListContent, "No active mods");
 
             // CENTER COLUMN (snapshot)
-            _centerColumn = UIFactory_CreatePanelSurfaceDecorated(_root, "CenterColumnPanel");
+            _centerColumn = UIFactory.CreatePanelSurface(_root, "CenterColumnPanel");
             var centerLE = _centerColumn.gameObject.AddComponent<LayoutElement>();
             centerLE.flexibleWidth = 1f; // flexible middle column
             var centerVL = _centerColumn.gameObject.AddComponent<VerticalLayoutGroup>();
@@ -3175,7 +3176,7 @@ namespace FantasyColony.UI.Screens
             snapLE.preferredWidth = 260f;
 
             // Snapshot panel with foldouts
-            var snapshotPanel = UIFactory_CreatePanelSurfaceDecorated(_centerColumn, "SnapshotPanel");
+            var snapshotPanel = UIFactory.CreatePanelSurface(_centerColumn, "SnapshotPanel");
             var spVL = snapshotPanel.gameObject.AddComponent<VerticalLayoutGroup>();
             spVL.childControlWidth = true;
             spVL.childControlHeight = false;
@@ -3198,7 +3199,7 @@ namespace FantasyColony.UI.Screens
             CreateDivider(_defsContent);
 
             // RIGHT COLUMN (actions)
-            _rightColumn = UIFactory_CreatePanelSurfaceDecorated(_root, "RightColumnPanel");
+            _rightColumn = UIFactory.CreatePanelSurface(_root, "RightColumnPanel");
             var rightLE = _rightColumn.gameObject.AddComponent<LayoutElement>();
             rightLE.preferredWidth = 300f;
             rightLE.minWidth = 260f;
@@ -3210,10 +3211,10 @@ namespace FantasyColony.UI.Screens
             rightVL.spacing = 12f;
             rightVL.padding = new RectOffset(12, 12, 12, 12);
 
-            UIFactory_CreateButtonSecondary(_rightColumn, "save mod list", () => { /* TODO */ });
-            UIFactory_CreateButtonSecondary(_rightColumn, "load mod list", () => { /* TODO */ });
+            UIFactory.CreateButtonSecondary(_rightColumn, "save mod list", () => { /* TODO */ });
+            UIFactory.CreateButtonSecondary(_rightColumn, "load mod list", () => { /* TODO */ });
             CreateFlexibleSpace(_rightColumn); // push primary button to bottom
-            UIFactory_CreateButtonPrimary(_rightColumn, "apply/restart", () =>
+            UIFactory.CreateButtonPrimary(_rightColumn, "apply/restart", () =>
             {
                 try { AppFlowCommands.Restart(); } catch { Debug.Log("Restart requested (AppFlowCommands.Restart missing in editor)"); }
             });
@@ -3342,65 +3343,9 @@ namespace FantasyColony.UI.Screens
             return input;
         }
 
-        private static RectTransform UIFactory_CreatePanelSurfaceDecorated(Transform parent, string name)
-        {
-            // Try a variety of UIFactory panel makers to ensure we get wood fill + borders.
-            var methodNames = new[]
-            {
-                "CreatePanelSurface",
-                "CreatePanel",
-                "CreatePanelDecorated",
-                "CreateDecoratedPanel",
-                "CreateBoardPanel"
-            };
-
-            foreach (var nameCand in methodNames)
-            {
-                var overloads = typeof(UIFactory).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .Where(x => x.Name == nameCand).ToArray();
-
-                foreach (var m in overloads)
-                {
-                    var ps = m.GetParameters();
-                    object[] args = null;
-
-                    // (Transform parent)
-                    if (ps.Length == 1 && typeof(Transform).IsAssignableFrom(ps[0].ParameterType))
-                        args = new object[] { parent };
-
-                    // (Transform parent, string name)
-                    else if (ps.Length == 2 && typeof(Transform).IsAssignableFrom(ps[0].ParameterType) && ps[1].ParameterType == typeof(string))
-                        args = new object[] { parent, name };
-
-                    // (Transform parent, string name, bool decorated)
-                    else if (ps.Length == 3 && typeof(Transform).IsAssignableFrom(ps[0].ParameterType) && ps[1].ParameterType == typeof(string) && ps[2].ParameterType == typeof(bool))
-                        args = new object[] { parent, name, true };
-
-                    // Skip unsupported shapes
-                    if (args == null) continue;
-
-                    try
-                    {
-                        var result = m.Invoke(null, args) as RectTransform;
-                        if (result != null) return result;
-                    }
-                    catch { /* try next */ }
-                }
-            }
-            // Fallback: simple dark panel
-            var panel = CreateUIObject(name, parent).GetComponent<RectTransform>();
-            var img = panel.gameObject.AddComponent<Image>();
-            img.color = new Color(0.10f, 0.09f, 0.07f, 1f);
-            // Add a subtle outline so it still reads as a panel
-            var outline = panel.gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(0f, 0f, 0f, 0.8f);
-            outline.effectDistance = new Vector2(1.5f, -1.5f);
-            return panel;
-        }
-
         private static RectTransform CreateTitledScrollPanel_Styled(Transform parent, string title)
         {
-            var container = UIFactory_CreatePanelSurfaceDecorated(parent, title + "_Panel");
+            var container = UIFactory.CreatePanelSurface(parent, title + "_Panel");
             var vl = container.gameObject.AddComponent<VerticalLayoutGroup>();
             vl.childControlWidth = true;
             vl.childControlHeight = false;
@@ -3465,60 +3410,6 @@ namespace FantasyColony.UI.Screens
             label.color = new Color(1f, 1f, 1f, 0.5f);
         }
 
-        // Button helpers that delegate to UIFactory if present
-        private static Button UIFactory_CreateButtonPrimary(Transform parent, string text, Action onClick)
-        {
-            var method = typeof(UIFactory).GetMethod("CreateButtonPrimary", BindingFlags.Public | BindingFlags.Static);
-            if (method != null)
-            {
-                var btn = (Button)method.Invoke(null, new object[] { parent, text, (Action)onClick });
-                if (btn != null) return btn;
-            }
-            // Fallback to local style
-            var fb = CreateBasicButton(parent, text);
-            var colors = fb.colors;
-            colors.normalColor = new Color(0.84f, 0.72f, 0.38f, 1f);
-            colors.highlightedColor = new Color(0.92f, 0.80f, 0.45f, 1f);
-            fb.colors = colors;
-            fb.onClick.AddListener(() => onClick?.Invoke());
-            return fb;
-        }
-
-        private static Button UIFactory_CreateButtonSecondary(Transform parent, string text, Action onClick)
-        {
-            var method = typeof(UIFactory).GetMethod("CreateButtonSecondary", BindingFlags.Public | BindingFlags.Static);
-            if (method != null)
-            {
-                var btn = (Button)method.Invoke(null, new object[] { parent, text, (Action)onClick });
-                if (btn != null) return btn;
-            }
-            var fb = CreateBasicButton(parent, text);
-            var colors = fb.colors;
-            colors.normalColor = new Color(0.22f, 0.20f, 0.16f, 1f);
-            colors.highlightedColor = new Color(0.28f, 0.26f, 0.22f, 1f);
-            fb.colors = colors;
-            fb.onClick.AddListener(() => onClick?.Invoke());
-            return fb;
-        }
-
-        private static Button CreateBasicButton(Transform parent, string label)
-        {
-            var go = CreateUIObject("Button", parent);
-            var img = go.AddComponent<Image>();
-            img.color = new Color(0.22f, 0.20f, 0.16f, 1f);
-            var le = go.AddComponent<LayoutElement>();
-            le.preferredHeight = 34f;
-            var btn = go.AddComponent<Button>();
-
-            var txt = CreateLabel(go.transform, label, 14, FontStyle.Bold, TextAnchor.MiddleCenter);
-            var tRT = txt.GetComponent<RectTransform>();
-            tRT.anchorMin = Vector2.zero;
-            tRT.anchorMax = Vector2.one;
-            tRT.offsetMin = new Vector2(8, 4);
-            tRT.offsetMax = new Vector2(-8, -4);
-            return btn;
-        }
-
         private static void CreateFoldout(Transform parent, string title, out RectTransform content)
         {
             // Header
@@ -3533,7 +3424,7 @@ namespace FantasyColony.UI.Screens
             var btn = header.gameObject.AddComponent<Button>();
 
             // Content
-            content = UIFactory_CreatePanelSurfaceDecorated(parent, title + "_Content");
+            content = UIFactory.CreatePanelSurface(parent, title + "_Content");
             var localContent = content;
             var vl = content.gameObject.AddComponent<VerticalLayoutGroup>();
             vl.childControlWidth = true;
@@ -3563,76 +3454,6 @@ namespace FantasyColony.UI.Screens
             }
         }
 
-        private static void UIFactory_CreateFullscreenBackground(Transform parent)
-        {
-            // Prefer UIFactory background (with wood/cloth and vignette)
-            var method = typeof(UIFactory).GetMethod("CreateFullscreenBackground", BindingFlags.Public | BindingFlags.Static);
-            if (method != null)
-            {
-                try
-                {
-                    method.Invoke(null, new object[] { parent });
-                    return;
-                }
-                catch (TargetParameterCountException)
-                {
-                    // Try variant with (Transform parent, bool dim)
-                    try
-                    {
-                        method.Invoke(null, new object[] { parent, true });
-                        return;
-                    }
-                    catch { /* fall through to fallback */ }
-                }
-            }
-            // Fallback: opaque dark
-            var bg = CreateUIObject("Background", parent).GetComponent<RectTransform>();
-            Stretch(bg);
-            var img = bg.gameObject.AddComponent<Image>();
-            img.color = new Color(0.05f, 0.04f, 0.03f, 1f);
-            bg.SetAsFirstSibling();
-        }
-
-        // Extra opaque occluder to guarantee the main menu doesn't show through any semi-transparent skins
-        private static void AddOpaqueOccluder(Transform parent)
-        {
-            var occluder = CreateUIObject("Occluder", parent);
-            Stretch(occluder);
-            var img = occluder.gameObject.AddComponent<Image>();
-            img.color = new Color(0f, 0f, 0f, 1f);
-            occluder.SetAsFirstSibling();
-        }
-
-        private static void UIFactory_CreateBottomRightPrimary(Transform screenRoot, string text, Action onClick)
-        {
-            // If UIFactory exposes a bottom-right stack, use it; else anchor a standalone button.
-            var method = typeof(UIFactory).GetMethod("CreateBottomRightStack", BindingFlags.Public | BindingFlags.Static);
-            if (method != null)
-            {
-                RectTransform stack = null;
-                try { stack = (RectTransform)method.Invoke(null, new object[] { screenRoot }); }
-                catch (TargetParameterCountException)
-                {
-                    // Try variant with an extra name parameter
-                    try { stack = (RectTransform)method.Invoke(null, new object[] { screenRoot, "BottomRight" }); }
-                    catch { /* ignore, will fallback */ }
-                }
-                if (stack != null)
-                {
-                    UIFactory_CreateButtonPrimary(stack, text, onClick);
-                    return;
-                }
-            }
-            // Fallback: absolute-anchored button in bottom-right
-            var holder = CreateUIObject("BottomRightHolder", screenRoot).GetComponent<RectTransform>();
-            holder.anchorMin = holder.anchorMax = new Vector2(1f, 0f);
-            holder.pivot = new Vector2(1f, 0f);
-            holder.anchoredPosition = new Vector2(-16f, 16f);
-            var hl = holder.gameObject.AddComponent<HorizontalLayoutGroup>();
-            hl.spacing = 8f;
-            hl.childAlignment = TextAnchor.LowerRight;
-            UIFactory_CreateButtonPrimary(holder, text, onClick);
-        }
     }
 }
 
