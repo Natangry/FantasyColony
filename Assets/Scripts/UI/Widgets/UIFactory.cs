@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-using FantasyColony.UI.Style;
 using System;
+using FantasyColony; // for GetHierarchyPath()
+using FantasyColony.UI.Style;
 using FantasyColony.UI.Util;
-using FantasyColony; // for Transform.GetHierarchyPath extension
 using TintTheme = FantasyColony.UI.Style.BaseUIStyle.TintTheme;
 
 namespace FantasyColony.UI.Widgets
@@ -52,9 +52,7 @@ namespace FantasyColony.UI.Widgets
                 return; // use default
             var mat = GetGrayscaleTintMaterial();
             if (mat == null) return;
-            // assign both to avoid fallback in some batching paths
             img.material = mat;
-            img.sharedMaterial = mat;
             img.SetMaterialDirty();
 #if UNITY_EDITOR
             // Verify what actually renders
