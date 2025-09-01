@@ -39,14 +39,14 @@ namespace FantasyColony.UI.Screens
             void NotImpl(string name) => Debug.Log($"BUTTON: {name} (not implemented)");
 
             UIFactory.CreateButtonSecondary(panel, "Log",        DevLogOverlay.Show);
-            UIFactory.CreateButtonPrimary(panel,   "Start",      () => NotImpl("Start"));
+            var startBtn = UIFactory.CreateButtonPrimary(panel, "Start", () => NotImpl("Start"));
             var btnContinue = UIFactory.CreateButtonSecondary(panel, "Continue", () => NotImpl("Continue"));
             var btnLoad     = UIFactory.CreateButtonSecondary(panel, "Load",     () => NotImpl("Load"));
             UIFactory.CreateButtonSecondary(panel, "Options",    () => NotImpl("Options"));
             UIFactory.CreateButtonSecondary(panel, "Mods",       () => NotImpl("Mods"));
             UIFactory.CreateButtonSecondary(panel, "Creator",    () => NotImpl("Creator"));
             UIFactory.CreateButtonSecondary(panel, "Restart",    ShowRestartConfirm);
-            UIFactory.CreateButtonDanger(panel,     "Quit",      ShowQuitConfirm);
+            var quitBtn = UIFactory.CreateButtonDanger(panel, "Quit", ShowQuitConfirm);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             UIFactory.CreateButtonSecondary(panel, "Boot Report", () => UIRouter.Current?.Push<BootReportScreen>());

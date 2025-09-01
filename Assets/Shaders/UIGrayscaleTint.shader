@@ -91,12 +91,16 @@ Shader "UI/GrayscaleTint"
 
             fixed4 frag (v2f IN) : SV_Target
             {
-                fixed4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
+                // sample wood texture (do NOT premultiply by vertex color)
+                fixed4 tex = SampleSpriteTexture(IN.texcoord);
 
-                // grayscale luminance
-                fixed g = dot(c.rgb, fixed3(0.299, 0.587, 0.114));
-                fixed3 tinted = g * _Color.rgb;
-                fixed4 outCol = fixed4(tinted, c.a * _Color.a);
+                // grayscale from texture only (preserve detail, neutralize hue)
+                fixed g = dot(tex.rgb, fixed3(0.299, 0.587, 0.114));
+
+                // use UI vertex color as the tint source (Button/Graphic color)
+                fixed3 tinted = g * IN.color.rgb;
+                fixed a = tex.a * IN.color.a;
+                fixed4 outCol = fixed4(tinted, a);
 
                 #ifdef UNITY_UI_CLIP_RECT
                 outCol.a *= UnityGet2DClipping(IN.worldPos.xy, _ClipRect);
