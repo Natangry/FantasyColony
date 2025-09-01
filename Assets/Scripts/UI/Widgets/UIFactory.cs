@@ -174,9 +174,9 @@ namespace FantasyColony.UI.Widgets
             fillImg.raycastTarget = false;
             var le = fillGO.GetComponent<LayoutElement>();
             le.ignoreLayout = true;
-            var wood = Resources.Load<Sprite>("ui/sprites/tiles/wood_soft_tile");
+            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
             if (wood == null)
-                Debug.LogWarning($"UIFactory: Wood tile sprite missing at ui/sprites/tiles/wood_soft_tile for {fillGO.transform.GetHierarchyPath()}");
+                Debug.LogWarning($"UIFactory: Wood tile sprite missing at {BaseUIStyle.WoodTilePath} for {fillGO.transform.GetHierarchyPath()}");
             fillImg.sprite = wood;
             fillImg.type = Image.Type.Tiled;
             fillImg.preserveAspect = false;
@@ -240,9 +240,9 @@ namespace FantasyColony.UI.Widgets
             fillImg.raycastTarget = false;
             fillImg.preserveAspect = false;
             fillGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            var wood = Resources.Load<Sprite>("ui/sprites/tiles/wood_soft_tile");
+            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
             if (wood == null)
-                Debug.LogWarning($"UIFactory: Wood tile sprite missing at ui/sprites/tiles/wood_soft_tile for {fillGO.transform.GetHierarchyPath()}");
+                Debug.LogWarning($"UIFactory: Wood tile sprite missing at {BaseUIStyle.WoodTilePath} for {fillGO.transform.GetHierarchyPath()}");
             fillImg.sprite = wood;
             fillImg.type = Image.Type.Tiled;
             ApplyTintMaterial(fillImg);
