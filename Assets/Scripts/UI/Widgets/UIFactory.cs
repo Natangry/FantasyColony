@@ -134,23 +134,16 @@ namespace FantasyColony.UI.Widgets
             }
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
-
-            // --- Border (9-slice) as sibling ABOVE fill ---
-            var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
+            // --- Pixel-precise frame instead of 9-slice Image ---
+            var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
             borderGO.transform.SetParent(go.transform, false);
             var borderRt = borderGO.GetComponent<RectTransform>();
             borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
-            var borderImg = borderGO.GetComponent<Image>();
-            borderImg.raycastTarget = false;
-            borderImg.preserveAspect = false;
-            var border = GetSymmetricDarkBorder();
-            // Compute precise pixel thickness so all four edges quantize identically
-            var panelScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasRefPPU(go.transform), GetCanvasScaleFactor(go.transform));
-            borderImg.pixelsPerUnitMultiplier = panelScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
-            else { borderImg.color = BaseUIStyle.PanelSurface; }
+            var frame = borderGO.GetComponent<UIFrame>();
+            var border = GetSymmetricDarkBorder();
+            frame.Init(border, BaseUIStyle.TargetBorderPx, Color.white);
 
             // Root image no longer draws visuals; keep it disabled but present for easy toggling
             rootImg.enabled = false;
@@ -160,9 +153,9 @@ namespace FantasyColony.UI.Widgets
             AttachPixelSnap(go.transform);
             AttachPixelSnap(borderGO.transform);
 
-            // Ensure BG_Fill under BG_Border
+            // Ensure BG_Fill under Frame
             var fill = go.transform.Find("BG_Fill");
-            var borderT = go.transform.Find("BG_Border");
+            var borderT = go.transform.Find("Frame");
             if (fill) fill.SetSiblingIndex(0);
             if (borderT) borderT.SetSiblingIndex(1);
 
@@ -205,23 +198,16 @@ namespace FantasyColony.UI.Widgets
                 fillImg.type = Image.Type.Tiled;
             }
             fillImg.color = theme.Base; // tint the wood itself
-
-            // --- Border (9-slice) as child ABOVE fill ---
-            var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
+            // --- Pixel-precise frame instead of 9-slice Image ---
+            var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
             borderGO.transform.SetParent(go.transform, false);
             var borderRt = borderGO.GetComponent<RectTransform>();
             borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
-            var borderImg = borderGO.GetComponent<Image>();
-            borderImg.raycastTarget = false;
-            borderImg.preserveAspect = false;
-            var border = GetSymmetricDarkBorder();
-            // Compute precise pixel thickness so all four edges quantize identically
-            var buttonScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasRefPPU(go.transform), GetCanvasScaleFactor(go.transform));
-            borderImg.pixelsPerUnitMultiplier = buttonScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
-            else { borderImg.color = theme.Base; }
+            var frame = borderGO.GetComponent<UIFrame>();
+            var border = GetSymmetricDarkBorder();
+            frame.Init(border, BaseUIStyle.TargetBorderPx, Color.white);
 
             // Button setup
             btn.transition = Selectable.Transition.ColorTint;
@@ -295,7 +281,7 @@ namespace FantasyColony.UI.Widgets
             if (fill) fill.gameObject.SetActive(visible);
 
             // Child border
-            var border = panel.Find("BG_Border");
+            var border = panel.Find("Frame");
             if (border) border.gameObject.SetActive(visible);
         }
 
