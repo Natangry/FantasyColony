@@ -35,6 +35,7 @@ namespace FantasyColony.UI.Widgets
             if (sh != null)
             {
                 _grayscaleTintMat = new Material(sh);
+                _grayscaleTintMat.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
             }
             return _grayscaleTintMat;
         }

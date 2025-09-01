@@ -31,7 +31,7 @@ namespace FantasyColony.UI.Style
 
         // Desired on-screen border thickness in device pixels for sliced borders
         // This single value controls both panels and buttons.
-        public const float TargetBorderPx = 10f; // try 0.75f for subtler, 2f for thicker
+        public const float TargetBorderPx = 10f; // default visual = 10px borders
 
         // --- Tint themes for wood_soft_tile surfaces ---
         public struct TintTheme { public Color32 Base, Hover, Pressed; }
