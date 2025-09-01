@@ -53,14 +53,18 @@ namespace FantasyColony.UI.Widgets
 
         // Compute a pixelsPerUnitMultiplier that yields a precise on-screen thickness in pixels for the 9-slice edges.
         // Assumes the Sprite has equal borders on all sides (enforced by GetSymmetricDarkBorder).
-        private static float ComputeBorderScale(Sprite s, float targetPixels, float canvasScaleFactor)
+        // Formula: displayed_px ≈ slice_px / (spritePPU * multiplier) * (canvasRefPPU / 100) * canvasScaleFactor
+        // We solve for multiplier so displayed_px == targetPixels. Unity's default referencePixelsPerUnit is 100.
+        private static float ComputeBorderScale(Sprite s, float targetPixels, float canvasRefPPU, float canvasScaleFactor)
         {
             if (s == null) return 1f;
-            // Unity: displayedThicknessInPixels ≈ borderPixels / (pixelsPerUnit * multiplier) * canvasScale
-            // Solve for multiplier to hit targetPixels exactly.
             float borderPx = s.border.w; // any side; they're equal
-            float denom = s.pixelsPerUnit * Mathf.Max(0.0001f, targetPixels);
-            float m = (borderPx / denom) * Mathf.Max(0.0001f, canvasScaleFactor);
+            float tpx = Mathf.Max(0.0001f, targetPixels);
+            float spritePPU = Mathf.Max(0.0001f, s.pixelsPerUnit);
+            float refPPU = Mathf.Max(0.0001f, canvasRefPPU);
+            float scale = Mathf.Max(0.0001f, canvasScaleFactor);
+            // Combine terms so multiplier scales down to meet the target pixel thickness
+            float m = (borderPx * (refPPU / 100f) * scale) / (spritePPU * tpx);
             return Mathf.Max(0.0001f, m);
         }
 
@@ -70,6 +74,16 @@ namespace FantasyColony.UI.Widgets
             var canvas = t.GetComponentInParent<Canvas>();
             if (canvas != null) return canvas.scaleFactor <= 0f ? 1f : canvas.scaleFactor;
             return 1f;
+        }
+
+        private static float GetCanvasRefPPU(Transform t)
+        {
+            var canvas = t.GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                return canvas.referencePixelsPerUnit <= 0f ? 100f : canvas.referencePixelsPerUnit;
+            }
+            return 100f;
         }
 
         // PANEL (Textured wood fill + dark 9-slice border)
@@ -118,7 +132,7 @@ namespace FantasyColony.UI.Widgets
             borderImg.preserveAspect = false;
             var border = GetSymmetricDarkBorder();
             // Compute precise pixel thickness so all four edges quantize identically
-            var panelScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasScaleFactor(go.transform));
+            var panelScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasRefPPU(go.transform), GetCanvasScaleFactor(go.transform));
             borderImg.pixelsPerUnitMultiplier = panelScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
@@ -181,7 +195,7 @@ namespace FantasyColony.UI.Widgets
             borderImg.preserveAspect = false;
             var border = GetSymmetricDarkBorder();
             // Compute precise pixel thickness so all four edges quantize identically
-            var buttonScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasScaleFactor(go.transform));
+            var buttonScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasRefPPU(go.transform), GetCanvasScaleFactor(go.transform));
             borderImg.pixelsPerUnitMultiplier = buttonScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }

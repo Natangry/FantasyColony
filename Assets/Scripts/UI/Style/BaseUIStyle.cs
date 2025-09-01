@@ -30,19 +30,14 @@ namespace FantasyColony.UI.Style
         public const string DarkBorder9SPath = "ui/sprites/9slice/border_dark_9s";
 
         // Desired on-screen border thickness in device pixels for sliced borders
-        public const float TargetBorderPx = 1f; // set to 2f if you want a slightly stronger frame
+        // This single value controls both panels and buttons.
+        public const float TargetBorderPx = 1f; // try 0.75f for subtler, 2f for thicker
 
         // Overlay tints for Button.state (applied to a transparent overlay Image)
         // Keep subtle so textures are not washed out
         public static readonly Color HoverOverlay   = new Color(1f, 1f, 1f, 0.06f);
         public static readonly Color PressedOverlay = new Color(0f, 0f, 0f, 0.10f);
         public static readonly Color DisabledOverlay= new Color(0f, 0f, 0f, 0.40f);
-
-        // Encasing border thinness: higher = thinner (affects 9-slice edge width via Image.pixelsPerUnitMultiplier)
-        // Effective border thickness in UI units ≈ slicePixels / (PPU * scale).
-        // Tweak these two values to taste.
-        public const float ButtonBorderScale = 4.0f;
-        public const float PanelBorderScale  = 10.0f;
 
         // Sizes
         public const int ButtonHeight = 56;
