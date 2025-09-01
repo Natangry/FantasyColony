@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using FantasyColony.UI; // IScreen
+using FantasyColony.UI.Router; // IScreen
 
 namespace FantasyColony.UI.Screens
 {
