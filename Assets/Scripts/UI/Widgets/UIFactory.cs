@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using FantasyColony.UI.Style;
 using System;
 using FantasyColony.UI.Util;
+using FantasyColony; // for Transform.GetHierarchyPath extension
 using TintTheme = FantasyColony.UI.Style.BaseUIStyle.TintTheme;
 
 namespace FantasyColony.UI.Widgets
@@ -32,12 +33,37 @@ namespace FantasyColony.UI.Widgets
         {
             if (_grayscaleTintMat != null) return _grayscaleTintMat;
             var sh = Shader.Find("UI/GrayscaleTint");
-            if (sh != null)
+            if (sh == null)
             {
-                _grayscaleTintMat = new Material(sh);
-                _grayscaleTintMat.hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
+                Debug.LogWarning("UIFactory: Shader 'UI/GrayscaleTint' not found. Falling back to UI/Default for wood tinting.");
+                return null;
             }
+            _grayscaleTintMat = new Material(sh)
+            {
+                hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor
+            };
             return _grayscaleTintMat;
+        }
+
+        private static void ApplyTintMaterial(Image img)
+        {
+            if (img == null) return;
+            if (!BaseUIStyle.UseGrayscaleTint)
+                return; // use default
+            var mat = GetGrayscaleTintMaterial();
+            if (mat == null) return;
+            // assign both to avoid fallback in some batching paths
+            img.material = mat;
+            img.sharedMaterial = mat;
+            img.SetMaterialDirty();
+#if UNITY_EDITOR
+            // Verify what actually renders
+            var actual = img.materialForRendering != null ? img.materialForRendering.shader.name : "<null>";
+            if (actual != "UI/GrayscaleTint")
+                Debug.LogWarning($"UIFactory: Expected 'UI/GrayscaleTint' but got '{actual}' on {img.transform.GetHierarchyPath()}.");
+            else
+                Debug.Log($"UIFactory: GrayscaleTint OK on {img.transform.GetHierarchyPath()}.");
+#endif
         }
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
@@ -145,8 +171,7 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
-            var mat = GetGrayscaleTintMaterial();
-            if (mat != null) fillImg.material = mat;
+            ApplyTintMaterial(fillImg);
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
             // --- Pixel-precise frame instead of 9-slice Image ---
@@ -212,8 +237,7 @@ namespace FantasyColony.UI.Widgets
                 fillImg.sprite = wood;
                 fillImg.type = Image.Type.Tiled;
             }
-            var mat = GetGrayscaleTintMaterial();
-            if (mat != null) fillImg.material = mat;
+            ApplyTintMaterial(fillImg);
             fillImg.color = theme.Base; // tint the wood itself
             // --- Pixel-precise frame instead of 9-slice Image ---
             var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
