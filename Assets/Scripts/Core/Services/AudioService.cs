@@ -31,6 +31,14 @@ namespace FantasyColony.Core.Services
 
         private void Awake()
         {
+            // Duplicate guard: prefer the first instance
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            _instance = this;
+
             _bgm = gameObject.AddComponent<AudioSource>();
             _bgm.loop = true;
             _bgm.playOnAwake = false;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace FantasyColony.Core.Services {
     /// <summary>
@@ -19,6 +20,7 @@ namespace FantasyColony.Core.Services {
         private readonly Dictionary<string, Dictionary<string, Entry>> _map = new(StringComparer.OrdinalIgnoreCase);
 
         public int Count { get; private set; }
+        public int ConflictCount { get; private set; }
 
         public void Register(string type, string id, string filePath, string modId) {
             if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(id)) return;
@@ -26,9 +28,12 @@ namespace FantasyColony.Core.Services {
                 inner = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
                 _map[type] = inner;
             }
-            var isNew = !inner.ContainsKey(id);
+            if (inner.TryGetValue(id, out var existing)) {
+                ConflictCount++;
+                Debug.LogWarning($"[Defs] Conflict for {type}/{id}: {existing.ModId} -> {modId} (file: {filePath})");
+            }
+            else { Count++; }
             inner[id] = new Entry { Type = type, Id = id, Path = filePath ?? string.Empty, ModId = modId };
-            if (isNew) Count++;
         }
 
         // Legacy Add signature for backward compatibility

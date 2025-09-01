@@ -15,9 +15,8 @@ namespace FantasyColony.Core.Services {
             if (_initialized) return;
             try {
                 var h = Addressables.InitializeAsync();
-                h.WaitForCompletion();
-                _initialized = true;
-            } catch { /* swallow; fall back to on-demand */ }
+                h.Completed += _ => { _initialized = true; };
+            } catch { /* swallow; fail-soft */ }
         }
 
         public Sprite LoadSprite(string virtualPath) {
