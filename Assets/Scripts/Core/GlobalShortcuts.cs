@@ -1,6 +1,7 @@
 using UnityEngine;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Screens;
+using UInput = UnityEngine.Input;
 
 namespace FantasyColony.Core {
     /// <summary>
@@ -15,7 +16,7 @@ namespace FantasyColony.Core {
 
         private void Update() {
             // Open Boot Report
-            if (Input.GetKeyDown(KeyCode.F9)) {
+            if (UInput.GetKeyDown(KeyCode.F9)) {
                 var router = UIRouter.Current;
                 if (router == null) {
                     // Fallback if static Current isn't set yet
