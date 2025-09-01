@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FantasyColony.Core;
 
 namespace FantasyColony.Core.Services
 {
@@ -47,7 +48,18 @@ namespace FantasyColony.Core.Services
             try
             {
                 var path = $"Localization/{lang}/strings";
-                var ta = Resources.Load<TextAsset>(path);
+                TextAsset ta = null;
+                // Prefer provider if available (mod- and backend-friendly)
+                var host = AppHost.Instance;
+                if (host != null && host.Services != null && host.Services.TryGet<IAssetProvider>(out var provider))
+                {
+                    ta = provider.LoadText(path);
+                }
+                // Fallback to Resources for safety
+                if (ta == null)
+                {
+                    ta = Resources.Load<TextAsset>(path);
+                }
                 if (ta == null) return false;
                 var bag = JsonUtility.FromJson<LocBag>(ta.text);
                 if (bag?.entries != null)

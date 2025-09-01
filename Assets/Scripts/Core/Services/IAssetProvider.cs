@@ -6,6 +6,7 @@ namespace FantasyColony.Core.Services
     {
         Sprite LoadSprite(string virtualPath);
         AudioClip LoadAudio(string virtualPath);
+        TextAsset LoadText(string virtualPath);
     }
 
     public sealed class ResourcesAssetProvider : IAssetProvider
@@ -18,6 +19,11 @@ namespace FantasyColony.Core.Services
         public AudioClip LoadAudio(string virtualPath)
         {
             return Resources.Load<AudioClip>(virtualPath);
+        }
+
+        public TextAsset LoadText(string virtualPath)
+        {
+            return Resources.Load<TextAsset>(virtualPath);
         }
     }
 }

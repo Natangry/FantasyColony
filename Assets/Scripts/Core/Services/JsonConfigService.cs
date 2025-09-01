@@ -8,7 +8,7 @@ namespace FantasyColony.Core.Services
     /// <summary>
     /// Minimal JSON-backed config service with string Get/Set to avoid API churn.
     /// </summary>
-    public class JsonConfigService
+    public class JsonConfigService : IConfigService
     {
         private static JsonConfigService _instance;
         public static JsonConfigService Instance => _instance ?? (_instance = new JsonConfigService());
@@ -57,8 +57,23 @@ namespace FantasyColony.Core.Services
                     idx++;
                 }
                 var json = JsonUtility.ToJson(bag, true);
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
-                File.WriteAllText(Path, json);
+                var dir = System.IO.Path.GetDirectoryName(Path);
+                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                var tmp = Path + ".tmp";
+                try
+                {
+                    File.WriteAllText(tmp, json);
+                    // Atomic replace when available (PC platforms)
+#if UNITY_2021_2_OR_NEWER
+                    var bak = Path + ".bak";
+                    File.Replace(tmp, Path, bak, true);
+#else
+                    // Fallback: best-effort replace
+                    if (File.Exists(Path)) File.Delete(Path);
+                    File.Move(tmp, Path);
+#endif
+                }
+                finally { if (File.Exists(tmp)) { try { File.Delete(tmp); } catch { } } }
             }
             catch (Exception e)
             {
