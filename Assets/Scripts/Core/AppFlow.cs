@@ -9,7 +9,6 @@ namespace FantasyColony.Core {
     /// </summary>
     public class AppFlow : MonoBehaviour {
         private UIRouter _router;
-        private ServiceRegistry _services;
 
         public static AppFlow Instance { get; private set; }
 
@@ -22,9 +21,8 @@ namespace FantasyColony.Core {
             DontDestroyOnLoad(gameObject);
         }
 
-        internal void Initialize(UIRouter router, ServiceRegistry services) {
+        internal void Initialize(UIRouter router) {
             _router = router;
-            _services = services;
         }
 
         /// <summary>

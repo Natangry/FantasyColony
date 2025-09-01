@@ -63,7 +63,7 @@ namespace FantasyColony.Core
             // Attach AppFlow helper to manage restart/quit across the app
             var flow = gameObject.GetComponent<AppFlow>();
             if (flow == null) flow = gameObject.AddComponent<AppFlow>();
-            flow.Initialize(_router, _services);
+            flow.Initialize(_router);
 
             // Global shortcuts (e.g., F9 to open Boot Report) available in all builds
             var shortcuts = gameObject.GetComponent<GlobalShortcuts>();
