@@ -270,6 +270,26 @@ namespace FantasyColony.UI.Widgets
             SetPanelBorders(right, left: false, right: true,  top: true, bottom: true);
         }
 
+        /// <summary>
+        /// Themed horizontal rule for visual separation. Uses theme border tone.
+        /// </summary>
+        public static Image CreateRuleHorizontal(Transform parent, float thickness = 2f, float alpha = 0.65f)
+        {
+            var rt = CreateUIObject("Rule_H", parent);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.color = new Color(0f, 0f, 0f, alpha);
+            var le = rt.gameObject.AddComponent<LayoutElement>();
+            le.minHeight = thickness;
+            le.preferredHeight = thickness;
+            le.flexibleHeight = 0f;
+            // Stretch full width within its layout group
+            rt.anchorMin = new Vector2(0, 0.5f);
+            rt.anchorMax = new Vector2(1, 0.5f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            return img;
+        }
+
         // PANEL (Textured wood fill + dark 9-slice border)
         public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel", TintTheme? theme = null)
         {
