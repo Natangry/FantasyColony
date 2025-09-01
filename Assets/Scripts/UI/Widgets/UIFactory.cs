@@ -7,6 +7,50 @@ namespace FantasyColony.UI.Widgets
 {
     public static class UIFactory
     {
+        // Cache a symmetrized version of the dark 9-slice border so L/R and T/B are equal.
+        private static Sprite _darkBorderSymmetric;
+
+        // Ensure the 9-slice border has equal left/right and top/bottom edge sizes.
+        // This avoids visual asymmetry when Unity stretches the sliced edges.
+        private static Sprite GetSymmetricDarkBorder()
+        {
+            if (_darkBorderSymmetric != null)
+                return _darkBorderSymmetric;
+
+            var src = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
+            if (src == null)
+                return null;
+
+            _darkBorderSymmetric = MakeSymmetricBorder(src);
+            return _darkBorderSymmetric;
+        }
+
+        private static Sprite MakeSymmetricBorder(Sprite src)
+        {
+            // Unity's Sprite.border order: (left, right, top, bottom)
+            var b = src.border;
+            float lr = Mathf.Min(b.x, b.y); // equalize L/R using the smaller to avoid cutting into artwork
+            float tb = Mathf.Min(b.z, b.w); // equalize T/B
+
+            // Sprite.Create expects pivot relative to rect (0..1). Convert existing pixel pivot.
+            var rect = src.rect;
+            var pivotNormalized = new Vector2(
+                rect.width  > 0 ? src.pivot.x / rect.width  : 0.5f,
+                rect.height > 0 ? src.pivot.y / rect.height : 0.5f
+            );
+
+            var sym = Sprite.Create(
+                src.texture,
+                rect,
+                pivotNormalized,
+                src.pixelsPerUnit,
+                0,
+                SpriteMeshType.FullRect,
+                new Vector4(lr, lr, tb, tb)
+            );
+            return sym;
+        }
+
         // PANEL (Textured wood fill + dark 9-slice border)
         public static RectTransform CreatePanelSurface(Transform parent, string name = "Panel")
         {
@@ -53,7 +97,7 @@ namespace FantasyColony.UI.Widgets
             borderImg.preserveAspect = false;
             borderImg.pixelsPerUnitMultiplier = BaseUIStyle.PanelBorderScale; // thinner encasing frame
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
+            var border = GetSymmetricDarkBorder();
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
             else { borderImg.color = BaseUIStyle.PanelSurface; }
 
@@ -114,7 +158,7 @@ namespace FantasyColony.UI.Widgets
             borderImg.preserveAspect = false;
             borderImg.pixelsPerUnitMultiplier = BaseUIStyle.ButtonBorderScale; // thinner encasing frame
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            var border = Resources.Load<Sprite>(BaseUIStyle.DarkBorder9SPath);
+            var border = GetSymmetricDarkBorder();
             if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
             else { borderImg.color = fill; }
 
