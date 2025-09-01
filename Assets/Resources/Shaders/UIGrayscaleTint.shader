@@ -97,9 +97,11 @@ Shader "UI/GrayscaleTint"
                 // grayscale from texture only (preserve detail, neutralize hue)
                 fixed g = dot(tex.rgb, fixed3(0.299, 0.587, 0.114));
 
-                // use UI vertex color as the tint source (Button/Graphic color)
-                fixed3 tinted = g * IN.color.rgb;
-                fixed a = tex.a * IN.color.a;
+                // tint by Graphic color *and* material color, so both work consistently
+                fixed3 tintRGB = IN.color.rgb * _Color.rgb;
+                fixed tintA = IN.color.a * _Color.a;
+                fixed3 tinted = g * tintRGB;
+                fixed a = tex.a * tintA;
                 fixed4 outCol = fixed4(tinted, a);
 
                 #ifdef UNITY_UI_CLIP_RECT

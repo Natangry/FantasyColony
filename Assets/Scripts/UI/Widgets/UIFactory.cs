@@ -32,10 +32,11 @@ namespace FantasyColony.UI.Widgets
         private static Material GetGrayscaleTintMaterial()
         {
             if (_grayscaleTintMat != null) return _grayscaleTintMat;
-            var sh = Shader.Find("UI/GrayscaleTint");
+            // Load from Resources to ensure inclusion in builds
+            var sh = Resources.Load<Shader>("Shaders/UIGrayscaleTint");
             if (sh == null)
             {
-                Debug.LogWarning("UIFactory: Shader 'UI/GrayscaleTint' not found. Falling back to UI/Default for wood tinting.");
+                Debug.LogWarning("UIFactory: Shader 'UI/GrayscaleTint' not found in Resources. Will fall back to CPU grayscale.");
                 return null;
             }
             _grayscaleTintMat = new Material(sh)
@@ -51,17 +52,27 @@ namespace FantasyColony.UI.Widgets
             if (!BaseUIStyle.UseGrayscaleTint)
                 return; // use default
             var mat = GetGrayscaleTintMaterial();
-            if (mat == null) return;
-            img.material = mat;
+            if (mat == null)
+            {
+                // Fallback: CPU grayscale sprite, then let UI/Default tint it
+                var src = img.sprite;
+                var gray = GrayscaleSpriteCache.Get(src);
+                if (gray != null)
+                {
+                    img.sprite = gray;
+                    img.material = null;
+                }
+                Debug.LogWarning($"UIFactory: Using CPU grayscale fallback on {img.transform.GetHierarchyPath()}.");
+                return;
+            }
+            img.material = new Material(mat); // per-image instance
             img.SetMaterialDirty();
-#if UNITY_EDITOR
-            // Verify what actually renders
+            // Runtime verification (no editor guard):
             var actual = img.materialForRendering != null ? img.materialForRendering.shader.name : "<null>";
             if (actual != "UI/GrayscaleTint")
                 Debug.LogWarning($"UIFactory: Expected 'UI/GrayscaleTint' but got '{actual}' on {img.transform.GetHierarchyPath()}.");
             else
                 Debug.Log($"UIFactory: GrayscaleTint OK on {img.transform.GetHierarchyPath()}.");
-#endif
         }
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
@@ -163,12 +174,12 @@ namespace FantasyColony.UI.Widgets
             fillImg.raycastTarget = false;
             var le = fillGO.GetComponent<LayoutElement>();
             le.ignoreLayout = true;
-            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
-            if (wood != null)
-            {
-                fillImg.sprite = wood;
-                fillImg.type = Image.Type.Tiled;
-            }
+            var wood = Resources.Load<Sprite>("ui/sprites/tiles/wood_soft_tile");
+            if (wood == null)
+                Debug.LogWarning($"UIFactory: Wood tile sprite missing at ui/sprites/tiles/wood_soft_tile for {fillGO.transform.GetHierarchyPath()}");
+            fillImg.sprite = wood;
+            fillImg.type = Image.Type.Tiled;
+            fillImg.preserveAspect = false;
             ApplyTintMaterial(fillImg);
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
@@ -229,12 +240,11 @@ namespace FantasyColony.UI.Widgets
             fillImg.raycastTarget = false;
             fillImg.preserveAspect = false;
             fillGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
-            if (wood != null)
-            {
-                fillImg.sprite = wood;
-                fillImg.type = Image.Type.Tiled;
-            }
+            var wood = Resources.Load<Sprite>("ui/sprites/tiles/wood_soft_tile");
+            if (wood == null)
+                Debug.LogWarning($"UIFactory: Wood tile sprite missing at ui/sprites/tiles/wood_soft_tile for {fillGO.transform.GetHierarchyPath()}");
+            fillImg.sprite = wood;
+            fillImg.type = Image.Type.Tiled;
             ApplyTintMaterial(fillImg);
             fillImg.color = theme.Base; // tint the wood itself
             // --- Pixel-precise frame instead of 9-slice Image ---
