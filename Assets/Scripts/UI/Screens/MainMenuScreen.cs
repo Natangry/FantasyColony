@@ -43,7 +43,7 @@ namespace FantasyColony.UI.Screens
             var btnContinue = UIFactory.CreateButtonSecondary(panel, "Continue", () => NotImpl("Continue"));
             var btnLoad     = UIFactory.CreateButtonSecondary(panel, "Load",     () => NotImpl("Load"));
             UIFactory.CreateButtonSecondary(panel, "Options",    () => NotImpl("Options"));
-            UIFactory.CreateButtonSecondary(panel, "Mods",       () => NotImpl("Mods"));
+            UIFactory.CreateButtonSecondary(panel, "Mods", () => UIRouter.Current?.Push<ModsScreen>());
             UIFactory.CreateButtonSecondary(panel, "Creator",    () => NotImpl("Creator"));
             UIFactory.CreateButtonSecondary(panel, "Restart",    ShowRestartConfirm);
             var quitBtn = UIFactory.CreateButtonDanger(panel, "Quit", ShowQuitConfirm);
