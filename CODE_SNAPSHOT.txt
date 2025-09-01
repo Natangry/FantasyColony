@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 04:40:45 UTC
+_Updated_: 2025-09-01 04:55:44 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3328,23 +3328,16 @@ namespace FantasyColony.UI.Widgets
             }
             var panelTheme = theme ?? BaseUIStyle.SecondaryTheme;
             fillImg.color = panelTheme.Base;
-
-            // --- Border (9-slice) as sibling ABOVE fill ---
-            var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
+            // --- Pixel-precise frame instead of 9-slice Image ---
+            var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
             borderGO.transform.SetParent(go.transform, false);
             var borderRt = borderGO.GetComponent<RectTransform>();
             borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
-            var borderImg = borderGO.GetComponent<Image>();
-            borderImg.raycastTarget = false;
-            borderImg.preserveAspect = false;
-            var border = GetSymmetricDarkBorder();
-            // Compute precise pixel thickness so all four edges quantize identically
-            var panelScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasRefPPU(go.transform), GetCanvasScaleFactor(go.transform));
-            borderImg.pixelsPerUnitMultiplier = panelScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
-            else { borderImg.color = BaseUIStyle.PanelSurface; }
+            var frame = borderGO.GetComponent<UIFrame>();
+            var border = GetSymmetricDarkBorder();
+            frame.Init(border, BaseUIStyle.TargetBorderPx, Color.white);
 
             // Root image no longer draws visuals; keep it disabled but present for easy toggling
             rootImg.enabled = false;
@@ -3354,9 +3347,9 @@ namespace FantasyColony.UI.Widgets
             AttachPixelSnap(go.transform);
             AttachPixelSnap(borderGO.transform);
 
-            // Ensure BG_Fill under BG_Border
+            // Ensure BG_Fill under Frame
             var fill = go.transform.Find("BG_Fill");
-            var borderT = go.transform.Find("BG_Border");
+            var borderT = go.transform.Find("Frame");
             if (fill) fill.SetSiblingIndex(0);
             if (borderT) borderT.SetSiblingIndex(1);
 
@@ -3399,23 +3392,16 @@ namespace FantasyColony.UI.Widgets
                 fillImg.type = Image.Type.Tiled;
             }
             fillImg.color = theme.Base; // tint the wood itself
-
-            // --- Border (9-slice) as child ABOVE fill ---
-            var borderGO = new GameObject("BG_Border", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(LayoutElement));
+            // --- Pixel-precise frame instead of 9-slice Image ---
+            var borderGO = new GameObject("Frame", typeof(RectTransform), typeof(CanvasRenderer), typeof(LayoutElement), typeof(UIFrame));
             borderGO.transform.SetParent(go.transform, false);
             var borderRt = borderGO.GetComponent<RectTransform>();
             borderRt.anchorMin = Vector2.zero; borderRt.anchorMax = Vector2.one;
             borderRt.offsetMin = Vector2.zero; borderRt.offsetMax = Vector2.zero;
-            var borderImg = borderGO.GetComponent<Image>();
-            borderImg.raycastTarget = false;
-            borderImg.preserveAspect = false;
-            var border = GetSymmetricDarkBorder();
-            // Compute precise pixel thickness so all four edges quantize identically
-            var buttonScale = ComputeBorderScale(border, BaseUIStyle.TargetBorderPx, GetCanvasRefPPU(go.transform), GetCanvasScaleFactor(go.transform));
-            borderImg.pixelsPerUnitMultiplier = buttonScale;
             borderGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            if (border != null) { borderImg.sprite = border; borderImg.type = Image.Type.Sliced; borderImg.color = Color.white; }
-            else { borderImg.color = theme.Base; }
+            var frame = borderGO.GetComponent<UIFrame>();
+            var border = GetSymmetricDarkBorder();
+            frame.Init(border, BaseUIStyle.TargetBorderPx, Color.white);
 
             // Button setup
             btn.transition = Selectable.Transition.ColorTint;
@@ -3489,7 +3475,7 @@ namespace FantasyColony.UI.Widgets
             if (fill) fill.gameObject.SetActive(visible);
 
             // Child border
-            var border = panel.Find("BG_Border");
+            var border = panel.Find("Frame");
             if (border) border.gameObject.SetActive(visible);
         }
 
@@ -3537,6 +3523,149 @@ namespace FantasyColony.UI.Widgets
             return img;
         }
 
+    }
+}
+
+// ===== FILE: Assets/Scripts/UI/Widgets/UIFrame.cs =====
+using UnityEngine;
+using UnityEngine.UI;
+using FantasyColony.UI.Style;
+
+namespace FantasyColony.UI.Widgets
+{
+    // Pixel-precise frame that guarantees identical edge thickness on all sides.
+    // Renders four edge Images cut from the source 9-slice sprite; optional corner Images can be added later if needed.
+    [ExecuteAlways]
+    [DisallowMultipleComponent]
+    public class UIFrame : MonoBehaviour
+    {
+        [SerializeField] private Sprite _sourceNineSlice; // your dark border 9-slice
+        [SerializeField] private float _targetBorderPx = 1f;
+        [SerializeField] private Color _tint = Color.white;
+
+        // child images
+        Image _top, _bottom, _left, _right;
+        RectTransform _rt;
+        Canvas _canvas;
+
+        public void Init(Sprite nineSlice, float targetPx, Color tint)
+        {
+            _sourceNineSlice = nineSlice;
+            _targetBorderPx = targetPx;
+            _tint = tint;
+            EnsureChildren();
+            ApplyLook();
+            LayoutNow();
+        }
+
+        void OnEnable()
+        {
+            _rt = GetComponent<RectTransform>();
+            _canvas = GetComponentInParent<Canvas>();
+            EnsureChildren();
+            ApplyLook();
+            LayoutNow();
+        }
+
+        void OnRectTransformDimensionsChange() => LayoutNow();
+        void Update()
+        {
+#if UNITY_EDITOR
+            // keep live in editor
+            LayoutNow();
+#endif
+        }
+
+        void EnsureChildren()
+        {
+            if (_rt == null) _rt = GetComponent<RectTransform>();
+            if (_top == null) _top = CreateEdge("Top");
+            if (_bottom == null) _bottom = CreateEdge("Bottom");
+            if (_left == null) _left = CreateEdge("Left");
+            if (_right == null) _right = CreateEdge("Right");
+        }
+
+        Image CreateEdge(string name)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            go.transform.SetParent(transform, false);
+            var img = go.GetComponent<Image>();
+            img.raycastTarget = false;
+            return img;
+        }
+
+        void ApplyLook()
+        {
+            if (_sourceNineSlice == null) return;
+            // Build sub-sprites for edges from the 9-slice source using its border rect
+            var b = _sourceNineSlice.border; // L,R,T,B (pixels in source texture units)
+            var rect = _sourceNineSlice.rect;
+            var tex = _sourceNineSlice.texture;
+            var ppu = _sourceNineSlice.pixelsPerUnit;
+
+            // Top strip
+            _top.sprite = Sprite.Create(tex, new Rect(rect.x, rect.yMax - b.z, rect.width, b.z), new Vector2(0.5f, 1f), ppu, 0, SpriteMeshType.FullRect);
+            // Bottom strip
+            _bottom.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, rect.width, b.w), new Vector2(0.5f, 0f), ppu, 0, SpriteMeshType.FullRect);
+            // Left strip
+            _left.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, b.x, rect.height), new Vector2(0f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
+            // Right strip
+            _right.sprite = Sprite.Create(tex, new Rect(rect.xMax - b.y, rect.y, b.y, rect.height), new Vector2(1f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
+
+            _top.color = _bottom.color = _left.color = _right.color = _tint;
+
+            _top.type = _bottom.type = _left.type = _right.type = Image.Type.Tiled;
+            _top.preserveAspect = _bottom.preserveAspect = _left.preserveAspect = _right.preserveAspect = false;
+        }
+
+        float PixelsToUnits(float px)
+        {
+            if (_canvas == null) _canvas = GetComponentInParent<Canvas>();
+            float refPPU = (_canvas != null && _canvas.referencePixelsPerUnit > 0f) ? _canvas.referencePixelsPerUnit : 100f;
+            float scale = (_canvas != null && _canvas.scaleFactor > 0f) ? _canvas.scaleFactor : 1f;
+            return px / (refPPU * scale);
+        }
+
+        void LayoutNow()
+        {
+            if (_rt == null) _rt = GetComponent<RectTransform>();
+            if (_rt == null || _top == null) return;
+
+            float t = Mathf.Max(0.0f, _targetBorderPx);
+            float u = PixelsToUnits(t);
+
+            // Top
+            var trt = _top.rectTransform;
+            trt.anchorMin = new Vector2(0f, 1f);
+            trt.anchorMax = new Vector2(1f, 1f);
+            trt.pivot = new Vector2(0.5f, 1f);
+            trt.anchoredPosition = Vector2.zero;
+            trt.sizeDelta = new Vector2(0f, u);
+
+            // Bottom
+            var brt = _bottom.rectTransform;
+            brt.anchorMin = new Vector2(0f, 0f);
+            brt.anchorMax = new Vector2(1f, 0f);
+            brt.pivot = new Vector2(0.5f, 0f);
+            brt.anchoredPosition = Vector2.zero;
+            brt.sizeDelta = new Vector2(0f, u);
+
+            // Left
+            var lrt = _left.rectTransform;
+            lrt.anchorMin = new Vector2(0f, 0f);
+            lrt.anchorMax = new Vector2(0f, 1f);
+            lrt.pivot = new Vector2(0f, 0.5f);
+            lrt.anchoredPosition = Vector2.zero;
+            lrt.sizeDelta = new Vector2(u, 0f);
+
+            // Right
+            var rrt = _right.rectTransform;
+            rrt.anchorMin = new Vector2(1f, 0f);
+            rrt.anchorMax = new Vector2(1f, 1f);
+            rrt.pivot = new Vector2(1f, 0.5f);
+            rrt.anchoredPosition = Vector2.zero;
+            rrt.sizeDelta = new Vector2(u, 0f);
+        }
     }
 }
 
