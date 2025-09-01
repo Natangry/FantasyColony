@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using FantasyColony.UI.Style;
 using System;
 
@@ -244,15 +243,5 @@ namespace FantasyColony.UI.Widgets
             return img;
         }
 
-        private static Color Multiply(Color c, float f) => new Color(c.r * f, c.g * f, c.b * f, c.a);
-
-        private static void ClearSelectionIfMouseClick()
-        {
-            var es = EventSystem.current;
-            if (es != null && Input.mousePresent)
-            {
-                es.SetSelectedGameObject(null);
-            }
-        }
     }
 }

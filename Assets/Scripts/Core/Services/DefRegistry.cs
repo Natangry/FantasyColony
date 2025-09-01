@@ -26,8 +26,9 @@ namespace FantasyColony.Core.Services {
                 inner = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
                 _map[type] = inner;
             }
+            var isNew = !inner.ContainsKey(id);
             inner[id] = new Entry { Type = type, Id = id, Path = filePath ?? string.Empty, ModId = modId };
-            Count++;
+            if (isNew) Count++;
         }
 
         // Legacy Add signature for backward compatibility

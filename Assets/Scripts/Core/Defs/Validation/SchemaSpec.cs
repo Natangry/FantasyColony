@@ -25,6 +25,8 @@ namespace FantasyColony.Core.Defs.Validation {
         public int min;          // numeric bounds (optional)
         public int max;
         public int minLength;    // for string
+        [NonSerialized] public bool hasMin; // runtime: whether 'min' was present in JSON
+        [NonSerialized] public bool hasMax; // runtime: whether 'max' was present in JSON
         public string @default;  // optional default as text
     }
 }

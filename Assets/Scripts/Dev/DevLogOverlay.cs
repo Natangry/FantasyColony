@@ -475,32 +475,6 @@ public class DevLogOverlay : MonoBehaviour
     }
 }
 
-// Helper component to make it trivial to wire a UI Button to the overlay
-// Attach to your "Log" Button (UnityEngine.UI.Button). It will toggle the Dev Log when clicked.
-namespace DevTools
-{
-    using UnityEngine.UI;
-    using UnityEngine;
-
-    [RequireComponent(typeof(Button))]
-    public class OpenDevLogButton : MonoBehaviour
-    {
-        public Button button;
-
-        private void Reset()
-        {
-            if (button == null) button = GetComponent<Button>();
-        }
-
-        private void Awake()
-        {
-            if (button == null) button = GetComponent<Button>();
-            if (button != null)
-                button.onClick.AddListener(DevLogOverlay.ToggleVisible);
-        }
-    }
-}
-
 // Optional convenience for code callers (e.g., MainMenuScreen) without adding compile-time dependency on UnityEngine.UI
 public static class DevLog
 {

@@ -58,6 +58,23 @@ namespace FantasyColony.Core.Defs.Validation {
                 var json = File.ReadAllText(path);
                 var spec = JsonUtility.FromJson<SchemaSpec>(json);
                 if (spec == null || string.IsNullOrEmpty(spec.type) || spec.version <= 0) return;
+
+                // Mark presence of numeric bounds so zero is enforceable
+                try {
+                    if (spec.fields != null) {
+                        foreach (var fs in spec.fields) {
+                            if (string.IsNullOrEmpty(fs.name)) continue;
+                            var nameEsc = System.Text.RegularExpressions.Regex.Escape(fs.name);
+                            var rx = new System.Text.RegularExpressions.Regex("{[^{}]*\\\"name\\\"\\s*:\\s*\\\"" + nameEsc + "\\\"[^{}]*}", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+                            var m = rx.Match(json);
+                            if (m.Success) {
+                                var slice = m.Value;
+                                fs.hasMin = slice.Contains("\\\"min\\\"");
+                                fs.hasMax = slice.Contains("\\\"max\\\"");
+                            }
+                        }
+                    }
+                } catch { /* best-effort; missing flags default to false */ }
                 var tkey = spec.type;
                 if (!_map.TryGetValue(tkey, out var byVer)) _map[tkey] = byVer = new Dictionary<int, SchemaSpec>();
                 // First-in wins; later duplicates are ignored but warned

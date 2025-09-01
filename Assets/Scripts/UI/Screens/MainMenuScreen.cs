@@ -1,7 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
 // using DevTools; // not required; DevLogOverlay is in the global namespace
-using System;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
 using FantasyColony.UI.Style;
@@ -96,22 +94,13 @@ namespace FantasyColony.UI.Screens
             });
         }
 
-        private void RestartGame()
-        {
-            // (Old direct restart path retained for reference; unused now)
-            Time.timeScale = 1f;
-            UIRouter.Current?.ResetTo<MainMenuScreen>();
-            Resources.UnloadUnusedAssets();
-            System.GC.Collect();
-        }
-
         private void QuitGame()
         {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.ExitPlaymode();
-        #else
+#else
             Application.Quit();
-        #endif
+#endif
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
