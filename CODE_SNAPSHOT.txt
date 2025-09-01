@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 06:11:49 UTC
+_Updated_: 2025-09-01 06:20:44 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3087,7 +3087,7 @@ namespace FantasyColony.UI.Style
         public const string DarkBorder9SPath = "ui/sprites/9slice/border_dark_9s";
 
         // Toggle: grayscale the wood tile before tinting (for faithful palette hues)
-        public const bool UseGrayscaleTint = true;
+        public static bool UseGrayscaleTint = true; // static (not const) to avoid unreachable-code folding
 
         // Desired on-screen border thickness in device pixels for sliced borders
         // This single value controls both panels and buttons.
@@ -3197,10 +3197,10 @@ namespace FantasyColony.UI.Util
 // ===== FILE: Assets/Scripts/UI/Widgets/UIFactory.cs =====
 using UnityEngine;
 using UnityEngine.UI;
-using FantasyColony.UI.Style;
 using System;
+using FantasyColony; // for GetHierarchyPath()
+using FantasyColony.UI.Style;
 using FantasyColony.UI.Util;
-using FantasyColony; // for Transform.GetHierarchyPath extension
 using TintTheme = FantasyColony.UI.Style.BaseUIStyle.TintTheme;
 
 namespace FantasyColony.UI.Widgets
@@ -3249,9 +3249,7 @@ namespace FantasyColony.UI.Widgets
                 return; // use default
             var mat = GetGrayscaleTintMaterial();
             if (mat == null) return;
-            // assign both to avoid fallback in some batching paths
             img.material = mat;
-            img.sharedMaterial = mat;
             img.SetMaterialDirty();
 #if UNITY_EDITOR
             // Verify what actually renders
