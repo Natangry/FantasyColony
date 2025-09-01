@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 09:22:24 UTC
+_Updated_: 2025-09-01 09:35:52 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3088,6 +3088,14 @@ namespace FantasyColony.UI.Screens
         private RectTransform _scriptContent;
         private RectTransform _defsContent;
 
+        // Flexible height weights for header/content rows
+        private const float H_HEADER = 1f;
+        private const float H_CONTENT = 5f;
+        // Column widths are ratio-only; the board HLG will distribute the remaining width
+        private const float LEFT_RATIO = 1.0f;
+        private const float CENTER_RATIO = 2.2f;
+        private const float RIGHT_RATIO = 0.8f;
+
         private const float LeftWidth = 380f;
         private const float RightWidth = 320f;
         // Selection state
@@ -3096,35 +3104,48 @@ namespace FantasyColony.UI.Screens
         public void Enter(Transform parent)
         {
 
-            // Root container (stretches to parent)
-            _root = CreateUIObject("ModsScreenRoot", parent).GetComponent<RectTransform>();
+            _root = CreateUIObject("ModsScreenRoot", parent);
             Stretch(_root);
+            // Full-screen board
+            var board = UIFactory.CreateBoardScreen(_root, padding:32, spacing:0); // spacing=0 so equalities hold exactly
 
-            // Use new board helpers
-            var board = UIFactory.CreateBoardScreen(_root, padding:32, spacing:16);
-            var trio = UIFactory.CreateThreeColumnBoard(board.Content, leftWidth:380f, rightWidth:320f, joinDecor:true);
+            // Top-level three columns; use flexible weights to satisfy w1 + w4 + w6 = screenWidth
+            var left = UIFactory.CreateColumn(board.Content, "Left",  preferredWidth: -1, flexibleWidth: LEFT_RATIO);
+            var center= UIFactory.CreateColumn(board.Content, "Center",preferredWidth: -1, flexibleWidth: CENTER_RATIO);
+            var right = UIFactory.CreateColumn(board.Content, "Right", preferredWidth: -1, flexibleWidth: RIGHT_RATIO);
+            UIFactory.JoinHorizontal(left, center);
+            UIFactory.JoinHorizontal(center, right);
 
             // LEFT COLUMN
-            _leftColumn = trio.left;
+            _leftColumn = left;
+            UIFactory.SetPanelDecorVisible(_leftColumn, true);
             var leftLE = _leftColumn.GetComponent<LayoutElement>() ?? _leftColumn.gameObject.AddComponent<LayoutElement>();
-            leftLE.preferredWidth = LeftWidth; // fixed width column
-            leftLE.minWidth = LeftWidth - 60f;
-            leftLE.flexibleWidth = 0f; // fixed width column
-            // Panel already has a VerticalLayoutGroup from UIFactory; adjust its spacing/padding if needed
+            leftLE.preferredWidth = -1f;   // use ratio
+            leftLE.flexibleWidth = LEFT_RATIO;
+
             var leftVL = _leftColumn.GetComponent<VerticalLayoutGroup>();
             if (leftVL != null)
             {
-                leftVL.spacing = 12f;
+                leftVL.spacing = 0; // to honor exact equalities; inner panels have their own padding
                 leftVL.padding = new RectOffset(12, 12, 12, 12);
-                leftVL.childControlHeight = false;
-                leftVL.childForceExpandHeight = false;
+                leftVL.childControlHeight = true;
+                leftVL.childForceExpandHeight = true;
             }
 
-            // Left title: "Mods"
-            CreateHeaderLabel(_leftColumn, "Mods");
+            // Panel #1 (header)
+            var p1 = UIFactory.CreatePanelSurface(_leftColumn, "P1_Header");
+            var p1LE = p1.GetComponent<LayoutElement>() ?? p1.gameObject.AddComponent<LayoutElement>();
+            p1LE.flexibleHeight = H_HEADER; // h1
+            BuildLeftHeader(p1);
 
-            // Search + Sort row
-            var leftControls = CreateUIObject("LeftControls", _leftColumn).GetComponent<RectTransform>();
+            // Row for #2 and #3 (equal widths)
+            var row23 = CreateUIObject("Row23", _leftColumn);
+            var row23HL = row23.gameObject.AddComponent<HorizontalLayoutGroup>();
+            row23HL.spacing = 0; row23HL.childForceExpandWidth = true; row23HL.childForceExpandHeight = true;
+            var row23LE = row23.gameObject.AddComponent<LayoutElement>();
+            row23LE.flexibleHeight = H_CONTENT; // this enforces h2 = h3 = h5 later
+
+            var leftControls = CreateUIObject("LeftControls", p1);
             var lcHL = leftControls.gameObject.AddComponent<HorizontalLayoutGroup>();
             lcHL.childAlignment = TextAnchor.MiddleLeft;
             lcHL.spacing = 8f;
@@ -3137,30 +3158,40 @@ namespace FantasyColony.UI.Screens
 
             UIFactory.CreateButtonSecondary(leftControls, "Sort", () => { /* TODO: sort menu */ });
 
-            // Inactive list panel
-            _inactiveListContent = CreateTitledScrollPanel_Styled(_leftColumn, "inactive mod list");
+            // Panel #2 (inactive) – half width of #1
+            var p2 = UIFactory.CreatePanelSurface(row23, "P2_Inactive");
+            var p2LE = p2.GetComponent<LayoutElement>() ?? p2.gameObject.AddComponent<LayoutElement>();
+            p2LE.flexibleWidth = 1; // w2
+            _inactiveListContent = CreateTitledScrollPanel_Styled(p2, "inactive mod list");
             CreateEmptyState(_inactiveListContent, "No inactive mods");
 
-            // Active list panel
-            _activeListContent = CreateTitledScrollPanel_Styled(_leftColumn, "active mod list");
+            // Panel #3 (active) – equals #2
+            var p3 = UIFactory.CreatePanelSurface(row23, "P3_Active");
+            var p3LE = p3.GetComponent<LayoutElement>() ?? p3.gameObject.AddComponent<LayoutElement>();
+            p3LE.flexibleWidth = 1; // w3, ensures w2 = w3 and w2 + w3 = w1
+            _activeListContent = CreateTitledScrollPanel_Styled(p3, "active mod list");
             CreateEmptyState(_activeListContent, "No active mods");
 
             // CENTER COLUMN (snapshot)
-            _centerColumn = trio.center;
+            _centerColumn = center;
+            UIFactory.SetPanelDecorVisible(_centerColumn, true);
             var centerLE = _centerColumn.GetComponent<LayoutElement>() ?? _centerColumn.gameObject.AddComponent<LayoutElement>();
-            centerLE.preferredWidth = -1f; // let layout decide
-            centerLE.flexibleWidth = 1f;  // flexible middle column
+            centerLE.preferredWidth = -1f; // use ratio
+            centerLE.flexibleWidth = CENTER_RATIO;  // flexible middle column
             var centerVL = _centerColumn.GetComponent<VerticalLayoutGroup>();
             if (centerVL != null)
             {
-                centerVL.spacing = 12f;
+                centerVL.spacing = 0;
                 centerVL.padding = new RectOffset(12, 12, 12, 12);
-                centerVL.childControlHeight = false;
-                centerVL.childForceExpandHeight = false;
+                centerVL.childControlHeight = true;
+                centerVL.childForceExpandHeight = true;
             }
 
-            // Center header row (Dynamic title + snapshot search)
-            var centerHeader = CreateUIObject("CenterHeader", _centerColumn).GetComponent<RectTransform>();
+            // Panel #4 (snapshot header)
+            var p4 = UIFactory.CreatePanelSurface(_centerColumn, "P4_SnapshotHeader");
+            var p4LE = p4.GetComponent<LayoutElement>() ?? p4.gameObject.AddComponent<LayoutElement>();
+            p4LE.flexibleHeight = H_HEADER; // h4 = h1
+            var centerHeader = CreateUIObject("CenterHeader", p4);
             var chHL = centerHeader.gameObject.AddComponent<HorizontalLayoutGroup>();
             chHL.childAlignment = TextAnchor.MiddleLeft;
             chHL.spacing = 8f;
@@ -3172,8 +3203,10 @@ namespace FantasyColony.UI.Screens
             var snapLE = _snapshotSearch.gameObject.AddComponent<LayoutElement>();
             snapLE.preferredWidth = 260f;
 
-            // Snapshot panel with foldouts
-            var snapshotPanel = UIFactory.CreatePanelSurface(_centerColumn, "SnapshotPanel");
+            // Panel #5 (snapshot content)
+            var snapshotPanel = UIFactory.CreatePanelSurface(_centerColumn, "P5_Snapshot");
+            var p5LE = snapshotPanel.GetComponent<LayoutElement>() ?? snapshotPanel.gameObject.AddComponent<LayoutElement>();
+            p5LE.flexibleHeight = H_CONTENT; // h5 = h2 = h3
             var spVL = snapshotPanel.GetComponent<VerticalLayoutGroup>();
             if (spVL != null)
             {
@@ -3190,18 +3223,18 @@ namespace FantasyColony.UI.Screens
             CreateDivider(_scriptContent);
             CreateDivider(_scriptContent);
             CreateDivider(_scriptContent);
-
+            UIFactory.CreateRuleHorizontal(snapshotPanel, 2f, 0.7f); // visual break inside panel #5 (this is 5b)
             CreateFoldout(snapshotPanel, "defs +", out _defsContent);
             CreateDivider(_defsContent);
             CreateDivider(_defsContent);
             CreateDivider(_defsContent);
 
             // RIGHT COLUMN (actions)
-            _rightColumn = trio.right;
+            _rightColumn = right;
+            UIFactory.SetPanelDecorVisible(_rightColumn, true);
             var rightLE = _rightColumn.GetComponent<LayoutElement>() ?? _rightColumn.gameObject.AddComponent<LayoutElement>();
-            rightLE.preferredWidth = RightWidth;
-            rightLE.minWidth = RightWidth - 60f;
-            rightLE.flexibleWidth = 0f; // fixed width column
+            rightLE.preferredWidth = -1f;
+            rightLE.flexibleWidth = RIGHT_RATIO; // ratio-based right rail
             var rightVL = _rightColumn.GetComponent<VerticalLayoutGroup>();
             if (rightVL != null)
             {
@@ -3299,6 +3332,11 @@ namespace FantasyColony.UI.Screens
         private static Text CreateHeaderLabel(Transform parent, string text)
         {
             return CreateLabel(parent, text, 22, FontStyle.Bold, TextAnchor.MiddleLeft);
+        }
+
+        private void BuildLeftHeader(Transform parent)
+        {
+            CreateHeaderLabel(parent, "Mods");
         }
 
         private static Text CreateTitleLabel(Transform parent, string text)
@@ -3921,6 +3959,26 @@ namespace FantasyColony.UI.Widgets
         {
             SetPanelBorders(left,  left: true,  right: false, top: true, bottom: true);
             SetPanelBorders(right, left: false, right: true,  top: true, bottom: true);
+        }
+
+        /// <summary>
+        /// Themed horizontal rule for visual separation. Uses theme border tone.
+        /// </summary>
+        public static Image CreateRuleHorizontal(Transform parent, float thickness = 2f, float alpha = 0.65f)
+        {
+            var rt = CreateUIObject("Rule_H", parent);
+            var img = rt.gameObject.AddComponent<Image>();
+            img.color = new Color(0f, 0f, 0f, alpha);
+            var le = rt.gameObject.AddComponent<LayoutElement>();
+            le.minHeight = thickness;
+            le.preferredHeight = thickness;
+            le.flexibleHeight = 0f;
+            // Stretch full width within its layout group
+            rt.anchorMin = new Vector2(0, 0.5f);
+            rt.anchorMax = new Vector2(1, 0.5f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            return img;
         }
 
         // PANEL (Textured wood fill + dark 9-slice border)
