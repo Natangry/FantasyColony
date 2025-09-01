@@ -33,8 +33,8 @@ namespace FantasyColony.Core
         private void Awake()
         {
             Instance = this;
+            // Frame pacing is controlled via vSync for desktop builds.
             QualitySettings.vSyncCount = 1;
-            // On desktop, let vSync drive frame pacing. Leave targetFrameRate unset (-1) unless vSync is disabled.
             Application.targetFrameRate = -1;
 
             _services = new ServiceRegistry();
@@ -42,6 +42,8 @@ namespace FantasyColony.Core
             _services.Register<FCConfigService>(new FCDummyConfig());
             _services.Register<FCEventBus>(new FCSimpleEventBus());
             _services.Register<FCAssetProvider>(new FCResourcesProvider());
+            // Make AudioService discoverable via the registry
+            _services.Register<AudioService>(AudioService.Instance);
 
             // Create UI root (Canvas + EventSystem)
             _uiRoot = UIRoot.Create(transform);

@@ -92,6 +92,11 @@ namespace FantasyColony.Boot {
                 var errors = new List<DefError>();
                 XmlDefLoader.Load(ctx.Mods, ctx.Defs, errors);
                 if (errors.Count > 0) warn = $"Defs loaded with {errors.Count} issues. See log.";
+                // Surface mod override conflicts in the boot report
+                if (ctx.Defs.ConflictCount > 0) {
+                    var note = $"Conflicts={ctx.Defs.ConflictCount}";
+                    warn = string.IsNullOrEmpty(warn) ? note : ($"{warn} | {note}");
+                }
                 Debug.Log($"Defs loaded. Count={ctx.Defs.Count}");
             } catch (Exception e) { warn = $"Def loading failed (lenient): {e.Message}"; Debug.LogWarning(warn); }
             ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, warn, null);
@@ -154,7 +159,15 @@ namespace FantasyColony.Boot {
         public IEnumerator Execute(BootContext ctx) {
             var t0 = Time.realtimeSinceStartup;
             // Placeholder for future warmups
+            // If Addressables is enabled, initialize it early to avoid first-use hitching
+#if ADDRESSABLES
+            try {
+                var handle = UnityEngine.AddressableAssets.Addressables.InitializeAsync();
+                yield return handle;
+            } catch { /* swallow; fail-soft */ }
+#else
             yield return null;
+#endif
             ctx.Report?.Add(Title, Time.realtimeSinceStartup - t0, null, null);
         }
     }
