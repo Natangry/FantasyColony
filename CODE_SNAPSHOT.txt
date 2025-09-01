@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-01 07:51:28 UTC
+_Updated_: 2025-09-01 07:53:43 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3457,6 +3457,7 @@ namespace FantasyColony.UI.Screens
 
             // Content
             content = CreatePanelSurface(parent, title + "_Content");
+            var localContent = content;
             var vl = content.gameObject.AddComponent<VerticalLayoutGroup>();
             vl.childControlWidth = true;
             vl.childControlHeight = false;
@@ -3472,7 +3473,7 @@ namespace FantasyColony.UI.Screens
             btn.onClick.AddListener(() =>
             {
                 expanded = !expanded;
-                content.gameObject.SetActive(expanded);
+                localContent.gameObject.SetActive(expanded);
                 plusMinus.text = expanded ? "–" : "+";
             });
         }
