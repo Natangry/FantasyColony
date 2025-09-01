@@ -53,9 +53,9 @@ namespace FantasyColony.UI.Screens
             var board = UIFactory.CreateBoardScreen(_root, padding:32, spacing:0); // spacing=0 so equalities hold exactly
 
             // Top-level three columns; use flexible weights to satisfy w1 + w4 + w6 = screenWidth
-            var left = UIFactory.CreateColumn(board.Content, "Left",  preferredWidth: -1, flexibleWidth: LEFT_RATIO);
-            var center= UIFactory.CreateColumn(board.Content, "Center",preferredWidth: -1, flexibleWidth: CENTER_RATIO);
-            var right = UIFactory.CreateColumn(board.Content, "Right", preferredWidth: -1, flexibleWidth: RIGHT_RATIO);
+            var left = UIFactory.CreateColumn(board.Content, "Left",  preferredWidth: -1, flexibleWidth: LEFT_RATIO).GetComponent<RectTransform>();
+            var center= UIFactory.CreateColumn(board.Content, "Center",preferredWidth: -1, flexibleWidth: CENTER_RATIO).GetComponent<RectTransform>();
+            var right = UIFactory.CreateColumn(board.Content, "Right", preferredWidth: -1, flexibleWidth: RIGHT_RATIO).GetComponent<RectTransform>();
             UIFactory.JoinHorizontal(left, center);
             UIFactory.JoinHorizontal(center, right);
 
@@ -76,7 +76,7 @@ namespace FantasyColony.UI.Screens
             }
 
             // Panel #1 (header)
-            var p1 = UIFactory.CreatePanelSurface(_leftColumn, "P1_Header");
+            var p1 = UIFactory.CreatePanelSurface(_leftColumn, "P1_Header").GetComponent<RectTransform>();
             var p1LE = p1.GetComponent<LayoutElement>() ?? p1.gameObject.AddComponent<LayoutElement>();
             p1LE.flexibleHeight = H_HEADER; // h1
             BuildLeftHeader(p1);
@@ -102,14 +102,14 @@ namespace FantasyColony.UI.Screens
             UIFactory.CreateButtonSecondary(leftControls, "Sort", () => { /* TODO: sort menu */ });
 
             // Panel #2 (inactive) – half width of #1
-            var p2 = UIFactory.CreatePanelSurface(row23, "P2_Inactive");
+            var p2 = UIFactory.CreatePanelSurface(row23, "P2_Inactive").GetComponent<RectTransform>();
             var p2LE = p2.GetComponent<LayoutElement>() ?? p2.gameObject.AddComponent<LayoutElement>();
             p2LE.flexibleWidth = 1; // w2
             _inactiveListContent = CreateTitledScrollPanel_Styled(p2, "inactive mod list");
             CreateEmptyState(_inactiveListContent, "No inactive mods");
 
             // Panel #3 (active) – equals #2
-            var p3 = UIFactory.CreatePanelSurface(row23, "P3_Active");
+            var p3 = UIFactory.CreatePanelSurface(row23, "P3_Active").GetComponent<RectTransform>();
             var p3LE = p3.GetComponent<LayoutElement>() ?? p3.gameObject.AddComponent<LayoutElement>();
             p3LE.flexibleWidth = 1; // w3, ensures w2 = w3 and w2 + w3 = w1
             _activeListContent = CreateTitledScrollPanel_Styled(p3, "active mod list");
@@ -131,7 +131,7 @@ namespace FantasyColony.UI.Screens
             }
 
             // Panel #4 (snapshot header)
-            var p4 = UIFactory.CreatePanelSurface(_centerColumn, "P4_SnapshotHeader");
+            var p4 = UIFactory.CreatePanelSurface(_centerColumn, "P4_SnapshotHeader").GetComponent<RectTransform>();
             var p4LE = p4.GetComponent<LayoutElement>() ?? p4.gameObject.AddComponent<LayoutElement>();
             p4LE.flexibleHeight = H_HEADER; // h4 = h1
             var centerHeader = CreateUIObject("CenterHeader", p4);
@@ -147,7 +147,7 @@ namespace FantasyColony.UI.Screens
             snapLE.preferredWidth = 260f;
 
             // Panel #5 (snapshot content)
-            var snapshotPanel = UIFactory.CreatePanelSurface(_centerColumn, "P5_Snapshot");
+            var snapshotPanel = UIFactory.CreatePanelSurface(_centerColumn, "P5_Snapshot").GetComponent<RectTransform>();
             var p5LE = snapshotPanel.GetComponent<LayoutElement>() ?? snapshotPanel.gameObject.AddComponent<LayoutElement>();
             p5LE.flexibleHeight = H_CONTENT; // h5 = h2 = h3
             var spVL = snapshotPanel.GetComponent<VerticalLayoutGroup>();
