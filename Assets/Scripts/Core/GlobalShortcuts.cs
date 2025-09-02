@@ -37,24 +37,29 @@ namespace FantasyColony.Core {
                 else Debug.LogWarning("[GlobalShortcuts] No UIRouter available to open Boot Report.");
             }
 
-            // Open UI Creator (F10)
-            bool openCreator = false;
+            // Toggle UI Creator (F10)
+            bool toggleCreator = false;
 #if ENABLE_INPUT_SYSTEM
             var kb2 = Keyboard.current;
-            if (kb2 != null && kb2.f10Key.wasPressedThisFrame) openCreator = true;
+            if (kb2 != null && kb2.f10Key.wasPressedThisFrame) toggleCreator = true;
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER
-            if (!openCreator && UnityEngine.Input.GetKeyDown(KeyCode.F10)) openCreator = true;
+            if (!toggleCreator && UnityEngine.Input.GetKeyDown(KeyCode.F10)) toggleCreator = true;
 #endif
-            if (openCreator) {
+            if (toggleCreator) {
                 var router = UIRouter.Current;
                 if (router == null) {
                     var host = AppHost.Instance;
                     router = host != null ? host.Router : null;
                 }
                 if (router != null) {
-                    Debug.Log("[UICreator] F10 pressed -> open Creator");
-                    router.Push(new UICreatorScreen());
+                    if (FantasyColony.UI.Screens.UICreatorScreen.IsOpen) {
+                        Debug.Log("[UICreator] F10 pressed -> close Creator");
+                        router.Pop();
+                    } else {
+                        Debug.Log("[UICreator] F10 pressed -> open Creator");
+                        router.Push(new FantasyColony.UI.Screens.UICreatorScreen());
+                    }
                 }
                 else Debug.LogWarning("[GlobalShortcuts] No UIRouter available to open UI Creator.");
             }

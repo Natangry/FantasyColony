@@ -12,6 +12,7 @@ namespace FantasyColony.UI.Screens
     /// </summary>
     public sealed class UICreatorScreen : IScreen
     {
+        public static bool IsOpen { get; private set; }
         private RectTransform _root;
 
         // Columns
@@ -19,10 +20,10 @@ namespace FantasyColony.UI.Screens
         private RectTransform _center;
         private RectTransform _right;
 
-        // Ratios for left/center/right widths (sum is arbitrary; layout normalizes)
-        private const float LEFT_RATIO = 0.9f;
-        private const float CENTER_RATIO = 2.2f;
-        private const float RIGHT_RATIO = 0.9f;
+        // Ratio weights (normalized by HorizontalLayoutGroup using flexible widths)
+        private const float LEFT_RATIO = 0.2f;
+        private const float CENTER_RATIO = 0.6f;
+        private const float RIGHT_RATIO = 0.2f;
 
         public void Enter(Transform parent)
         {
@@ -40,10 +41,13 @@ namespace FantasyColony.UI.Screens
             // Board: tiled wood background + padded content area
             var board = UIFactory.CreateBoardScreen(_root, padding: 24, spacing: 0);
 
+            // Main horizontal row to distribute columns by flexible width
+            var mainRow = UIFactory.CreateRow(board.Content, spacing: 8f);
+
             // Columns: Flexible surfaces joined to avoid double seams
-            _left  = UIFactory.CreateColumn(board.Content, "Palette", preferredWidth: -1, flexibleWidth: LEFT_RATIO).GetComponent<RectTransform>();
-            _center= UIFactory.CreateColumn(board.Content, "Canvas",  preferredWidth: -1, flexibleWidth: CENTER_RATIO).GetComponent<RectTransform>();
-            _right = UIFactory.CreateColumn(board.Content, "Inspector",preferredWidth: -1, flexibleWidth: RIGHT_RATIO).GetComponent<RectTransform>();
+            _left  = UIFactory.CreateColumn(mainRow, "Palette",  preferredWidth: -1, flexibleWidth: LEFT_RATIO).GetComponent<RectTransform>();
+            _center= UIFactory.CreateColumn(mainRow, "Canvas",   preferredWidth: -1, flexibleWidth: CENTER_RATIO).GetComponent<RectTransform>();
+            _right = UIFactory.CreateColumn(mainRow, "Inspector", preferredWidth: -1, flexibleWidth: RIGHT_RATIO).GetComponent<RectTransform>();
             UIFactory.JoinHorizontal(_left, _center);
             UIFactory.JoinHorizontal(_center, _right);
 
@@ -51,6 +55,11 @@ namespace FantasyColony.UI.Screens
             ConfigureColumn(_left,   padding: new RectOffset(12,12,12,12), spacing: 8f);
             ConfigureColumn(_center, padding: new RectOffset(12,12,12,12), spacing: 8f);
             ConfigureColumn(_right,  padding: new RectOffset(12,12,12,12), spacing: 8f);
+
+            // Minimum widths to prevent collapse at extreme resolutions
+            EnsureMinWidth(_left,   220f);
+            EnsureMinWidth(_center, 420f);
+            EnsureMinWidth(_right,  260f);
 
             // Headers
             CreateHeaderLabel(_left,   "Palette");
@@ -62,12 +71,14 @@ namespace FantasyColony.UI.Screens
             var closeBtn = UIFactory.CreateButtonSecondary(topRow, "Close", () => UIRouter.Current?.Pop());
             var le = closeBtn.GetComponent<LayoutElement>();
             if (le == null) le = closeBtn.gameObject.AddComponent<LayoutElement>();
-            le.preferredWidth = 120f;
+            le.preferredWidth = 160f;
 
             // Placeholders in each column (simple framed panels)
             UIFactory.CreatePanelSurface(_left, "PalettePanel");
             UIFactory.CreatePanelSurface(_center, "CanvasPanel");
             UIFactory.CreatePanelSurface(_right, "InspectorPanel");
+
+            IsOpen = true;
         }
 
         public void Exit()
@@ -78,6 +89,7 @@ namespace FantasyColony.UI.Screens
                 UnityObject.Destroy(_root.gameObject);
                 _root = null;
             }
+            IsOpen = false;
         }
 
         // --- helpers ---
@@ -90,6 +102,16 @@ namespace FantasyColony.UI.Screens
                 vl.spacing = spacing;
                 vl.childControlHeight = true;
                 vl.childForceExpandHeight = true;
+            }
+        }
+
+        private static void EnsureMinWidth(RectTransform col, float minWidth)
+        {
+            var le = col.GetComponent<LayoutElement>();
+            if (le == null) le = col.gameObject.AddComponent<LayoutElement>();
+            if (le != null)
+            {
+                if (le.minWidth < minWidth) le.minWidth = minWidth;
             }
         }
 
