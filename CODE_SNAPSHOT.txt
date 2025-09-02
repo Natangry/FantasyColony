@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-02 07:46:14 UTC
+_Updated_: 2025-09-02 07:57:32 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3578,16 +3578,25 @@ namespace FantasyColony.UI.Screens
 
             Debug.Log("[UICreator] Enter");
 
-            // Board: neutral dev look; padded content
+            // Board: neutral dev look; padded content for borders, but anchors must live under a layout-free layer.
             var board = UIFactory.CreateBoardScreen(_root, padding: 8, spacing: 0);
 
-            // Percent-height anchors for Toolbar/Stage
-            _toolbar = UIFactory.CreatePanelSurface(board.Content, "Toolbar");
-            _stage   = UIFactory.CreatePanelSurface(board.Content, "CanvasStage");
+            // Create a layout-free absolute layer under BoardRoot to host anchor-based regions
+            var absGO = new GameObject("AbsoluteLayer", typeof(RectTransform));
+            var absRT = absGO.GetComponent<RectTransform>();
+            absRT.SetParent(board.Root, false);
+            absRT.anchorMin = Vector2.zero;
+            absRT.anchorMax = Vector2.one;
+            absRT.offsetMin = Vector2.zero;
+            absRT.offsetMax = Vector2.zero;
+
+            // Percent-height anchors for Toolbar/Stage (under the absolute, layout-free layer)
+            _toolbar = UIFactory.CreatePanelSurface(absRT, "Toolbar");
+            _stage   = UIFactory.CreatePanelSurface(absRT, "CanvasStage");
 
             // Anchors: toolbar = top 5% height, stage = remaining 95%
-            SetAnchorsPercent(_toolbar,   xMin:0f, xMax:1f, yMin:1f-TOOLBAR_FRAC, yMax:1f);
-            SetAnchorsPercent(_stage,     xMin:0f, xMax:1f, yMin:0f,              yMax:1f-TOOLBAR_FRAC);
+            SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f-TOOLBAR_FRAC, yMax:1f);
+            SetAnchorsPercent(_stage,   xMin:0f, xMax:1f, yMin:0f,              yMax:1f-TOOLBAR_FRAC);
 
             // --- Toolbar content: equal-width buttons across full width ---
             var bar = UIFactory.CreateRow(_toolbar, spacing: 0f);
