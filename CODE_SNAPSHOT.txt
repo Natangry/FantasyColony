@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-02 06:20:50 UTC
+_Updated_: 2025-09-02 06:31:15 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -4466,11 +4466,11 @@ namespace FantasyColony.UI.Widgets
 
             float px = Mathf.Max(0.0f, _targetBorderPx);
             if (_canvas == null) _canvas = GetComponentInParent<Canvas>();
-            float refPPU = (_canvas != null && _canvas.referencePixelsPerUnit > 0f) ? _canvas.referencePixelsPerUnit : 100f;
             float sf = (_canvas != null && _canvas.scaleFactor > 0f) ? _canvas.scaleFactor : 1f;
-            // Convert requested pixel thickness to local UI units so thickness is pixel-accurate across scalers.
-            float unitsPerPixel = 1f / (refPPU * sf);
-            float u = Mathf.Round(px) * unitsPerPixel;
+            // RectTransform sizes are specified in reference pixels. Under CanvasScaler.ScaleWithScreenSize,
+            // device pixels = reference pixels * scaleFactor. Therefore to get N device pixels of thickness,
+            // we set sizeDelta = N / scaleFactor. Do NOT include referencePixelsPerUnit here.
+            float u = Mathf.Round(px) / sf;
 
             // Top
             var trt = _top.rectTransform;
