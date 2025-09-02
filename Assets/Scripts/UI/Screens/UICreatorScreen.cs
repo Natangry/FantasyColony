@@ -48,7 +48,13 @@ namespace FantasyColony.UI.Screens
 
             // Percent-height anchors for Toolbar/Stage (under the absolute, layout-free layer)
             _toolbar = UIFactory.CreatePanelSurface(absRT, "Toolbar");
-            _stage   = UIFactory.CreatePanelSurface(absRT, "CanvasStage");
+            // Stage should be a BLANK area (no frame/joins) — use a plain Image with no raycast
+            var stageGO = new GameObject("CanvasStage", typeof(RectTransform));
+            _stage = stageGO.GetComponent<RectTransform>();
+            _stage.SetParent(absRT, false);
+            var stageImg = stageGO.AddComponent<Image>();
+            stageImg.color = new Color(0f, 0f, 0f, 0f); // transparent
+            stageImg.raycastTarget = false;
 
             // Anchors: toolbar = top 5% height, stage = remaining 95%
             SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f-TOOLBAR_FRAC, yMax:1f);
@@ -67,16 +73,13 @@ namespace FantasyColony.UI.Screens
                 hl.childAlignment = TextAnchor.MiddleCenter;
             }
 
-            // Create equal-width buttons (width/N)
+            // Create equal-width buttons (width/N) with text best-fit
             CreateFlexMenuButton(bar, "File",  () => {});
             CreateFlexMenuButton(bar, "Edit",  () => {});
             CreateFlexMenuButton(bar, "View",  () => {});
             CreateFlexMenuButton(bar, "Tools", () => {});
             CreateFlexMenuButton(bar, "Help",  () => {});
             CreateFlexMenuButton(bar, "Close", () => UIRouter.Current?.Pop());
-
-            // Stage: remove header for blank area and ensure it fills
-            RemoveHeaderIfExists(_stage);
 
             IsOpen = true;
         }
@@ -93,13 +96,21 @@ namespace FantasyColony.UI.Screens
         }
 
         // --- helpers ---
-        private static Button CreateFlexMenuButton(Transform parent, string label, Action onClick)
+        private static void CreateFlexMenuButton(Transform parent, string label, Action onClick)
         {
-            var btn = UIFactory.CreateButtonSecondary(parent, label, onClick);
+            var btn = UIFactory.CreateButtonPrimary(parent, label, onClick);
             var le = btn.GetComponent<LayoutElement>() ?? btn.gameObject.AddComponent<LayoutElement>();
-            le.flexibleWidth = 1f;
             le.minWidth = 0f;
-            return btn;
+            le.preferredWidth = 0f;
+            le.flexibleWidth = 1f; // Equal slice of the row
+
+            var txt = btn.GetComponentInChildren<Text>();
+            if (txt != null)
+            {
+                txt.resizeTextForBestFit = true;
+                txt.resizeTextMinSize = 12;
+                txt.resizeTextMaxSize = 28;
+            }
         }
 
         private static void SetAnchorsPercent(RectTransform rt, float xMin, float xMax, float yMin, float yMax)
