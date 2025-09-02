@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 namespace FantasyColony.Core {
     /// <summary>
     /// Lightweight global hotkeys available in all builds.
-    /// Currently: F9 opens the Boot Report screen.
+    /// F9: Boot Report  |  F10: UI Creator (stub)
     /// </summary>
     public sealed class GlobalShortcuts : MonoBehaviour {
         private void Awake() {
@@ -17,7 +17,7 @@ namespace FantasyColony.Core {
         }
 
         private void Update() {
-            // Open Boot Report
+            // Open Boot Report (F9)
             bool pressed = false;
 #if ENABLE_INPUT_SYSTEM
             var kb = Keyboard.current;
@@ -35,6 +35,28 @@ namespace FantasyColony.Core {
                 }
                 if (router != null) router.Push<BootReportScreen>();
                 else Debug.LogWarning("[GlobalShortcuts] No UIRouter available to open Boot Report.");
+            }
+
+            // Open UI Creator (F10)
+            bool openCreator = false;
+#if ENABLE_INPUT_SYSTEM
+            var kb2 = Keyboard.current;
+            if (kb2 != null && kb2.f10Key.wasPressedThisFrame) openCreator = true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (!openCreator && UnityEngine.Input.GetKeyDown(KeyCode.F10)) openCreator = true;
+#endif
+            if (openCreator) {
+                var router = UIRouter.Current;
+                if (router == null) {
+                    var host = AppHost.Instance;
+                    router = host != null ? host.Router : null;
+                }
+                if (router != null) {
+                    Debug.Log("[UICreator] F10 pressed -> open Creator");
+                    router.Push(new UICreatorScreen());
+                }
+                else Debug.LogWarning("[GlobalShortcuts] No UIRouter available to open UI Creator.");
             }
         }
     }
