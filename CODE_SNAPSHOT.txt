@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-02 07:32:47 UTC
+_Updated_: 2025-09-02 07:46:14 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3560,9 +3560,10 @@ namespace FantasyColony.UI.Screens
         public static bool IsOpen { get; private set; }
         private RectTransform _root;
 
-        // Program-window layout: top toolbar + large blank stage
+        // Program-window layout: Top toolbar (percent height) + large blank stage
         private RectTransform _toolbar;
         private RectTransform _stage;
+        private const float TOOLBAR_FRAC = 0.05f; // 5% of screen height
 
         public void Enter(Transform parent)
         {
@@ -3577,59 +3578,39 @@ namespace FantasyColony.UI.Screens
 
             Debug.Log("[UICreator] Enter");
 
-            // Board: tiled wood background + padded content area
-            var board = UIFactory.CreateBoardScreen(_root, padding: 24, spacing: 0);
+            // Board: neutral dev look; padded content
+            var board = UIFactory.CreateBoardScreen(_root, padding: 8, spacing: 0);
 
-            // Root vertical stack: Toolbar (fixed height) + Stage (fills remaining)
-            var rootCol = UIFactory.CreateCol(board.Content, spacing: 8f);
-            var rootVL = rootCol.GetComponent<UnityEngine.UI.VerticalLayoutGroup>();
-            if (rootVL != null)
-            {
-                rootVL.spacing = 8f;
-                rootVL.childControlHeight = true;
-                rootVL.childForceExpandHeight = true;
-                // Stretch children horizontally to full width of the board
-                rootVL.childControlWidth = true;
-                rootVL.childForceExpandWidth = true;
-            }
+            // Percent-height anchors for Toolbar/Stage
+            _toolbar = UIFactory.CreatePanelSurface(board.Content, "Toolbar");
+            _stage   = UIFactory.CreatePanelSurface(board.Content, "CanvasStage");
 
-            // --- Toolbar ---
-            _toolbar = UIFactory.CreatePanelSurface(rootCol, "Toolbar");
-            var tLe = _toolbar.gameObject.GetComponent<LayoutElement>() ?? _toolbar.gameObject.AddComponent<LayoutElement>();
-            tLe.minHeight = 40f; tLe.preferredHeight = 40f; tLe.flexibleHeight = 0f;
-            var bar = UIFactory.CreateRow(_toolbar, spacing: 8f);
-            // Ensure the row does NOT force-expand children horizontally; spacer will absorb extra space.
+            // Anchors: toolbar = top 5% height, stage = remaining 95%
+            SetAnchorsPercent(_toolbar,   xMin:0f, xMax:1f, yMin:1f-TOOLBAR_FRAC, yMax:1f);
+            SetAnchorsPercent(_stage,     xMin:0f, xMax:1f, yMin:0f,              yMax:1f-TOOLBAR_FRAC);
+
+            // --- Toolbar content: equal-width buttons across full width ---
+            var bar = UIFactory.CreateRow(_toolbar, spacing: 0f);
             var hl = bar.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
             if (hl != null)
             {
+                hl.padding = new RectOffset(0,0,0,0);
                 hl.childControlWidth = true;
-                hl.childForceExpandWidth = false;
+                hl.childForceExpandWidth = true; // divide width evenly via flexible widths
                 hl.childControlHeight = true;
-                hl.childForceExpandHeight = false;
-                hl.childAlignment = TextAnchor.MiddleLeft;
+                hl.childForceExpandHeight = true;
+                hl.childAlignment = TextAnchor.MiddleCenter;
             }
 
-            // Fixed-size menu buttons
-            CreateFixedMenuButton(bar, "File", 96f, null);
-            CreateFixedMenuButton(bar, "Edit", 96f, null);
-            CreateFixedMenuButton(bar, "View", 96f, null);
-            CreateFixedMenuButton(bar, "Tools", 96f, null);
-            CreateFixedMenuButton(bar, "Help", 96f, null);
+            // Create equal-width buttons (width/N)
+            CreateFlexMenuButton(bar, "File",  () => {});
+            CreateFlexMenuButton(bar, "Edit",  () => {});
+            CreateFlexMenuButton(bar, "View",  () => {});
+            CreateFlexMenuButton(bar, "Tools", () => {});
+            CreateFlexMenuButton(bar, "Help",  () => {});
+            CreateFlexMenuButton(bar, "Close", () => UIRouter.Current?.Pop());
 
-            // Spacer pushes Close to the right
-            CreateFlexSpacer(bar, 1f);
-
-            var closeBtn = UIFactory.CreateButtonSecondary(bar, "Close", () => UIRouter.Current?.Pop());
-            var closeLe = closeBtn.GetComponent<LayoutElement>();
-            if (closeLe == null) closeLe = closeBtn.gameObject.AddComponent<LayoutElement>();
-            closeLe.preferredWidth = 120f;
-            closeLe.flexibleWidth = 0f;
-
-            // --- Stage ---
-            _stage = UIFactory.CreatePanelSurface(rootCol, "CanvasStage");
-            var sLe = _stage.gameObject.GetComponent<LayoutElement>() ?? _stage.gameObject.AddComponent<LayoutElement>();
-            sLe.flexibleHeight = 1f; sLe.flexibleWidth = 1f; sLe.minWidth = 0f;
-            // Remove header label for a blank stage look
+            // Stage: remove header for blank area and ensure it fills
             RemoveHeaderIfExists(_stage);
 
             IsOpen = true;
@@ -3647,19 +3628,22 @@ namespace FantasyColony.UI.Screens
         }
 
         // --- helpers ---
-        private static Button CreateFixedMenuButton(Transform parent, string label, float width, Action onClick)
+        private static Button CreateFlexMenuButton(Transform parent, string label, Action onClick)
         {
             var btn = UIFactory.CreateButtonSecondary(parent, label, onClick);
             var le = btn.GetComponent<LayoutElement>() ?? btn.gameObject.AddComponent<LayoutElement>();
-            le.minWidth = width;
-            le.preferredWidth = width;
-            le.flexibleWidth = 0f;
+            le.flexibleWidth = 1f;
+            le.minWidth = 0f;
             return btn;
         }
 
-        private static void CreateFlexSpacer(Transform parent, float flex)
+        private static void SetAnchorsPercent(RectTransform rt, float xMin, float xMax, float yMin, float yMax)
         {
-            UIFactory.CreateSpacer(parent, flex);
+            if (rt == null) return;
+            rt.anchorMin = new Vector2(xMin, yMin);
+            rt.anchorMax = new Vector2(xMax, yMax);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
 
         private static void RemoveHeaderIfExists(RectTransform panel)
