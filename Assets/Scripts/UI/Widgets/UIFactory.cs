@@ -356,25 +356,46 @@ namespace FantasyColony.UI.Widgets
             }
         }
 
-        public static RectTransform CreateRow(Transform parent, float spacing = 8f, RectOffset padding = null)
+        public static RectTransform CreateRow(Transform parent, float spacing = 8f)
         {
-            var rt = CreateUIObject("Row", parent);
-            var lg = rt.gameObject.AddComponent<HorizontalLayoutGroup>();
-            lg.spacing = spacing;
-            lg.childForceExpandWidth = true;
-            lg.childForceExpandHeight = true;
-            lg.padding = padding ?? new RectOffset();
+            var row = new GameObject("Row", typeof(RectTransform));
+            var rt = row.GetComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            var h = row.AddComponent<HorizontalLayoutGroup>();
+            h.spacing = spacing;
+            h.padding = new RectOffset(0, 0, 0, 0);
+            h.childAlignment = TextAnchor.MiddleLeft;
+            h.childControlHeight = true;
+            h.childForceExpandHeight = true;
+            h.childControlWidth = true;
+            h.childForceExpandWidth = true;
             return rt;
         }
 
-        public static RectTransform CreateCol(Transform parent, float spacing = 8f, RectOffset padding = null)
+        public static RectTransform CreateCol(Transform parent, float spacing = 8f)
         {
-            var rt = CreateUIObject("Col", parent);
-            var lg = rt.gameObject.AddComponent<VerticalLayoutGroup>();
-            lg.spacing = spacing;
-            lg.childForceExpandWidth = true;
-            lg.childForceExpandHeight = true;
-            lg.padding = padding ?? new RectOffset();
+            var col = new GameObject("Col", typeof(RectTransform));
+            var rt = col.GetComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            var v = col.AddComponent<VerticalLayoutGroup>();
+            v.spacing = spacing;
+            v.padding = new RectOffset(0, 0, 0, 0);
+            v.childAlignment = TextAnchor.UpperLeft;
+            v.childControlHeight = true;
+            v.childForceExpandHeight = true;
+            v.childControlWidth = true;
+            v.childForceExpandWidth = true;
+            return rt;
+        }
+
+        public static RectTransform CreateSpacer(Transform parent, float flexW = 1f)
+        {
+            var go = new GameObject("Spacer", typeof(RectTransform));
+            var rt = go.GetComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            var le = go.AddComponent<LayoutElement>();
+            le.flexibleWidth = flexW;
+            le.minWidth = 0f;
             return rt;
         }
 

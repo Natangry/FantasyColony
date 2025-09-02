@@ -15,15 +15,9 @@ namespace FantasyColony.UI.Screens
         public static bool IsOpen { get; private set; }
         private RectTransform _root;
 
-        // Columns
-        private RectTransform _left;
-        private RectTransform _center;
-        private RectTransform _right;
-
-        // Ratio weights (normalized by HorizontalLayoutGroup using flexible widths)
-        private const float LEFT_RATIO = 0.2f;
-        private const float CENTER_RATIO = 0.6f;
-        private const float RIGHT_RATIO = 0.2f;
+        // Program-window layout: top toolbar + large blank stage
+        private RectTransform _toolbar;
+        private RectTransform _stage;
 
         public void Enter(Transform parent)
         {
@@ -41,42 +35,28 @@ namespace FantasyColony.UI.Screens
             // Board: tiled wood background + padded content area
             var board = UIFactory.CreateBoardScreen(_root, padding: 24, spacing: 0);
 
-            // Main horizontal row to distribute columns by flexible width
-            var mainRow = UIFactory.CreateRow(board.Content, spacing: 8f);
+            // Root vertical stack: Toolbar (fixed height) + Stage (fills remaining)
+            var rootCol = UIFactory.CreateCol(board.Content, spacing: 8f);
 
-            // Columns: Flexible surfaces joined to avoid double seams
-            _left  = UIFactory.CreateColumn(mainRow, "Palette",  preferredWidth: -1, flexibleWidth: LEFT_RATIO).GetComponent<RectTransform>();
-            _center= UIFactory.CreateColumn(mainRow, "Canvas",   preferredWidth: -1, flexibleWidth: CENTER_RATIO).GetComponent<RectTransform>();
-            _right = UIFactory.CreateColumn(mainRow, "Inspector", preferredWidth: -1, flexibleWidth: RIGHT_RATIO).GetComponent<RectTransform>();
-            UIFactory.JoinHorizontal(_left, _center);
-            UIFactory.JoinHorizontal(_center, _right);
+            // --- Toolbar ---
+            _toolbar = UIFactory.CreatePanelSurface(rootCol, "Toolbar");
+            var tLe = _toolbar.gameObject.GetComponent<LayoutElement>() ?? _toolbar.gameObject.AddComponent<LayoutElement>();
+            tLe.minHeight = 40f; tLe.preferredHeight = 40f; tLe.flexibleHeight = 0f;
+            var tRow = UIFactory.CreateRow(_toolbar, spacing: 8f);
+            // Simple buttons for now; dropdown menus come later
+            UIFactory.CreateButtonPrimary(tRow, "File",  () => Debug.Log("[UICreator] File menu"));
+            UIFactory.CreateButtonPrimary(tRow, "Edit",  () => Debug.Log("[UICreator] Edit menu"));
+            UIFactory.CreateButtonPrimary(tRow, "View",  () => Debug.Log("[UICreator] View menu"));
+            UIFactory.CreateButtonPrimary(tRow, "Tools", () => Debug.Log("[UICreator] Tools menu"));
+            UIFactory.CreateButtonPrimary(tRow, "Help",  () => Debug.Log("[UICreator] Help menu"));
+            // Spacer pushes Close to the far right
+            UIFactory.CreateSpacer(tRow, 1f);
+            UIFactory.CreateButtonSecondary(tRow, "Close", () => UIRouter.Current?.Pop());
 
-            // Configure columns (VerticalLayoutGroups already exist; do not add duplicates)
-            ConfigureColumn(_left,   padding: new RectOffset(12,12,12,12), spacing: 8f);
-            ConfigureColumn(_center, padding: new RectOffset(12,12,12,12), spacing: 8f);
-            ConfigureColumn(_right,  padding: new RectOffset(12,12,12,12), spacing: 8f);
-
-            // Minimum widths to prevent collapse at extreme resolutions
-            EnsureMinWidth(_left,   220f);
-            EnsureMinWidth(_center, 420f);
-            EnsureMinWidth(_right,  260f);
-
-            // Headers
-            CreateHeaderLabel(_left,   "Palette");
-            CreateHeaderLabel(_center, "Canvas");
-            CreateHeaderLabel(_right,  "Inspector");
-
-            // Right toolbar: Close button (also accessible via F10)
-            var topRow = UIFactory.CreateRow(_right, spacing: 8f);
-            var closeBtn = UIFactory.CreateButtonSecondary(topRow, "Close", () => UIRouter.Current?.Pop());
-            var le = closeBtn.GetComponent<LayoutElement>();
-            if (le == null) le = closeBtn.gameObject.AddComponent<LayoutElement>();
-            le.preferredWidth = 160f;
-
-            // Placeholders in each column (simple framed panels)
-            UIFactory.CreatePanelSurface(_left, "PalettePanel");
-            UIFactory.CreatePanelSurface(_center, "CanvasPanel");
-            UIFactory.CreatePanelSurface(_right, "InspectorPanel");
+            // --- Stage ---
+            _stage = UIFactory.CreatePanelSurface(rootCol, "CanvasStage");
+            var sLe = _stage.gameObject.GetComponent<LayoutElement>() ?? _stage.gameObject.AddComponent<LayoutElement>();
+            sLe.flexibleHeight = 1f; sLe.flexibleWidth = 1f; sLe.minHeight = 64f;
 
             IsOpen = true;
         }
