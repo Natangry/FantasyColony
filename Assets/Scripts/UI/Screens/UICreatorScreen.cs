@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router;
@@ -37,26 +38,55 @@ namespace FantasyColony.UI.Screens
 
             // Root vertical stack: Toolbar (fixed height) + Stage (fills remaining)
             var rootCol = UIFactory.CreateCol(board.Content, spacing: 8f);
+            var rootVL = rootCol.GetComponent<UnityEngine.UI.VerticalLayoutGroup>();
+            if (rootVL != null)
+            {
+                rootVL.spacing = 8f;
+                rootVL.childControlHeight = true;
+                rootVL.childForceExpandHeight = true;
+                // Stretch children horizontally to full width of the board
+                rootVL.childControlWidth = true;
+                rootVL.childForceExpandWidth = true;
+            }
 
             // --- Toolbar ---
             _toolbar = UIFactory.CreatePanelSurface(rootCol, "Toolbar");
             var tLe = _toolbar.gameObject.GetComponent<LayoutElement>() ?? _toolbar.gameObject.AddComponent<LayoutElement>();
             tLe.minHeight = 40f; tLe.preferredHeight = 40f; tLe.flexibleHeight = 0f;
-            var tRow = UIFactory.CreateRow(_toolbar, spacing: 8f);
-            // Simple buttons for now; dropdown menus come later
-            UIFactory.CreateButtonPrimary(tRow, "File",  () => Debug.Log("[UICreator] File menu"));
-            UIFactory.CreateButtonPrimary(tRow, "Edit",  () => Debug.Log("[UICreator] Edit menu"));
-            UIFactory.CreateButtonPrimary(tRow, "View",  () => Debug.Log("[UICreator] View menu"));
-            UIFactory.CreateButtonPrimary(tRow, "Tools", () => Debug.Log("[UICreator] Tools menu"));
-            UIFactory.CreateButtonPrimary(tRow, "Help",  () => Debug.Log("[UICreator] Help menu"));
-            // Spacer pushes Close to the far right
-            UIFactory.CreateSpacer(tRow, 1f);
-            UIFactory.CreateButtonSecondary(tRow, "Close", () => UIRouter.Current?.Pop());
+            var bar = UIFactory.CreateRow(_toolbar, spacing: 8f);
+            // Ensure the row does NOT force-expand children horizontally; spacer will absorb extra space.
+            var hl = bar.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+            if (hl != null)
+            {
+                hl.childControlWidth = true;
+                hl.childForceExpandWidth = false;
+                hl.childControlHeight = true;
+                hl.childForceExpandHeight = false;
+                hl.childAlignment = TextAnchor.MiddleLeft;
+            }
+
+            // Fixed-size menu buttons
+            CreateFixedMenuButton(bar, "File", 96f, null);
+            CreateFixedMenuButton(bar, "Edit", 96f, null);
+            CreateFixedMenuButton(bar, "View", 96f, null);
+            CreateFixedMenuButton(bar, "Tools", 96f, null);
+            CreateFixedMenuButton(bar, "Help", 96f, null);
+
+            // Spacer pushes Close to the right
+            CreateFlexSpacer(bar, 1f);
+
+            var closeBtn = UIFactory.CreateButtonSecondary(bar, "Close", () => UIRouter.Current?.Pop());
+            var closeLe = closeBtn.GetComponent<LayoutElement>();
+            if (closeLe == null) closeLe = closeBtn.gameObject.AddComponent<LayoutElement>();
+            closeLe.preferredWidth = 120f;
+            closeLe.flexibleWidth = 0f;
 
             // --- Stage ---
             _stage = UIFactory.CreatePanelSurface(rootCol, "CanvasStage");
             var sLe = _stage.gameObject.GetComponent<LayoutElement>() ?? _stage.gameObject.AddComponent<LayoutElement>();
-            sLe.flexibleHeight = 1f; sLe.flexibleWidth = 1f; sLe.minHeight = 64f;
+            sLe.flexibleHeight = 1f; sLe.flexibleWidth = 1f; sLe.minWidth = 0f;
+            // Remove header label for a blank stage look
+            RemoveHeaderIfExists(_stage);
 
             IsOpen = true;
         }
@@ -73,6 +103,31 @@ namespace FantasyColony.UI.Screens
         }
 
         // --- helpers ---
+        private static Button CreateFixedMenuButton(Transform parent, string label, float width, Action onClick)
+        {
+            var btn = UIFactory.CreateButtonSecondary(parent, label, onClick);
+            var le = btn.GetComponent<LayoutElement>() ?? btn.gameObject.AddComponent<LayoutElement>();
+            le.minWidth = width;
+            le.preferredWidth = width;
+            le.flexibleWidth = 0f;
+            return btn;
+        }
+
+        private static void CreateFlexSpacer(Transform parent, float flex)
+        {
+            UIFactory.CreateSpacer(parent, flex);
+        }
+
+        private static void RemoveHeaderIfExists(RectTransform panel)
+        {
+            if (panel == null) return;
+            var header = panel.Find("Header");
+            if (header != null)
+            {
+                UnityObject.Destroy(header.gameObject);
+            }
+        }
+
         private static void ConfigureColumn(RectTransform col, RectOffset padding, float spacing)
         {
             var vl = col.GetComponent<VerticalLayoutGroup>();
