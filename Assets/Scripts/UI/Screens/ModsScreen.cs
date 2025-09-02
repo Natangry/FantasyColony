@@ -360,7 +360,8 @@ namespace FantasyColony.UI.Screens
             mask.showMaskGraphic = false;
 
             var content = CreateUIObject("Content", viewport);
-            var layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            // The viewport content needs its own VerticalLayoutGroup; ensure only one per object.
+            var layout = content.GetComponent<VerticalLayoutGroup>() ?? content.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.childControlWidth = true;
             layout.childControlHeight = false;
             layout.childForceExpandWidth = true;
@@ -415,7 +416,8 @@ namespace FantasyColony.UI.Screens
             // Content
             content = UIFactory.CreatePanelSurface(parent, title + "_Content");
             var localContent = content;
-            var vl = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            // Avoid duplicate LayoutGroups: use existing or add if missing
+            var vl = content.GetComponent<VerticalLayoutGroup>() ?? content.gameObject.AddComponent<VerticalLayoutGroup>();
             vl.childControlWidth = true;
             vl.childControlHeight = false;
             vl.childForceExpandWidth = true;

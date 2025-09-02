@@ -273,7 +273,8 @@ namespace FantasyColony.UI.Widgets
         /// </summary>
         public static RectTransform CreateColumn(Transform parent, string name, float preferredWidth, float flexibleWidth, bool showFrame = true)
         {
-            var panel = CreatePanelSurface(parent, name);
+            // Columns are structural: they must fill their slot. Use Flexible sizing explicitly.
+            var panel = CreatePanelSurface(parent, name, sizing: PanelSizing.Flexible);
             SetPanelDecorVisible(panel, true);
             if (!showFrame) SetPanelBorders(panel, false, false, false, false);
 
@@ -596,23 +597,22 @@ namespace FantasyColony.UI.Widgets
             if (border) border.gameObject.SetActive(visible);
         }
 
-        // STACK CONTAINER (Bottom-right MenuPanel)
-        public static RectTransform CreateBottomRightStack(Transform parent, string name = "MenuPanel")
+        /// <summary>
+        /// Helper that creates a small bottom-right stacked panel (e.g., debug/info stack).
+        /// Shrinks vertically to content.
+        /// </summary>
+        public static RectTransform CreateBottomRightStack(Transform parent, string name = "BottomRightStack")
         {
-            var panel = CreatePanelSurface(parent, name);
-            panel.anchorMin = new Vector2(1, 0);
-            panel.anchorMax = new Vector2(1, 0);
-            panel.pivot = new Vector2(1, 0);
-            panel.anchoredPosition = new Vector2(-BaseUIStyle.EdgeOffset, BaseUIStyle.EdgeOffset);
-
-            var layout = panel.GetComponent<VerticalLayoutGroup>();
-            layout.childAlignment = TextAnchor.UpperCenter;
-
-            var le = panel.GetComponent<LayoutElement>();
-            if (le == null) le = panel.gameObject.AddComponent<LayoutElement>();
-            le.preferredWidth = 420;
-            le.flexibleWidth = 0;
-            return panel;
+            // Explicit AutoHeight so behavior does not depend on CreatePanelSurface defaults
+            var rt = CreatePanelSurface(parent, name, sizing: PanelSizing.AutoHeight);
+            var le = rt.GetComponent<LayoutElement>() ?? rt.gameObject.AddComponent<LayoutElement>();
+            le.flexibleWidth = 0f; le.flexibleHeight = 0f;
+            // Anchor to bottom-right
+            rt.anchorMin = new Vector2(1, 0);
+            rt.anchorMax = new Vector2(1, 0);
+            rt.pivot     = new Vector2(1, 0);
+            rt.anchoredPosition = new Vector2(-12, 12);
+            return rt;
         }
 
         // BACKGROUND IMAGE (full screen)
