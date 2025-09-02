@@ -30,7 +30,9 @@ namespace FantasyColony.UI.Root
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             // Ensure pixel-accurate rounding to avoid uneven 1px borders on sliced images
             canvas.pixelPerfect = true; // ScreenSpaceOverlay only
-            canvasGO.AddComponent<GraphicRaycaster>();
+            // Ensure a GraphicRaycaster exists
+            if (canvasGO.GetComponent<GraphicRaycaster>() == null)
+                canvasGO.AddComponent<GraphicRaycaster>();
 
             var scaler = canvasGO.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -46,23 +48,27 @@ namespace FantasyColony.UI.Root
             if (!hasEventSystem)
                 hasEventSystem = (FindObjectOfType<EventSystem>() != null);
 #endif
+            // Create or sanitize EventSystem + input module (exactly one module)
+            EventSystem esys = EventSystem.current;
             if (!hasEventSystem)
             {
-                // Create EventSystem and attach the correct UI input module
-                var es = new GameObject("EventSystem");
-                es.AddComponent<EventSystem>();
-#if ENABLE_INPUT_SYSTEM
-                if (es.GetComponent<InputSystemUIInputModule>() == null)
-                {
-                    es.AddComponent<InputSystemUIInputModule>();
-                }
-#else
-                if (es.GetComponent<StandaloneInputModule>() == null)
-                {
-                    es.AddComponent<StandaloneInputModule>();
-                }
-#endif
+                esys = new GameObject("EventSystem").AddComponent<EventSystem>();
+                Debug.Log("[UIRoot] Created EventSystem");
             }
+
+#if ENABLE_INPUT_SYSTEM
+            // New Input System
+            var oldMod = esys.GetComponent<StandaloneInputModule>();
+            if (oldMod != null) Destroy(oldMod);
+            if (esys.GetComponent<InputSystemUIInputModule>() == null)
+                esys.gameObject.AddComponent<InputSystemUIInputModule>();
+#else
+            // Legacy Input (Standalone)
+            var newMod = esys.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
+            if (newMod != null) Destroy(newMod);
+            if (esys.GetComponent<StandaloneInputModule>() == null)
+                esys.gameObject.AddComponent<StandaloneInputModule>();
+#endif
 
             // Screen parent
             var screenParentGO = new GameObject("Screens");

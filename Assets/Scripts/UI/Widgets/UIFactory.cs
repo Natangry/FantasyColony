@@ -80,11 +80,12 @@ namespace FantasyColony.UI.Widgets
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
         {
-            // Unity's Sprite.border order: (left, right, top, bottom)
+            // Unity's Sprite.border order: (left, bottom, right, top)
+            // Ensure we compare Top (w) and Bottom (y).
             var b = src.border;
             // Force all four edges to match the thinner of Top/Bottom to keep corners safe
-            float tb = Mathf.Min(b.z, b.w);
-
+            float tb = Mathf.Min(b.w, b.y);
+            
             // Sprite.Create expects pivot relative to rect (0..1). Convert existing pixel pivot.
             var rect = src.rect;
             var pivotNormalized = new Vector2(

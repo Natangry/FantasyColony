@@ -26,6 +26,7 @@ namespace FantasyColony.UI.Router
             var screen = new T();
             screen.Enter(_parent);
             _stack.Push(screen);
+            Debug.Log($"[UIRouter] Push {typeof(T).Name}");
         }
 
         // Allow initializing a screen (e.g., dialogs) before entering
@@ -41,6 +42,7 @@ namespace FantasyColony.UI.Router
         {
             screen.Enter(_parent);
             _stack.Push(screen);
+            Debug.Log($"[UIRouter] Push {screen.GetType().Name}");
         }
 
         public void Pop()
@@ -48,6 +50,7 @@ namespace FantasyColony.UI.Router
             if (_stack.Count == 0) return;
             var top = _stack.Pop();
             top.Exit();
+            Debug.Log($"[UIRouter] Pop {top.GetType().Name}");
         }
 
         // --- Restart helpers ---
