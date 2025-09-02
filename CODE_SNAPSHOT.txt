@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-02 06:31:15 UTC
+_Updated_: 2025-09-02 06:47:57 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -1039,7 +1039,7 @@ using UnityEngine.InputSystem;
 namespace FantasyColony.Core {
     /// <summary>
     /// Lightweight global hotkeys available in all builds.
-    /// Currently: F9 opens the Boot Report screen.
+    /// F9: Boot Report  |  F10: UI Creator (stub)
     /// </summary>
     public sealed class GlobalShortcuts : MonoBehaviour {
         private void Awake() {
@@ -1048,7 +1048,7 @@ namespace FantasyColony.Core {
         }
 
         private void Update() {
-            // Open Boot Report
+            // Open Boot Report (F9)
             bool pressed = false;
 #if ENABLE_INPUT_SYSTEM
             var kb = Keyboard.current;
@@ -1066,6 +1066,28 @@ namespace FantasyColony.Core {
                 }
                 if (router != null) router.Push<BootReportScreen>();
                 else Debug.LogWarning("[GlobalShortcuts] No UIRouter available to open Boot Report.");
+            }
+
+            // Open UI Creator (F10)
+            bool openCreator = false;
+#if ENABLE_INPUT_SYSTEM
+            var kb2 = Keyboard.current;
+            if (kb2 != null && kb2.f10Key.wasPressedThisFrame) openCreator = true;
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (!openCreator && UnityEngine.Input.GetKeyDown(KeyCode.F10)) openCreator = true;
+#endif
+            if (openCreator) {
+                var router = UIRouter.Current;
+                if (router == null) {
+                    var host = AppHost.Instance;
+                    router = host != null ? host.Router : null;
+                }
+                if (router != null) {
+                    Debug.Log("[UICreator] F10 pressed -> open Creator");
+                    router.Push(new UICreatorScreen());
+                }
+                else Debug.LogWarning("[GlobalShortcuts] No UIRouter available to open UI Creator.");
             }
         }
     }
@@ -3511,6 +3533,121 @@ namespace FantasyColony.UI.Screens
             }
         }
 
+    }
+}
+
+// ===== FILE: Assets/Scripts/UI/Screens/UICreatorScreen.cs =====
+using UnityEngine;
+using UnityEngine.UI;
+using FantasyColony.UI.Router;
+using FantasyColony.UI.Widgets;
+using UnityObject = UnityEngine.Object;
+
+namespace FantasyColony.UI.Screens
+{
+    /// <summary>
+    /// UI Creator (Stub) — Step 1: dev entry & shell scaffold.
+    /// Runtime-only, built via UIFactory. Structural containers use PanelSizing.Flexible.
+    /// </summary>
+    public sealed class UICreatorScreen : IScreen
+    {
+        private RectTransform _root;
+
+        // Columns
+        private RectTransform _left;
+        private RectTransform _center;
+        private RectTransform _right;
+
+        // Ratios for left/center/right widths (sum is arbitrary; layout normalizes)
+        private const float LEFT_RATIO = 0.9f;
+        private const float CENTER_RATIO = 2.2f;
+        private const float RIGHT_RATIO = 0.9f;
+
+        public void Enter(Transform parent)
+        {
+            // Root (full-screen)
+            var go = new GameObject("UICreator", typeof(RectTransform));
+            _root = go.GetComponent<RectTransform>();
+            _root.SetParent(parent, false);
+            _root.anchorMin = Vector2.zero;
+            _root.anchorMax = Vector2.one;
+            _root.offsetMin = Vector2.zero;
+            _root.offsetMax = Vector2.zero;
+
+            Debug.Log("[UICreator] Enter");
+
+            // Board: tiled wood background + padded content area
+            var board = UIFactory.CreateBoardScreen(_root, padding: 24, spacing: 0);
+
+            // Columns: Flexible surfaces joined to avoid double seams
+            _left  = UIFactory.CreateColumn(board.Content, "Palette", preferredWidth: -1, flexibleWidth: LEFT_RATIO).GetComponent<RectTransform>();
+            _center= UIFactory.CreateColumn(board.Content, "Canvas",  preferredWidth: -1, flexibleWidth: CENTER_RATIO).GetComponent<RectTransform>();
+            _right = UIFactory.CreateColumn(board.Content, "Inspector",preferredWidth: -1, flexibleWidth: RIGHT_RATIO).GetComponent<RectTransform>();
+            UIFactory.JoinHorizontal(_left, _center);
+            UIFactory.JoinHorizontal(_center, _right);
+
+            // Configure columns (VerticalLayoutGroups already exist; do not add duplicates)
+            ConfigureColumn(_left,   padding: new RectOffset(12,12,12,12), spacing: 8f);
+            ConfigureColumn(_center, padding: new RectOffset(12,12,12,12), spacing: 8f);
+            ConfigureColumn(_right,  padding: new RectOffset(12,12,12,12), spacing: 8f);
+
+            // Headers
+            CreateHeaderLabel(_left,   "Palette");
+            CreateHeaderLabel(_center, "Canvas");
+            CreateHeaderLabel(_right,  "Inspector");
+
+            // Right toolbar: Close button (also accessible via F10)
+            var topRow = UIFactory.CreateRow(_right, spacing: 8f);
+            var closeBtn = UIFactory.CreateButtonSecondary(topRow, "Close", () => UIRouter.Current?.Pop());
+            var le = closeBtn.GetComponent<LayoutElement>();
+            if (le == null) le = closeBtn.gameObject.AddComponent<LayoutElement>();
+            le.preferredWidth = 120f;
+
+            // Placeholders in each column (simple framed panels)
+            UIFactory.CreatePanelSurface(_left, "PalettePanel");
+            UIFactory.CreatePanelSurface(_center, "CanvasPanel");
+            UIFactory.CreatePanelSurface(_right, "InspectorPanel");
+        }
+
+        public void Exit()
+        {
+            if (_root != null)
+            {
+                Debug.Log("[UICreator] Exit");
+                UnityObject.Destroy(_root.gameObject);
+                _root = null;
+            }
+        }
+
+        // --- helpers ---
+        private static void ConfigureColumn(RectTransform col, RectOffset padding, float spacing)
+        {
+            var vl = col.GetComponent<VerticalLayoutGroup>();
+            if (vl != null)
+            {
+                vl.padding = padding;
+                vl.spacing = spacing;
+                vl.childControlHeight = true;
+                vl.childForceExpandHeight = true;
+            }
+        }
+
+        private static Text CreateHeaderLabel(Transform parent, string text)
+        {
+            var go = new GameObject("Header", typeof(RectTransform));
+            var rt = go.GetComponent<RectTransform>();
+            rt.SetParent(parent, false);
+            var t = go.AddComponent<Text>();
+            t.text = text;
+            t.fontSize = 20;
+            t.fontStyle = FontStyle.Bold;
+            t.alignment = TextAnchor.MiddleLeft;
+            t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            t.color = new Color(0.92f, 0.88f, 0.78f, 1f);
+            var le = go.AddComponent<LayoutElement>();
+            le.minHeight = 28f;
+            return t;
+        }
     }
 }
 
