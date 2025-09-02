@@ -47,39 +47,42 @@ namespace FantasyColony.UI.Screens
             absRT.offsetMax = Vector2.zero;
 
             // Percent-height anchors for Toolbar/Stage (under the absolute, layout-free layer)
-            _toolbar = UIFactory.CreatePanelSurface(absRT, "Toolbar");
-            // Stage should be a BLANK area (no frame/joins) — use a plain Image with no raycast
-            var stageGO = new GameObject("CanvasStage", typeof(RectTransform));
+            // Toolbar: make it OWN the HorizontalLayoutGroup; avoid nested layout parents that collapse width
+            var toolbarGO = new GameObject("Toolbar", typeof(RectTransform), typeof(Image), typeof(HorizontalLayoutGroup));
+            _toolbar = toolbarGO.GetComponent<RectTransform>();
+            var toolbarImg = toolbarGO.GetComponent<Image>();
+            toolbarImg.color = new Color(0f, 0f, 0f, 1f); // solid bar; adjust in future if needed
+            toolbarImg.raycastTarget = true;
+            var toolbarHL = toolbarGO.GetComponent<HorizontalLayoutGroup>();
+            toolbarHL.padding = new RectOffset(0,0,0,0);
+            toolbarHL.spacing = 0f;
+            toolbarHL.childControlWidth = true;
+            toolbarHL.childForceExpandWidth = true; // split width evenly via button flexibleWidth=1
+            toolbarHL.childControlHeight = true;
+            toolbarHL.childForceExpandHeight = true;
+            toolbarHL.childAlignment = TextAnchor.MiddleCenter;
+            _toolbar.SetParent(absRT, false);
+
+            // Stage should be a BLANK surface (no frame/border) to avoid artifacts in the center
+            var stageGO = new GameObject("CanvasStage", typeof(RectTransform), typeof(Image));
             _stage = stageGO.GetComponent<RectTransform>();
-            _stage.SetParent(absRT, false);
-            var stageImg = stageGO.AddComponent<Image>();
+            var stageImg = stageGO.GetComponent<Image>();
             stageImg.color = new Color(0f, 0f, 0f, 0f); // transparent
             stageImg.raycastTarget = false;
+            _stage.SetParent(absRT, false);
 
             // Anchors: toolbar = top 5% height, stage = remaining 95%
             SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f-TOOLBAR_FRAC, yMax:1f);
             SetAnchorsPercent(_stage,   xMin:0f, xMax:1f, yMin:0f,              yMax:1f-TOOLBAR_FRAC);
 
             // --- Toolbar content: equal-width buttons across full width ---
-            var bar = UIFactory.CreateRow(_toolbar, spacing: 0f);
-            var hl = bar.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
-            if (hl != null)
-            {
-                hl.padding = new RectOffset(0,0,0,0);
-                hl.childControlWidth = true;
-                hl.childForceExpandWidth = true; // divide width evenly via flexible widths
-                hl.childControlHeight = true;
-                hl.childForceExpandHeight = true;
-                hl.childAlignment = TextAnchor.MiddleCenter;
-            }
-
-            // Create equal-width buttons (width/N) with text best-fit
-            CreateFlexMenuButton(bar, "File",  () => {});
-            CreateFlexMenuButton(bar, "Edit",  () => {});
-            CreateFlexMenuButton(bar, "View",  () => {});
-            CreateFlexMenuButton(bar, "Tools", () => {});
-            CreateFlexMenuButton(bar, "Help",  () => {});
-            CreateFlexMenuButton(bar, "Close", () => UIRouter.Current?.Pop());
+            // Create equal-width buttons directly under the toolbar (no nested Row)
+            CreateFlexMenuButton(_toolbar, "File",  () => {});
+            CreateFlexMenuButton(_toolbar, "Edit",  () => {});
+            CreateFlexMenuButton(_toolbar, "View",  () => {});
+            CreateFlexMenuButton(_toolbar, "Tools", () => {});
+            CreateFlexMenuButton(_toolbar, "Help",  () => {});
+            CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
 
             IsOpen = true;
         }
