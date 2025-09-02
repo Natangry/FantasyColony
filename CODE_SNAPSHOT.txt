@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-02 05:08:04 UTC
+_Updated_: 2025-09-02 06:20:50 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -2470,7 +2470,9 @@ namespace FantasyColony.UI.Root
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             // Ensure pixel-accurate rounding to avoid uneven 1px borders on sliced images
             canvas.pixelPerfect = true; // ScreenSpaceOverlay only
-            canvasGO.AddComponent<GraphicRaycaster>();
+            // Ensure a GraphicRaycaster exists
+            if (canvasGO.GetComponent<GraphicRaycaster>() == null)
+                canvasGO.AddComponent<GraphicRaycaster>();
 
             var scaler = canvasGO.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -2486,23 +2488,27 @@ namespace FantasyColony.UI.Root
             if (!hasEventSystem)
                 hasEventSystem = (FindObjectOfType<EventSystem>() != null);
 #endif
+            // Create or sanitize EventSystem + input module (exactly one module)
+            EventSystem esys = EventSystem.current;
             if (!hasEventSystem)
             {
-                // Create EventSystem and attach the correct UI input module
-                var es = new GameObject("EventSystem");
-                es.AddComponent<EventSystem>();
-#if ENABLE_INPUT_SYSTEM
-                if (es.GetComponent<InputSystemUIInputModule>() == null)
-                {
-                    es.AddComponent<InputSystemUIInputModule>();
-                }
-#else
-                if (es.GetComponent<StandaloneInputModule>() == null)
-                {
-                    es.AddComponent<StandaloneInputModule>();
-                }
-#endif
+                esys = new GameObject("EventSystem").AddComponent<EventSystem>();
+                Debug.Log("[UIRoot] Created EventSystem");
             }
+
+#if ENABLE_INPUT_SYSTEM
+            // New Input System
+            var oldMod = esys.GetComponent<StandaloneInputModule>();
+            if (oldMod != null) Destroy(oldMod);
+            if (esys.GetComponent<InputSystemUIInputModule>() == null)
+                esys.gameObject.AddComponent<InputSystemUIInputModule>();
+#else
+            // Legacy Input (Standalone)
+            var newMod = esys.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
+            if (newMod != null) Destroy(newMod);
+            if (esys.GetComponent<StandaloneInputModule>() == null)
+                esys.gameObject.AddComponent<StandaloneInputModule>();
+#endif
 
             // Screen parent
             var screenParentGO = new GameObject("Screens");
@@ -2564,6 +2570,7 @@ namespace FantasyColony.UI.Router
             var screen = new T();
             screen.Enter(_parent);
             _stack.Push(screen);
+            Debug.Log($"[UIRouter] Push {typeof(T).Name}");
         }
 
         // Allow initializing a screen (e.g., dialogs) before entering
@@ -2579,6 +2586,7 @@ namespace FantasyColony.UI.Router
         {
             screen.Enter(_parent);
             _stack.Push(screen);
+            Debug.Log($"[UIRouter] Push {screen.GetType().Name}");
         }
 
         public void Pop()
@@ -2586,6 +2594,7 @@ namespace FantasyColony.UI.Router
             if (_stack.Count == 0) return;
             var top = _stack.Pop();
             top.Exit();
+            Debug.Log($"[UIRouter] Pop {top.GetType().Name}");
         }
 
         // --- Restart helpers ---
@@ -3614,13 +3623,24 @@ namespace FantasyColony.UI.Util
 
             var rect = source.rect;
             var tex = source.texture;
+            if (tex == null)
+                return null;
+            // CPU fallback requires readable textures; atlased sprites in builds are often not readable.
+            if (!tex.isReadable)
+            {
+                Debug.LogWarning($"[GrayscaleSpriteCache] Source texture not readable for '{source.name}', skipping CPU grayscale.");
+                return null;
+            }
             var x = Mathf.RoundToInt(rect.x);
             var y = Mathf.RoundToInt(rect.y);
             var w = Mathf.RoundToInt(rect.width);
             var h = Mathf.RoundToInt(rect.height);
 
             // Read pixels from source region
-            var tmp = new Texture2D(w, h, TextureFormat.RGBA32, false, false);
+            var tmp = new Texture2D(w, h, TextureFormat.RGBA32, false, false)
+            {
+                hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor
+            };
             var pixels = tex.GetPixels(x, y, w, h);
             for (int i = 0; i < pixels.Length; i++)
             {
@@ -3779,11 +3799,12 @@ namespace FantasyColony.UI.Widgets
 
         private static Sprite MakeUniformBorderFromTopBottom(Sprite src)
         {
-            // Unity's Sprite.border order: (left, right, top, bottom)
+            // Unity's Sprite.border order: (left, bottom, right, top)
+            // Ensure we compare Top (w) and Bottom (y).
             var b = src.border;
             // Force all four edges to match the thinner of Top/Bottom to keep corners safe
-            float tb = Mathf.Min(b.z, b.w);
-
+            float tb = Mathf.Min(b.w, b.y);
+            
             // Sprite.Create expects pivot relative to rect (0..1). Convert existing pixel pivot.
             var rect = src.rect;
             var pivotNormalized = new Vector2(
@@ -4416,20 +4437,21 @@ namespace FantasyColony.UI.Widgets
         void ApplyLook()
         {
             if (_sourceNineSlice == null) return;
-            // Build sub-sprites for edges from the 9-slice source using its border rect
-            var b = _sourceNineSlice.border; // L,R,T,B (pixels in source texture units)
+            // Build sub-sprites for edges from the 9-slice source using its border rect.
+            // Unity's Sprite.border order: (left, bottom, right, top)
+            var b = _sourceNineSlice.border;
             var rect = _sourceNineSlice.rect;
             var tex = _sourceNineSlice.texture;
             var ppu = _sourceNineSlice.pixelsPerUnit;
 
-            // Top strip
-            _top.sprite = Sprite.Create(tex, new Rect(rect.x, rect.yMax - b.z, rect.width, b.z), new Vector2(0.5f, 1f), ppu, 0, SpriteMeshType.FullRect);
-            // Bottom strip
-            _bottom.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, rect.width, b.w), new Vector2(0.5f, 0f), ppu, 0, SpriteMeshType.FullRect);
-            // Left strip
+            // Top strip (height = b.w, y starts at rect.yMax - b.w)
+            _top.sprite = Sprite.Create(tex, new Rect(rect.x, rect.yMax - b.w, rect.width, b.w), new Vector2(0.5f, 1f), ppu, 0, SpriteMeshType.FullRect);
+            // Bottom strip (height = b.y)
+            _bottom.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, rect.width, b.y), new Vector2(0.5f, 0f), ppu, 0, SpriteMeshType.FullRect);
+            // Left strip (width = b.x)
             _left.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, b.x, rect.height), new Vector2(0f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
-            // Right strip
-            _right.sprite = Sprite.Create(tex, new Rect(rect.xMax - b.y, rect.y, b.y, rect.height), new Vector2(1f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
+            // Right strip (width = b.z, x starts at rect.xMax - b.z)
+            _right.sprite = Sprite.Create(tex, new Rect(rect.xMax - b.z, rect.y, b.z, rect.height), new Vector2(1f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
 
             _top.color = _bottom.color = _left.color = _right.color = _tint;
 
@@ -4443,6 +4465,12 @@ namespace FantasyColony.UI.Widgets
             if (_rt == null || _top == null) return;
 
             float px = Mathf.Max(0.0f, _targetBorderPx);
+            if (_canvas == null) _canvas = GetComponentInParent<Canvas>();
+            float refPPU = (_canvas != null && _canvas.referencePixelsPerUnit > 0f) ? _canvas.referencePixelsPerUnit : 100f;
+            float sf = (_canvas != null && _canvas.scaleFactor > 0f) ? _canvas.scaleFactor : 1f;
+            // Convert requested pixel thickness to local UI units so thickness is pixel-accurate across scalers.
+            float unitsPerPixel = 1f / (refPPU * sf);
+            float u = Mathf.Round(px) * unitsPerPixel;
 
             // Top
             var trt = _top.rectTransform;
@@ -4450,7 +4478,7 @@ namespace FantasyColony.UI.Widgets
             trt.anchorMax = new Vector2(1f, 1f);
             trt.pivot = new Vector2(0.5f, 1f);
             trt.anchoredPosition = Vector2.zero;
-            trt.sizeDelta = new Vector2(0f, Mathf.Round(px));
+            trt.sizeDelta = new Vector2(0f, u);
 
             // Bottom
             var brt = _bottom.rectTransform;
@@ -4458,7 +4486,7 @@ namespace FantasyColony.UI.Widgets
             brt.anchorMax = new Vector2(1f, 0f);
             brt.pivot = new Vector2(0.5f, 0f);
             brt.anchoredPosition = Vector2.zero;
-            brt.sizeDelta = new Vector2(0f, Mathf.Round(px));
+            brt.sizeDelta = new Vector2(0f, u);
 
             // Left
             var lrt = _left.rectTransform;
@@ -4466,7 +4494,7 @@ namespace FantasyColony.UI.Widgets
             lrt.anchorMax = new Vector2(0f, 1f);
             lrt.pivot = new Vector2(0f, 0.5f);
             lrt.anchoredPosition = Vector2.zero;
-            lrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
+            lrt.sizeDelta = new Vector2(u, 0f);
 
             // Right
             var rrt = _right.rectTransform;
@@ -4474,7 +4502,7 @@ namespace FantasyColony.UI.Widgets
             rrt.anchorMax = new Vector2(1f, 1f);
             rrt.pivot = new Vector2(1f, 0.5f);
             rrt.anchoredPosition = Vector2.zero;
-            rrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
+            rrt.sizeDelta = new Vector2(u, 0f);
         }
 
         public void SetEdges(bool left, bool right, bool top, bool bottom)
