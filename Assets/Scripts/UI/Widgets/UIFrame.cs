@@ -71,20 +71,21 @@ namespace FantasyColony.UI.Widgets
         void ApplyLook()
         {
             if (_sourceNineSlice == null) return;
-            // Build sub-sprites for edges from the 9-slice source using its border rect
-            var b = _sourceNineSlice.border; // L,R,T,B (pixels in source texture units)
+            // Build sub-sprites for edges from the 9-slice source using its border rect.
+            // Unity's Sprite.border order: (left, bottom, right, top)
+            var b = _sourceNineSlice.border;
             var rect = _sourceNineSlice.rect;
             var tex = _sourceNineSlice.texture;
             var ppu = _sourceNineSlice.pixelsPerUnit;
 
-            // Top strip
-            _top.sprite = Sprite.Create(tex, new Rect(rect.x, rect.yMax - b.z, rect.width, b.z), new Vector2(0.5f, 1f), ppu, 0, SpriteMeshType.FullRect);
-            // Bottom strip
-            _bottom.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, rect.width, b.w), new Vector2(0.5f, 0f), ppu, 0, SpriteMeshType.FullRect);
-            // Left strip
+            // Top strip (height = b.w, y starts at rect.yMax - b.w)
+            _top.sprite = Sprite.Create(tex, new Rect(rect.x, rect.yMax - b.w, rect.width, b.w), new Vector2(0.5f, 1f), ppu, 0, SpriteMeshType.FullRect);
+            // Bottom strip (height = b.y)
+            _bottom.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, rect.width, b.y), new Vector2(0.5f, 0f), ppu, 0, SpriteMeshType.FullRect);
+            // Left strip (width = b.x)
             _left.sprite = Sprite.Create(tex, new Rect(rect.x, rect.y, b.x, rect.height), new Vector2(0f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
-            // Right strip
-            _right.sprite = Sprite.Create(tex, new Rect(rect.xMax - b.y, rect.y, b.y, rect.height), new Vector2(1f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
+            // Right strip (width = b.z, x starts at rect.xMax - b.z)
+            _right.sprite = Sprite.Create(tex, new Rect(rect.xMax - b.z, rect.y, b.z, rect.height), new Vector2(1f, 0.5f), ppu, 0, SpriteMeshType.FullRect);
 
             _top.color = _bottom.color = _left.color = _right.color = _tint;
 
@@ -98,6 +99,12 @@ namespace FantasyColony.UI.Widgets
             if (_rt == null || _top == null) return;
 
             float px = Mathf.Max(0.0f, _targetBorderPx);
+            if (_canvas == null) _canvas = GetComponentInParent<Canvas>();
+            float refPPU = (_canvas != null && _canvas.referencePixelsPerUnit > 0f) ? _canvas.referencePixelsPerUnit : 100f;
+            float sf = (_canvas != null && _canvas.scaleFactor > 0f) ? _canvas.scaleFactor : 1f;
+            // Convert requested pixel thickness to local UI units so thickness is pixel-accurate across scalers.
+            float unitsPerPixel = 1f / (refPPU * sf);
+            float u = Mathf.Round(px) * unitsPerPixel;
 
             // Top
             var trt = _top.rectTransform;
@@ -105,7 +112,7 @@ namespace FantasyColony.UI.Widgets
             trt.anchorMax = new Vector2(1f, 1f);
             trt.pivot = new Vector2(0.5f, 1f);
             trt.anchoredPosition = Vector2.zero;
-            trt.sizeDelta = new Vector2(0f, Mathf.Round(px));
+            trt.sizeDelta = new Vector2(0f, u);
 
             // Bottom
             var brt = _bottom.rectTransform;
@@ -113,7 +120,7 @@ namespace FantasyColony.UI.Widgets
             brt.anchorMax = new Vector2(1f, 0f);
             brt.pivot = new Vector2(0.5f, 0f);
             brt.anchoredPosition = Vector2.zero;
-            brt.sizeDelta = new Vector2(0f, Mathf.Round(px));
+            brt.sizeDelta = new Vector2(0f, u);
 
             // Left
             var lrt = _left.rectTransform;
@@ -121,7 +128,7 @@ namespace FantasyColony.UI.Widgets
             lrt.anchorMax = new Vector2(0f, 1f);
             lrt.pivot = new Vector2(0f, 0.5f);
             lrt.anchoredPosition = Vector2.zero;
-            lrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
+            lrt.sizeDelta = new Vector2(u, 0f);
 
             // Right
             var rrt = _right.rectTransform;
@@ -129,7 +136,7 @@ namespace FantasyColony.UI.Widgets
             rrt.anchorMax = new Vector2(1f, 1f);
             rrt.pivot = new Vector2(1f, 0.5f);
             rrt.anchoredPosition = Vector2.zero;
-            rrt.sizeDelta = new Vector2(Mathf.Round(px), 0f);
+            rrt.sizeDelta = new Vector2(u, 0f);
         }
 
         public void SetEdges(bool left, bool right, bool top, bool bottom)

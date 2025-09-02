@@ -16,13 +16,24 @@ namespace FantasyColony.UI.Util
 
             var rect = source.rect;
             var tex = source.texture;
+            if (tex == null)
+                return null;
+            // CPU fallback requires readable textures; atlased sprites in builds are often not readable.
+            if (!tex.isReadable)
+            {
+                Debug.LogWarning($"[GrayscaleSpriteCache] Source texture not readable for '{source.name}', skipping CPU grayscale.");
+                return null;
+            }
             var x = Mathf.RoundToInt(rect.x);
             var y = Mathf.RoundToInt(rect.y);
             var w = Mathf.RoundToInt(rect.width);
             var h = Mathf.RoundToInt(rect.height);
 
             // Read pixels from source region
-            var tmp = new Texture2D(w, h, TextureFormat.RGBA32, false, false);
+            var tmp = new Texture2D(w, h, TextureFormat.RGBA32, false, false)
+            {
+                hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor
+            };
             var pixels = tex.GetPixels(x, y, w, h);
             for (int i = 0; i < pixels.Length; i++)
             {
