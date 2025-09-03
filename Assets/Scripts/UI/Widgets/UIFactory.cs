@@ -132,11 +132,11 @@ namespace FantasyColony.UI.Widgets
             if (!ParentHasLayoutGroup(rt))
             {
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.sizeDelta = size.Value;
+                rt.sizeDelta = size;
                 rt.anchoredPosition = Vector2.zero;
             }
             le.minWidth = 0f; le.preferredWidth = 0f; le.flexibleWidth = 0f;
-            le.minHeight = 0f; le.preferredHeight = size.Value.y; le.flexibleHeight = 0f;
+            le.minHeight = 0f; le.preferredHeight = size.y; le.flexibleHeight = 0f;
         }
 
         // ---- Dropdown Menu ----
