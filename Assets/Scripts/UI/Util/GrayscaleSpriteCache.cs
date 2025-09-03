@@ -50,6 +50,19 @@ namespace FantasyColony.UI.Util
             return sp;
         }
 
+        public static void Clear()
+        {
+            foreach (var sp in _cache.Values)
+            {
+                if (sp == null) continue;
+                var tex = sp.texture;
+                if (tex != null)
+                    Object.Destroy(tex);
+                Object.Destroy(sp);
+            }
+            _cache.Clear();
+        }
+
         private static string MakeKey(Sprite s)
         {
             var r = s.rect;

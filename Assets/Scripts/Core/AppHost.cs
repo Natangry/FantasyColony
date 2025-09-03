@@ -3,6 +3,7 @@ using FantasyColony.UI.Root;
 using FantasyColony.UI.Router;
 using FantasyColony.Core.Services;
 using FantasyColony.UI.Screens;
+using FantasyColony.UI.Util;
 
 // Disambiguate our service interfaces from Unity's similarly named types
 using FCLogger = FantasyColony.Core.Services.ILogger;
@@ -75,7 +76,11 @@ namespace FantasyColony.Core
 
         private void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            if (Instance == this)
+            {
+                Instance = null;
+                GrayscaleSpriteCache.Clear();
+            }
         }
     }
 }
