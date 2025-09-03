@@ -150,7 +150,7 @@ namespace FantasyColony.UI.Screens
         {
             if (_openMenu != null)
             {
-                Destroy(_openMenu.gameObject);
+                UnityObject.Destroy(_openMenu.gameObject);
                 _openMenu = null;
             }
             if (_menuOverlay != null) _menuOverlay.gameObject.SetActive(false);
