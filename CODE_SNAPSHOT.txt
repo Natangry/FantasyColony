@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-03 05:33:40 UTC
+_Updated_: 2025-09-03 05:50:47 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -3694,7 +3694,7 @@ namespace FantasyColony.UI.Screens
         {
             if (_openMenu != null)
             {
-                Destroy(_openMenu.gameObject);
+                UnityObject.Destroy(_openMenu.gameObject);
                 _openMenu = null;
             }
             if (_menuOverlay != null) _menuOverlay.gameObject.SetActive(false);
