@@ -12,6 +12,8 @@ namespace FantasyColony.UI.Root
     {
         public RectTransform ScreenParent { get; private set; }
 
+        public static event System.Action OnUpdate;
+
         public static UIRoot Create(Transform parent)
         {
             var go = new GameObject("UIRoot");
@@ -86,6 +88,11 @@ namespace FantasyColony.UI.Root
             ScreenParent.anchorMax = Vector2.one;
             ScreenParent.offsetMin = Vector2.zero;
             ScreenParent.offsetMax = Vector2.zero;
+        }
+
+        private void Update()
+        {
+            OnUpdate?.Invoke();
         }
     }
 }
