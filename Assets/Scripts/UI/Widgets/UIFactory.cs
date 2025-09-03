@@ -202,24 +202,29 @@ namespace FantasyColony.UI.Widgets
 
             var root = new GameObject("Dropdown", typeof(RectTransform)).GetComponent<RectTransform>();
             root.SetParent(overlay, false);
+
+            var canvas = overlay.GetComponentInParent<Canvas>();
+
+            // Position near the anchor (below it, left-aligned) using bottom-left corner of the button
+            var anchorRT = anchor.GetComponent<RectTransform>();
+
+            // Dropdown root measures from overlay top-left
+            root.anchorMin = root.anchorMax = new Vector2(0f, 1f);
             root.pivot = new Vector2(0f, 1f);
 
-            // Position below anchor using the overlay's Canvas camera (if any)
-            var canvas = overlay.GetComponentInParent<Canvas>();
-            Camera cam = null;
-            if (canvas != null)
-            {
-                cam = canvas.worldCamera;
-                if (cam == null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
-                    cam = Camera.main; // fallback for camera-less canvases
-            }
+            // Get world-space corners of the anchor; index 0 = bottom-left
+            Vector3[] corners = new Vector3[4];
+            anchorRT.GetWorldCorners(corners);
+            Vector3 worldBL = corners[0];
 
-            var screenPos = RectTransformUtility.WorldToScreenPoint(cam, anchor.position);
-            Vector2 local;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenPos, cam, out local);
-            local.x -= (anchor.rect.width * 0.5f);
-            local.y -= (anchor.rect.height * 0.5f); // slightly below
-            root.anchoredPosition = local;
+            // Convert to overlay local space (ScreenSpaceOverlay => cam null)
+            Vector2 screenBL = RectTransformUtility.WorldToScreenPoint(null, worldBL);
+            Vector2 localBL;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenBL, null, out localBL);
+
+            // Convert overlay-local (pivot) to anchoredPosition in top-left anchor space
+            Vector2 overlayTopLeft = new Vector2(-overlay.rect.width * overlay.pivot.x, overlay.rect.height * (1f - overlay.pivot.y));
+            root.anchoredPosition = localBL - overlayTopLeft;
             root.SetAsLastSibling();
 
             // Panel with VLG + CSF (Preferred Y)
