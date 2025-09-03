@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Screens;
+using FantasyColony.UI.Util;
 
 namespace FantasyColony.Core {
     /// <summary>
@@ -41,6 +42,7 @@ namespace FantasyColony.Core {
             // Give UI one frame to present cover
             yield return null;
 
+            GrayscaleSpriteCache.Clear();
             // Free anything not referenced anymore
             yield return Resources.UnloadUnusedAssets();
             System.GC.Collect();
