@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
+using FantasyColony.UI.Root;
 using UnityObject = UnityEngine.Object;
 
 namespace FantasyColony.UI.Screens
@@ -85,6 +86,12 @@ namespace FantasyColony.UI.Screens
             // Remove Help per request
             _btnClose = CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
 
+            // Reset toolbar ON whenever entering the Creator
+            SetToolbarVisible(true);
+
+            // Register hotkeys (F11 toggle fullscreen, Esc exits fullscreen)
+            RegisterHotkeys();
+
             IsOpen = true;
         }
 
@@ -93,6 +100,9 @@ namespace FantasyColony.UI.Screens
             if (_root != null)
             {
                 Debug.Log("[UICreator] Exit");
+                UnregisterHotkeys();
+                // Cleanup any open menus/overlays
+                CloseMenus();
                 UnityObject.Destroy(_root.gameObject);
                 _root = null;
             }
@@ -191,8 +201,53 @@ namespace FantasyColony.UI.Screens
         private void ToggleFullscreenWorkArea()
         {
             bool isActive = _toolbar.gameObject.activeSelf;
-            _toolbar.gameObject.SetActive(!isActive);
+            SetToolbarVisible(!isActive);
             Debug.Log($"[UICreator] View/Fullscreen Work Area: {!isActive}");
+        }
+
+        private void SetToolbarVisible(bool visible)
+        {
+            _toolbar.gameObject.SetActive(visible);
+            // Re-apply anchors in case external code changed them
+            if (visible)
+            {
+                UIFactory.SetAnchorsPercent(_toolbar, 0f, 1f, 1f - TOOLBAR_FRAC, 1f);
+                UIFactory.SetAnchorsPercent(_stage,   0f, 1f, 0f,              1f - TOOLBAR_FRAC);
+            }
+            else
+            {
+                // Toolbar hidden: stage occupies full height
+                UIFactory.SetAnchorsPercent(_toolbar, 0f, 1f, 1f, 1f);
+                UIFactory.SetAnchorsPercent(_stage,   0f, 1f, 0f, 1f);
+            }
+        }
+
+        // --- Hotkeys ---
+        private bool _hotkeysRegistered;
+        private void RegisterHotkeys()
+        {
+            if (_hotkeysRegistered) return;
+            _hotkeysRegistered = true;
+            // Hook into Update loop via a lightweight runner attached to UIRoot
+            UIRoot.OnUpdate += OnUpdate;
+            Debug.Log("[UICreator] Hotkeys registered (F11 fullscreen, Esc exit fullscreen)");
+        }
+
+        private void UnregisterHotkeys()
+        {
+            if (!_hotkeysRegistered) return;
+            _hotkeysRegistered = false;
+            UIRoot.OnUpdate -= OnUpdate;
+        }
+
+        private void OnUpdate()
+        {
+            // Legacy Input (works without new Input System)
+            if (Input.GetKeyDown(KeyCode.F11))
+                ToggleFullscreenWorkArea();
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+                SetToolbarVisible(true);
         }
 
         // --- Spawn helpers (center of stage; placement tools come later) ---
