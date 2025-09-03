@@ -14,6 +14,23 @@ namespace FantasyColony.UI.Widgets
 
     public static class UIFactory
     {
+        // ===== Layout utilities =====
+        public static void SetAnchorsPercent(RectTransform rt, float xMin, float xMax, float yMin, float yMax)
+        {
+            if (rt == null) return;
+            rt.anchorMin = new Vector2(xMin, yMin);
+            rt.anchorMax = new Vector2(xMax, yMax);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        public static LayoutElement EnsureLayoutElement(GameObject go)
+        {
+            var le = go.GetComponent<LayoutElement>();
+            if (le == null) le = go.AddComponent<LayoutElement>();
+            return le;
+        }
+
         // Cache a symmetrized version of the dark 9-slice border so L/R and T/B are equal.
         private static Sprite _darkBorderSymmetric;
         private static Material _grayscaleTintMat;
@@ -35,6 +52,46 @@ namespace FantasyColony.UI.Widgets
                 p = p.parent;
             }
             return false;
+        }
+
+        public static RectTransform[] SplitPercentH(Transform parent, params float[] percents)
+        {
+            if (parent == null || percents == null || percents.Length == 0) return Array.Empty<RectTransform>();
+            float total = 0f; foreach (var f in percents) total += Mathf.Max(0f, f);
+            if (total <= 0f) return Array.Empty<RectTransform>();
+            float x = 0f;
+            var list = new List<RectTransform>(percents.Length);
+            for (int i = 0; i < percents.Length; i++)
+            {
+                float w = Mathf.Max(0f, percents[i]) / total;
+                var go = new GameObject($"H{i}", typeof(RectTransform));
+                var rt = go.GetComponent<RectTransform>();
+                rt.SetParent(parent, false);
+                SetAnchorsPercent(rt, x, x + w, 0f, 1f);
+                list.Add(rt);
+                x += w;
+            }
+            return list.ToArray();
+        }
+
+        public static RectTransform[] SplitPercentV(Transform parent, params float[] percents)
+        {
+            if (parent == null || percents == null || percents.Length == 0) return Array.Empty<RectTransform>();
+            float total = 0f; foreach (var f in percents) total += Mathf.Max(0f, f);
+            if (total <= 0f) return Array.Empty<RectTransform>();
+            float y = 0f;
+            var list = new List<RectTransform>(percents.Length);
+            for (int i = 0; i < percents.Length; i++)
+            {
+                float h = Mathf.Max(0f, percents[i]) / total;
+                var go = new GameObject($"V{i}", typeof(RectTransform));
+                var rt = go.GetComponent<RectTransform>();
+                rt.SetParent(parent, false);
+                SetAnchorsPercent(rt, 0f, 1f, y, y + h);
+                list.Add(rt);
+                y += h;
+            }
+            return list.ToArray();
         }
 
         /// <summary>
@@ -65,6 +122,21 @@ namespace FantasyColony.UI.Widgets
                 le.minWidth = 0f; le.preferredWidth = 0f; le.flexibleWidth = 0f;
                 le.minHeight = 0f; le.preferredHeight = 48f; le.flexibleHeight = 0f;
             }
+        }
+
+        public static void ApplyDefaultPanelSizing(RectTransform rt, Vector2? freeSize = null)
+        {
+            if (rt == null) return;
+            var size = freeSize ?? new Vector2(480f, 320f);
+            var le = rt.GetComponent<LayoutElement>(); if (le == null) le = rt.gameObject.AddComponent<LayoutElement>();
+            if (!ParentHasLayoutGroup(rt))
+            {
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.sizeDelta = size.Value;
+                rt.anchoredPosition = Vector2.zero;
+            }
+            le.minWidth = 0f; le.preferredWidth = 0f; le.flexibleWidth = 0f;
+            le.minHeight = 0f; le.preferredHeight = size.Value.y; le.flexibleHeight = 0f;
         }
 
         // ---- Dropdown Menu ----
