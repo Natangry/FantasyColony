@@ -174,10 +174,19 @@ namespace FantasyColony.UI.Widgets
             root.SetParent(overlay, false);
             root.pivot = new Vector2(0f, 1f);
 
-            // Position below anchor (Screen Space Overlay)
-            var screenPos = RectTransformUtility.WorldToScreenPoint(null, anchor.position);
+            // Position below anchor using the overlay's Canvas camera (if any)
+            var canvas = overlay.GetComponentInParent<Canvas>();
+            Camera cam = null;
+            if (canvas != null)
+            {
+                cam = canvas.worldCamera;
+                if (cam == null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                    cam = Camera.main; // fallback for camera-less canvases
+            }
+
+            var screenPos = RectTransformUtility.WorldToScreenPoint(cam, anchor.position);
             Vector2 local;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenPos, null, out local);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenPos, cam, out local);
             local.x -= (anchor.rect.width * 0.5f);
             local.y -= (anchor.rect.height * 0.5f); // slightly below
             root.anchoredPosition = local;
