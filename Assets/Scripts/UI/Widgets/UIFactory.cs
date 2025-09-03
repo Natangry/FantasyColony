@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
+using UnityObject = UnityEngine.Object;
 using System.Linq;
 using FantasyColony; // for GetHierarchyPath()
 using FantasyColony.UI.Style;
