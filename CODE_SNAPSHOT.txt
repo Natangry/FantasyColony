@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-03 21:28:07 UTC
+_Updated_: 2025-09-03 21:32:17 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -4353,7 +4353,7 @@ namespace FantasyColony.UI.Widgets
                 }
                 else if (tracker != null && tracker.Source == null)
                 {
-                    Object.Destroy(tracker);
+                    UnityObject.Destroy(tracker);
                 }
                 Debug.LogWarning($"UIFactory: Using CPU grayscale fallback on {img.transform.GetHierarchyPath()}.");
                 return;
@@ -4365,7 +4365,7 @@ namespace FantasyColony.UI.Widgets
                 GrayscaleSpriteCache.Release(tracker.Source);
                 tracker.Source = null;
                 tracker.Gray = null;
-                Object.Destroy(tracker);
+                UnityObject.Destroy(tracker);
                 tracker = null;
             }
 
