@@ -35,6 +35,23 @@ namespace FantasyColony.UI.Widgets
         private static Sprite _darkBorderSymmetric;
         private static Material _grayscaleTintMat;
 
+        // Tracks CPU-generated grayscale sprites so they can be released.
+        private class GrayscaleTracker : MonoBehaviour
+        {
+            public Sprite Source;
+            public Sprite Gray;
+
+            private void OnDestroy()
+            {
+                if (Source != null)
+                {
+                    GrayscaleSpriteCache.Release(Source);
+                    Source = null;
+                    Gray = null;
+                }
+            }
+        }
+
         // ---- Button sizing helpers (safe defaults when outside a LayoutGroup) ----
         /// <summary>
         /// Returns true if any parent has a LayoutGroup (Horizontal/Vertical/Grid).
@@ -263,20 +280,57 @@ namespace FantasyColony.UI.Widgets
             if (img == null) return;
             if (!BaseUIStyle.UseGrayscaleTint)
                 return; // use default
+            var tracker = img.GetComponent<GrayscaleTracker>();
+            var src = img.sprite;
+
+            if (tracker != null)
+            {
+                // If this image currently uses a tracked grayscale sprite, recover the original source.
+                if (tracker.Gray != null && img.sprite == tracker.Gray)
+                    src = tracker.Source;
+                // If sprite changed away from tracked grayscale, release previous.
+                else if (tracker.Source != null && tracker.Gray != null && img.sprite != tracker.Gray)
+                {
+                    GrayscaleSpriteCache.Release(tracker.Source);
+                    tracker.Source = null;
+                    tracker.Gray = null;
+                }
+            }
+
             var mat = GetGrayscaleTintMaterial();
             if (mat == null)
             {
                 // Fallback: CPU grayscale sprite, then let UI/Default tint it
-                var src = img.sprite;
-                var gray = GrayscaleSpriteCache.Get(src);
+                var gray = (tracker != null && tracker.Source == src && tracker.Gray != null)
+                    ? tracker.Gray
+                    : GrayscaleSpriteCache.Get(src);
                 if (gray != null)
                 {
+                    if (tracker == null) tracker = img.gameObject.AddComponent<GrayscaleTracker>();
+
                     img.sprite = gray;
                     img.material = null;
+                    tracker.Source = src;
+                    tracker.Gray = gray;
+                }
+                else if (tracker != null && tracker.Source == null)
+                {
+                    Object.Destroy(tracker);
                 }
                 Debug.LogWarning($"UIFactory: Using CPU grayscale fallback on {img.transform.GetHierarchyPath()}.");
                 return;
             }
+
+            // Using shader-based tinting; ensure any tracked sprite is released
+            if (tracker != null && tracker.Source != null)
+            {
+                GrayscaleSpriteCache.Release(tracker.Source);
+                tracker.Source = null;
+                tracker.Gray = null;
+                Object.Destroy(tracker);
+                tracker = null;
+            }
+
             img.material = new Material(mat); // per-image instance
             img.SetMaterialDirty();
             // Runtime verification (no editor guard):
