@@ -73,8 +73,8 @@ namespace FantasyColony.UI.Screens
             _stage.SetParent(absRT, false);
 
             // Anchors: toolbar = top 5% height, stage = remaining 95%
-            SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f-TOOLBAR_FRAC, yMax:1f);
-            SetAnchorsPercent(_stage,   xMin:0f, xMax:1f, yMin:0f,              yMax:1f-TOOLBAR_FRAC);
+            UIFactory.SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f - TOOLBAR_FRAC, yMax:1f);
+            UIFactory.SetAnchorsPercent(_stage, xMin:0f, xMax:1f, yMin:0f, yMax:1f - TOOLBAR_FRAC);
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
@@ -118,14 +118,6 @@ namespace FantasyColony.UI.Screens
                 txt.resizeTextMaxSize = 28;
             }
             return btn.GetComponent<RectTransform>();
-        }
-
-        private static void SetAnchorsPercent(RectTransform rt, float xMin, float xMax, float yMin, float yMax)
-        {
-            rt.anchorMin = new Vector2(xMin, yMin);
-            rt.anchorMax = new Vector2(xMax, yMax);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
         }
 
         // --- Simple dropdown framework (stub for Step 1) ---
@@ -234,9 +226,7 @@ namespace FantasyColony.UI.Screens
 
             var panel = UIFactory.CreatePanelSurface(_stage, "UI_Panel");
             var prt = panel;
-            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
-            prt.sizeDelta = new Vector2(480f, 320f);
-            prt.anchoredPosition = Vector2.zero;
+            UIFactory.ApplyDefaultPanelSizing(prt);
             Debug.Log("[UICreator] Spawn UI_Panel");
         }
     }
