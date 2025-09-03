@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-03 20:46:31 UTC
+_Updated_: 2025-09-03 20:56:24 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -377,6 +377,7 @@ using System.Collections;
 using UnityEngine;
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Screens;
+using FantasyColony.UI.Util;
 
 namespace FantasyColony.Core {
     /// <summary>
@@ -416,6 +417,7 @@ namespace FantasyColony.Core {
             // Give UI one frame to present cover
             yield return null;
 
+            GrayscaleSpriteCache.Clear();
             // Free anything not referenced anymore
             yield return Resources.UnloadUnusedAssets();
             System.GC.Collect();
@@ -441,6 +443,7 @@ using FantasyColony.UI.Root;
 using FantasyColony.UI.Router;
 using FantasyColony.Core.Services;
 using FantasyColony.UI.Screens;
+using FantasyColony.UI.Util;
 
 // Disambiguate our service interfaces from Unity's similarly named types
 using FCLogger = FantasyColony.Core.Services.ILogger;
@@ -513,7 +516,11 @@ namespace FantasyColony.Core
 
         private void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            if (Instance == this)
+            {
+                Instance = null;
+                GrayscaleSpriteCache.Clear();
+            }
         }
     }
 }
@@ -3917,6 +3924,19 @@ namespace FantasyColony.UI.Util
             var sp = Sprite.Create(tmp, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), source.pixelsPerUnit, 0, SpriteMeshType.FullRect);
             _cache[key] = sp;
             return sp;
+        }
+
+        public static void Clear()
+        {
+            foreach (var sp in _cache.Values)
+            {
+                if (sp == null) continue;
+                var tex = sp.texture;
+                if (tex != null)
+                    Object.Destroy(tex);
+                Object.Destroy(sp);
+            }
+            _cache.Clear();
         }
 
         private static string MakeKey(Sprite s)
