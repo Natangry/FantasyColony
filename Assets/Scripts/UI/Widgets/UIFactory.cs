@@ -252,22 +252,57 @@ namespace FantasyColony.UI.Widgets
         private static void ApplyTintMaterial(Image img)
         {
             if (img == null) return;
+
+            var tracker = img.GetComponent<GrayscaleSpriteCacheRef>();
+
             if (!BaseUIStyle.UseGrayscaleTint)
+            {
+                if (tracker != null)
+                {
+                    img.sprite = tracker.Source;
+                    GrayscaleSpriteCache.Release(tracker.Source);
+                    tracker.Source = tracker.Gray = null;
+                    Object.Destroy(tracker);
+                }
                 return; // use default
+            }
+
             var mat = GetGrayscaleTintMaterial();
             if (mat == null)
             {
                 // Fallback: CPU grayscale sprite, then let UI/Default tint it
+                if (tracker != null)
+                {
+                    if (img.sprite == tracker.Gray)
+                        return; // already using cached grayscale
+
+                    GrayscaleSpriteCache.Release(tracker.Source);
+                    tracker.Source = tracker.Gray = null;
+                    Object.Destroy(tracker);
+                }
+
                 var src = img.sprite;
                 var gray = GrayscaleSpriteCache.Get(src);
                 if (gray != null)
                 {
                     img.sprite = gray;
                     img.material = null;
+                    tracker = img.gameObject.AddComponent<GrayscaleSpriteCacheRef>();
+                    tracker.Source = src;
+                    tracker.Gray = gray;
                 }
                 Debug.LogWarning($"UIFactory: Using CPU grayscale fallback on {img.transform.GetHierarchyPath()}.");
                 return;
             }
+
+            if (tracker != null)
+            {
+                img.sprite = tracker.Source;
+                GrayscaleSpriteCache.Release(tracker.Source);
+                tracker.Source = tracker.Gray = null;
+                Object.Destroy(tracker);
+            }
+
             img.material = new Material(mat); // per-image instance
             img.SetMaterialDirty();
             // Runtime verification (no editor guard):

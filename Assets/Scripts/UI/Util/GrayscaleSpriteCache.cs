@@ -5,14 +5,25 @@ namespace FantasyColony.UI.Util
 {
     public static class GrayscaleSpriteCache
     {
+        private class Entry
+        {
+            public Sprite Sprite;
+            public Texture2D Texture;
+            public int RefCount;
+        }
+
         // Cache by source texture instanceID + rect
-        private static readonly Dictionary<string, Sprite> _cache = new();
+        private static readonly Dictionary<string, Entry> _cache = new();
 
         public static Sprite Get(Sprite source)
         {
             if (source == null) return null;
             var key = MakeKey(source);
-            if (_cache.TryGetValue(key, out var s)) return s;
+            if (_cache.TryGetValue(key, out var entry))
+            {
+                entry.RefCount++;
+                return entry.Sprite;
+            }
 
             var rect = source.rect;
             var tex = source.texture;
@@ -46,14 +57,47 @@ namespace FantasyColony.UI.Util
 
             // Create a sprite with same PPU and pivot
             var sp = Sprite.Create(tmp, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), source.pixelsPerUnit, 0, SpriteMeshType.FullRect);
-            _cache[key] = sp;
+            _cache[key] = new Entry { Sprite = sp, Texture = tmp, RefCount = 1 };
             return sp;
+        }
+
+        public static void Release(Sprite source)
+        {
+            if (source == null) return;
+            var key = MakeKey(source);
+            if (_cache.TryGetValue(key, out var entry))
+            {
+                entry.RefCount--;
+                if (entry.RefCount <= 0)
+                {
+                    Object.Destroy(entry.Sprite);
+                    Object.Destroy(entry.Texture);
+                    _cache.Remove(key);
+                }
+            }
         }
 
         private static string MakeKey(Sprite s)
         {
             var r = s.rect;
             return s.texture.GetInstanceID().ToString() + ":" + r.x + "," + r.y + "," + r.width + "," + r.height + ":" + s.pixelsPerUnit;
+        }
+    }
+
+    /// <summary>
+    /// Tracks usage of a cached grayscale sprite and releases it when the Image is destroyed.
+    /// </summary>
+    public class GrayscaleSpriteCacheRef : MonoBehaviour
+    {
+        // Original colored sprite used to generate the grayscale variant.
+        public Sprite Source;
+        // The grayscale sprite currently assigned to the Image (for reuse checks).
+        public Sprite Gray;
+
+        private void OnDestroy()
+        {
+            if (Source != null)
+                GrayscaleSpriteCache.Release(Source);
         }
     }
 }
