@@ -17,6 +17,55 @@ namespace FantasyColony.UI.Widgets
         private static Sprite _darkBorderSymmetric;
         private static Material _grayscaleTintMat;
 
+        // ---- Button sizing helpers (safe defaults when outside a LayoutGroup) ----
+        /// <summary>
+        /// Returns true if any parent has a LayoutGroup (Horizontal/Vertical/Grid).
+        /// </summary>
+        public static bool ParentHasLayoutGroup(Transform t)
+        {
+            if (t == null) return false;
+            Transform p = t.parent;
+            while (p != null)
+            {
+                if (p.GetComponent<HorizontalLayoutGroup>() != null ||
+                    p.GetComponent<VerticalLayoutGroup>()   != null ||
+                    p.GetComponent<GridLayoutGroup>()       != null)
+                    return true;
+                p = p.parent;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Apply sane default sizing to a Button's RectTransform when not controlled by a LayoutGroup.
+        /// In a free (no-layout) container, set explicit size; in a layout, only ensure a stable height.
+        /// Idempotent.
+        /// </summary>
+        public static void ApplyDefaultButtonSizing(RectTransform rt, Vector2? freeSize = null)
+        {
+            if (rt == null) return;
+            var size = freeSize ?? new Vector2(240f, 64f);
+            var le = rt.GetComponent<LayoutElement>();
+            if (le == null) le = rt.gameObject.AddComponent<LayoutElement>();
+
+            if (!ParentHasLayoutGroup(rt))
+            {
+                // Free stage: give it an explicit, visible size centered on the stage.
+                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.sizeDelta = size.Value;
+                rt.anchoredPosition = Vector2.zero;
+                // Allow later manual resizing by authoring tools
+                le.minWidth = 0f; le.preferredWidth = 0f; le.flexibleWidth = 0f;
+                le.minHeight = 0f; le.preferredHeight = size.Value.y; le.flexibleHeight = 0f;
+            }
+            else
+            {
+                // In a LayoutGroup: don't force width; provide a sensible preferred height for the row.
+                le.minWidth = 0f; le.preferredWidth = 0f; le.flexibleWidth = 0f;
+                le.minHeight = 0f; le.preferredHeight = 48f; le.flexibleHeight = 0f;
+            }
+        }
+
         // Ensure the 9-slice border has equal left/right and top/bottom edge sizes.
         // This avoids visual asymmetry when Unity stretches the sliced edges.
         private static Sprite GetSymmetricDarkBorder()
