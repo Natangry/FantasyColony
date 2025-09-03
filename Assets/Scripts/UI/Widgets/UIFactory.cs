@@ -15,6 +15,16 @@ namespace FantasyColony.UI.Widgets
 
     public static class UIFactory
     {
+        // ===== Cached assets =====
+        private static Sprite _woodTile;
+
+        private static Sprite GetWoodTile()
+        {
+            if (_woodTile == null)
+                _woodTile = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
+            return _woodTile;
+        }
+
         // ===== Layout utilities =====
         public static void SetAnchorsPercent(RectTransform rt, float xMin, float xMax, float yMin, float yMax)
         {
@@ -128,6 +138,7 @@ namespace FantasyColony.UI.Widgets
             {
                 // Free stage: give it an explicit, visible size centered on the stage.
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
                 rt.sizeDelta = size;
                 rt.anchoredPosition = Vector2.zero;
                 // Allow later manual resizing by authoring tools
@@ -150,6 +161,7 @@ namespace FantasyColony.UI.Widgets
             if (!ParentHasLayoutGroup(rt))
             {
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
                 rt.sizeDelta = size;
                 rt.anchoredPosition = Vector2.zero;
             }
@@ -208,15 +220,16 @@ namespace FantasyColony.UI.Widgets
             local.x -= (anchor.rect.width * 0.5f);
             local.y -= (anchor.rect.height * 0.5f); // slightly below
             root.anchoredPosition = local;
+            root.SetAsLastSibling();
 
             // Panel with VLG + CSF (Preferred Y)
             var panel = CreatePanelSurface(root, "Panel");
-            var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
+            var vl = panel.gameObject.GetComponent<VerticalLayoutGroup>() ?? panel.gameObject.AddComponent<VerticalLayoutGroup>();
             vl.childControlWidth = true; vl.childForceExpandWidth = true;
             vl.childControlHeight = true; vl.childForceExpandHeight = false;
             vl.spacing = 4f; vl.padding = new RectOffset(6,6,6,6);
 
-            var fitter = panel.gameObject.AddComponent<ContentSizeFitter>();
+            var fitter = panel.gameObject.GetComponent<ContentSizeFitter>() ?? panel.gameObject.AddComponent<ContentSizeFitter>();
             fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
@@ -232,7 +245,8 @@ namespace FantasyColony.UI.Widgets
                     var srt = sep.GetComponent<RectTransform>();
                     srt.SetParent(panel, false);
                     var le = sep.AddComponent<LayoutElement>();
-                    le.preferredHeight = 1f;
+                    var scale = canvas != null ? Mathf.Max(1f, canvas.scaleFactor) : 1f;
+                    le.preferredHeight = 1f / scale; // crisp 1 physical pixel
                     continue;
                 }
                 var row = CreateButtonSecondary(panel, it.Label, () => it.OnClick?.Invoke());
@@ -442,7 +456,10 @@ namespace FantasyColony.UI.Widgets
             var root = CreateUIObject(name, parent);
             Stretch(root);
             var img = root.gameObject.AddComponent<Image>();
-            img.sprite = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
+            var woodBg = GetWoodTile();
+            if (woodBg == null)
+                Debug.LogWarning($"UIFactory: Wood tile sprite missing at {BaseUIStyle.WoodTilePath} for {root.GetHierarchyPath()}");
+            img.sprite = woodBg;
             img.type = Image.Type.Tiled;
             img.raycastTarget = true;
             img.color = dim ? new Color(0f, 0f, 0f, 0.5f) : Color.white;
@@ -500,7 +517,10 @@ namespace FantasyColony.UI.Widgets
             Stretch(root);
 
             // Background (tiled wood) that ignores layout
-            var bg = CreateFullscreenBackground(root, Resources.Load<Sprite>(BaseUIStyle.WoodTilePath), new Color(0.05f, 0.04f, 0.03f, 1f));
+            var woodBg = GetWoodTile();
+            if (woodBg == null)
+                Debug.LogWarning($"UIFactory: Wood tile sprite missing at {BaseUIStyle.WoodTilePath} for {root.GetHierarchyPath()}");
+            var bg = CreateFullscreenBackground(root, woodBg, new Color(0.05f, 0.04f, 0.03f, 1f));
             bg.type = Image.Type.Tiled;
             var bgLE = bg.gameObject.AddComponent<LayoutElement>();
             bgLE.ignoreLayout = true;
@@ -592,10 +612,10 @@ namespace FantasyColony.UI.Widgets
         {
             var lf = left.GetComponent<UIFrame>();
             var rf = right.GetComponent<UIFrame>();
-            if (lf || rf)
+            if (lf != null || rf != null)
             {
-                if (lf) lf.SetEdges(true, false, true, true);
-                if (rf) rf.SetEdges(false, true, true, true);
+                if (lf != null) lf.SetEdges(true, false, true, true);
+                if (rf != null) rf.SetEdges(false, true, true, true);
             }
             else
             {
@@ -608,10 +628,10 @@ namespace FantasyColony.UI.Widgets
         {
             var tf = top.GetComponent<UIFrame>();
             var bf = bottom.GetComponent<UIFrame>();
-            if (tf || bf)
+            if (tf != null || bf != null)
             {
-                if (tf) tf.SetEdges(true, true, true, false);
-                if (bf) bf.SetEdges(true, true, false, true);
+                if (tf != null) tf.SetEdges(true, true, true, false);
+                if (bf != null) bf.SetEdges(true, true, false, true);
             }
             else
             {
@@ -723,7 +743,7 @@ namespace FantasyColony.UI.Widgets
             fillImg.raycastTarget = false;
             var le = fillGO.GetComponent<LayoutElement>();
             le.ignoreLayout = true;
-            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
+            var wood = GetWoodTile();
             if (wood == null)
                 Debug.LogWarning($"UIFactory: Wood tile sprite missing at {BaseUIStyle.WoodTilePath} for {fillGO.transform.GetHierarchyPath()}");
             fillImg.sprite = wood;
@@ -789,7 +809,7 @@ namespace FantasyColony.UI.Widgets
             fillImg.raycastTarget = false;
             fillImg.preserveAspect = false;
             fillGO.GetComponent<LayoutElement>().ignoreLayout = true;
-            var wood = Resources.Load<Sprite>(BaseUIStyle.WoodTilePath);
+            var wood = GetWoodTile();
             if (wood == null)
                 Debug.LogWarning($"UIFactory: Wood tile sprite missing at {BaseUIStyle.WoodTilePath} for {fillGO.transform.GetHierarchyPath()}");
             fillImg.sprite = wood;
