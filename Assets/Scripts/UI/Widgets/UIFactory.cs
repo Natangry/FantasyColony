@@ -205,26 +205,77 @@ namespace FantasyColony.UI.Widgets
 
             var canvas = overlay.GetComponentInParent<Canvas>();
 
-            // Position near the anchor (below it, left-aligned) using bottom-left corner of the button
-            var anchorRT = anchor.GetComponent<RectTransform>();
+        // Position near the anchor (below it, left-aligned) with edge clamping
+        var anchorRT = anchor.GetComponent<RectTransform>();
 
-            // Dropdown root measures from overlay top-left
-            root.anchorMin = root.anchorMax = new Vector2(0f, 1f);
-            root.pivot = new Vector2(0f, 1f);
+        // Dropdown measures from overlay top-left for deterministic placement
+        root.anchorMin = root.anchorMax = new Vector2(0f, 1f);
+        root.pivot = new Vector2(0f, 1f);
 
-            // Get world-space corners of the anchor; index 0 = bottom-left
-            Vector3[] corners = new Vector3[4];
-            anchorRT.GetWorldCorners(corners);
-            Vector3 worldBL = corners[0];
+        // Get world-space corners of the anchor; 0=BL, 1=TL, 2=TR, 3=BR
+        Vector3[] corners = new Vector3[4];
+        anchorRT.GetWorldCorners(corners);
+        Vector3 worldBL = corners[0];
+        Vector3 worldTL = corners[1];
 
-            // Convert to overlay local space (ScreenSpaceOverlay => cam null)
-            Vector2 screenBL = RectTransformUtility.WorldToScreenPoint(null, worldBL);
-            Vector2 localBL;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenBL, null, out localBL);
+        // Determine canvas camera (ScreenSpaceOverlay => null)
+        Camera cam = null;
+        var canvas = overlay.GetComponentInParent<Canvas>();
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            cam = canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
+        }
 
-            // Convert overlay-local (pivot) to anchoredPosition in top-left anchor space
-            Vector2 overlayTopLeft = new Vector2(-overlay.rect.width * overlay.pivot.x, overlay.rect.height * (1f - overlay.pivot.y));
-            root.anchoredPosition = localBL - overlayTopLeft;
+        // Convert to overlay local space
+        Vector2 screenBL = RectTransformUtility.WorldToScreenPoint(cam, worldBL);
+        Vector2 localBL;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenBL, cam, out localBL);
+
+        // Convert overlay-local (pivot) to anchoredPosition in top-left anchor space
+        Vector2 overlayTopLeft = new Vector2(-overlay.rect.width * overlay.pivot.x, overlay.rect.height * (1f - overlay.pivot.y));
+        Vector2 anchored = localBL - overlayTopLeft; // initial: below-left of anchor
+
+        // Ensure layout is measured before clamping
+        UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(root);
+        var size = root.rect.size;
+
+        // Clamp horizontally to keep fully on-screen
+        float maxX = overlay.rect.width - size.x;
+        if (anchored.x > maxX)
+        {
+            anchored.x = Mathf.Max(0f, maxX);
+            Debug.Log("[UIFactory] Dropdown clamped (right)");
+        }
+        if (anchored.x < 0f)
+        {
+            anchored.x = 0f;
+            Debug.Log("[UIFactory] Dropdown clamped (left)");
+        }
+
+        // Clamp vertically; if not enough room below, try flipping above
+        float minY = -overlay.rect.height + size.y; // lowest so bottom stays visible
+        float maxY = 0f; // top aligned with overlay top
+        float desiredYBelow = anchored.y;
+        float desiredYBottom = desiredYBelow - size.y; // bottom of menu
+
+        if (desiredYBottom < minY)
+        {
+            // Try place above using top-left corner
+            Vector2 screenTL = RectTransformUtility.WorldToScreenPoint(cam, worldTL);
+            Vector2 localTL;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenTL, cam, out localTL);
+            Vector2 anchoredAbove = localTL - overlayTopLeft; // top-left of anchor => menu above
+            anchoredAbove.y = Mathf.Clamp(anchoredAbove.y, minY + size.y, maxY);
+            anchored = new Vector2(anchored.x, anchoredAbove.y);
+            Debug.Log("[UIFactory] Dropdown flipped above (bottom clamp)");
+        }
+        else
+        {
+            // Clamp within vertical bounds while staying below
+            anchored.y = Mathf.Clamp(anchored.y, minY + size.y, maxY);
+        }
+
+        root.anchoredPosition = anchored;
             root.SetAsLastSibling();
 
             // Panel with VLG + CSF (Preferred Y)
