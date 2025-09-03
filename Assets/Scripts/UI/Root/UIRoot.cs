@@ -64,8 +64,16 @@ namespace FantasyColony.UI.Root
                 esys.gameObject.AddComponent<InputSystemUIInputModule>();
 #else
             // Legacy Input (Standalone)
-            var newMod = esys.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
-            if (newMod != null) Destroy(newMod);
+            // Remove any leftover InputSystemUIInputModule via reflection so this compiles
+            // even if the new Input System package is not installed.
+            var newInputModuleType = System.Type.GetType(
+                "UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
+            if (newInputModuleType != null)
+            {
+                var newMod = esys.GetComponent(newInputModuleType);
+                if (newMod != null)
+                    Destroy(newMod);
+            }
             if (esys.GetComponent<StandaloneInputModule>() == null)
                 esys.gameObject.AddComponent<StandaloneInputModule>();
 #endif
