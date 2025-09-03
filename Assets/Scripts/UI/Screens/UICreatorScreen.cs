@@ -19,6 +19,7 @@ namespace FantasyColony.UI.Screens
         // Program-window layout: Top toolbar (percent height) + large blank stage
         private RectTransform _toolbar;
         private RectTransform _stage;
+        private RectTransform _btnFile, _btnEdit, _btnView, _btnTools, _btnClose;
         private const float TOOLBAR_FRAC = 0.05f; // 5% of screen height
 
         public void Enter(Transform parent)
@@ -77,12 +78,12 @@ namespace FantasyColony.UI.Screens
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
-            var fileBtn = CreateFlexMenuButton(_toolbar, "File",  OnFileMenu);
-            var editBtn = CreateFlexMenuButton(_toolbar, "Edit",  OnEditMenu);
-            var viewBtn = CreateFlexMenuButton(_toolbar, "View",  OnViewMenu);
-            var toolBtn = CreateFlexMenuButton(_toolbar, "Tools", OnToolsMenu);
+            _btnFile  = CreateFlexMenuButton(_toolbar, "File",  OnFileMenu);
+            _btnEdit  = CreateFlexMenuButton(_toolbar, "Edit",  OnEditMenu);
+            _btnView  = CreateFlexMenuButton(_toolbar, "View",  OnViewMenu);
+            _btnTools = CreateFlexMenuButton(_toolbar, "Tools", OnToolsMenu);
             // Remove Help per request
-            var closeBtn = CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
+            _btnClose = CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
 
             IsOpen = true;
         }
@@ -198,21 +199,21 @@ namespace FantasyColony.UI.Screens
         // --- Menu actions (stubs) ---
         private void OnFileMenu()
         {
-            ShowMenu(_toolbar, ("New", ()=>Debug.Log("[UICreator] File/New")),
-                             ("Save", ()=>Debug.Log("[UICreator] File/Save (stub)")),
-                             ("Load", ()=>Debug.Log("[UICreator] File/Load (stub)")));
+            ShowMenu(_btnFile, ("New", ()=>Debug.Log("[UICreator] File/New")),
+                              ("Save", ()=>Debug.Log("[UICreator] File/Save (stub)")),
+                              ("Load", ()=>Debug.Log("[UICreator] File/Load (stub)")));
         }
 
         private void OnEditMenu() { Debug.Log("[UICreator] Edit (stub)"); }
 
         private void OnViewMenu()
         {
-            ShowMenu(_toolbar, ("Fullscreen Work Area", ()=> ToggleFullscreenWorkArea()));
+            ShowMenu(_btnView, ("Fullscreen Work Area", ()=> ToggleFullscreenWorkArea()));
         }
 
         private void OnToolsMenu()
         {
-            ShowMenu(_toolbar,
+            ShowMenu(_btnTools,
                 ("Add Primary Button", ()=> SpawnButton("UI_PrimaryButton", UIFactory.CreateButtonPrimary)),
                 ("Add Secondary Button", ()=> SpawnButton("UI_SecondaryButton", UIFactory.CreateButtonSecondary)),
                 ("Add Danger Button", ()=> SpawnButton("UI_DangerButton", UIFactory.CreateButtonDanger)),
@@ -234,7 +235,8 @@ namespace FantasyColony.UI.Screens
             var btn = ctor(_stage, name.Replace("UI_", string.Empty), ()=>{});
             btn.gameObject.name = name;
             var rt = btn.GetComponent<RectTransform>();
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            // Apply factory defaults so buttons spawned outside a LayoutGroup are visible and usable
+            UIFactory.ApplyDefaultButtonSizing(rt);
             rt.anchoredPosition = Vector2.zero;
             Debug.Log($"[UICreator] Spawn {name}");
         }
