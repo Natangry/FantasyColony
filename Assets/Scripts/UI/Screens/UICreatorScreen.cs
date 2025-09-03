@@ -1,9 +1,11 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
-using FantasyColony.UI.Root;
 using UnityObject = UnityEngine.Object;
 
 namespace FantasyColony.UI.Screens
@@ -22,6 +24,35 @@ namespace FantasyColony.UI.Screens
         private RectTransform _stage;
         private RectTransform _btnFile, _btnEdit, _btnView, _btnTools, _btnClose;
         private const float TOOLBAR_FRAC = 0.05f; // 5% of screen height
+
+        // Attach controller when screen becomes active to manage stage fullscreen toggling
+        private void OnEnable()
+        {
+            try
+            {
+                var rootRT = _root != null ? _root.GetComponent<RectTransform>() : null;
+                if (rootRT != null && _toolbar != null && _stage != null && _root.GetComponent<UICreatorStageController>() == null)
+                {
+                    var ctl = _root.gameObject.AddComponent<UICreatorStageController>();
+                    ctl.Initialize(_toolbar, _stage, TOOLBAR_FRAC);
+                    Debug.Log("[UICreator] Controller attached");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[UICreator] Controller attach failed: {e.Message}");
+            }
+        }
+
+        // Ensure toolbar is visible if this screen is being closed
+        private void OnDisable()
+        {
+            var ctl = _root != null ? _root.GetComponent<UICreatorStageController>() : null;
+            if (ctl != null)
+            {
+                ctl.SetStageFullscreen(false);
+            }
+        }
 
         public void Enter(Transform parent)
         {
@@ -87,10 +118,9 @@ namespace FantasyColony.UI.Screens
             _btnClose = CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
 
             // Reset toolbar ON whenever entering the Creator
-            SetToolbarVisible(true);
-
-            // Register hotkeys (F11 toggle fullscreen, Esc exits fullscreen)
-            RegisterHotkeys();
+            OnEnable();
+            var ctl = _root != null ? _root.GetComponent<UICreatorStageController>() : null;
+            if (ctl != null) ctl.SetStageFullscreen(false);
 
             IsOpen = true;
         }
@@ -100,7 +130,7 @@ namespace FantasyColony.UI.Screens
             if (_root != null)
             {
                 Debug.Log("[UICreator] Exit");
-                UnregisterHotkeys();
+                OnDisable();
                 // Cleanup any open menus/overlays
                 CloseMenus();
                 UnityObject.Destroy(_root.gameObject);
@@ -200,54 +230,13 @@ namespace FantasyColony.UI.Screens
 
         private void ToggleFullscreenWorkArea()
         {
-            bool isActive = _toolbar.gameObject.activeSelf;
-            SetToolbarVisible(!isActive);
-            Debug.Log($"[UICreator] View/Fullscreen Work Area: {!isActive}");
-        }
-
-        private void SetToolbarVisible(bool visible)
-        {
-            _toolbar.gameObject.SetActive(visible);
-            // Re-apply anchors in case external code changed them
-            if (visible)
+            var ctl = _root != null ? _root.GetComponent<UICreatorStageController>() : null;
+            if (ctl != null)
             {
-                UIFactory.SetAnchorsPercent(_toolbar, 0f, 1f, 1f - TOOLBAR_FRAC, 1f);
-                UIFactory.SetAnchorsPercent(_stage,   0f, 1f, 0f,              1f - TOOLBAR_FRAC);
+                bool target = !ctl.IsStageFullscreen;
+                ctl.SetStageFullscreen(target);
+                Debug.Log($"[UICreator] View/Fullscreen Work Area: {target}");
             }
-            else
-            {
-                // Toolbar hidden: stage occupies full height
-                UIFactory.SetAnchorsPercent(_toolbar, 0f, 1f, 1f, 1f);
-                UIFactory.SetAnchorsPercent(_stage,   0f, 1f, 0f, 1f);
-            }
-        }
-
-        // --- Hotkeys ---
-        private bool _hotkeysRegistered;
-        private void RegisterHotkeys()
-        {
-            if (_hotkeysRegistered) return;
-            _hotkeysRegistered = true;
-            // Hook into Update loop via a lightweight runner attached to UIRoot
-            UIRoot.OnUpdate += OnUpdate;
-            Debug.Log("[UICreator] Hotkeys registered (F11 fullscreen, Esc exit fullscreen)");
-        }
-
-        private void UnregisterHotkeys()
-        {
-            if (!_hotkeysRegistered) return;
-            _hotkeysRegistered = false;
-            UIRoot.OnUpdate -= OnUpdate;
-        }
-
-        private void OnUpdate()
-        {
-            // Legacy Input (works without new Input System)
-            if (Input.GetKeyDown(KeyCode.F11))
-                ToggleFullscreenWorkArea();
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-                SetToolbarVisible(true);
         }
 
         // --- Spawn helpers (center of stage; placement tools come later) ---
@@ -283,6 +272,83 @@ namespace FantasyColony.UI.Screens
             var prt = panel;
             UIFactory.ApplyDefaultPanelSizing(prt);
             Debug.Log("[UICreator] Spawn UI_Panel");
+        }
+    }
+
+    // Local controller that handles F11/Escape and stage fullscreen toggling.
+    internal sealed class UICreatorStageController : MonoBehaviour
+    {
+        private RectTransform _toolbar;
+        private RectTransform _stage;
+        private float _toolbarFrac = 0.05f;
+        private bool _isFullscreen;
+
+        public bool IsStageFullscreen => _isFullscreen;
+
+        public void Initialize(RectTransform toolbar, RectTransform stage, float toolbarFrac)
+        {
+            _toolbar = toolbar;
+            _stage = stage;
+            _toolbarFrac = Mathf.Clamp01(toolbarFrac);
+        }
+
+        private void Update()
+        {
+            if (_toolbar == null || _stage == null) return;
+#if ENABLE_INPUT_SYSTEM
+            bool f11 = Keyboard.current != null && Keyboard.current.f11Key.wasPressedThisFrame;
+            bool esc = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+#else
+            bool f11 = Input.GetKeyDown(KeyCode.F11);
+            bool esc = Input.GetKeyDown(KeyCode.Escape);
+#endif
+            if (f11)
+            {
+                SetStageFullscreen(!_isFullscreen);
+            }
+            else if (esc && _isFullscreen)
+            {
+                SetStageFullscreen(false);
+            }
+        }
+
+        public void SetStageFullscreen(bool on)
+        {
+            if (_toolbar == null || _stage == null) return;
+            _isFullscreen = on;
+
+            if (on)
+            {
+                if (_toolbar.gameObject.activeSelf) _toolbar.gameObject.SetActive(false);
+                // Stage fills entire area
+                SetAnchors(_stage, new Vector2(0f, 0f), new Vector2(1f, 1f));
+                Debug.Log("[UICreator] View: Stage Fullscreen ON");
+            }
+            else
+            {
+                if (!_toolbar.gameObject.activeSelf) _toolbar.gameObject.SetActive(true);
+                // Toolbar on top strip; stage below it.
+                SetAnchors(_toolbar, new Vector2(0f, 1f - _toolbarFrac), new Vector2(1f, 1f));
+                SetAnchors(_stage, new Vector2(0f, 0f), new Vector2(1f, 1f - _toolbarFrac));
+                Debug.Log("[UICreator] View: Stage Fullscreen OFF");
+            }
+        }
+
+        private static void SetAnchors(RectTransform rt, Vector2 min, Vector2 max)
+        {
+            var t = rt;
+            t.anchorMin = min;
+            t.anchorMax = max;
+            t.offsetMin = Vector2.zero;
+            t.offsetMax = Vector2.zero;
+            t.anchoredPosition = Vector2.zero;
+            t.localScale = Vector3.one;
+        }
+
+        private void OnDestroy()
+        {
+            // If screen closes while fullscreen, ensure toolbar is not left hidden in scene play mode.
+            if (_toolbar != null) _toolbar.gameObject.SetActive(true);
         }
     }
 }
