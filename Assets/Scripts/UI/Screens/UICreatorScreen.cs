@@ -77,12 +77,12 @@ namespace FantasyColony.UI.Screens
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
-            CreateFlexMenuButton(_toolbar, "File",  () => {});
-            CreateFlexMenuButton(_toolbar, "Edit",  () => {});
-            CreateFlexMenuButton(_toolbar, "View",  () => {});
-            CreateFlexMenuButton(_toolbar, "Tools", () => {});
-            CreateFlexMenuButton(_toolbar, "Help",  () => {});
-            CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
+            var fileBtn = CreateFlexMenuButton(_toolbar, "File",  OnFileMenu);
+            var editBtn = CreateFlexMenuButton(_toolbar, "Edit",  OnEditMenu);
+            var viewBtn = CreateFlexMenuButton(_toolbar, "View",  OnViewMenu);
+            var toolBtn = CreateFlexMenuButton(_toolbar, "Tools", OnToolsMenu);
+            // Remove Help per request
+            var closeBtn = CreateFlexMenuButton(_toolbar, "Close", () => UIRouter.Current?.Pop());
 
             IsOpen = true;
         }
@@ -99,13 +99,15 @@ namespace FantasyColony.UI.Screens
         }
 
         // --- helpers ---
-        private static void CreateFlexMenuButton(Transform parent, string label, Action onClick)
+        private static RectTransform CreateFlexMenuButton(Transform parent, string label, System.Action onClick)
         {
             var btn = UIFactory.CreateButtonPrimary(parent, label, onClick);
-            var le = btn.GetComponent<LayoutElement>() ?? btn.gameObject.AddComponent<LayoutElement>();
+            // Equal slice of width, regardless of label length
+            var le = btn.GetComponent<LayoutElement>();
+            if (le == null) le = btn.gameObject.AddComponent<LayoutElement>();
             le.minWidth = 0f;
             le.preferredWidth = 0f;
-            le.flexibleWidth = 1f; // Equal slice of the row
+            le.flexibleWidth = 1f; // ratio slice
 
             var txt = btn.GetComponentInChildren<Text>();
             if (txt != null)
@@ -114,64 +116,152 @@ namespace FantasyColony.UI.Screens
                 txt.resizeTextMinSize = 12;
                 txt.resizeTextMaxSize = 28;
             }
+            return btn.GetComponent<RectTransform>();
         }
 
         private static void SetAnchorsPercent(RectTransform rt, float xMin, float xMax, float yMin, float yMax)
         {
-            if (rt == null) return;
             rt.anchorMin = new Vector2(xMin, yMin);
             rt.anchorMax = new Vector2(xMax, yMax);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
         }
 
-        private static void RemoveHeaderIfExists(RectTransform panel)
+        // --- Simple dropdown framework (stub for Step 1) ---
+        private RectTransform _menuOverlay;
+        private RectTransform _openMenu;
+
+        private void EnsureMenuOverlay(Transform parent)
         {
-            if (panel == null) return;
-            var header = panel.Find("Header");
-            if (header != null)
+            if (_menuOverlay != null) return;
+            var go = new GameObject("MenuOverlay", typeof(RectTransform), typeof(Image));
+            _menuOverlay = go.GetComponent<RectTransform>();
+            var img = go.GetComponent<Image>();
+            img.color = new Color(0f,0f,0f,0f);
+            img.raycastTarget = true; // capture outside clicks
+            _menuOverlay.SetParent(parent, false);
+            _menuOverlay.anchorMin = Vector2.zero; _menuOverlay.anchorMax = Vector2.one;
+            _menuOverlay.offsetMin = Vector2.zero; _menuOverlay.offsetMax = Vector2.zero;
+            go.AddComponent<Button>().onClick.AddListener(CloseMenus);
+            go.SetActive(false);
+        }
+
+        private void CloseMenus()
+        {
+            if (_openMenu != null)
             {
-                UnityObject.Destroy(header.gameObject);
+                Destroy(_openMenu.gameObject);
+                _openMenu = null;
+            }
+            if (_menuOverlay != null) _menuOverlay.gameObject.SetActive(false);
+        }
+
+        private void ShowMenu(RectTransform anchor, params (string label, System.Action onClick)[] items)
+        {
+            CloseMenus();
+            EnsureMenuOverlay(_toolbar.parent); // overlay lives under AbsoluteLayer
+            _menuOverlay.gameObject.SetActive(true);
+
+            var go = new GameObject("Dropdown", typeof(RectTransform));
+            _openMenu = go.GetComponent<RectTransform>();
+            _openMenu.SetParent(_menuOverlay, false);
+            _openMenu.pivot = new Vector2(0f, 1f);
+            _openMenu.sizeDelta = new Vector2(anchor.rect.width, 0f);
+
+            // Position just below the anchor button
+            var screenPos = RectTransformUtility.WorldToScreenPoint(null, anchor.position);
+            Vector2 local;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_menuOverlay, screenPos, null, out local);
+            // align left edge: subtract half of anchor width since anchor pivot is 0.5
+            local.x -= (anchor.rect.width * 0.5f);
+            local.y -= (anchor.rect.height * 0.5f); // drop below
+            _openMenu.anchoredPosition = local;
+
+            // Menu panel
+            var panel = UIFactory.CreatePanelSurface(_openMenu, "Panel");
+            var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
+            vl.childControlWidth = true;
+            vl.childForceExpandWidth = true;
+            vl.childControlHeight = true;
+            vl.childForceExpandHeight = false;
+            vl.spacing = 4f;
+            vl.padding = new RectOffset(6,6,6,6);
+
+            foreach (var (label, act) in items)
+            {
+                var row = UIFactory.CreateButtonSecondary(panel, label, () => { act?.Invoke(); CloseMenus(); });
+                var le = row.GetComponent<LayoutElement>() ?? row.gameObject.AddComponent<LayoutElement>();
+                le.preferredHeight = 32f;
             }
         }
 
-        private static void ConfigureColumn(RectTransform col, RectOffset padding, float spacing)
+        // --- Menu actions (stubs) ---
+        private void OnFileMenu()
         {
-            var vl = col.GetComponent<VerticalLayoutGroup>();
-            if (vl != null)
-            {
-                vl.padding = padding;
-                vl.spacing = spacing;
-                vl.childControlHeight = true;
-                vl.childForceExpandHeight = true;
-            }
+            ShowMenu(_toolbar, ("New", ()=>Debug.Log("[UICreator] File/New")),
+                             ("Save", ()=>Debug.Log("[UICreator] File/Save (stub)")),
+                             ("Load", ()=>Debug.Log("[UICreator] File/Load (stub)")));
         }
 
-        private static void EnsureMinWidth(RectTransform col, float minWidth)
+        private void OnEditMenu() { Debug.Log("[UICreator] Edit (stub)"); }
+
+        private void OnViewMenu()
         {
-            var le = col.GetComponent<LayoutElement>();
-            if (le == null) le = col.gameObject.AddComponent<LayoutElement>();
-            if (le != null)
-            {
-                if (le.minWidth < minWidth) le.minWidth = minWidth;
-            }
+            ShowMenu(_toolbar, ("Fullscreen Work Area", ()=> ToggleFullscreenWorkArea()));
         }
 
-        private static Text CreateHeaderLabel(Transform parent, string text)
+        private void OnToolsMenu()
         {
-            var go = new GameObject("Header", typeof(RectTransform));
-            var rt = go.GetComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            var t = go.AddComponent<Text>();
-            t.text = text;
-            t.fontSize = 20;
-            t.fontStyle = FontStyle.Bold;
-            t.alignment = TextAnchor.MiddleLeft;
-            t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            t.color = new Color(0.92f, 0.88f, 0.78f, 1f);
-            var le = go.AddComponent<LayoutElement>();
-            le.minHeight = 28f;
-            return t;
+            ShowMenu(_toolbar,
+                ("Add Primary Button", ()=> SpawnButton("UI_PrimaryButton", UIFactory.CreateButtonPrimary)),
+                ("Add Secondary Button", ()=> SpawnButton("UI_SecondaryButton", UIFactory.CreateButtonSecondary)),
+                ("Add Danger Button", ()=> SpawnButton("UI_DangerButton", UIFactory.CreateButtonDanger)),
+                ("Add Panel", ()=> SpawnPanel(false)),
+                ("Add Background Panel", ()=> SpawnPanel(true))
+            );
+        }
+
+        private void ToggleFullscreenWorkArea()
+        {
+            bool isActive = _toolbar.gameObject.activeSelf;
+            _toolbar.gameObject.SetActive(!isActive);
+            Debug.Log($"[UICreator] View/Fullscreen Work Area: {!isActive}");
+        }
+
+        // --- Spawn helpers (center of stage; placement tools come later) ---
+        private void SpawnButton(string name, System.Func<Transform, string, System.Action, UnityEngine.UI.Button> ctor)
+        {
+            var btn = ctor(_stage, name.Replace("UI_", string.Empty), ()=>{});
+            btn.gameObject.name = name;
+            var rt = btn.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            Debug.Log($"[UICreator] Spawn {name}");
+        }
+
+        private void SpawnPanel(bool background)
+        {
+            if (background)
+            {
+                var go = new GameObject("UI_BackgroundPanel", typeof(RectTransform), typeof(Image));
+                var rt = go.GetComponent<RectTransform>();
+                var img = go.GetComponent<Image>();
+                img.color = new Color(0f,0f,0f,0f);
+                img.raycastTarget = false;
+                rt.SetParent(_stage, false);
+                rt.anchorMin = new Vector2(0.1f, 0.1f);
+                rt.anchorMax = new Vector2(0.9f, 0.9f);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+                Debug.Log("[UICreator] Spawn UI_BackgroundPanel");
+                return;
+            }
+
+            var panel = UIFactory.CreatePanelSurface(_stage, "UI_Panel");
+            var prt = panel;
+            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
+            prt.sizeDelta = new Vector2(480f, 320f);
+            prt.anchoredPosition = Vector2.zero;
+            Debug.Log("[UICreator] Spawn UI_Panel");
         }
     }
 }
