@@ -316,7 +316,7 @@ namespace FantasyColony.UI.Widgets
                 }
                 else if (tracker != null && tracker.Source == null)
                 {
-                    Object.Destroy(tracker);
+                    UnityObject.Destroy(tracker);
                 }
                 Debug.LogWarning($"UIFactory: Using CPU grayscale fallback on {img.transform.GetHierarchyPath()}.");
                 return;
@@ -328,7 +328,7 @@ namespace FantasyColony.UI.Widgets
                 GrayscaleSpriteCache.Release(tracker.Source);
                 tracker.Source = null;
                 tracker.Gray = null;
-                Object.Destroy(tracker);
+                UnityObject.Destroy(tracker);
                 tracker = null;
             }
 
