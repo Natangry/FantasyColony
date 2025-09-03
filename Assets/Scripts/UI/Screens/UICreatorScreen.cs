@@ -163,37 +163,11 @@ namespace FantasyColony.UI.Screens
             EnsureMenuOverlay(_toolbar.parent); // overlay lives under AbsoluteLayer
             _menuOverlay.gameObject.SetActive(true);
 
-            var go = new GameObject("Dropdown", typeof(RectTransform));
-            _openMenu = go.GetComponent<RectTransform>();
-            _openMenu.SetParent(_menuOverlay, false);
-            _openMenu.pivot = new Vector2(0f, 1f);
-            _openMenu.sizeDelta = new Vector2(anchor.rect.width, 0f);
+            var list = new System.Collections.Generic.List<UIFactory.MenuItem>(items.Length);
+            foreach (var it in items)
+                list.Add(new UIFactory.MenuItem(it.label, () => { it.onClick?.Invoke(); CloseMenus(); }));
 
-            // Position just below the anchor button
-            var screenPos = RectTransformUtility.WorldToScreenPoint(null, anchor.position);
-            Vector2 local;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(_menuOverlay, screenPos, null, out local);
-            // align left edge: subtract half of anchor width since anchor pivot is 0.5
-            local.x -= (anchor.rect.width * 0.5f);
-            local.y -= (anchor.rect.height * 0.5f); // drop below
-            _openMenu.anchoredPosition = local;
-
-            // Menu panel
-            var panel = UIFactory.CreatePanelSurface(_openMenu, "Panel");
-            var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
-            vl.childControlWidth = true;
-            vl.childForceExpandWidth = true;
-            vl.childControlHeight = true;
-            vl.childForceExpandHeight = false;
-            vl.spacing = 4f;
-            vl.padding = new RectOffset(6,6,6,6);
-
-            foreach (var (label, act) in items)
-            {
-                var row = UIFactory.CreateButtonSecondary(panel, label, () => { act?.Invoke(); CloseMenus(); });
-                var le = row.GetComponent<LayoutElement>() ?? row.gameObject.AddComponent<LayoutElement>();
-                le.preferredHeight = 32f;
-            }
+            _openMenu = UIFactory.CreateDropdownMenu(_menuOverlay, anchor, list, rowHeight: 32f, minWidth: 160f, matchAnchorWidth: true);
         }
 
         // --- Menu actions (stubs) ---

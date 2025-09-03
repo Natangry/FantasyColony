@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FantasyColony; // for GetHierarchyPath()
 using FantasyColony.UI.Style;
@@ -64,6 +65,84 @@ namespace FantasyColony.UI.Widgets
                 le.minWidth = 0f; le.preferredWidth = 0f; le.flexibleWidth = 0f;
                 le.minHeight = 0f; le.preferredHeight = 48f; le.flexibleHeight = 0f;
             }
+        }
+
+        // ---- Dropdown Menu ----
+        public struct MenuItem
+        {
+            public string Label;
+            public Action OnClick;
+            public bool Separator;
+
+            public MenuItem(string label, Action onClick)
+            {
+                Label = label;
+                OnClick = onClick;
+                Separator = false;
+            }
+
+            public static MenuItem Sep() => new MenuItem { Label = string.Empty, OnClick = null, Separator = true };
+        }
+
+        /// <summary>
+        /// Build a dropdown menu under an anchor. The overlay must be a full-screen RectTransform with no LayoutGroup.
+        /// Returns the dropdown root (caller manages its lifetime).
+        /// </summary>
+        public static RectTransform CreateDropdownMenu(
+            RectTransform overlay,
+            RectTransform anchor,
+            IList<MenuItem> items,
+            float rowHeight = 32f,
+            float minWidth = 160f,
+            bool matchAnchorWidth = true)
+        {
+            if (overlay == null || anchor == null) return null;
+
+            var root = new GameObject("Dropdown", typeof(RectTransform)).GetComponent<RectTransform>();
+            root.SetParent(overlay, false);
+            root.pivot = new Vector2(0f, 1f);
+
+            // Position below anchor (Screen Space Overlay)
+            var screenPos = RectTransformUtility.WorldToScreenPoint(null, anchor.position);
+            Vector2 local;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenPos, null, out local);
+            local.x -= (anchor.rect.width * 0.5f);
+            local.y -= (anchor.rect.height * 0.5f); // slightly below
+            root.anchoredPosition = local;
+
+            // Panel with VLG + CSF (Preferred Y)
+            var panel = CreatePanelSurface(root, "Panel");
+            var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
+            vl.childControlWidth = true; vl.childForceExpandWidth = true;
+            vl.childControlHeight = true; vl.childForceExpandHeight = false;
+            vl.spacing = 4f; vl.padding = new RectOffset(6,6,6,6);
+
+            var fitter = panel.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            float width = Mathf.Max(minWidth, matchAnchorWidth ? anchor.rect.width : minWidth);
+            var prt = panel.GetComponent<RectTransform>();
+            prt.sizeDelta = new Vector2(width, 0f);
+
+            foreach (var it in items)
+            {
+                if (it.Separator)
+                {
+                    var sep = new GameObject("Sep", typeof(RectTransform), typeof(Image));
+                    var srt = sep.GetComponent<RectTransform>();
+                    srt.SetParent(panel, false);
+                    var le = sep.AddComponent<LayoutElement>();
+                    le.preferredHeight = 1f;
+                    continue;
+                }
+                var row = CreateButtonSecondary(panel, it.Label, () => it.OnClick?.Invoke());
+                var le2 = row.GetComponent<LayoutElement>();
+                if (le2 == null) le2 = row.gameObject.AddComponent<LayoutElement>();
+                le2.preferredHeight = rowHeight;
+                le2.flexibleWidth = 1f;
+            }
+            return root;
         }
 
         // Ensure the 9-slice border has equal left/right and top/bottom edge sizes.
