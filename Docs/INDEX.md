@@ -122,6 +122,7 @@
 - ``Docs/UI/Character-Info-and-Compare-v0.1.md
 - ``Docs/UI/Loadout-Manager-and-Armory-UI-v0.1.md
 - ``Docs/UI/Logistics-Overlays-and-Alerts-v0.1.md
+- ``Docs/UIFactory_Reference.md
 - ``Docs/UI_Creator_Spec.md
 - ``Docs/UI_Glossary.md
 - ``Docs/World/Aftershocks-SpinOff-Chains-and-Mutator-Propagation-v0.1.md
