@@ -128,7 +128,22 @@ namespace FantasyColony.UI.Screens
               // Attach hotkeys component so keyboard shortcuts work even if this Screen is not a MonoBehaviour
               var hk = _stage.gameObject.GetComponent<UICreatorHotkeys>();
               if (hk == null) hk = _stage.gameObject.AddComponent<UICreatorHotkeys>();
-              hk.Init(_stage, _layerBackground, _layerPanels, _layerControls, RebuildViewMenu);
+              hk.Init(
+                  _stage, _layerBackground, _layerPanels, _layerControls,
+                  RebuildViewMenu,
+                  // F11
+                  () => ToggleStageFullscreen(),
+                  // G
+                  () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? \"on\" : \"off\")}"); },
+                  // Ctrl+G
+                  () => { GridPrefs.CycleCellSize(); },
+                  // F4
+                  () => { GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled; Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? \"on\" : \"off\")}"); },
+                  // canDelete
+                  () => { var sel = UISelectionBox.CurrentTarget; return sel != null && sel != _stage && sel != _layerBackground && sel != _layerPanels && sel != _layerControls; },
+                  // deleteSelected
+                  () => { var sel = UISelectionBox.CurrentTarget; if (sel == null) return; var name = sel.name; UnityObject.Destroy(sel.gameObject); Debug.Log($"[UICreator] Deleted: {name}"); RebuildViewMenu(); }
+              );
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
@@ -240,7 +255,7 @@ namespace FantasyColony.UI.Screens
         private void OnViewMenu()
         {
             ShowMenu(_btnView,
-                ("Fullscreen Work Area", () => ToggleFullscreenWorkArea()),
+                ("Fullscreen Work Area", () => ToggleStageFullscreen()),
                 ($"Show Grid: {(GridPrefs.GridVisible ? "On" : "Off")}", () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}"); RebuildViewMenu(); })
             );
         }
@@ -256,7 +271,7 @@ namespace FantasyColony.UI.Screens
             );
         }
 
-        private void ToggleFullscreenWorkArea()
+        private void ToggleStageFullscreen()
         {
             var ctl = _root != null ? _root.GetComponent<UICreatorStageController>() : null;
             if (ctl != null)
@@ -265,25 +280,6 @@ namespace FantasyColony.UI.Screens
                 ctl.SetStageFullscreen(target);
                 Debug.Log($"[UICreator] View/Fullscreen Work Area: {target}");
             }
-        }
-
-        private void DeleteSelected()
-        {
-            var sel = UISelectionBox.CurrentTarget;
-            if (sel == null)
-            {
-                Debug.Log("[UICreator] Delete: nothing selected");
-                return;
-            }
-            if (sel == _stage || sel == _layerBackground || sel == _layerPanels || sel == _layerControls)
-            {
-                Debug.Log("[UICreator] Delete: refusing to delete stage/layer");
-                return;
-            }
-            var name = sel.name;
-            UnityObject.Destroy(sel.gameObject);
-            Debug.Log($"[UICreator] Deleted: {name}");
-            RebuildViewMenu();
         }
 
         private void RebuildViewMenu()
@@ -415,58 +411,6 @@ namespace FantasyColony.UI.Screens
             sel.Init(rt, _stage);
         }
 
-        private void Update()
-        {
-#if ENABLE_INPUT_SYSTEM
-            bool g = Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame;
-            bool ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
-            bool f4 = Keyboard.current != null && Keyboard.current.f4Key.wasPressedThisFrame;
-            bool iKey = Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
-            bool del = Keyboard.current != null && (Keyboard.current.deleteKey.wasPressedThisFrame || Keyboard.current.backspaceKey.wasPressedThisFrame);
-#else
-            bool g = Input.GetKeyDown(KeyCode.G);
-            bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-            bool f4 = Input.GetKeyDown(KeyCode.F4);
-            bool iKey = Input.GetKeyDown(KeyCode.I);
-            bool del = Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace);
-#endif
-            if (g)
-            {
-                if (ctrl)
-                {
-                    GridPrefs.CycleCellSize();
-                    _grid?.MarkDirty();
-                }
-                else
-                {
-                    GridPrefs.GridVisible = !GridPrefs.GridVisible;
-                    Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
-                    RebuildViewMenu();
-                }
-            }
-            if (f4)
-            {
-                GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
-                Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
-            }
-
-            if (iKey)
-            {
-                var sel = UISelectionBox.CurrentTarget;
-                if (sel != null)
-                {
-                    InstructionDialog.Show(_stage, sel);
-                }
-                else
-                {
-                    Debug.Log("[UICreator] No selection for Instructions dialog");
-                }
-            }
-            if (del)
-            {
-                DeleteSelected();
-            }
-        }
     }
 
     // Local controller that handles F11/Escape and stage fullscreen toggling.
