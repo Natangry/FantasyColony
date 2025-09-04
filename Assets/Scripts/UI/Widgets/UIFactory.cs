@@ -1022,7 +1022,7 @@ namespace FantasyColony.UI.Widgets
             // Ensure our default wood frame skin
             var frame = go.GetComponent<UIFrame>();
             if (frame == null) frame = go.AddComponent<UIFrame>();
-            frame.SetBorderEnabled(true, true, true, true);
+            frame.SetEdges(true, true, true, true);
 
             // Find/create caption label
             Text caption = go.GetComponentInChildren<Text>();
