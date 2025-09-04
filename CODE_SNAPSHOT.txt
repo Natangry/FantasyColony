@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-04 06:17:11 UTC
+_Updated_: 2025-09-04 06:46:58 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -2632,6 +2632,7 @@ namespace FantasyColony.UI.Creator.Editing
 // ===== FILE: Assets/Scripts/UI/Creator/Editing/UICreatorHotkeys.cs =====
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace FantasyColony.UI.Creator.Editing
 {
@@ -2643,57 +2644,88 @@ namespace FantasyColony.UI.Creator.Editing
     {
         private RectTransform _stage, _layerBG, _layerPanels, _layerControls;
         private Action _onMenuRefresh;
+        private Action _toggleFullscreen, _toggleGrid, _cycleGridSize, _toggleSnap, _deleteSelected;
+        private Func<bool> _canDelete;
 
-        public void Init(RectTransform stage, RectTransform layerBG, RectTransform layerPanels, RectTransform layerControls, Action onMenuRefresh)
+        public void Init(
+            RectTransform stage,
+            RectTransform layerBG,
+            RectTransform layerPanels,
+            RectTransform layerControls,
+            Action onMenuRefresh,
+            Action toggleFullscreen,
+            Action toggleGrid,
+            Action cycleGridSize,
+            Action toggleSnap,
+            Func<bool> canDelete,
+            Action deleteSelected)
         {
-            _stage = stage; _layerBG = layerBG; _layerPanels = layerPanels; _layerControls = layerControls; _onMenuRefresh = onMenuRefresh;
+            _stage = stage; _layerBG = layerBG; _layerPanels = layerPanels; _layerControls = layerControls;
+            _onMenuRefresh = onMenuRefresh;
+            _toggleFullscreen = toggleFullscreen; _toggleGrid = toggleGrid; _cycleGridSize = cycleGridSize; _toggleSnap = toggleSnap;
+            _canDelete = canDelete; _deleteSelected = deleteSelected;
             Debug.Log("[UICreator] Hotkeys ready");
         }
 
         private void Update()
         {
-            // Toggle grid (G) and cycle size (Ctrl+G)
+            // Don't fire hotkeys while typing into an InputField/TMP_InputField
+            var go = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+            if (go != null && (go.GetComponent<UnityEngine.UI.InputField>() != null || HasTMPInput(go))) return;
+
+#if ENABLE_INPUT_SYSTEM
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb == null) return;
+
+            // F11: fullscreen toggle
+            if (kb.f11Key != null && kb.f11Key.wasPressedThisFrame) { _toggleFullscreen?.Invoke(); return; }
+
+            // Ctrl+G cycles grid size, G toggles
+            bool ctrl = (kb.leftCtrlKey != null && kb.leftCtrlKey.isPressed) || (kb.rightCtrlKey != null && kb.rightCtrlKey.isPressed);
+            if (kb.gKey != null && kb.gKey.wasPressedThisFrame)
+            {
+                if (ctrl) _cycleGridSize?.Invoke(); else _toggleGrid?.Invoke();
+                _onMenuRefresh?.Invoke();
+                return;
+            }
+
+            // F4: snap toggle
+            if (kb.f4Key != null && kb.f4Key.wasPressedThisFrame) { _toggleSnap?.Invoke(); return; }
+
+            // Delete / Backspace
+            bool del = kb.deleteKey != null && kb.deleteKey.wasPressedThisFrame;
+            bool back = kb.backspaceKey != null && kb.backspaceKey.wasPressedThisFrame;
+            if (del || back)
+            {
+                if (_canDelete == null || _canDelete()) _deleteSelected?.Invoke();
+                return;
+            }
+#else
+            // Legacy Input path
+            if (Input.GetKeyDown(KeyCode.F11)) { _toggleFullscreen?.Invoke(); return; }
             if (Input.GetKeyDown(KeyCode.G))
             {
                 bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-                if (ctrl)
-                {
-                    GridPrefs.CycleCellSize();
-                }
-                else
-                {
-                    GridPrefs.GridVisible = !GridPrefs.GridVisible;
-                    Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
-                }
+                if (ctrl) _cycleGridSize?.Invoke(); else _toggleGrid?.Invoke();
                 _onMenuRefresh?.Invoke();
+                return;
             }
-
-            // Snap toggle (F4)
-            if (Input.GetKeyDown(KeyCode.F4))
-            {
-                GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
-                Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
-            }
-
-            // Delete selected (Del/Backspace)
+            if (Input.GetKeyDown(KeyCode.F4)) { _toggleSnap?.Invoke(); return; }
             if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
             {
-                var sel = UISelectionBox.CurrentTarget;
-                if (sel == null)
-                {
-                    Debug.Log("[UICreator] Delete: nothing selected");
-                    return;
-                }
-                if (sel == _stage || sel == _layerBG || sel == _layerPanels || sel == _layerControls)
-                {
-                    Debug.Log("[UICreator] Delete: refusing to delete stage/layer");
-                    return;
-                }
-                var name = sel.name;
-                Destroy(sel.gameObject);
-                Debug.Log($"[UICreator] Deleted: {name}");
-                _onMenuRefresh?.Invoke();
+                if (_canDelete == null || _canDelete()) _deleteSelected?.Invoke();
+                return;
             }
+#endif
+        }
+
+        private static bool HasTMPInput(GameObject go)
+        {
+#if TMP_PRESENT
+            return go.GetComponent<TMPro.TMP_InputField>() != null;
+#else
+            return false;
+#endif
         }
     }
 }
@@ -4368,7 +4400,22 @@ namespace FantasyColony.UI.Screens
               // Attach hotkeys component so keyboard shortcuts work even if this Screen is not a MonoBehaviour
               var hk = _stage.gameObject.GetComponent<UICreatorHotkeys>();
               if (hk == null) hk = _stage.gameObject.AddComponent<UICreatorHotkeys>();
-              hk.Init(_stage, _layerBackground, _layerPanels, _layerControls, RebuildViewMenu);
+              hk.Init(
+                  _stage, _layerBackground, _layerPanels, _layerControls,
+                  RebuildViewMenu,
+                  // F11
+                  () => ToggleStageFullscreen(),
+                  // G
+                  () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? \"on\" : \"off\")}"); },
+                  // Ctrl+G
+                  () => { GridPrefs.CycleCellSize(); },
+                  // F4
+                  () => { GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled; Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? \"on\" : \"off\")}"); },
+                  // canDelete
+                  () => { var sel = UISelectionBox.CurrentTarget; return sel != null && sel != _stage && sel != _layerBackground && sel != _layerPanels && sel != _layerControls; },
+                  // deleteSelected
+                  () => { var sel = UISelectionBox.CurrentTarget; if (sel == null) return; var name = sel.name; UnityObject.Destroy(sel.gameObject); Debug.Log($"[UICreator] Deleted: {name}"); RebuildViewMenu(); }
+              );
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
@@ -4480,7 +4527,7 @@ namespace FantasyColony.UI.Screens
         private void OnViewMenu()
         {
             ShowMenu(_btnView,
-                ("Fullscreen Work Area", () => ToggleFullscreenWorkArea()),
+                ("Fullscreen Work Area", () => ToggleStageFullscreen()),
                 ($"Show Grid: {(GridPrefs.GridVisible ? "On" : "Off")}", () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}"); RebuildViewMenu(); })
             );
         }
@@ -4496,7 +4543,7 @@ namespace FantasyColony.UI.Screens
             );
         }
 
-        private void ToggleFullscreenWorkArea()
+        private void ToggleStageFullscreen()
         {
             var ctl = _root != null ? _root.GetComponent<UICreatorStageController>() : null;
             if (ctl != null)
@@ -4505,25 +4552,6 @@ namespace FantasyColony.UI.Screens
                 ctl.SetStageFullscreen(target);
                 Debug.Log($"[UICreator] View/Fullscreen Work Area: {target}");
             }
-        }
-
-        private void DeleteSelected()
-        {
-            var sel = UISelectionBox.CurrentTarget;
-            if (sel == null)
-            {
-                Debug.Log("[UICreator] Delete: nothing selected");
-                return;
-            }
-            if (sel == _stage || sel == _layerBackground || sel == _layerPanels || sel == _layerControls)
-            {
-                Debug.Log("[UICreator] Delete: refusing to delete stage/layer");
-                return;
-            }
-            var name = sel.name;
-            UnityObject.Destroy(sel.gameObject);
-            Debug.Log($"[UICreator] Deleted: {name}");
-            RebuildViewMenu();
         }
 
         private void RebuildViewMenu()
@@ -4655,58 +4683,6 @@ namespace FantasyColony.UI.Screens
             sel.Init(rt, _stage);
         }
 
-        private void Update()
-        {
-#if ENABLE_INPUT_SYSTEM
-            bool g = Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame;
-            bool ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
-            bool f4 = Keyboard.current != null && Keyboard.current.f4Key.wasPressedThisFrame;
-            bool iKey = Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
-            bool del = Keyboard.current != null && (Keyboard.current.deleteKey.wasPressedThisFrame || Keyboard.current.backspaceKey.wasPressedThisFrame);
-#else
-            bool g = Input.GetKeyDown(KeyCode.G);
-            bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-            bool f4 = Input.GetKeyDown(KeyCode.F4);
-            bool iKey = Input.GetKeyDown(KeyCode.I);
-            bool del = Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace);
-#endif
-            if (g)
-            {
-                if (ctrl)
-                {
-                    GridPrefs.CycleCellSize();
-                    _grid?.MarkDirty();
-                }
-                else
-                {
-                    GridPrefs.GridVisible = !GridPrefs.GridVisible;
-                    Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
-                    RebuildViewMenu();
-                }
-            }
-            if (f4)
-            {
-                GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
-                Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
-            }
-
-            if (iKey)
-            {
-                var sel = UISelectionBox.CurrentTarget;
-                if (sel != null)
-                {
-                    InstructionDialog.Show(_stage, sel);
-                }
-                else
-                {
-                    Debug.Log("[UICreator] No selection for Instructions dialog");
-                }
-            }
-            if (del)
-            {
-                DeleteSelected();
-            }
-        }
     }
 
     // Local controller that handles F11/Escape and stage fullscreen toggling.
