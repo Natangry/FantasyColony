@@ -114,6 +114,11 @@ namespace FantasyColony.UI.Screens
               // Use top-left origin for deterministic editing math
               _stage.pivot = new Vector2(0f, 1f);
               _stage.anchoredPosition = Vector2.zero;
+
+              // Make stage click-through so it never blocks selection of panels
+              var stageImg2 = _stage.GetComponent<Image>();
+              if (stageImg2 != null) stageImg2.raycastTarget = false;
+
               _grid = _stage.gameObject.GetComponent<UIStageGrid>();
               if (_grid == null) _grid = _stage.gameObject.AddComponent<UIStageGrid>();
               Debug.Log($"[UICreator] Grid:on size={GridPrefs.CellSize}");
@@ -267,6 +272,7 @@ namespace FantasyColony.UI.Screens
         {
             if (background)
             {
+                Debug.Log("[UICreator] Add Background Panel requested");
                 var panelGO = UIFactory.CreatePanelSurface(_stage, "UI_BackgroundPanel", sizing: PanelSizing.AutoBoth);
                 var rt = panelGO != null ? panelGO.GetComponent<RectTransform>() : null;
                 if (rt != null)
@@ -274,20 +280,22 @@ namespace FantasyColony.UI.Screens
                     UIFactory.EnsureRaycastTarget(rt);
                     NormalizePlaceable(rt);
                     AttachEditing(rt);
-                    Debug.Log("[UICreator] Spawn UI_BackgroundPanel");
+                    rt.SetAsLastSibling();
+                    Debug.Log($"[UICreator] BackgroundPanel created size={rt.rect.size} pos={rt.anchoredPosition} sib={rt.GetSiblingIndex()}");
                 }
                 return;
             }
 
+            Debug.Log("[UICreator] Add Panel requested");
             var panelGO2 = UIFactory.CreatePanelSurface(_stage, "UI_Panel", sizing: PanelSizing.AutoBoth);
             var prt = panelGO2 != null ? panelGO2.GetComponent<RectTransform>() : null;
             if (prt != null)
             {
-                UIFactory.ApplyDefaultPanelSizing(prt);
                 UIFactory.EnsureRaycastTarget(prt);
                 NormalizePlaceable(prt);
                 AttachEditing(prt);
-                Debug.Log("[UICreator] Spawn UI_Panel");
+                prt.SetAsLastSibling();
+                Debug.Log($"[UICreator] Panel created size={prt.rect.size} pos={prt.anchoredPosition} sib={prt.GetSiblingIndex()}");
             }
         }
 
@@ -299,7 +307,9 @@ namespace FantasyColony.UI.Screens
             t.pivot = new Vector2(0, 1);
             if (t.parent != _stage) t.SetParent(_stage, false);
             t.sizeDelta = size;
-            if (t.sizeDelta == Vector2.zero) t.sizeDelta = new Vector2(200, 60);
+            if (t.sizeDelta == Vector2.zero) t.sizeDelta = new Vector2(400, 240);
+            // Ensure a visible, non-overlapping default spawn position
+            if (t.anchoredPosition == Vector2.zero) t.anchoredPosition = new Vector2(128, -128);
             t.anchoredPosition = new Vector2(
                 Mathf.Round(t.anchoredPosition.x / GridPrefs.CellSize) * GridPrefs.CellSize,
                 Mathf.Round(t.anchoredPosition.y / GridPrefs.CellSize) * GridPrefs.CellSize);
