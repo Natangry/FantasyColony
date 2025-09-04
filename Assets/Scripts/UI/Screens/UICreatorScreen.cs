@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 #endif
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
+using FantasyColony.UI.Util;
+using FantasyColony.UI.Creator.Editing;
 using UnityObject = UnityEngine.Object;
 
 namespace FantasyColony.UI.Screens
@@ -22,6 +24,7 @@ namespace FantasyColony.UI.Screens
         // Program-window layout: Top toolbar (percent height) + large blank stage
         private RectTransform _toolbar;
         private RectTransform _stage;
+        private UIStageGrid _grid;
         private RectTransform _btnFile, _btnEdit, _btnView, _btnTools, _btnClose;
         private const float TOOLBAR_FRAC = 0.05f; // 5% of screen height
 
@@ -102,11 +105,18 @@ namespace FantasyColony.UI.Screens
             var stageImg = stageGO.GetComponent<Image>();
             stageImg.color = new Color(0f, 0f, 0f, 0f); // transparent
             stageImg.raycastTarget = false;
-            _stage.SetParent(absRT, false);
+              _stage.SetParent(absRT, false);
 
             // Anchors: toolbar = top 5% height, stage = remaining 95%
             UIFactory.SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f - TOOLBAR_FRAC, yMax:1f);
-            UIFactory.SetAnchorsPercent(_stage, xMin:0f, xMax:1f, yMin:0f, yMax:1f - TOOLBAR_FRAC);
+              UIFactory.SetAnchorsPercent(_stage, xMin:0f, xMax:1f, yMin:0f, yMax:1f - TOOLBAR_FRAC);
+
+              // Use top-left origin for deterministic editing math
+              _stage.pivot = new Vector2(0f, 1f);
+              _stage.anchoredPosition = Vector2.zero;
+              _grid = _stage.gameObject.GetComponent<UIStageGrid>();
+              if (_grid == null) _grid = _stage.gameObject.AddComponent<UIStageGrid>();
+              Debug.Log($"[UICreator] Grid:on size={GridPrefs.CellSize}");
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
@@ -248,6 +258,8 @@ namespace FantasyColony.UI.Screens
             // Apply factory defaults so buttons spawned outside a LayoutGroup are visible and usable
             UIFactory.ApplyDefaultButtonSizing(rt);
             rt.anchoredPosition = Vector2.zero;
+            NormalizePlaceable(rt);
+            AttachEditing(rt);
             Debug.Log($"[UICreator] Spawn {name}");
         }
 
@@ -264,6 +276,8 @@ namespace FantasyColony.UI.Screens
                 rt.anchorMin = new Vector2(0.1f, 0.1f);
                 rt.anchorMax = new Vector2(0.9f, 0.9f);
                 rt.offsetMin = rt.offsetMax = Vector2.zero;
+                NormalizePlaceable(rt);
+                AttachEditing(rt);
                 Debug.Log("[UICreator] Spawn UI_BackgroundPanel");
                 return;
             }
@@ -271,7 +285,62 @@ namespace FantasyColony.UI.Screens
             var panel = UIFactory.CreatePanelSurface(_stage, "UI_Panel");
             var prt = panel;
             UIFactory.ApplyDefaultPanelSizing(prt);
+            NormalizePlaceable(prt);
+            AttachEditing(prt);
             Debug.Log("[UICreator] Spawn UI_Panel");
+        }
+
+        private void NormalizePlaceable(RectTransform t)
+        {
+            if (t == null) return;
+            var size = t.rect.size;
+            t.anchorMin = t.anchorMax = new Vector2(0, 1);
+            t.pivot = new Vector2(0, 1);
+            if (t.parent != _stage) t.SetParent(_stage, false);
+            t.sizeDelta = size;
+            if (t.sizeDelta == Vector2.zero) t.sizeDelta = new Vector2(200, 60);
+            t.anchoredPosition = new Vector2(
+                Mathf.Round(t.anchoredPosition.x / GridPrefs.CellSize) * GridPrefs.CellSize,
+                Mathf.Round(t.anchoredPosition.y / GridPrefs.CellSize) * GridPrefs.CellSize);
+        }
+
+        private void AttachEditing(RectTransform rt)
+        {
+            if (rt == null) return;
+            if (rt.GetComponent<UIPixelSnap>() == null) rt.gameObject.AddComponent<UIPixelSnap>();
+            if (rt.GetComponent<UIDragMove>() == null) rt.gameObject.AddComponent<UIDragMove>();
+            if (rt.GetComponent<UISelectionBox>() == null) rt.gameObject.AddComponent<UISelectionBox>();
+        }
+
+        private void Update()
+        {
+#if ENABLE_INPUT_SYSTEM
+            bool g = Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame;
+            bool ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
+            bool f4 = Keyboard.current != null && Keyboard.current.f4Key.wasPressedThisFrame;
+#else
+            bool g = Input.GetKeyDown(KeyCode.G);
+            bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            bool f4 = Input.GetKeyDown(KeyCode.F4);
+#endif
+            if (g)
+            {
+                if (ctrl)
+                {
+                    GridPrefs.CycleCellSize();
+                    _grid?.MarkDirty();
+                }
+                else
+                {
+                    GridPrefs.GridVisible = !GridPrefs.GridVisible;
+                    Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
+                }
+            }
+            if (f4)
+            {
+                GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
+                Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
+            }
         }
     }
 
