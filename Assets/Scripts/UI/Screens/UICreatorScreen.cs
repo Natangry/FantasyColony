@@ -180,6 +180,7 @@ namespace FantasyColony.UI.Screens
         // --- Simple dropdown framework (stub for Step 1) ---
         private RectTransform _menuOverlay;
         private RectTransform _openMenu;
+        private RectTransform _openMenuAnchor;
 
         private void EnsureMenuOverlay(Transform parent)
         {
@@ -203,6 +204,7 @@ namespace FantasyColony.UI.Screens
                 UnityObject.Destroy(_openMenu.gameObject);
                 _openMenu = null;
             }
+            _openMenuAnchor = null;
             if (_menuOverlay != null) _menuOverlay.gameObject.SetActive(false);
         }
 
@@ -216,6 +218,7 @@ namespace FantasyColony.UI.Screens
             foreach (var it in items)
                 list.Add(new UIFactory.MenuItem(it.label, () => { it.onClick?.Invoke(); CloseMenus(); }));
 
+            _openMenuAnchor = anchor;
             _openMenu = UIFactory.CreateDropdownMenu(_menuOverlay, anchor, list, rowHeight: 32f, minWidth: 160f, matchAnchorWidth: true);
         }
 
@@ -231,7 +234,10 @@ namespace FantasyColony.UI.Screens
 
         private void OnViewMenu()
         {
-            ShowMenu(_btnView, ("Fullscreen Work Area", ()=> ToggleFullscreenWorkArea()));
+            ShowMenu(_btnView,
+                ("Fullscreen Work Area", () => ToggleFullscreenWorkArea()),
+                ($"Show Grid: {(GridPrefs.GridVisible ? "On" : "Off")}", () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}"); RebuildViewMenu(); })
+            );
         }
 
         private void OnToolsMenu()
@@ -253,6 +259,33 @@ namespace FantasyColony.UI.Screens
                 bool target = !ctl.IsStageFullscreen;
                 ctl.SetStageFullscreen(target);
                 Debug.Log($"[UICreator] View/Fullscreen Work Area: {target}");
+            }
+        }
+
+        private void DeleteSelected()
+        {
+            var sel = UISelectionBox.CurrentTarget;
+            if (sel == null)
+            {
+                Debug.Log("[UICreator] Delete: nothing selected");
+                return;
+            }
+            if (sel == _stage || sel == _layerBackground || sel == _layerPanels || sel == _layerControls)
+            {
+                Debug.Log("[UICreator] Delete: refusing to delete stage/layer");
+                return;
+            }
+            var name = sel.name;
+            UnityObject.Destroy(sel.gameObject);
+            Debug.Log($"[UICreator] Deleted: {name}");
+            RebuildViewMenu();
+        }
+
+        private void RebuildViewMenu()
+        {
+            if (_openMenuAnchor == _btnView)
+            {
+                OnViewMenu();
             }
         }
 
@@ -384,11 +417,13 @@ namespace FantasyColony.UI.Screens
             bool ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
             bool f4 = Keyboard.current != null && Keyboard.current.f4Key.wasPressedThisFrame;
             bool iKey = Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
+            bool del = Keyboard.current != null && (Keyboard.current.deleteKey.wasPressedThisFrame || Keyboard.current.backspaceKey.wasPressedThisFrame);
 #else
             bool g = Input.GetKeyDown(KeyCode.G);
             bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             bool f4 = Input.GetKeyDown(KeyCode.F4);
             bool iKey = Input.GetKeyDown(KeyCode.I);
+            bool del = Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace);
 #endif
             if (g)
             {
@@ -401,6 +436,7 @@ namespace FantasyColony.UI.Screens
                 {
                     GridPrefs.GridVisible = !GridPrefs.GridVisible;
                     Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
+                    RebuildViewMenu();
                 }
             }
             if (f4)
@@ -420,6 +456,10 @@ namespace FantasyColony.UI.Screens
                 {
                     Debug.Log("[UICreator] No selection for Instructions dialog");
                 }
+            }
+            if (del)
+            {
+                DeleteSelected();
             }
         }
     }

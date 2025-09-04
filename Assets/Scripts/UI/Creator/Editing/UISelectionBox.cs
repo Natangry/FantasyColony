@@ -99,7 +99,11 @@ namespace FantasyColony.UI.Creator.Editing
 
         private void OnDisable() => ClearOverlay();
 
-        private void OnDestroy() => ClearOverlay();
+        private void OnDestroy()
+        {
+            ClearOverlay();
+            if (_current == this) _current = null;
+        }
 
         private void ClearOverlay()
         {
