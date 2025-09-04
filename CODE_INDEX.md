@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-09-04 05:08:28 UTC
+_Updated_: 2025-09-04 05:19:39 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/BootPipeline.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BootPipeline.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BootPipeline.cs)
