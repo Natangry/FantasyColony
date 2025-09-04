@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-03 23:57:35 UTC
+_Updated_: 2025-09-04 01:58:23 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -4385,10 +4385,10 @@ namespace FantasyColony.UI.Widgets
 
         // Determine canvas camera (ScreenSpaceOverlay => null)
         Camera cam = null;
-        var canvas = overlay.GetComponentInParent<Canvas>();
-        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        var parentCanvas = overlay.GetComponentInParent<Canvas>();
+        if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
         {
-            cam = canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
+            cam = parentCanvas.worldCamera != null ? parentCanvas.worldCamera : Camera.main;
         }
 
         // Convert to overlay local space
