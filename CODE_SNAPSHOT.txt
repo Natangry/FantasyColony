@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-04 03:56:24 UTC
+_Updated_: 2025-09-04 04:14:02 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -2471,6 +2471,417 @@ public class OpenDevLogButton : MonoBehaviour
     }
 }
 
+// ===== FILE: Assets/Scripts/UI/Creator/Editing/GridPrefs.cs =====
+using UnityEngine;
+
+namespace FantasyColony.UI.Creator.Editing
+{
+    /// <summary>
+    /// Global grid/snapping preferences for the Creator. Runtime-only.
+    /// </summary>
+    public static class GridPrefs
+    {
+        public static bool SnapEnabled = true;
+        public static bool GridVisible = true;
+        public static int CellSize = 16; // pixels
+
+        public static int CycleCellSize()
+        {
+            CellSize = CellSize == 8 ? 16 : CellSize == 16 ? 32 : 8;
+            Debug.Log($"[UICreator] Grid size = {CellSize}");
+            return CellSize;
+        }
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/UI/Creator/Editing/UIDragMove.cs =====
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace FantasyColony.UI.Creator.Editing
+{
+    /// <summary>
+    /// Drag to move a RectTransform within a stage (top-left anchored space).
+    /// Assumes target pivot=(0,1) and anchors fixed to stage (0,1).
+    /// </summary>
+    [RequireComponent(typeof(RectTransform))]
+    public sealed class UIDragMove : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        [SerializeField] private RectTransform _target; // optional; defaults to self
+        [SerializeField] private RectTransform _stage;
+        private Vector2 _startPos;
+        private Vector2 _startMouseLocal;
+
+        private void Awake()
+        {
+            if (_target == null) _target = GetComponent<RectTransform>();
+            if (_stage == null && _target != null) _stage = _target.parent as RectTransform;
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if (_target == null || _stage == null) return;
+            _startPos = _target.anchoredPosition;
+            ScreenToStageLocal(eventData, out _startMouseLocal);
+            Debug.Log($"[UICreator] Drag begin: {_target.name} pos={_startPos}");
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (_target == null || _stage == null) return;
+            Vector2 mouseLocal;
+            ScreenToStageLocal(eventData, out mouseLocal);
+            var delta = mouseLocal - _startMouseLocal;
+            var pos = _startPos + delta;
+
+            if (GridPrefs.SnapEnabled && !IsAltHeld())
+            {
+                pos.x = Mathf.Round(pos.x / GridPrefs.CellSize) * GridPrefs.CellSize;
+                pos.y = Mathf.Round(pos.y / GridPrefs.CellSize) * GridPrefs.CellSize;
+            }
+
+            var w = _target.rect.width;
+            var h = _target.rect.height;
+            var sw = _stage.rect.width;
+            var sh = _stage.rect.height;
+
+            pos.x = Mathf.Clamp(pos.x, 0f, Mathf.Max(0f, sw - w));
+            pos.y = Mathf.Clamp(pos.y, -Mathf.Max(0f, sh - h), 0f);
+
+            _target.anchoredPosition = pos;
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            if (_target == null) return;
+            Debug.Log($"[UICreator] Drag end: {_target.name} pos={_target.anchoredPosition}");
+        }
+
+        private void ScreenToStageLocal(PointerEventData ev, out Vector2 local)
+        {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_stage, ev.position, null, out local);
+        }
+
+        private static bool IsAltHeld()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return UnityEngine.InputSystem.Keyboard.current != null &&
+                   (UnityEngine.InputSystem.Keyboard.current.leftAltKey.isPressed || UnityEngine.InputSystem.Keyboard.current.rightAltKey.isPressed);
+#else
+            return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+#endif
+        }
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/UI/Creator/Editing/UIResizeHandle.cs =====
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace FantasyColony.UI.Creator.Editing
+{
+    /// <summary>
+    /// Drag to resize a RectTransform. Assumes target pivot=(0,1) (top-left) and fixed anchors.
+    /// </summary>
+    [RequireComponent(typeof(RectTransform))]
+    public sealed class UIResizeHandle : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        public enum Side { N, S, E, W, NE, NW, SE, SW }
+
+        [SerializeField] private RectTransform _target;
+        [SerializeField] private RectTransform _stage;
+        [SerializeField] private Side _side;
+        [SerializeField] private Vector2 _minSize = new Vector2(40, 24);
+
+        private Vector2 _startMouseLocal;
+        private Vector2 _startPos;
+        private Vector2 _startSize;
+
+        public void Init(RectTransform target, RectTransform stage, Side side)
+        {
+            _target = target; _stage = stage; _side = side;
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if (_target == null || _stage == null) return;
+            _startPos = _target.anchoredPosition;
+            _startSize = _target.rect.size;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_stage, eventData.position, null, out _startMouseLocal);
+            Debug.Log($"[UICreator] Resize begin: {_target.name} side={_side}");
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (_target == null || _stage == null) return;
+            Vector2 mouseLocal; RectTransformUtility.ScreenPointToLocalPointInRectangle(_stage, eventData.position, null, out mouseLocal);
+            Vector2 d = mouseLocal - _startMouseLocal;
+
+            float left = _startPos.x;
+            float top = _startPos.y;
+            float right = left + _startSize.x;
+            float bottom = top - _startSize.y;
+
+            if (_side == Side.E || _side == Side.NE || _side == Side.SE) right += d.x;
+            if (_side == Side.W || _side == Side.NW || _side == Side.SW) left += d.x;
+            if (_side == Side.N || _side == Side.NE || _side == Side.NW) top += d.y;
+            if (_side == Side.S || _side == Side.SE || _side == Side.SW) bottom += d.y;
+
+            if (GridPrefs.SnapEnabled && !IsAltHeld())
+            {
+                left = Mathf.Round(left / GridPrefs.CellSize) * GridPrefs.CellSize;
+                right = Mathf.Round(right / GridPrefs.CellSize) * GridPrefs.CellSize;
+                top = Mathf.Round(top / GridPrefs.CellSize) * GridPrefs.CellSize;
+                bottom = Mathf.Round(bottom / GridPrefs.CellSize) * GridPrefs.CellSize;
+            }
+
+            float sw = _stage.rect.width;
+            float sh = _stage.rect.height;
+            left = Mathf.Clamp(left, 0f, sw);
+            right = Mathf.Clamp(right, 0f, sw);
+            top = Mathf.Clamp(top, -0f, 0f);
+            bottom = Mathf.Clamp(bottom, -sh, 0f);
+
+            float w = Mathf.Max(_minSize.x, right - left);
+            float h = Mathf.Max(_minSize.y, top - bottom);
+            right = left + w;
+            bottom = top - h;
+
+            _target.anchoredPosition = new Vector2(left, top);
+            _target.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, w);
+            _target.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, h);
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            if (_target == null) return;
+            Debug.Log($"[UICreator] Resize end: {_target.name} size={_target.rect.size}");
+        }
+
+        private static bool IsAltHeld()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return UnityEngine.InputSystem.Keyboard.current != null &&
+                   (UnityEngine.InputSystem.Keyboard.current.leftAltKey.isPressed || UnityEngine.InputSystem.Keyboard.current.rightAltKey.isPressed);
+#else
+            return Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+#endif
+        }
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/UI/Creator/Editing/UISelectionBox.cs =====
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+namespace FantasyColony.UI.Creator.Editing
+{
+    /// <summary>
+    /// Single-selection box with 8 resize handles for a placeable.
+    /// </summary>
+    [RequireComponent(typeof(RectTransform))]
+    public sealed class UISelectionBox : MonoBehaviour, IPointerDownHandler
+    {
+        private static UISelectionBox _current;
+
+        [SerializeField] private RectTransform _target; // self by default
+        [SerializeField] private RectTransform _stage;
+        [SerializeField] private RectTransform _overlay; // visual box parent
+
+        private void Awake()
+        {
+            if (_target == null) _target = GetComponent<RectTransform>();
+            if (_stage == null) _stage = _target.parent as RectTransform;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            Select();
+        }
+
+        public void Select()
+        {
+            if (_current == this) { Refresh(); return; }
+            if (_current != null) _current.ClearOverlay();
+            _current = this;
+            BuildOverlay();
+            Debug.Log($"[UICreator] Select: {_target.name}");
+        }
+
+        private void BuildOverlay()
+        {
+            ClearOverlay();
+            _overlay = new GameObject("SelectionOverlay", typeof(RectTransform)).GetComponent<RectTransform>();
+            _overlay.SetParent(_target, false);
+            _overlay.anchorMin = new Vector2(0, 1);
+            _overlay.anchorMax = new Vector2(0, 1);
+            _overlay.pivot = new Vector2(0, 1);
+            _overlay.anchoredPosition = Vector2.zero;
+            _overlay.sizeDelta = _target.rect.size;
+
+            var border = _overlay.gameObject.AddComponent<UIFrame>();
+            border.SetEdges(true, true, true, true);
+
+            CreateHandle(UIResizeHandle.Side.N, new Vector2(0.5f, 1f));
+            CreateHandle(UIResizeHandle.Side.S, new Vector2(0.5f, 0f));
+            CreateHandle(UIResizeHandle.Side.E, new Vector2(1f, 1f));
+            CreateHandle(UIResizeHandle.Side.W, new Vector2(0f, 1f));
+            CreateHandle(UIResizeHandle.Side.NE, new Vector2(1f, 1f));
+            CreateHandle(UIResizeHandle.Side.NW, new Vector2(0f, 1f));
+            CreateHandle(UIResizeHandle.Side.SE, new Vector2(1f, 0f));
+            CreateHandle(UIResizeHandle.Side.SW, new Vector2(0f, 0f));
+        }
+
+        private void CreateHandle(UIResizeHandle.Side side, Vector2 anchor)
+        {
+            var go = new GameObject($"Handle_{side}", typeof(RectTransform), typeof(Image), typeof(UIResizeHandle));
+            var rt = go.GetComponent<RectTransform>();
+            rt.SetParent(_overlay, false);
+            rt.anchorMin = rt.anchorMax = anchor;
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(12, 12);
+            var img = go.GetComponent<Image>(); var c = img.color; c.a = 0.6f; img.color = c;
+
+            var h = go.GetComponent<UIResizeHandle>();
+            h.Init(_target, _stage, side);
+        }
+
+        private void LateUpdate()
+        {
+            if (_overlay != null)
+            {
+                _overlay.sizeDelta = _target.rect.size;
+            }
+        }
+
+        private void Refresh()
+        {
+            if (_overlay == null) BuildOverlay();
+        }
+
+        private void OnDisable() => ClearOverlay();
+
+        private void OnDestroy() => ClearOverlay();
+
+        private void ClearOverlay()
+        {
+            if (_overlay != null)
+            {
+                Destroy(_overlay.gameObject);
+                _overlay = null;
+            }
+        }
+    }
+}
+
+
+// ===== FILE: Assets/Scripts/UI/Creator/Editing/UIStageGrid.cs =====
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace FantasyColony.UI.Creator.Editing
+{
+    /// <summary>
+    /// Lightweight grid overlay for the Creator stage. Drawn with pooled 1px Images.
+    /// </summary>
+    [RequireComponent(typeof(RectTransform))]
+    public sealed class UIStageGrid : MonoBehaviour
+    {
+        [SerializeField] private RectTransform _rt;
+        private readonly List<Image> _lines = new List<Image>();
+        private bool _dirty = true;
+
+        private void Awake()
+        {
+            if (_rt == null) _rt = GetComponent<RectTransform>();
+        }
+
+        private void OnEnable()
+        {
+            _dirty = true;
+        }
+
+        private void OnRectTransformDimensionsChange()
+        {
+            _dirty = true;
+        }
+
+        private void Update()
+        {
+            if (_dirty) Rebuild();
+            foreach (var img in _lines)
+            {
+                if (img) img.enabled = GridPrefs.GridVisible;
+            }
+        }
+
+        private void Rebuild()
+        {
+            _dirty = false;
+            if (_rt.rect.width <= 0 || _rt.rect.height <= 0) return;
+
+            int cell = Mathf.Max(2, GridPrefs.CellSize);
+            int cols = Mathf.CeilToInt(_rt.rect.width / cell) + 1;
+            int rows = Mathf.CeilToInt(_rt.rect.height / cell) + 1;
+            int need = cols + rows;
+            while (_lines.Count < need)
+            {
+                var go = new GameObject("grid-line", typeof(RectTransform), typeof(Image));
+                go.transform.SetParent(transform, false);
+                var img = go.GetComponent<Image>();
+                var c = img.color; c.a = 0.08f; img.color = c; // subtle tint
+                _lines.Add(img);
+            }
+            for (int i = need; i < _lines.Count; i++)
+            {
+                if (_lines[i]) _lines[i].enabled = false;
+            }
+
+            int idx = 0;
+            // Vertical lines
+            for (int x = 0; x <= cols; x++)
+            {
+                var img = _lines[idx++];
+                var rt = img.rectTransform;
+                rt.anchorMin = new Vector2(0, 1);
+                rt.anchorMax = new Vector2(0, 1);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.sizeDelta = new Vector2(1, _rt.rect.height);
+                rt.anchoredPosition = new Vector2(x * cell, -_rt.rect.height * 0.5f);
+                img.enabled = GridPrefs.GridVisible;
+            }
+            // Horizontal lines
+            for (int y = 0; y <= rows; y++)
+            {
+                var img = _lines[idx++];
+                var rt = img.rectTransform;
+                rt.anchorMin = new Vector2(0, 1);
+                rt.anchorMax = new Vector2(0, 1);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.sizeDelta = new Vector2(_rt.rect.width, 1);
+                rt.anchoredPosition = new Vector2(_rt.rect.width * 0.5f, -y * cell);
+                img.enabled = GridPrefs.GridVisible;
+            }
+        }
+
+        public Vector2 Snap(Vector2 localTopLeft)
+        {
+            int cell = Mathf.Max(2, GridPrefs.CellSize);
+            float x = Mathf.Round(localTopLeft.x / cell) * cell;
+            float y = Mathf.Round(localTopLeft.y / cell) * cell;
+            return new Vector2(x, y);
+        }
+
+        public void MarkDirty() => _dirty = true;
+    }
+}
+
+
 // ===== FILE: Assets/Scripts/UI/Root/UIRoot.cs =====
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -3572,6 +3983,8 @@ using UnityEngine.InputSystem;
 #endif
 using FantasyColony.UI.Router;
 using FantasyColony.UI.Widgets;
+using FantasyColony.UI.Util;
+using FantasyColony.UI.Creator.Editing;
 using UnityObject = UnityEngine.Object;
 
 namespace FantasyColony.UI.Screens
@@ -3588,6 +4001,7 @@ namespace FantasyColony.UI.Screens
         // Program-window layout: Top toolbar (percent height) + large blank stage
         private RectTransform _toolbar;
         private RectTransform _stage;
+        private UIStageGrid _grid;
         private RectTransform _btnFile, _btnEdit, _btnView, _btnTools, _btnClose;
         private const float TOOLBAR_FRAC = 0.05f; // 5% of screen height
 
@@ -3668,11 +4082,18 @@ namespace FantasyColony.UI.Screens
             var stageImg = stageGO.GetComponent<Image>();
             stageImg.color = new Color(0f, 0f, 0f, 0f); // transparent
             stageImg.raycastTarget = false;
-            _stage.SetParent(absRT, false);
+              _stage.SetParent(absRT, false);
 
             // Anchors: toolbar = top 5% height, stage = remaining 95%
             UIFactory.SetAnchorsPercent(_toolbar, xMin:0f, xMax:1f, yMin:1f - TOOLBAR_FRAC, yMax:1f);
-            UIFactory.SetAnchorsPercent(_stage, xMin:0f, xMax:1f, yMin:0f, yMax:1f - TOOLBAR_FRAC);
+              UIFactory.SetAnchorsPercent(_stage, xMin:0f, xMax:1f, yMin:0f, yMax:1f - TOOLBAR_FRAC);
+
+              // Use top-left origin for deterministic editing math
+              _stage.pivot = new Vector2(0f, 1f);
+              _stage.anchoredPosition = Vector2.zero;
+              _grid = _stage.gameObject.GetComponent<UIStageGrid>();
+              if (_grid == null) _grid = _stage.gameObject.AddComponent<UIStageGrid>();
+              Debug.Log($"[UICreator] Grid:on size={GridPrefs.CellSize}");
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
@@ -3814,6 +4235,8 @@ namespace FantasyColony.UI.Screens
             // Apply factory defaults so buttons spawned outside a LayoutGroup are visible and usable
             UIFactory.ApplyDefaultButtonSizing(rt);
             rt.anchoredPosition = Vector2.zero;
+            NormalizePlaceable(rt);
+            AttachEditing(rt);
             Debug.Log($"[UICreator] Spawn {name}");
         }
 
@@ -3830,6 +4253,8 @@ namespace FantasyColony.UI.Screens
                 rt.anchorMin = new Vector2(0.1f, 0.1f);
                 rt.anchorMax = new Vector2(0.9f, 0.9f);
                 rt.offsetMin = rt.offsetMax = Vector2.zero;
+                NormalizePlaceable(rt);
+                AttachEditing(rt);
                 Debug.Log("[UICreator] Spawn UI_BackgroundPanel");
                 return;
             }
@@ -3837,7 +4262,62 @@ namespace FantasyColony.UI.Screens
             var panel = UIFactory.CreatePanelSurface(_stage, "UI_Panel");
             var prt = panel;
             UIFactory.ApplyDefaultPanelSizing(prt);
+            NormalizePlaceable(prt);
+            AttachEditing(prt);
             Debug.Log("[UICreator] Spawn UI_Panel");
+        }
+
+        private void NormalizePlaceable(RectTransform t)
+        {
+            if (t == null) return;
+            var size = t.rect.size;
+            t.anchorMin = t.anchorMax = new Vector2(0, 1);
+            t.pivot = new Vector2(0, 1);
+            if (t.parent != _stage) t.SetParent(_stage, false);
+            t.sizeDelta = size;
+            if (t.sizeDelta == Vector2.zero) t.sizeDelta = new Vector2(200, 60);
+            t.anchoredPosition = new Vector2(
+                Mathf.Round(t.anchoredPosition.x / GridPrefs.CellSize) * GridPrefs.CellSize,
+                Mathf.Round(t.anchoredPosition.y / GridPrefs.CellSize) * GridPrefs.CellSize);
+        }
+
+        private void AttachEditing(RectTransform rt)
+        {
+            if (rt == null) return;
+            if (rt.GetComponent<UIPixelSnap>() == null) rt.gameObject.AddComponent<UIPixelSnap>();
+            if (rt.GetComponent<UIDragMove>() == null) rt.gameObject.AddComponent<UIDragMove>();
+            if (rt.GetComponent<UISelectionBox>() == null) rt.gameObject.AddComponent<UISelectionBox>();
+        }
+
+        private void Update()
+        {
+#if ENABLE_INPUT_SYSTEM
+            bool g = Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame;
+            bool ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
+            bool f4 = Keyboard.current != null && Keyboard.current.f4Key.wasPressedThisFrame;
+#else
+            bool g = Input.GetKeyDown(KeyCode.G);
+            bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            bool f4 = Input.GetKeyDown(KeyCode.F4);
+#endif
+            if (g)
+            {
+                if (ctrl)
+                {
+                    GridPrefs.CycleCellSize();
+                    _grid?.MarkDirty();
+                }
+                else
+                {
+                    GridPrefs.GridVisible = !GridPrefs.GridVisible;
+                    Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
+                }
+            }
+            if (f4)
+            {
+                GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
+                Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
+            }
         }
     }
 

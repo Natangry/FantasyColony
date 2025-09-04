@@ -1,6 +1,6 @@
 # Code Index
 
-_Updated_: 2025-09-04 03:56:24 UTC
+_Updated_: 2025-09-04 04:14:02 UTC
 
 - `Assets/Editor/SpriteImportDefaults.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Editor/SpriteImportDefaults.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Editor/SpriteImportDefaults.cs)
 - `Assets/Scripts/Boot/BootPipeline.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Boot/BootPipeline.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Boot/BootPipeline.cs)
@@ -35,6 +35,11 @@ _Updated_: 2025-09-04 03:56:24 UTC
 - `Assets/Scripts/Core/Services/LocService.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Core/Services/LocService.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Core/Services/LocService.cs)
 - `Assets/Scripts/Dev/DevLogOverlay.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Dev/DevLogOverlay.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Dev/DevLogOverlay.cs)
 - `Assets/Scripts/Dev/OpenDevLogButton.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/Dev/OpenDevLogButton.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/Dev/OpenDevLogButton.cs)
+- `Assets/Scripts/UI/Creator/Editing/GridPrefs.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Creator/Editing/GridPrefs.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Creator/Editing/GridPrefs.cs)
+- `Assets/Scripts/UI/Creator/Editing/UIDragMove.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Creator/Editing/UIDragMove.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Creator/Editing/UIDragMove.cs)
+- `Assets/Scripts/UI/Creator/Editing/UIResizeHandle.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Creator/Editing/UIResizeHandle.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Creator/Editing/UIResizeHandle.cs)
+- `Assets/Scripts/UI/Creator/Editing/UISelectionBox.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Creator/Editing/UISelectionBox.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Creator/Editing/UISelectionBox.cs)
+- `Assets/Scripts/UI/Creator/Editing/UIStageGrid.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Creator/Editing/UIStageGrid.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Creator/Editing/UIStageGrid.cs)
 - `Assets/Scripts/UI/Root/UIRoot.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Root/UIRoot.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Root/UIRoot.cs)
 - `Assets/Scripts/UI/Router/IScreen.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Router/IScreen.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Router/IScreen.cs)
 - `Assets/Scripts/UI/Router/UIRouter.cs` — [View](https://github.com/Natangry/FantasyColony/blob/main/Assets/Scripts/UI/Router/UIRouter.cs) · [Raw](https://raw.githubusercontent.com/Natangry/FantasyColony/main/Assets/Scripts/UI/Router/UIRouter.cs)
