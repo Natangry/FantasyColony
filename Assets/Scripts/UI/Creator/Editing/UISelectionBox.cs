@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using FantasyColony.UI.Widgets;
 
 namespace FantasyColony.UI.Creator.Editing
 {
