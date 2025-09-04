@@ -309,8 +309,20 @@ namespace FantasyColony.UI.Screens
         {
             if (rt == null) return;
             if (rt.GetComponent<UIPixelSnap>() == null) rt.gameObject.AddComponent<UIPixelSnap>();
-            if (rt.GetComponent<UIDragMove>() == null) rt.gameObject.AddComponent<UIDragMove>();
-            if (rt.GetComponent<UISelectionBox>() == null) rt.gameObject.AddComponent<UISelectionBox>();
+
+            // Create a full-rect HitArea child to receive pointer events reliably
+            var hit = new GameObject("HitArea", typeof(RectTransform), typeof(Image));
+            var hitRT = hit.GetComponent<RectTransform>();
+            hitRT.SetParent(rt, false);
+            hitRT.anchorMin = Vector2.zero; hitRT.anchorMax = Vector2.one; hitRT.pivot = new Vector2(0.5f, 0.5f);
+            hitRT.offsetMin = Vector2.zero; hitRT.offsetMax = Vector2.zero;
+            var hitImg = hit.GetComponent<Image>(); hitImg.color = new Color(0,0,0,0); hitImg.raycastTarget = true;
+
+            var mover = hit.AddComponent<UIDragMove>();
+            mover.Init(rt, _stage);
+
+            var sel = hit.AddComponent<UISelectionBox>();
+            sel.Init(rt, _stage);
         }
 
         private void Update()
