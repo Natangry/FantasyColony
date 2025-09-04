@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-04 01:58:23 UTC
+_Updated_: 2025-09-04 02:38:41 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -4178,8 +4178,8 @@ namespace FantasyColony.UI.Widgets
 {
     public enum PanelSizing { Flexible, AutoHeight, AutoWidth, AutoBoth }
 
-    public static class UIFactory
-    {
+ public static class UIFactory
+ {
         // ===== Cached assets =====
         private static Sprite _woodTile;
 
@@ -4200,11 +4200,11 @@ namespace FantasyColony.UI.Widgets
             rt.offsetMax = Vector2.zero;
         }
 
-        public static LayoutElement EnsureLayoutElement(GameObject go)
-        {
-            var le = go.GetComponent<LayoutElement>();
-            if (le == null) le = go.AddComponent<LayoutElement>();
-            return le;
+    public static LayoutElement EnsureLayoutElement(GameObject go)
+    {
+        var le = go.GetComponent<LayoutElement>();
+        if (le == null) le = go.AddComponent<LayoutElement>();
+        return le;
         }
 
         // Cache a symmetrized version of the dark 9-slice border so L/R and T/B are equal.
@@ -5167,6 +5167,166 @@ namespace FantasyColony.UI.Widgets
             return img;
         }
 
+        /// <summary>
+        /// Attach a native uGUI Dropdown to an existing top-bar Button so it behaves like a menu.
+        /// Uses Unity's built-in placement/flip/clamp via the Template hierarchy.
+        /// </summary>
+        public static Dropdown AttachDropdownToButton(Button button,
+            IList<(string text, Action onClick)> items,
+            float maxHeight = 320f,
+            float minWidth = 220f)
+        {
+            if (button == null) throw new ArgumentNullException(nameof(button));
+            if (items == null) throw new ArgumentNullException(nameof(items));
+
+            var go = button.gameObject;
+            var rt = go.GetComponent<RectTransform>();
+            var img = go.GetComponent<Image>();
+            if (img == null) img = go.AddComponent<Image>();
+
+            // Ensure our default wood frame skin
+            var frame = go.GetComponent<UIFrame>();
+            if (frame == null) frame = go.AddComponent<UIFrame>();
+            frame.SetBorderEnabled(true, true, true, true);
+
+            // Find/create caption label
+            Text caption = go.GetComponentInChildren<Text>();
+            if (caption == null)
+            {
+                var captionGO = new GameObject("Label", typeof(RectTransform), typeof(Text));
+                captionGO.transform.SetParent(go.transform, false);
+                var crt = captionGO.GetComponent<RectTransform>();
+                crt.anchorMin = new Vector2(0, 0);
+                crt.anchorMax = new Vector2(1, 1);
+                crt.offsetMin = new Vector2(8, 6);
+                crt.offsetMax = new Vector2(-8, -6);
+                caption = captionGO.GetComponent<Text>();
+                caption.alignment = TextAnchor.MiddleCenter;
+                caption.text = go.name;
+            }
+            string originalCaption = caption.text;
+
+            // Dropdown component
+            var dd = go.GetComponent<Dropdown>();
+            if (dd == null) dd = go.AddComponent<Dropdown>();
+            dd.targetGraphic = img;
+            dd.captionText = caption;
+            dd.interactable = true;
+
+            // Template tree (as per Unity's expected structure)
+            var templateGO = new GameObject("Template", typeof(RectTransform), typeof(Image), typeof(ScrollRect));
+            templateGO.transform.SetParent(go.transform, false);
+            var templateRT = templateGO.GetComponent<RectTransform>();
+            templateRT.anchorMin = new Vector2(0, 1);
+            templateRT.anchorMax = new Vector2(1, 1);
+            templateRT.pivot = new Vector2(0, 1);
+            templateRT.sizeDelta = new Vector2(0, Mathf.Min(240f, maxHeight));
+            templateGO.SetActive(false);
+
+            var templateImg = templateGO.GetComponent<Image>();
+            templateImg.raycastTarget = true;
+
+            var viewportGO = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+            viewportGO.transform.SetParent(templateGO.transform, false);
+            var viewportRT = viewportGO.GetComponent<RectTransform>();
+            viewportRT.anchorMin = new Vector2(0, 1);
+            viewportRT.anchorMax = new Vector2(1, 1);
+            viewportRT.pivot = new Vector2(0, 1);
+            viewportRT.sizeDelta = new Vector2(0, 0);
+            viewportGO.GetComponent<Image>().raycastTarget = true;
+            viewportGO.GetComponent<Mask>().showMaskGraphic = false;
+
+            var contentGO = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup));
+            contentGO.transform.SetParent(viewportGO.transform, false);
+            var contentRT = contentGO.GetComponent<RectTransform>();
+            contentRT.anchorMin = new Vector2(0, 1);
+            contentRT.anchorMax = new Vector2(1, 1);
+            contentRT.pivot = new Vector2(0, 1);
+            contentRT.anchoredPosition = Vector2.zero;
+            var vlg = contentGO.GetComponent<VerticalLayoutGroup>();
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = true;
+            vlg.spacing = 2f;
+            vlg.padding = new RectOffset(2, 2, 2, 2);
+
+            var itemGO = new GameObject("Item", typeof(RectTransform), typeof(Toggle));
+            itemGO.transform.SetParent(contentGO.transform, false);
+            var itemRT = itemGO.GetComponent<RectTransform>();
+            itemRT.anchorMin = new Vector2(0, 1);
+            itemRT.anchorMax = new Vector2(1, 1);
+            itemRT.pivot = new Vector2(0, 1);
+            itemRT.sizeDelta = new Vector2(0, 28f);
+            var itemToggle = itemGO.GetComponent<Toggle>();
+
+            var itemLabelGO = new GameObject("Item Label", typeof(RectTransform), typeof(Text));
+            itemLabelGO.transform.SetParent(itemGO.transform, false);
+            var itemLabelRT = itemLabelGO.GetComponent<RectTransform>();
+            itemLabelRT.anchorMin = new Vector2(0, 0);
+            itemLabelRT.anchorMax = new Vector2(1, 1);
+            itemLabelRT.offsetMin = new Vector2(10, 4);
+            itemLabelRT.offsetMax = new Vector2(-10, -4);
+            var itemLabel = itemLabelGO.GetComponent<Text>();
+            itemLabel.alignment = TextAnchor.MiddleLeft;
+            itemLabel.text = "Item";
+
+            // ScrollRect wiring
+            var sr = templateGO.GetComponent<ScrollRect>();
+            sr.viewport = viewportRT;
+            sr.content = contentRT;
+            sr.horizontal = false;
+            sr.vertical = true;
+
+            // Dropdown wiring
+            dd.template = templateRT;
+            dd.itemText = itemLabel;
+            dd.captionText = caption;
+
+            // Width handling
+            var le = go.GetComponent<LayoutElement>();
+            if (le == null) le = go.AddComponent<LayoutElement>();
+            le.minWidth = Mathf.Max(minWidth, le.minWidth);
+
+            // Build options and action binder
+            var opts = new List<Dropdown.OptionData>(items.Count);
+            var binder = go.GetComponent<DropdownMenuBinder>();
+            if (binder == null) binder = go.AddComponent<DropdownMenuBinder>();
+            binder.Actions.Clear();
+            foreach (var it in items)
+            {
+                opts.Add(new Dropdown.OptionData(it.text));
+                binder.Actions.Add(it.onClick);
+            }
+            dd.options = opts;
+
+            // Button opens dropdown list; keep visual skin
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => { dd.Show(); Debug.Log("[UICreator] Menu opened: " + originalCaption); });
+
+            dd.onValueChanged.RemoveAllListeners();
+            dd.onValueChanged.AddListener((idx) =>
+            {
+                if (idx >= 0 && idx < binder.Actions.Count)
+                {
+                    try { binder.Actions[idx]?.Invoke(); } catch (Exception e) { Debug.LogWarning("[UICreator] Menu item error: " + e.Message); }
+                }
+                // Reset caption so menu acts like a toolbar menu
+                caption.text = originalCaption;
+            });
+
+            // Ensure pixel snap
+            if (go.GetComponent<UIPixelSnap>() == null) go.AddComponent<UIPixelSnap>();
+
+            return dd;
+        }
+
+    }
+
+    // Stores actions for menu options created via AttachDropdownToButton
+    internal sealed class DropdownMenuBinder : MonoBehaviour
+    {
+        public readonly List<Action> Actions = new List<Action>();
     }
 }
 
