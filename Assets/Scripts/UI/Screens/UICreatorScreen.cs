@@ -25,6 +25,7 @@ namespace FantasyColony.UI.Screens
         private RectTransform _toolbar;
         private RectTransform _stage;
         private UIStageGrid _grid;
+        private RectTransform _layerBackground, _layerPanels, _layerControls;
         private RectTransform _btnFile, _btnEdit, _btnView, _btnTools, _btnClose;
         private const float TOOLBAR_FRAC = 0.05f; // 5% of screen height
 
@@ -122,6 +123,7 @@ namespace FantasyColony.UI.Screens
               _grid = _stage.gameObject.GetComponent<UIStageGrid>();
               if (_grid == null) _grid = _stage.gameObject.AddComponent<UIStageGrid>();
               Debug.Log($"[UICreator] Grid:on size={GridPrefs.CellSize}");
+              EnsureLayers();
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
@@ -279,9 +281,8 @@ namespace FantasyColony.UI.Screens
                 if (rt != null)
                 {
                     UIFactory.EnsureRaycastTarget(rt);
-                    NormalizePlaceable(rt);
+                    NormalizePlaceable(rt, PlaceableLayer.Background);
                     AttachEditing(rt);
-                    rt.SetAsLastSibling();
                     Debug.Log($"[UICreator] BackgroundPanel created size={rt.rect.size} pos={rt.anchoredPosition} sib={rt.GetSiblingIndex()}");
                 }
                 return;
@@ -294,34 +295,65 @@ namespace FantasyColony.UI.Screens
             if (prt != null)
             {
                 UIFactory.EnsureRaycastTarget(prt);
-                NormalizePlaceable(prt);
+                NormalizePlaceable(prt, PlaceableLayer.Panel);
                 AttachEditing(prt);
-                prt.SetAsLastSibling();
                 Debug.Log($"[UICreator] Panel created size={prt.rect.size} pos={prt.anchoredPosition} sib={prt.GetSiblingIndex()}");
             }
         }
 
         private void NormalizePlaceable(RectTransform rt)
         {
+            if (rt.GetComponent<Button>() != null) NormalizePlaceable(rt, PlaceableLayer.Control);
+            else if (rt.name.Contains("Background")) NormalizePlaceable(rt, PlaceableLayer.Background);
+            else NormalizePlaceable(rt, PlaceableLayer.Panel);
+        }
+
+        private enum PlaceableLayer { Background, Panel, Control }
+
+        private void NormalizePlaceable(RectTransform rt, PlaceableLayer layer)
+        {
             var t = rt;
             t.anchorMin = new Vector2(0, 1);
             t.anchorMax = new Vector2(0, 1);
             t.pivot = new Vector2(0, 1);
-            if (t.parent != _stage) t.SetParent(_stage, false);
+            var parent = layer == PlaceableLayer.Control ? _layerControls : layer == PlaceableLayer.Panel ? _layerPanels : _layerBackground;
+            if (t.parent != parent) t.SetParent(parent, false);
             if (t.sizeDelta == Vector2.zero) t.sizeDelta = new Vector2(400, 240);
-            // Ensure a visible, non-overlapping default spawn position
             if (t.anchoredPosition == Vector2.zero) t.anchoredPosition = new Vector2(128, -128);
             t.anchoredPosition = new Vector2(
                 Mathf.Round(t.anchoredPosition.x / GridPrefs.CellSize) * GridPrefs.CellSize,
                 Mathf.Round(t.anchoredPosition.y / GridPrefs.CellSize) * GridPrefs.CellSize);
 
-            // If any ContentSizeFitter exists on the root, it will override manual resize => remove it
             var csf = t.GetComponent<ContentSizeFitter>();
             if (csf != null)
             {
                 UnityObject.Destroy(csf);
                 Debug.Log("[UICreator] Removed ContentSizeFitter on placeable root");
             }
+        }
+
+        private void EnsureLayers()
+        {
+            _layerBackground = EnsureLayer(_stage, "_Layer_Background");
+            _layerPanels = EnsureLayer(_stage, "_Layer_Panels");
+            _layerControls = EnsureLayer(_stage, "_Layer_Controls");
+            _layerBackground.SetSiblingIndex(0);
+            _layerPanels.SetSiblingIndex(1);
+            _layerControls.SetSiblingIndex(2);
+        }
+
+        private static RectTransform EnsureLayer(RectTransform parent, string name)
+        {
+            var t = parent.Find(name) as RectTransform;
+            if (t == null)
+            {
+                var go = new GameObject(name, typeof(RectTransform));
+                t = go.GetComponent<RectTransform>();
+                t.SetParent(parent, false);
+                t.anchorMin = Vector2.zero; t.anchorMax = Vector2.one; t.pivot = new Vector2(0.5f, 0.5f);
+                t.offsetMin = Vector2.zero; t.offsetMax = Vector2.zero;
+            }
+            return t;
         }
 
         private void AttachEditing(RectTransform rt)
