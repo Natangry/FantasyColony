@@ -1145,6 +1145,18 @@ namespace FantasyColony.UI.Widgets
             return dd;
         }
 
+        /// <summary>
+        /// Ensure the RectTransform has a raycast-target Graphic so pointer events hit it.
+        /// Adds an Image if no MaskableGraphic exists.
+        /// </summary>
+        public static void EnsureRaycastTarget(RectTransform rt)
+        {
+            if (rt == null) return;
+            var g = rt.GetComponent<MaskableGraphic>();
+            if (g == null) g = rt.gameObject.AddComponent<Image>();
+            g.raycastTarget = true;
+        }
+
     }
 
     // Stores actions for menu options created via AttachDropdownToButton
