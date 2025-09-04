@@ -205,113 +205,102 @@ namespace FantasyColony.UI.Widgets
 
             var canvas = overlay.GetComponentInParent<Canvas>();
 
-        // Position near the anchor (below it, left-aligned) with edge clamping
-        var anchorRT = anchor.GetComponent<RectTransform>();
+            Action<RectTransform> populateItems = contentRT =>
+            {
+                foreach (var it in items)
+                {
+                    if (it.Separator)
+                    {
+                        var sep = new GameObject("Sep", typeof(RectTransform), typeof(Image));
+                        var srt = sep.GetComponent<RectTransform>();
+                        srt.SetParent(contentRT, false);
+                        var le = sep.AddComponent<LayoutElement>();
+                        var scale = canvas != null ? Mathf.Max(1f, canvas.scaleFactor) : 1f;
+                        le.preferredHeight = 1f / scale; // crisp 1 physical pixel
+                        continue;
+                    }
 
-        // Dropdown measures from overlay top-left for deterministic placement
+                    var row = CreateButtonSecondary(contentRT, it.Label, () => it.OnClick?.Invoke());
+                    var le2 = row.GetComponent<LayoutElement>();
+                    if (le2 == null) le2 = row.gameObject.AddComponent<LayoutElement>();
+                    le2.preferredHeight = rowHeight;
+                    le2.flexibleWidth = 1f;
+                }
+            };
+
+        // Positioning & clamping happen AFTER content is created to get real size
+        var anchorRT = anchor.GetComponent<RectTransform>();
         root.anchorMin = root.anchorMax = new Vector2(0f, 1f);
         root.pivot = new Vector2(0f, 1f);
 
-        // Get world-space corners of the anchor; 0=BL, 1=TL, 2=TR, 3=BR
-        Vector3[] corners = new Vector3[4];
-        anchorRT.GetWorldCorners(corners);
-        Vector3 worldBL = corners[0];
-        Vector3 worldTL = corners[1];
+        // --- BUILD PANEL & ITEMS FIRST ---
+        var panel = CreatePanelSurface(root, PanelSizing.AutoHeight, PanelSizing.Flexible, isDark: true);
+        panel.name = "DropdownPanel";
+        var content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup));
+        content.transform.SetParent(panel.transform, false);
+        var contentRT = content.GetComponent<RectTransform>();
+        contentRT.anchorMin = new Vector2(0f, 1f);
+        contentRT.anchorMax = new Vector2(1f, 1f);
+        contentRT.pivot = new Vector2(0f, 1f);
+        contentRT.offsetMin = new Vector2(0f, 0f);
+        contentRT.offsetMax = new Vector2(0f, 0f);
+        var vlg = content.GetComponent<VerticalLayoutGroup>();
+        vlg.childControlWidth = true;
+        vlg.childControlHeight = true;
+        vlg.childForceExpandWidth = true;
+        vlg.childForceExpandHeight = false;
+        vlg.spacing = 2f;
+        vlg.padding = new RectOffset(2, 2, 2, 2);
 
-        // Determine canvas camera (ScreenSpaceOverlay => null)
+        var prt = panel.GetComponent<RectTransform>();
+        float width = Mathf.Max(minWidth, matchAnchorWidth ? anchor.rect.width : minWidth);
+        prt.sizeDelta = new Vector2(width, 0f);
+
+        populateItems?.Invoke(contentRT);
+
+        // --- NOW MEASURE & POSITION ---
         Camera cam = null;
         var parentCanvas = overlay.GetComponentInParent<Canvas>();
         if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-        {
             cam = parentCanvas.worldCamera != null ? parentCanvas.worldCamera : Camera.main;
-        }
 
-        // Convert to overlay local space
+        LayoutRebuilder.ForceRebuildLayoutImmediate(root);
+        var size = root.rect.size;
+
+        Vector3[] corners = new Vector3[4];
+        anchorRT.GetWorldCorners(corners);
+        var worldBL = corners[0];
+        var worldTL = corners[1];
         Vector2 screenBL = RectTransformUtility.WorldToScreenPoint(cam, worldBL);
         Vector2 localBL;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenBL, cam, out localBL);
-
-        // Convert overlay-local (pivot) to anchoredPosition in top-left anchor space
         Vector2 overlayTopLeft = new Vector2(-overlay.rect.width * overlay.pivot.x, overlay.rect.height * (1f - overlay.pivot.y));
-        Vector2 anchored = localBL - overlayTopLeft; // initial: below-left of anchor
+        Vector2 anchored = localBL - overlayTopLeft;
 
-        // Ensure layout is measured before clamping
-        UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(root);
-        var size = root.rect.size;
-
-        // Clamp horizontally to keep fully on-screen
         float maxX = overlay.rect.width - size.x;
-        if (anchored.x > maxX)
-        {
-            anchored.x = Mathf.Max(0f, maxX);
-            Debug.Log("[UIFactory] Dropdown clamped (right)");
-        }
-        if (anchored.x < 0f)
-        {
-            anchored.x = 0f;
-            Debug.Log("[UIFactory] Dropdown clamped (left)");
-        }
+        if (anchored.x > maxX) { anchored.x = Mathf.Max(0f, maxX); Debug.Log("[UIFactory] Dropdown clamped (right)"); }
+        if (anchored.x < 0f)    { anchored.x = 0f; Debug.Log("[UIFactory] Dropdown clamped (left)"); }
 
-        // Clamp vertically; if not enough room below, try flipping above
-        float minY = -overlay.rect.height + size.y; // lowest so bottom stays visible
-        float maxY = 0f; // top aligned with overlay top
-        float desiredYBelow = anchored.y;
-        float desiredYBottom = desiredYBelow - size.y; // bottom of menu
-
-        if (desiredYBottom < minY)
+        float minY = -overlay.rect.height + size.y;
+        float maxY = 0f;
+        float desiredBottom = anchored.y - size.y;
+        if (desiredBottom < minY)
         {
-            // Try place above using top-left corner
             Vector2 screenTL = RectTransformUtility.WorldToScreenPoint(cam, worldTL);
             Vector2 localTL;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenTL, cam, out localTL);
-            Vector2 anchoredAbove = localTL - overlayTopLeft; // top-left of anchor => menu above
-            anchoredAbove.y = Mathf.Clamp(anchoredAbove.y, minY + size.y, maxY);
-            anchored = new Vector2(anchored.x, anchoredAbove.y);
+            Vector2 anchoredAbove = localTL - overlayTopLeft;
+            anchored.y = Mathf.Clamp(anchoredAbove.y, minY + size.y, maxY);
             Debug.Log("[UIFactory] Dropdown flipped above (bottom clamp)");
         }
         else
         {
-            // Clamp within vertical bounds while staying below
             anchored.y = Mathf.Clamp(anchored.y, minY + size.y, maxY);
         }
 
         root.anchoredPosition = anchored;
-            root.SetAsLastSibling();
-
-            // Panel with VLG + CSF (Preferred Y)
-            var panel = CreatePanelSurface(root, "Panel");
-            var vl = panel.gameObject.GetComponent<VerticalLayoutGroup>() ?? panel.gameObject.AddComponent<VerticalLayoutGroup>();
-            vl.childControlWidth = true; vl.childForceExpandWidth = true;
-            vl.childControlHeight = true; vl.childForceExpandHeight = false;
-            vl.spacing = 4f; vl.padding = new RectOffset(6,6,6,6);
-
-            var fitter = panel.gameObject.GetComponent<ContentSizeFitter>() ?? panel.gameObject.AddComponent<ContentSizeFitter>();
-            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            float width = Mathf.Max(minWidth, matchAnchorWidth ? anchor.rect.width : minWidth);
-            var prt = panel.GetComponent<RectTransform>();
-            prt.sizeDelta = new Vector2(width, 0f);
-
-            foreach (var it in items)
-            {
-                if (it.Separator)
-                {
-                    var sep = new GameObject("Sep", typeof(RectTransform), typeof(Image));
-                    var srt = sep.GetComponent<RectTransform>();
-                    srt.SetParent(panel, false);
-                    var le = sep.AddComponent<LayoutElement>();
-                    var scale = canvas != null ? Mathf.Max(1f, canvas.scaleFactor) : 1f;
-                    le.preferredHeight = 1f / scale; // crisp 1 physical pixel
-                    continue;
-                }
-                var row = CreateButtonSecondary(panel, it.Label, () => it.OnClick?.Invoke());
-                var le2 = row.GetComponent<LayoutElement>();
-                if (le2 == null) le2 = row.gameObject.AddComponent<LayoutElement>();
-                le2.preferredHeight = rowHeight;
-                le2.flexibleWidth = 1f;
-            }
-            return root;
+        root.SetAsLastSibling();
+        return root;
         }
 
         // Ensure the 9-slice border has equal left/right and top/bottom edge sizes.
