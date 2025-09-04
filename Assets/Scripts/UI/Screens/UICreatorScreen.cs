@@ -125,6 +125,11 @@ namespace FantasyColony.UI.Screens
               Debug.Log($"[UICreator] Grid:on size={GridPrefs.CellSize}");
               EnsureLayers();
 
+              // Attach hotkeys component so keyboard shortcuts work even if this Screen is not a MonoBehaviour
+              var hk = _stage.gameObject.GetComponent<UICreatorHotkeys>();
+              if (hk == null) hk = _stage.gameObject.AddComponent<UICreatorHotkeys>();
+              hk.Init(_stage, _layerBackground, _layerPanels, _layerControls, RebuildViewMenu);
+
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
             _btnFile  = CreateFlexMenuButton(_toolbar, "File",  OnFileMenu);
