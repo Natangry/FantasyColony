@@ -234,8 +234,7 @@ namespace FantasyColony.UI.Widgets
         root.pivot = new Vector2(0f, 1f);
 
         // --- BUILD PANEL & ITEMS FIRST ---
-        var panel = CreatePanelSurface(root, PanelSizing.AutoHeight, PanelSizing.Flexible, isDark: true);
-        panel.name = "DropdownPanel";
+        var panel = CreatePanelSurface(root, "DropdownPanel", sizing: PanelSizing.AutoHeight);
         var content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup));
         content.transform.SetParent(panel.transform, false);
         var contentRT = content.GetComponent<RectTransform>();
