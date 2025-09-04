@@ -317,6 +317,7 @@ namespace FantasyColony.UI.Screens
             hitRT.anchorMin = Vector2.zero; hitRT.anchorMax = Vector2.one; hitRT.pivot = new Vector2(0.5f, 0.5f);
             hitRT.offsetMin = Vector2.zero; hitRT.offsetMax = Vector2.zero;
             var hitImg = hit.GetComponent<Image>(); hitImg.color = new Color(0,0,0,0); hitImg.raycastTarget = true;
+            var hitLE = hit.AddComponent<LayoutElement>(); hitLE.ignoreLayout = true; // do not be controlled by parent VLG
 
             var mover = hit.AddComponent<UIDragMove>();
             mover.Init(rt, _stage);

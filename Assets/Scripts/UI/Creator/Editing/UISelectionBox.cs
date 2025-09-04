@@ -54,6 +54,8 @@ namespace FantasyColony.UI.Creator.Editing
             _overlay.pivot = new Vector2(0, 1);
             _overlay.anchoredPosition = Vector2.zero;
             _overlay.sizeDelta = _target.rect.size;
+            var le = _overlay.gameObject.AddComponent<UnityEngine.UI.LayoutElement>(); le.ignoreLayout = true; // avoid VLG on panel root
+            _overlay.SetAsLastSibling();
 
             var border = _overlay.gameObject.AddComponent<UIFrame>();
             border.SetEdges(true, true, true, true);
