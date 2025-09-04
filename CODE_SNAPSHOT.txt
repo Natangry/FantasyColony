@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-04 06:02:56 UTC
+_Updated_: 2025-09-04 06:17:11 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -2629,6 +2629,76 @@ namespace FantasyColony.UI.Creator.Editing
 }
 
 
+// ===== FILE: Assets/Scripts/UI/Creator/Editing/UICreatorHotkeys.cs =====
+using System;
+using UnityEngine;
+
+namespace FantasyColony.UI.Creator.Editing
+{
+    /// <summary>
+    /// MonoBehaviour that captures keyboard shortcuts for the UI Creator.
+    /// Attach to the stage so Update() runs; delegates actions back to the screen.
+    /// </summary>
+    public sealed class UICreatorHotkeys : MonoBehaviour
+    {
+        private RectTransform _stage, _layerBG, _layerPanels, _layerControls;
+        private Action _onMenuRefresh;
+
+        public void Init(RectTransform stage, RectTransform layerBG, RectTransform layerPanels, RectTransform layerControls, Action onMenuRefresh)
+        {
+            _stage = stage; _layerBG = layerBG; _layerPanels = layerPanels; _layerControls = layerControls; _onMenuRefresh = onMenuRefresh;
+            Debug.Log("[UICreator] Hotkeys ready");
+        }
+
+        private void Update()
+        {
+            // Toggle grid (G) and cycle size (Ctrl+G)
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+                if (ctrl)
+                {
+                    GridPrefs.CycleCellSize();
+                }
+                else
+                {
+                    GridPrefs.GridVisible = !GridPrefs.GridVisible;
+                    Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}");
+                }
+                _onMenuRefresh?.Invoke();
+            }
+
+            // Snap toggle (F4)
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
+                Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
+            }
+
+            // Delete selected (Del/Backspace)
+            if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
+            {
+                var sel = UISelectionBox.CurrentTarget;
+                if (sel == null)
+                {
+                    Debug.Log("[UICreator] Delete: nothing selected");
+                    return;
+                }
+                if (sel == _stage || sel == _layerBG || sel == _layerPanels || sel == _layerControls)
+                {
+                    Debug.Log("[UICreator] Delete: refusing to delete stage/layer");
+                    return;
+                }
+                var name = sel.name;
+                Destroy(sel.gameObject);
+                Debug.Log($"[UICreator] Deleted: {name}");
+                _onMenuRefresh?.Invoke();
+            }
+        }
+    }
+}
+
+
 // ===== FILE: Assets/Scripts/UI/Creator/Editing/UIDragMove.cs =====
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -4294,6 +4364,11 @@ namespace FantasyColony.UI.Screens
               if (_grid == null) _grid = _stage.gameObject.AddComponent<UIStageGrid>();
               Debug.Log($"[UICreator] Grid:on size={GridPrefs.CellSize}");
               EnsureLayers();
+
+              // Attach hotkeys component so keyboard shortcuts work even if this Screen is not a MonoBehaviour
+              var hk = _stage.gameObject.GetComponent<UICreatorHotkeys>();
+              if (hk == null) hk = _stage.gameObject.AddComponent<UICreatorHotkeys>();
+              hk.Init(_stage, _layerBackground, _layerPanels, _layerControls, RebuildViewMenu);
 
             // --- Toolbar content: equal-width buttons across full width ---
             // Create equal-width buttons directly under the toolbar (no nested Row)
