@@ -228,7 +228,7 @@ namespace FantasyColony.UI.Widgets
                 }
             };
 
-        // Positioning & clamping happen AFTER content is created to get real size
+        // Build first, then measure, then attach-and-clamp using real size
         var anchorRT = anchor.GetComponent<RectTransform>();
         root.anchorMin = root.anchorMax = new Vector2(0f, 1f);
         root.pivot = new Vector2(0f, 1f);
@@ -251,50 +251,50 @@ namespace FantasyColony.UI.Widgets
         vlg.spacing = 2f;
         vlg.padding = new RectOffset(2, 2, 2, 2);
 
-        var prt = panel.GetComponent<RectTransform>();
-        float width = Mathf.Max(minWidth, matchAnchorWidth ? anchor.rect.width : minWidth);
-        prt.sizeDelta = new Vector2(width, 0f);
-
+        // Populate items now so layout has real height
         populateItems?.Invoke(contentRT);
 
-        // --- NOW MEASURE & POSITION ---
+        // --- MEASURE & POSITION ---
         Camera cam = null;
         var parentCanvas = overlay.GetComponentInParent<Canvas>();
         if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
             cam = parentCanvas.worldCamera != null ? parentCanvas.worldCamera : Camera.main;
 
-        LayoutRebuilder.ForceRebuildLayoutImmediate(root);
-        var size = root.rect.size;
+        // Rebuild to get real size
+        LayoutRebuilder.ForceRebuildLayoutImmediate(panel.GetComponent<RectTransform>());
+        var panelRt = panel.GetComponent<RectTransform>();
+        var size = panelRt.rect.size;
 
+        // Ensure root matches panel size so we clamp correctly
+        root.sizeDelta = size;
+
+        // Convert button bottom-left to overlay local (top-left space)
         Vector3[] corners = new Vector3[4];
         anchorRT.GetWorldCorners(corners);
-        var worldBL = corners[0];
-        var worldTL = corners[1];
-        Vector2 screenBL = RectTransformUtility.WorldToScreenPoint(cam, worldBL);
+        Vector2 screenBL = RectTransformUtility.WorldToScreenPoint(cam, corners[0]);
         Vector2 localBL;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenBL, cam, out localBL);
         Vector2 overlayTopLeft = new Vector2(-overlay.rect.width * overlay.pivot.x, overlay.rect.height * (1f - overlay.pivot.y));
-        Vector2 anchored = localBL - overlayTopLeft;
+        Vector2 anchored = localBL - overlayTopLeft; // attach top of dropdown to bottom of button
 
+        // Clamp X within overlay
         float maxX = overlay.rect.width - size.x;
-        if (anchored.x > maxX) { anchored.x = Mathf.Max(0f, maxX); Debug.Log("[UIFactory] Dropdown clamped (right)"); }
-        if (anchored.x < 0f)    { anchored.x = 0f; Debug.Log("[UIFactory] Dropdown clamped (left)"); }
+        anchored.x = Mathf.Clamp(anchored.x, 0f, maxX);
 
-        float minY = -overlay.rect.height + size.y;
-        float maxY = 0f;
-        float desiredBottom = anchored.y - size.y;
-        if (desiredBottom < minY)
+        // Clamp/flip Y in top-left space
+        float maxY = overlay.rect.height - size.y;
+        if (anchored.y + size.y > overlay.rect.height)
         {
-            Vector2 screenTL = RectTransformUtility.WorldToScreenPoint(cam, worldTL);
+            // place above using top-left corner of button
+            Vector2 screenTL = RectTransformUtility.WorldToScreenPoint(cam, corners[1]);
             Vector2 localTL;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(overlay, screenTL, cam, out localTL);
-            Vector2 anchoredAbove = localTL - overlayTopLeft;
-            anchored.y = Mathf.Clamp(anchoredAbove.y, minY + size.y, maxY);
+            anchored.y = Mathf.Clamp((localTL - overlayTopLeft).y - size.y, 0f, maxY);
             Debug.Log("[UIFactory] Dropdown flipped above (bottom clamp)");
         }
         else
         {
-            anchored.y = Mathf.Clamp(anchored.y, minY + size.y, maxY);
+            anchored.y = Mathf.Clamp(anchored.y, 0f, maxY);
         }
 
         root.anchoredPosition = anchored;
