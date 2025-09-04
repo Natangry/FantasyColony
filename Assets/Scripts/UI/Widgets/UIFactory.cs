@@ -220,10 +220,10 @@ namespace FantasyColony.UI.Widgets
 
         // Determine canvas camera (ScreenSpaceOverlay => null)
         Camera cam = null;
-        var canvas = overlay.GetComponentInParent<Canvas>();
-        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        var parentCanvas = overlay.GetComponentInParent<Canvas>();
+        if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
         {
-            cam = canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
+            cam = parentCanvas.worldCamera != null ? parentCanvas.worldCamera : Camera.main;
         }
 
         // Convert to overlay local space
