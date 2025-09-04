@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-04 02:38:41 UTC
+_Updated_: 2025-09-04 02:52:39 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -5187,7 +5187,7 @@ namespace FantasyColony.UI.Widgets
             // Ensure our default wood frame skin
             var frame = go.GetComponent<UIFrame>();
             if (frame == null) frame = go.AddComponent<UIFrame>();
-            frame.SetBorderEnabled(true, true, true, true);
+            frame.SetEdges(true, true, true, true);
 
             // Find/create caption label
             Text caption = go.GetComponentInChildren<Text>();
