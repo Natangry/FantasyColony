@@ -267,27 +267,28 @@ namespace FantasyColony.UI.Screens
         {
             if (background)
             {
-                var go = new GameObject("UI_BackgroundPanel", typeof(RectTransform), typeof(Image));
-                var rt = go.GetComponent<RectTransform>();
-                var img = go.GetComponent<Image>();
-                img.color = new Color(0f,0f,0f,0f);
-                img.raycastTarget = false;
-                rt.SetParent(_stage, false);
-                rt.anchorMin = new Vector2(0.1f, 0.1f);
-                rt.anchorMax = new Vector2(0.9f, 0.9f);
-                rt.offsetMin = rt.offsetMax = Vector2.zero;
-                NormalizePlaceable(rt);
-                AttachEditing(rt);
-                Debug.Log("[UICreator] Spawn UI_BackgroundPanel");
+                var panelGO = UIFactory.CreatePanelSurface(_stage, "UI_BackgroundPanel", sizing: PanelSizing.AutoBoth);
+                var rt = panelGO != null ? panelGO.GetComponent<RectTransform>() : null;
+                if (rt != null)
+                {
+                    UIFactory.EnsureRaycastTarget(rt);
+                    NormalizePlaceable(rt);
+                    AttachEditing(rt);
+                    Debug.Log("[UICreator] Spawn UI_BackgroundPanel");
+                }
                 return;
             }
 
-            var panel = UIFactory.CreatePanelSurface(_stage, "UI_Panel");
-            var prt = panel;
-            UIFactory.ApplyDefaultPanelSizing(prt);
-            NormalizePlaceable(prt);
-            AttachEditing(prt);
-            Debug.Log("[UICreator] Spawn UI_Panel");
+            var panelGO2 = UIFactory.CreatePanelSurface(_stage, "UI_Panel", sizing: PanelSizing.AutoBoth);
+            var prt = panelGO2 != null ? panelGO2.GetComponent<RectTransform>() : null;
+            if (prt != null)
+            {
+                UIFactory.ApplyDefaultPanelSizing(prt);
+                UIFactory.EnsureRaycastTarget(prt);
+                NormalizePlaceable(prt);
+                AttachEditing(prt);
+                Debug.Log("[UICreator] Spawn UI_Panel");
+            }
         }
 
         private void NormalizePlaceable(RectTransform t)
@@ -318,10 +319,12 @@ namespace FantasyColony.UI.Screens
             bool g = Keyboard.current != null && Keyboard.current.gKey.wasPressedThisFrame;
             bool ctrl = Keyboard.current != null && (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
             bool f4 = Keyboard.current != null && Keyboard.current.f4Key.wasPressedThisFrame;
+            bool iKey = Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
 #else
             bool g = Input.GetKeyDown(KeyCode.G);
             bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             bool f4 = Input.GetKeyDown(KeyCode.F4);
+            bool iKey = Input.GetKeyDown(KeyCode.I);
 #endif
             if (g)
             {
@@ -340,6 +343,19 @@ namespace FantasyColony.UI.Screens
             {
                 GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled;
                 Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}");
+            }
+
+            if (iKey)
+            {
+                var sel = UISelectionBox.CurrentTarget;
+                if (sel != null)
+                {
+                    InstructionDialog.Show(_stage, sel);
+                }
+                else
+                {
+                    Debug.Log("[UICreator] No selection for Instructions dialog");
+                }
             }
         }
     }

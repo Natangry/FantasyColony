@@ -13,6 +13,8 @@ namespace FantasyColony.UI.Creator.Editing
     {
         private static UISelectionBox _current;
 
+        public static RectTransform CurrentTarget => _current != null ? _current._target : null;
+
         [SerializeField] private RectTransform _target; // self by default
         [SerializeField] private RectTransform _stage;
         [SerializeField] private RectTransform _overlay; // visual box parent
