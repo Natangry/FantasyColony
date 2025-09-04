@@ -273,7 +273,8 @@ namespace FantasyColony.UI.Screens
             if (background)
             {
                 Debug.Log("[UICreator] Add Background Panel requested");
-                var panelGO = UIFactory.CreatePanelSurface(_stage, "UI_BackgroundPanel", sizing: PanelSizing.AutoBoth);
+                // Background placeable should also be manually resizable
+                var panelGO = UIFactory.CreatePanelSurface(_stage, "UI_BackgroundPanel", sizing: PanelSizing.Flexible);
                 var rt = panelGO != null ? panelGO.GetComponent<RectTransform>() : null;
                 if (rt != null)
                 {
@@ -287,7 +288,8 @@ namespace FantasyColony.UI.Screens
             }
 
             Debug.Log("[UICreator] Add Panel requested");
-            var panelGO2 = UIFactory.CreatePanelSurface(_stage, "UI_Panel", sizing: PanelSizing.AutoBoth);
+            // Placeables must be manually resizable -> use Flexible sizing (no ContentSizeFitter)
+            var panelGO2 = UIFactory.CreatePanelSurface(_stage, "UI_Panel", sizing: PanelSizing.Flexible);
             var prt = panelGO2 != null ? panelGO2.GetComponent<RectTransform>() : null;
             if (prt != null)
             {
@@ -299,20 +301,27 @@ namespace FantasyColony.UI.Screens
             }
         }
 
-        private void NormalizePlaceable(RectTransform t)
+        private void NormalizePlaceable(RectTransform rt)
         {
-            if (t == null) return;
-            var size = t.rect.size;
-            t.anchorMin = t.anchorMax = new Vector2(0, 1);
+            var t = rt;
+            t.anchorMin = new Vector2(0, 1);
+            t.anchorMax = new Vector2(0, 1);
             t.pivot = new Vector2(0, 1);
             if (t.parent != _stage) t.SetParent(_stage, false);
-            t.sizeDelta = size;
             if (t.sizeDelta == Vector2.zero) t.sizeDelta = new Vector2(400, 240);
             // Ensure a visible, non-overlapping default spawn position
             if (t.anchoredPosition == Vector2.zero) t.anchoredPosition = new Vector2(128, -128);
             t.anchoredPosition = new Vector2(
                 Mathf.Round(t.anchoredPosition.x / GridPrefs.CellSize) * GridPrefs.CellSize,
                 Mathf.Round(t.anchoredPosition.y / GridPrefs.CellSize) * GridPrefs.CellSize);
+
+            // If any ContentSizeFitter exists on the root, it will override manual resize => remove it
+            var csf = t.GetComponent<ContentSizeFitter>();
+            if (csf != null)
+            {
+                UnityObject.Destroy(csf);
+                Debug.Log("[UICreator] Removed ContentSizeFitter on placeable root");
+            }
         }
 
         private void AttachEditing(RectTransform rt)
