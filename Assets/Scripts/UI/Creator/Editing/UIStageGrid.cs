@@ -13,10 +13,12 @@ namespace FantasyColony.UI.Creator.Editing
         [SerializeField] private RectTransform _rt;
         private readonly List<Image> _lines = new List<Image>();
         private bool _dirty = true;
+        private RectTransform _layer; // dedicated child so grid always renders under content
 
         private void Awake()
         {
             if (_rt == null) _rt = GetComponent<RectTransform>();
+            EnsureLayer();
         }
 
         private void OnEnable()
@@ -34,7 +36,11 @@ namespace FantasyColony.UI.Creator.Editing
             if (_dirty) Rebuild();
             foreach (var img in _lines)
             {
-                if (img) img.enabled = GridPrefs.GridVisible;
+                if (img)
+                {
+                    img.enabled = GridPrefs.GridVisible;
+                    img.raycastTarget = false; // NEVER block input
+                }
             }
         }
 
@@ -43,6 +49,8 @@ namespace FantasyColony.UI.Creator.Editing
             _dirty = false;
             if (_rt.rect.width <= 0 || _rt.rect.height <= 0) return;
 
+            EnsureLayer();
+
             int cell = Mathf.Max(2, GridPrefs.CellSize);
             int cols = Mathf.CeilToInt(_rt.rect.width / cell) + 1;
             int rows = Mathf.CeilToInt(_rt.rect.height / cell) + 1;
@@ -50,9 +58,10 @@ namespace FantasyColony.UI.Creator.Editing
             while (_lines.Count < need)
             {
                 var go = new GameObject("grid-line", typeof(RectTransform), typeof(Image));
-                go.transform.SetParent(transform, false);
+                go.transform.SetParent(_layer, false);
                 var img = go.GetComponent<Image>();
                 var c = img.color; c.a = 0.08f; img.color = c; // subtle tint
+                img.raycastTarget = false; // click-through
                 _lines.Add(img);
             }
             for (int i = need; i < _lines.Count; i++)
@@ -66,6 +75,7 @@ namespace FantasyColony.UI.Creator.Editing
             {
                 var img = _lines[idx++];
                 var rt = img.rectTransform;
+                if (rt.parent != _layer) rt.SetParent(_layer, false);
                 rt.anchorMin = new Vector2(0, 1);
                 rt.anchorMax = new Vector2(0, 1);
                 rt.pivot = new Vector2(0.5f, 0.5f);
@@ -78,6 +88,7 @@ namespace FantasyColony.UI.Creator.Editing
             {
                 var img = _lines[idx++];
                 var rt = img.rectTransform;
+                if (rt.parent != _layer) rt.SetParent(_layer, false);
                 rt.anchorMin = new Vector2(0, 1);
                 rt.anchorMax = new Vector2(0, 1);
                 rt.pivot = new Vector2(0.5f, 0.5f);
@@ -85,6 +96,20 @@ namespace FantasyColony.UI.Creator.Editing
                 rt.anchoredPosition = new Vector2(_rt.rect.width * 0.5f, -y * cell);
                 img.enabled = GridPrefs.GridVisible;
             }
+
+            // Always draw grid under stage content
+            if (_layer != null) _layer.SetAsFirstSibling();
+        }
+
+        private void EnsureLayer()
+        {
+            if (_layer != null) return;
+            var go = GameObject.Find("__GridLayer") ?? new GameObject("__GridLayer", typeof(RectTransform));
+            _layer = go.GetComponent<RectTransform>();
+            _layer.SetParent(_rt, false);
+            _layer.anchorMin = Vector2.zero; _layer.anchorMax = Vector2.one; _layer.pivot = new Vector2(0.5f, 0.5f);
+            _layer.offsetMin = Vector2.zero; _layer.offsetMax = Vector2.zero;
+            _layer.SetAsFirstSibling();
         }
 
         public Vector2 Snap(Vector2 localTopLeft)
