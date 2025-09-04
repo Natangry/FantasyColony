@@ -21,6 +21,11 @@ namespace FantasyColony.UI.Creator.Editing
             if (_stage == null && _target != null) _stage = _target.parent as RectTransform;
         }
 
+        public void Init(RectTransform target, RectTransform stage)
+        {
+            _target = target; _stage = stage;
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (_target == null || _stage == null) return;
