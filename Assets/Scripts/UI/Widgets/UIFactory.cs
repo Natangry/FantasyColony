@@ -1040,9 +1040,10 @@ namespace FantasyColony.UI.Widgets
             var templateGO = new GameObject("Template", typeof(RectTransform), typeof(Image), typeof(ScrollRect));
             templateGO.transform.SetParent(go.transform, false);
             var templateRT = templateGO.GetComponent<RectTransform>();
-            templateRT.anchorMin = new Vector2(0, 1);
-            templateRT.anchorMax = new Vector2(1, 1);
-            templateRT.pivot = new Vector2(0, 1);
+            // Anchor the template to the BOTTOM of the button so its TOP attaches to the button's bottom
+            templateRT.anchorMin = new Vector2(0, 0);
+            templateRT.anchorMax = new Vector2(1, 0);
+            templateRT.pivot = new Vector2(0.5f, 1f);
             templateRT.sizeDelta = new Vector2(0, Mathf.Min(240f, maxHeight));
             templateGO.SetActive(false);
 
