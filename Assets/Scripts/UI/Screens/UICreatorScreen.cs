@@ -134,11 +134,11 @@ namespace FantasyColony.UI.Screens
                   // F11
                   () => ToggleStageFullscreen(),
                   // G
-                  () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? \"on\" : \"off\")}"); },
+                  () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}"); },
                   // Ctrl+G
                   () => { GridPrefs.CycleCellSize(); },
                   // F4
-                  () => { GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled; Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? \"on\" : \"off\")}"); },
+                  () => { GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled; Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}"); },
                   // canDelete
                   () => { var sel = UISelectionBox.CurrentTarget; return sel != null && sel != _stage && sel != _layerBackground && sel != _layerPanels && sel != _layerControls; },
                   // deleteSelected
