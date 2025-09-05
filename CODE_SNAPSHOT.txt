@@ -1,5 +1,5 @@
 # Auto-generated code snapshot
-_Updated_: 2025-09-04 06:46:58 UTC
+_Updated_: 2025-09-05 04:39:54 UTC
 
 // ===== FILE: Assets/Editor/SpriteImportDefaults.cs =====
 // Editor-only: ensures sprites import with our project defaults (hi-res, crisp pixels).
@@ -4406,11 +4406,11 @@ namespace FantasyColony.UI.Screens
                   // F11
                   () => ToggleStageFullscreen(),
                   // G
-                  () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? \"on\" : \"off\")}"); },
+                  () => { GridPrefs.GridVisible = !GridPrefs.GridVisible; Debug.Log($"[UICreator] Grid {(GridPrefs.GridVisible ? "on" : "off")}"); },
                   // Ctrl+G
                   () => { GridPrefs.CycleCellSize(); },
                   // F4
-                  () => { GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled; Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? \"on\" : \"off\")}"); },
+                  () => { GridPrefs.SnapEnabled = !GridPrefs.SnapEnabled; Debug.Log($"[UICreator] Snap {(GridPrefs.SnapEnabled ? "on" : "off")}"); },
                   // canDelete
                   () => { var sel = UISelectionBox.CurrentTarget; return sel != null && sel != _stage && sel != _layerBackground && sel != _layerPanels && sel != _layerControls; },
                   // deleteSelected
